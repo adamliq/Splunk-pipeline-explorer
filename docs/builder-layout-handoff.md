@@ -112,11 +112,11 @@ v113 met most of issue 7, but the canvas top was at y=528, and it introduced the
 
 ---
 
-## 8. Next task: builder toolbar declutter (v115)
+## 8. Next task: builder toolbar declutter (v116)
 
 **Goal:** move canvas-level controls onto the canvas, and shrink the two rows above it (the toolbar and the relationship-plane bar) to one. At 1440×900 the canvas top is currently at y=423; the target is about 360.
 
-Put all changes in `<style id="builder-toolbar-declutter-v115-styles">` and `<script id="builder-toolbar-declutter-v115">`. **Move existing elements; don't recreate them.** Their click handlers are bound to these elements by id, and other scripts query them. Desktop only (`min-width:1121px`, matching v113); leave the mobile layout alone.
+Put all changes in `<style id="builder-toolbar-declutter-v116-styles">` and `<script id="builder-toolbar-declutter-v116">`. **Move existing elements; don't recreate them.** Their click handlers are bound to these elements by id, and other scripts query them. Desktop only (`min-width:1121px`, matching v113); leave the mobile layout alone.
 
 ### Current state (the desktop toolbar, `.builderToolbar`)
 `#builderCanvasTitle` ("Unified topology · N components · N relationships") · drag hint · `#builderZoomOut` `#builderZoomReadout` `#builderZoomIn` · `#builderAddToggle` · `#builderInspectorToggle` · `#builderFocusToggle` · `#builderMinimapToggle` · `#builderPresentationToggle` · `#builderFullscreenToggle` · menus **Navigate** (contains `#builderFitView`, `#builderAutoLayout`), **Build**, **Validate**, **Export** (contains `#builderPrintPresent`).
@@ -142,4 +142,22 @@ Below it, the `.builderPlaneBar.unifiedPlaneBar` holds the plane checkboxes, the
 - No `pageerror` at 1280, 1440, 1920 or 390, or across a 1440→1000→1440 resize. The layout code must be idempotent (see v114, item 1).
 - Mobile (≤760px or touch) is unchanged.
 - No horizontal page scroll.
-- Add a `changeRegister` entry the way v112–v114 do.
+- Add a `changeRegister` entry the way v112–v115 do.
+
+---
+
+## Update: full button sweep and v115 fixes
+
+**Upload `1e42009` is identical to `57de59d` (v113), so it does not contain v114.** Build from this branch's `index.html`, which contains v112, v113, v114 and v115.
+
+All 163 buttons in `#topologyBuilder` were tested. Each ran on a fresh page, with its menu, disclosure or drawer opened the way a user would open it. There were no JS errors. Undo, Redo and Ctrl+Z, the Focus-mode bar, the inspection drawer, the mobile zoom controls, the dock toggles, the `/` shortcut and the export and print actions all work. The 14 disabled buttons are disabled only where nothing is selected or nothing is saved, as expected.
+
+Bugs found, all fixed in `<style id="builder-button-fixes-v115-styles">` and `<script id="builder-button-fixes-v115">`:
+
+1. **Most palette items did nothing from the default state.** Canvas-palette items attach to the selected component (Universal Forwarder 1 by default). The capability wrapper refused invalid handoffs, such as UF → Windows Event Log or UF → Search Head, with only a status message; the palette closed and no node appeared. **Fix:** for palette clicks only (a capture-phase flag), try the normal add. If it added nothing, add the component unconnected and show "Added X unconnected · <reason> Drag it onto a compatible component to connect." Drag-and-drop onto a specific node still refuses, because the user chose that target. Special types (User, identity providers, DS, Stream, SOAR) keep their own messages, because the fallback only runs after a refusal.
+2. **Relationship Review markers (the orange "2" on edges) could never be clicked.** `.unifiedConnectorLayer` has `pointer-events:none`; route labels opt back in, but `.builderEdgeIssueMarker` didn't. **Fix:** `pointer-events:all` on the markers. Clicking one now opens `#builderIssuePopover`.
+3. **The selected node's Review badge was hidden and unclickable.** The multi-select ✓ (`.unifiedNodeWrap.multiSelected:before`, z-index 9) sits in the same top-right corner as `.builderNodeIssueMarker` (z-index 5). **Fix:** move the ✓ to the top-left corner.
+
+Minor, not changed:
+- Clicking the palette group that is already open doesn't collapse it; the single-open accordion always keeps one group open.
+- The `+ Add` suggestions only list components compatible with the selected node. The full list below them doesn't mark incompatible items. Now that incompatible items are added unconnected rather than refused, this is lower priority, but a muted "adds unconnected" hint on them would help.

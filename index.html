@@ -3755,5 +3755,24 @@ changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['C
 if(state.view==='changes')renderChanges();
 </script>
 
+<style id="builder-button-fixes-v115-styles">
+/* The connector layer ignores pointer events; route labels opt back in, issue markers never did. */
+.unifiedConnectorLayer .builderEdgeIssueMarker{pointer-events:all}
+/* The multi-select tick sat on top of the node's Review badge (same corner, higher z-index). */
+.unifiedNodeWrap.multiSelected:before{right:auto;left:-7px}
+</style>
+<script id="builder-button-fixes-v115">
+/* Palette items attach to the selected component. When that handoff is invalid the add was
+   refused with only a screen-reader status, so most palette items did nothing from the default
+   selection. For palette clicks, add the component unconnected instead and say so. Drops onto a
+   specific component still refuse, because the user chose that target. */
+let builderPaletteClickAdd=false;
+document.addEventListener('click',event=>{if(event.target.closest?.('#builderCanvasPalette [data-builder-add]')){builderPaletteClickAdd=true;setTimeout(()=>{builderPaletteClickAdd=false})}},true);
+const addBuilderNodeBeforePaletteFallback=addBuilderNode;
+addBuilderNode=function(type,parent=null){const before=state.builderNodes.length,result=addBuilderNodeBeforePaletteFallback(type,parent);if(!builderPaletteClickAdd||parent===null||state.builderNodes.length!==before)return result;const source=state.builderNodes.find(n=>n.id===parent),check=source?dataCapability(source,{id:-1,type}):null,added=addBuilderNodeBeforePaletteFallback(type,null);if(state.builderNodes.length>before)builderStatus(`Added ${builderComponents[type]?.name||type} unconnected · ${check?.reason||'It cannot follow the selected component.'} Drag it onto a compatible component to connect.`);return added};
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Builder button fixes','Add palette components unconnected when the selected component cannot accept them, make relationship Review markers clickable and keep node Review badges visible when selected.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
 </body>
 </html>
