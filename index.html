@@ -3884,5 +3884,157 @@ changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['B
 if(state.view==='changes')renderChanges();
 </script>
 
+<style id="builder-add-return-v117-styles">
+@media (min-width:1121px) and (pointer:fine){
+  .builderPlaneBar .builderCanvasQuickActions #builderAddToggle{display:flex!important;align-items:center;min-height:32px;border-color:#6bcfae;border-radius:99px;background:#174537;color:#e1ffeb;white-space:nowrap}
+  .builderPlaneBar .builderCanvasQuickActions #builderAddToggle:focus-visible{outline:2px solid #a6f2ce;outline-offset:2px}
+  .topologyBuilder.presentationView .builderPlaneBar .builderCanvasQuickActions{display:none!important}
+}
+</style>
+<script id="builder-add-return-v117">
+/* Keep the original Add control beside Inspector in the visible combined toolbar.
+   The v116 attachment runs after every plane-bar rebuild, so return it each time. */
+const builderToolbarAttachBeforeAddReturn=builderToolbarAttach;
+builderToolbarAttach=function(...args){const result=builderToolbarAttachBeforeAddReturn(...args);if(builderToolbarMedia.matches){const add=$('#builderAddToggle'),actions=$('.builderCanvasQuickActions');if(add&&actions&&add.parentElement!==actions)actions.prepend(add)}return result};
+builderToolbarAttach();
+$('#topologyBuilder').dataset.buildNumber='117';
+const builderV117Stamp=$('.builderBuildStamp');
+if(builderV117Stamp){builderV117Stamp.setAttribute('aria-label','Build 117, dated 28 September 2026');builderV117Stamp.querySelector('b').textContent='Build 117'}
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Visible Add control','Keep the original Add button beside Inspector in the desktop relationship toolbar, including after canvas rerenders.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
+<style id="builder-bottom-controls-v118-styles">
+@media (min-width:1121px) and (pointer:fine){
+  .builderCanvas .builderBottomControls{position:absolute;left:10px;right:10px;bottom:10px;z-index:45;display:flex;align-items:center;gap:5px;min-height:38px;padding:5px 7px;border:1px solid #35566a;border-radius:10px;background:rgba(6,18,29,.95);box-shadow:0 8px 24px #0008;backdrop-filter:blur(8px)}
+  .builderCanvas .builderBottomControls>.builderNavBtn{flex:0 0 auto;min-height:32px;white-space:nowrap;font-size:.66rem}
+  .builderCanvas .builderBottomControls #builderAddToggle{display:flex!important;align-items:center;border-color:#6bcfae;border-radius:99px;background:#174537;color:#e1ffeb}
+  .builderCanvas .builderBottomControls #builderFullscreenToggle{position:static;z-index:auto;display:flex;width:auto;height:32px;padding:0 9px;font-size:.66rem}
+  .builderCanvas .builderBottomControls #builderMinimapToggle{display:flex!important}
+  .builderCanvas .builderBottomControls #builderInspectorToggle[aria-pressed="true"],.builderCanvas .builderBottomControls #builderFocusToggle[aria-pressed="true"]{border-color:#83d8dd;background:#174452;color:#e8fafb}
+  .builderCanvas .builderBottomControls .builderMobileZoomControls{position:static;left:auto;right:auto;top:auto;bottom:auto;display:flex;flex:0 0 auto;margin-left:auto;box-shadow:none;padding:2px}
+  .builderCanvas .builderNavigationHint{bottom:67px}
+  .builderCanvas .builderMinimap{bottom:65px}
+  .builderCanvas #builderMinimapCorner{display:none}
+  .topologyBuilder.minimapHidden .builderCanvas .builderMobileZoomControls{bottom:auto}
+  .topologyBuilder.minimapHidden .builderCanvas #builderMapChip{display:none}
+  .topologyBuilder.presentationView .builderBottomControls #builderAddToggle,.topologyBuilder.presentationView .builderBottomControls #builderInspectorToggle{display:none!important}
+  .builderCanvas .builderBottomControls button:focus-visible,.builderCanvas .builderBottomControls [role="button"]:focus-visible{outline:2px solid #a6f2ce;outline-offset:2px}
+}
+</style>
+<script id="builder-bottom-controls-v118">
+/* Keep one instance of each existing control and return desktop-only moves on resize. */
+const builderBottomBar=document.createElement('div');builderBottomBar.className='builderBottomControls';builderBottomBar.setAttribute('role','toolbar');builderBottomBar.setAttribute('aria-label','Canvas controls');
+const builderBottomMarkers=new Map();
+function builderBottomMove(node){if(!node)return;if(!builderBottomMarkers.has(node)){const marker=document.createComment('Canvas control original position');node.before(marker);builderBottomMarkers.set(node,marker)}builderBottomBar.appendChild(node)}
+function builderBottomAttach(){
+  if(!builderToolbarMedia.matches)return;
+  if(!builderBottomBar.isConnected)builderCanvas.appendChild(builderBottomBar);
+  for(const id of ['builderAddToggle','builderInspectorToggle','builderFocusToggle','builderMinimapToggle','builderPresentationToggle','builderFullscreenToggle']){
+    const node=$('#'+id);if(['builderInspectorToggle','builderFocusToggle','builderMinimapToggle'].includes(id))builderBottomMove(node);else if(node&&node.parentElement!==builderBottomBar)builderBottomBar.appendChild(node);
+  }
+  builderBottomMove($('.builderMobileZoomControls'));
+  builderBottomBar.querySelector('#builderFullscreenToggle')?.setAttribute('aria-label',document.fullscreenElement===$('#topologyBuilder')?'Exit full screen':'Full screen');
+}
+const builderToolbarAttachBeforeBottom=builderToolbarAttach;
+builderToolbarAttach=function(...args){const result=builderToolbarAttachBeforeBottom(...args);builderBottomAttach();return result};
+const builderToolbarIconBeforeBottom=builderToolbarIcon;
+builderToolbarIcon=function(...args){builderToolbarIconBeforeBottom(...args);if(!builderToolbarMedia.matches)return;const button=$('#builderFullscreenToggle'),active=document.fullscreenElement===$('#topologyBuilder');if(button){button.textContent=active?'⤡ Exit full screen':'⤢ Full screen';button.setAttribute('aria-label',active?'Exit full screen':'Full screen')}};
+builderToolbarMedia.addEventListener('change',()=>{if(builderToolbarMedia.matches){builderBottomAttach();builderToolbarIcon()}else{for(const [node,marker] of builderBottomMarkers)marker.replaceWith(node);builderBottomMarkers.clear();builderBottomBar.remove()}});
+/* Fit inside the space above the control bar and the raised minimap. */
+const fitBuilderViewBeforeBottom=fitBuilderView;
+fitBuilderView=function(announce=false){if(!builderToolbarMedia.matches)return fitBuilderViewBeforeBottom(announce);const canvas=$('.builderCanvas');if(!canvas?.clientWidth||!canvas?.clientHeight)return fitBuilderViewBeforeBottom(announce);const bounds=builderVisibleFitBounds();if(!bounds)return fitBuilderViewBeforeBottom(announce);const left=45,top=58,right=172,bottom=$('#topologyBuilder').classList.contains('minimapHidden')?72:185,width=Math.max(1,bounds.right-bounds.left),height=Math.max(1,bounds.bottom-bounds.top),roomWidth=Math.max(1,canvas.clientWidth-left-right),roomHeight=Math.max(1,canvas.clientHeight-top-bottom),zoom=clampBuilderZoom(Math.min(roomWidth/width,roomHeight/height,1.15));state.builderViewport.zoom=zoom;state.builderViewport.x=left+(roomWidth-width*zoom)/2-bounds.left*zoom;state.builderViewport.y=top+(roomHeight-height*zoom)/2-bounds.top*zoom;state.builderViewport.initialized=true;applyBuilderViewport();if(announce)builderStatus('Fit to view')};
+builderToolbarAttach();builderToolbarIcon();
+$('#topologyBuilder').dataset.buildNumber='118';
+const builderV118Stamp=$('.builderBuildStamp');
+if(builderV118Stamp){builderV118Stamp.setAttribute('aria-label','Build 118, dated 28 September 2026');builderV118Stamp.querySelector('b').textContent='Build 118'}
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Bottom canvas control bar','Place Add, Inspector, Focus canvas, minimap, Presentation and Full screen beside zoom and Fit at the bottom of the desktop canvas.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
+<style id="builder-add-palette-v117-styles">
+.builderPalette .builderPaletteItem{align-items:flex-start;min-width:0}
+.builderPalette .builderPaletteCopy{display:flex;flex:1;min-width:0;flex-direction:column;gap:2px}
+.builderPalette .builderPaletteName{white-space:normal;line-height:1.2}
+.builderPalette .builderPaletteSubtitle{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#8299aa;font-size:.58rem;line-height:1.25}
+.builderPalette .builderUnconnectedTag{display:block;margin-top:2px;color:#e6bc81;font-size:.56rem}
+.builderPalette .builderUnconnectedTag[hidden]{display:none!important}
+.builderPalette .builderPaletteSearch{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 8px;align-items:center}
+.builderPalette .builderPaletteSearch label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.builderPalette .builderPaletteSearch #builderPaletteCount{margin:0;white-space:nowrap;color:#849bab;font-size:.58rem}
+.builderPalette .builderPaletteSearch input{min-width:0}
+.builderPalette .builderPaletteDragHint{grid-column:1/-1;margin:0;color:#8ba2b2;font-size:.57rem}
+.builderPaletteTarget{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin:0 0 7px;color:#a9c0cc;font-size:.62rem}
+.builderPaletteTarget strong{color:#e0f0f5}
+.builderPaletteTarget button,.builderPaletteRecent button{border:1px solid #3b6171;border-radius:6px;padding:3px 6px;background:#102936;color:#d1e9ee;cursor:pointer;font-size:.59rem}
+.builderPaletteTarget label{display:flex;align-items:center;gap:4px;margin-left:auto;white-space:nowrap}
+.builderPaletteRecent{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin:0 0 9px;color:#8fa8b7;font-size:.59rem}
+.builderPaletteRecent[hidden]{display:none}
+@media (min-width:1121px) and (pointer:fine){
+  .topologyBuilder.canvasFirst.canvasPanelPaletteOpen .builderPalette{box-sizing:border-box;position:fixed;bottom:auto!important;max-width:300px;overflow-y:auto;overscroll-behavior:contain}
+}
+</style>
+<script id="builder-add-palette-v117">
+/* Order the actual group and item elements so their listeners and saved type keys survive. */
+const builderPaletteGroupOrder=['Sources','Collection','Processing','Destinations','Access & management','Deployment configuration','Indexer clustering','Search head clustering','S3 federated search','Splunk Stream','Splunk SOAR'];
+function builderPaletteGroupPriority(group){const name=group.querySelector('.builderPaletteToggle>span')?.textContent?.trim()||'';const index=builderPaletteGroupOrder.findIndex(item=>name.startsWith(item));return index<0?builderPaletteGroupOrder.length:index}
+const builderPaletteBaseGroups=[...accordionGroups].sort((a,b)=>builderPaletteGroupPriority(a)-builderPaletteGroupPriority(b));
+for(const group of builderPaletteBaseGroups)accordionPalette.appendChild(group);
+accordionGroups.splice(0,accordionGroups.length,...builderPaletteBaseGroups);
+accordionActive=builderPaletteBaseGroups[0]||null;
+const builderPaletteBaseItems=new Map(builderPaletteBaseGroups.map(group=>[group,[...group.querySelectorAll('.builderPaletteItems>[data-builder-add]')]]));
+const builderPaletteButtons=[...accordionPalette.querySelectorAll('.builderPaletteItems>[data-builder-add]')];
+const builderPaletteOriginalIndex=new Map(builderPaletteButtons.map((button,index)=>[button,index]));
+for(const button of builderPaletteButtons){
+  const type=button.dataset.builderAdd,raw=[...button.childNodes].filter(node=>node.nodeType===Node.TEXT_NODE).map(node=>node.textContent).join(' ').trim();
+  for(const node of [...button.childNodes])if(node.nodeType===Node.TEXT_NODE)node.remove();
+  const name=type==='authProviderCloud'?'Identity provider · Cloud':type==='authProviderOnPrem'?'Identity provider · On-prem':raw;
+  const title=button.title||'',description=(title||builderComponents[type]?.type||'').split(/ · |\./)[0].trim();
+  button.dataset.paletteName=name;button.dataset.paletteDescription=description;button.dataset.paletteOriginalTitle=title||description;button.title=title||description;
+  const copy=document.createElement('span');copy.className='builderPaletteCopy';
+  const label=document.createElement('span');label.className='builderPaletteName';label.textContent=name;copy.appendChild(label);
+  if(description){const subtitle=document.createElement('span');subtitle.className='builderPaletteSubtitle';subtitle.textContent=description;copy.appendChild(subtitle)}
+  const tag=document.createElement('span');tag.className='builderUnconnectedTag';tag.textContent='adds unconnected';tag.hidden=true;copy.appendChild(tag);button.appendChild(copy);
+}
+const builderPaletteTarget=document.createElement('div');builderPaletteTarget.className='builderPaletteTarget';builderPaletteTarget.innerHTML='<span id="builderPaletteTargetText"></span><button type="button" id="builderPaletteChangeTarget">Change</button><label><input type="checkbox" id="builderPaletteNewUnconnected"> New unconnected</label>';
+const builderPaletteRecent=document.createElement('div');builderPaletteRecent.className='builderPaletteRecent';builderPaletteRecent.hidden=true;
+const builderPaletteDragHint=document.createElement('p');builderPaletteDragHint.className='builderPaletteDragHint';builderPaletteDragHint.textContent='Click to add · or drag onto the canvas or onto a component';
+$('.builderPaletteSearch').appendChild(builderPaletteDragHint);
+$('#builderSuggestions').before(builderPaletteTarget,builderPaletteRecent);
+const builderPaletteRecentKey='splunkPipelineExplorer.builderPaletteRecent.v1';let builderPaletteRecentTypes=[],builderPaletteRecentAvailable=true;
+try{const stored=JSON.parse(localStorage.getItem(builderPaletteRecentKey)||'[]');if(Array.isArray(stored))builderPaletteRecentTypes=stored.filter(type=>builderPaletteButtons.some(button=>button.dataset.builderAdd===type)).slice(0,5)}catch{builderPaletteRecentAvailable=false}
+function renderBuilderPaletteRecent(){builderPaletteRecent.hidden=!builderPaletteRecentAvailable||!builderPaletteRecentTypes.length;if(builderPaletteRecent.hidden)return;builderPaletteRecent.replaceChildren();const heading=document.createElement('span');heading.textContent='Recent';builderPaletteRecent.appendChild(heading);for(const type of builderPaletteRecentTypes){const item=builderPaletteButtons.find(button=>button.dataset.builderAdd===type),chip=document.createElement('button');chip.type='button';chip.textContent=item?.dataset.paletteName||type;chip.onclick=()=>item?.click();builderPaletteRecent.appendChild(chip)}}
+const addBuilderNodeBeforePaletteRecent=addBuilderNode;
+addBuilderNode=function(type,parent=null){const before=state.builderNodes.length,result=addBuilderNodeBeforePaletteRecent(type,parent);if(state.builderNodes.length>before&&builderPaletteRecentAvailable){builderPaletteRecentTypes=[type,...builderPaletteRecentTypes.filter(item=>item!==type)].slice(0,5);try{localStorage.setItem(builderPaletteRecentKey,JSON.stringify(builderPaletteRecentTypes))}catch{builderPaletteRecentAvailable=false}renderBuilderPaletteRecent()}return result};
+const builderPaletteIndependentTypes=new Set(['authUser','authProviderCloud','authProviderOnPrem','ds','licenseManager','monitoringConsole','serverClass','deploymentApp','indexerCluster','indexerClusterManager','shcCluster','shcMember','shcDeployer','s3FederatedConnection','s3DataCatalog','cloudSearchTier','streamServer','streamDefinition','soarCloud','soarOnPrem','soarPlaybook']);
+function builderPaletteRank(button,query){const name=button.dataset.paletteName.toLowerCase(),type=button.dataset.builderAdd.toLowerCase(),meta=builderComponents[button.dataset.builderAdd],named=(meta?.name||'').toLowerCase(),secondary=`${button.dataset.paletteDescription} ${(meta?.stages||[]).join(' ')} ${meta?.type||''}`.toLowerCase();let total=0;for(const term of query.split(/\s+/).filter(Boolean)){let rank=Infinity;if([name,type,named].some(value=>value===term))rank=0;else if([name,type,named].some(value=>value.startsWith(term)))rank=1;else if(name.split(/[^a-z0-9]+/).some(word=>word.startsWith(term)))rank=2;else if(secondary.split(/[^a-z0-9]+/).some(word=>word.startsWith(term)))rank=3;if(!Number.isFinite(rank))return Infinity;total+=rank}return total}
+function syncBuilderPaletteTarget(){const node=state.builderNodes.find(item=>item.id===state.builderSelected),text=$('#builderPaletteTargetText');text.textContent=node?`Adding after: ${componentInstanceLabel(node)}`:'Adding as a new unconnected component';$('#builderPaletteChangeTarget').hidden=!node;for(const button of builderPaletteButtons){const type=button.dataset.builderAdd,tag=button.querySelector('.builderUnconnectedTag'),independent=builderPaletteIndependentTypes.has(type),check=node&&!independent?dataCapability(node,{id:-1,type}):null;tag.hidden=!node||independent||check.valid;button.title=tag.hidden?button.dataset.paletteOriginalTitle:[button.dataset.paletteOriginalTitle,`Adds unconnected: ${check.reason}`].filter(Boolean).join(' · ')}if($('#builderPaletteNewUnconnected').checked)$('#builderSuggestions').hidden=true}
+let builderPaletteWasSearching=false,builderPaletteOrderedMatches=[];
+const syncPaletteAccordionBeforeRanked=syncPaletteAccordion;
+syncPaletteAccordion=function(){if(!paletteText&&!builderPaletteWasSearching&&accordionActive===undefined)accordionActive=builderPaletteBaseGroups[0];for(const group of accordionGroups){const body=group.querySelector('.builderPaletteItems'),toggle=group.querySelector('.builderPaletteToggle'),count=[...body.querySelectorAll('[data-builder-add]')].filter(button=>!button.hidden).length,open=!group.hidden&&(paletteText?count>0:group===accordionActive);body.hidden=!open;toggle.setAttribute('aria-expanded',String(open));toggle.querySelector('.builderPaletteGroupCount').textContent=String(count)}};
+for(const group of builderPaletteBaseGroups)group.querySelector('.builderPaletteToggle').onclick=()=>{if(paletteText)return;accordionActive=accordionActive===group?null:group;syncPaletteAccordion()};
+const renderPaletteSearchBeforeRanked=renderPaletteSearch;
+renderPaletteSearch=function(){renderPaletteSearchBeforeRanked();const query=paletteText.trim(),ranked=new Map();for(const button of builderPaletteButtons){const rank=query?builderPaletteRank(button,query):0;button.hidden=!Number.isFinite(rank);ranked.set(button,rank)}const searching=!!query;if(builderPaletteWasSearching&&!searching)accordionActive=builderPaletteBaseGroups[0];builderPaletteWasSearching=searching;for(const group of builderPaletteBaseGroups){const body=group.querySelector('.builderPaletteItems'),items=builderPaletteBaseItems.get(group),sorted=[...items].sort((a,b)=>ranked.get(a)-ranked.get(b)||builderPaletteOriginalIndex.get(a)-builderPaletteOriginalIndex.get(b));for(const item of sorted)body.appendChild(item);group.hidden=items.every(item=>item.hidden)}const groups=searching?[...builderPaletteBaseGroups].sort((a,b)=>Math.min(...builderPaletteBaseItems.get(a).map(item=>ranked.get(item)))-Math.min(...builderPaletteBaseItems.get(b).map(item=>ranked.get(item)))||builderPaletteGroupPriority(a)-builderPaletteGroupPriority(b)):builderPaletteBaseGroups;for(const group of groups)accordionPalette.appendChild(group);accordionGroups.splice(0,accordionGroups.length,...groups);syncPaletteAccordion();builderPaletteOrderedMatches=groups.flatMap(group=>[...group.querySelectorAll('.builderPaletteItems>[data-builder-add]')].filter(button=>!button.hidden));$('#builderPaletteEmpty').hidden=builderPaletteOrderedMatches.length>0;$('#builderPaletteCount').textContent=query?`${builderPaletteOrderedMatches.length} matches`:`${builderPaletteButtons.length} components`;if(query)$('#builderSuggestions').hidden=true;syncBuilderPaletteTarget()};
+let builderPaletteChangePending=false;
+$('#builderPaletteChangeTarget').onclick=()=>{builderPaletteChangePending=true;canvasPanelState.palette=false;syncCanvasPanels();$('.builderCanvas')?.focus()};
+$('.builderCanvas').addEventListener('click',event=>{if(!builderPaletteChangePending||!event.target.closest?.('.builderNode'))return;builderPaletteChangePending=false;setTimeout(()=>openBuilderCanvasPalette(),0)},true);
+$('#builderPaletteNewUnconnected').onchange=()=>renderPaletteSearch();
+accordionPalette.addEventListener('click',event=>{const button=event.target.closest?.('.builderPaletteItems>[data-builder-add]');if(!button||!$('#builderPaletteNewUnconnected').checked)return;event.preventDefault();event.stopImmediatePropagation();addBuilderNode(button.dataset.builderAdd,null);setTimeout(()=>{canvasPanelState.palette=false;syncCanvasPanels()},0)},true);
+accordionPalette.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();builderPaletteChangePending=false;canvasPanelState.palette=false;syncCanvasPanels();$('#builderAddToggle')?.focus();return}if(['ArrowDown','ArrowUp'].includes(event.key)){const list=builderPaletteOrderedMatches.filter(button=>!button.closest('.builderPaletteItems')?.hidden),index=list.indexOf(document.activeElement);if(!list.length)return;event.preventDefault();list[event.key==='ArrowDown'?(index+1)%list.length:(index<0?list.length-1:(index-1+list.length)%list.length)].focus();return}if(event.key==='Enter'&&event.target===paletteQuery){event.preventDefault();builderPaletteOrderedMatches[0]?.click()}});
+document.addEventListener('keydown',event=>{if(state.view!=='builder'||event.key.toLowerCase()!=='a'||event.ctrlKey||event.altKey||event.metaKey||event.target!==$('.builderCanvas'))return;event.preventDefault();event.stopImmediatePropagation();openBuilderCanvasPalette()},true);
+const builderPaletteAnchorMedia=window.matchMedia('(min-width:1121px) and (pointer:fine)');
+function positionBuilderPalette(){const panel=$('#builderCanvasPalette'),canvas=$('.builderCanvas');if(!panel||!canvas)return;if(!builderPaletteAnchorMedia.matches){for(const property of ['top','left','height','width','bottom','visibility'])panel.style.removeProperty(property);return}if(!canvasPanelState.palette)return;const rect=canvas.getBoundingClientRect(),top=Math.max(8,rect.top),bottom=Math.min(innerHeight-8,rect.bottom);panel.style.visibility=bottom<=top?'hidden':'';panel.style.top=`${top}px`;panel.style.left=`${Math.max(8,rect.left+5)}px`;panel.style.height=`${Math.max(1,bottom-top)}px`;panel.style.width=`${Math.min(300,rect.width-10)}px`;panel.style.bottom='auto'}
+window.addEventListener('scroll',positionBuilderPalette,{passive:true});window.addEventListener('resize',positionBuilderPalette);builderPaletteAnchorMedia.addEventListener('change',positionBuilderPalette);
+const fitBuilderViewBeforePalette=fitBuilderView;
+fitBuilderView=function(announce=false){if(!builderPaletteAnchorMedia.matches||!canvasPanelState.palette)return fitBuilderViewBeforePalette(announce);const canvas=$('.builderCanvas');if(!canvas?.clientWidth||!canvas?.clientHeight)return fitBuilderViewBeforePalette(announce);const bounds=builderVisibleFitBounds();if(!bounds)return fitBuilderViewBeforePalette(announce);const left=335,top=58,right=172,bottom=$('#topologyBuilder').classList.contains('minimapHidden')?72:185,width=Math.max(1,bounds.right-bounds.left),height=Math.max(1,bounds.bottom-bounds.top),roomWidth=Math.max(1,canvas.clientWidth-left-right),roomHeight=Math.max(1,canvas.clientHeight-top-bottom),zoom=clampBuilderZoom(Math.min(roomWidth/width,roomHeight/height,1.15));state.builderViewport.zoom=zoom;state.builderViewport.x=left+(roomWidth-width*zoom)/2-bounds.left*zoom;state.builderViewport.y=top+(roomHeight-height*zoom)/2-bounds.top*zoom;state.builderViewport.initialized=true;applyBuilderViewport();if(announce)builderStatus('Fit to view')};
+const openBuilderCanvasPaletteBeforeRanked=openBuilderCanvasPalette;
+openBuilderCanvasPalette=function(...args){const result=openBuilderCanvasPaletteBeforeRanked(...args);renderPaletteSearch();positionBuilderPalette();if(builderPaletteAnchorMedia.matches)requestAnimationFrame(()=>fitBuilderView());return result};
+renderPaletteSearch();renderBuilderPaletteRecent();positionBuilderPalette();
+$('#topologyBuilder').dataset.buildNumber='119';
+const builderV119Stamp=$('.builderBuildStamp');if(builderV119Stamp){builderV119Stamp.setAttribute('aria-label','Build 119, dated 28 September 2026');builderV119Stamp.querySelector('b').textContent='Build 119'}
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Searchable Add palette','Rank whole-word component matches, show all matching groups, clarify add targets and compatibility, and keep recent components with keyboard access.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
 </body>
 </html>
