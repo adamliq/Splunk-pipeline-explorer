@@ -109,3 +109,37 @@ v113 met most of issue 7, but the canvas top was at y=528, and it introduced the
 4. **Toggle labels:** labels were inconsistently aligned (`space-between`), and the names themselves were truncated. **Fix:** left-align the labels and render the name in full with the status as a muted `<small>` that truncates. The full text is in the `title`.
 
 **Result at 1440×900:** the canvas top moved from 528 to 423, with 477px of canvas visible without scrolling. No errors at 1280, 1440, 1920 or 390, or across a 1440→1000→1440 resize.
+
+---
+
+## 8. Next task: builder toolbar declutter (v115)
+
+**Goal:** move canvas-level controls onto the canvas, and shrink the two rows above it (the toolbar and the relationship-plane bar) to one. At 1440×900 the canvas top is currently at y=423; the target is about 360.
+
+Put all changes in `<style id="builder-toolbar-declutter-v115-styles">` and `<script id="builder-toolbar-declutter-v115">`. **Move existing elements; don't recreate them.** Their click handlers are bound to these elements by id, and other scripts query them. Desktop only (`min-width:1121px`, matching v113); leave the mobile layout alone.
+
+### Current state (the desktop toolbar, `.builderToolbar`)
+`#builderCanvasTitle` ("Unified topology · N components · N relationships") · drag hint · `#builderZoomOut` `#builderZoomReadout` `#builderZoomIn` · `#builderAddToggle` · `#builderInspectorToggle` · `#builderFocusToggle` · `#builderMinimapToggle` · `#builderPresentationToggle` · `#builderFullscreenToggle` · menus **Navigate** (contains `#builderFitView`, `#builderAutoLayout`), **Build**, **Validate**, **Export** (contains `#builderPrintPresent`).
+Below it, the `.builderPlaneBar.unifiedPlaneBar` holds the plane checkboxes, the `#unifiedLayoutMode` select and a hint. **`renderUnifiedPlaneControls()` rewrites this bar's innerHTML on every render**, so anything you move out of it must be re-applied after each render: wrap `renderUnifiedPlaneControls` the way v112 and v113 wrap functions.
+
+### Phase 1 (do first; small, low risk)
+1. **Zoom and Fit on the canvas.** `.builderCanvas` already contains `.builderMobileZoomControls` (− / + / Fit, wired to `setBuilderZoom` and `fitBuilderView`). It is only shown by `@media(pointer:coarse),(max-width:760px)`. On desktop, show it and position it bottom-right, stacked directly above `.builderMinimap`, and add a zoom-percentage readout between − and +. Clicking the readout resets zoom to 100% (`setBuilderZoom(1)`). Then hide `#builderZoomOut`, `#builderZoomReadout` and `#builderZoomIn` in the toolbar. Keep the keyboard shortcuts (+ − 0).
+   - `applyBuilderViewport()` updates `#builderZoomReadout`. Either move that element into the overlay, or wrap `applyBuilderViewport` to update the new readout too.
+2. **＋ Add as a floating button.** Move `#builderAddToggle` into `.builderCanvas`, positioned top-left (at the `.builderMobileZoomControls` default spot, now free on desktop). Style it as a primary pill. It already opens the canvas palette.
+3. **Minimap collapse on the minimap.** Put a small collapse/expand button (▾/▸) in the corner of `.builderMinimap` that calls `$('#builderMinimapToggle').click()`, and hide `#builderMinimapToggle` in the toolbar. While the minimap is hidden, show a small "Map" chip in the same corner so it can be reopened.
+4. **Full screen icon.** Move `#builderFullscreenToggle` to the canvas's top-right corner as an icon button (⤢, with `title="Full screen"` and `aria-label`). It must still work in `:fullscreen` and `.canvasFocus` modes.
+
+### Phase 2 (bigger change; do after phase 1 is verified)
+5. **Remove the toolbar's top row.** Show `#builderCanvasTitle` as a small muted caption in the canvas's top-left (beside ＋ Add), and move the drag hint text into the existing `.builderNavigationHint` strip at the canvas's bottom-left.
+6. **Merge the toolbar with the plane bar into one line:** plane checkboxes on the left; Inspector, Focus canvas and the Navigate/Build/Validate/Export menus on the right. Move `#builderPresentationToggle` into the Export menu beside `#builderPrintPresent`. Move the "Canvas layout" `#unifiedLayoutMode` select into the Navigate menu, re-attached after every `renderUnifiedPlaneControls()`. Show Inspector and Focus canvas as toggles with an active state (`aria-pressed` plus a highlight) while on.
+
+### Acceptance criteria
+- At 1440×900 with no scroll, the canvas top is at y ≤ 370 after phase 2 (≤ 400 after phase 1 alone).
+- The zoom buttons, readout, Fit, ＋ Add, minimap collapse and full screen all work from the canvas. The readout updates on wheel zoom and on Fit.
+- The floating controls don't overlap each other or the nodes after Fit. The Fit padding (34px, `builder-deferred-fit-v112`/`builder-fit-visible-topology`) may need to grow to keep nodes clear of the top-left ＋ Add button and the bottom-right zoom/minimap stack.
+- The canvas layout select still switches modes after re-renders: cycle vertical → free → horizontal → auto, adding a node in between.
+- Focus canvas, full screen and Presentation still work. In `.canvasFocus` and `:fullscreen`, the canvas overlay controls stay visible.
+- No `pageerror` at 1280, 1440, 1920 or 390, or across a 1440→1000→1440 resize. The layout code must be idempotent (see v114, item 1).
+- Mobile (≤760px or touch) is unchanged.
+- No horizontal page scroll.
+- Add a `changeRegister` entry the way v112–v114 do.
