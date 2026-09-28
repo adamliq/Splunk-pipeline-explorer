@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 130 · 29 Sep 2026</title>
+  <title>Splunk Pipeline Explorer · Build 131 · 29 Sep 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,9 +202,9 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="130" data-build-date="2026-09-29">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="131" data-build-date="2026-09-29">
     <div class="builderHead">
-      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 130, dated 29 September 2026"><b>Build 130</b><time datetime="2026-09-29">29 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
+      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 131, dated 29 September 2026"><b>Build 131</b><time datetime="2026-09-29">29 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
         <div class="builderActions"><div class="builderHistoryControls"><button class="builderBtn" id="builderUndo" disabled>↶ Undo <kbd>Ctrl Z</kbd></button><button class="builderBtn" id="builderRedo" disabled>↷ Redo <kbd>Ctrl Y</kbd></button><button class="builderBtn" id="builderHistoryToggle" aria-expanded="false">History <span class="builderHistoryCount" id="builderHistoryCount">0</span></button></div><button class="builderBtn" id="builderLoadPath">Load selected path</button><button class="builderBtn" id="builderClear">Clear</button><button class="builderBtn" id="builderFailure">Open in Failure Lab</button><button class="builderBtn primary" id="builderUse">Use in explorer</button></div>
         <div class="builderPersistence"><select id="builderSaved" aria-label="Saved custom topologies"><option value="">Saved topologies</option></select><button class="builderBtn" id="builderSave">Save</button><button class="builderBtn" id="builderLoadSaved">Load</button><button class="builderBtn" id="builderImport">Import JSON</button><button class="builderBtn" id="builderExport">Export JSON</button><input id="builderImportFile" type="file" accept="application/json,.json" hidden></div>
@@ -5202,16 +5202,16 @@ unifiedBuilderPositions=function(...args){
     layout.width=mobile?Math.max(320,layout.width):Math.max(layout.width,48+values.length*pitch+25);
     layout.height=Math.max(layout.height,65+(mobile?state.builderNodes.length*211:maxRows*235)+90);return layout
   }
-  const byTier=new Map([...builderTierNames130,'management'].map(tier=>[tier,[]]));
+  const byTier=new Map([...builderTierNames130,'management'].map(tier=>[tier.toLowerCase(),[]]));
   state.builderNodes.forEach(node=>{if(layout.positions.has(node.id))byTier.get(builderTierOf130(node)).push(node)});
   if(mode==='type')for(const members of byTier.values())members.sort((a,b)=>a.type.localeCompare(b.type)||a.id-b.id);
   const slots=members=>{const result=[];for(const node of members){const last=result.at(-1);if(mode==='type'&&last?.[0]?.type===node.type&&state.builderGrouping.collapsedTypes.includes(node.type)&&!node.groupId)last.push(node);else result.push([node])}return result};
   if(mobile){let y=58;for(const tier of [...builderTierNames130,'management']){
-    const nodes=byTier.get(tier);if(!nodes.length){y+=28;continue}
+    const nodes=byTier.get(tier.toLowerCase());if(!nodes.length){y+=28;continue}
     for(const batch of slots(nodes)){for(const node of batch){const point=layout.positions.get(node.id);point.x=55;point.y=y}y+=batch.some(node=>node.id===state.builderSelected)?254:211}y+=36
   }layout.height=Math.max(430,y+80);layout.width=Math.max(320,layout.width);return layout}
-  const pitch=320,left=48,managementY=Math.max(350,...builderTierNames130.map(tier=>58+slots(byTier.get(tier)).length*235+35));
-  builderTierNames130.forEach((tier,column)=>slots(byTier.get(tier)).forEach((batch,row)=>batch.forEach(node=>{const point=layout.positions.get(node.id);point.x=left+column*pitch;point.y=65+row*235})));
+  const pitch=320,left=48,managementY=Math.max(350,...builderTierNames130.map(tier=>58+slots(byTier.get(tier.toLowerCase())).length*235+35));
+  builderTierNames130.forEach((tier,column)=>slots(byTier.get(tier.toLowerCase())).forEach((batch,row)=>batch.forEach(node=>{const point=layout.positions.get(node.id);point.x=left+column*pitch;point.y=65+row*235})));
   const managementRows=new Map();for(const batch of slots(byTier.get('management'))){const column=builderManagementColumn130[batch[0].type]??2,row=managementRows.get(column)||0;managementRows.set(column,row+1);batch.forEach(node=>{const point=layout.positions.get(node.id);point.x=left+column*pitch;point.y=managementY+row*235})}
   layout.width=Math.max(layout.width,left+6*pitch+25);layout.height=Math.max(layout.height,managementY+Math.max(1,...managementRows.values())*235+50);return layout;
 };
@@ -5344,6 +5344,120 @@ builderV125PackPages125=function(...args){const pages=builderPackPagesBefore130(
 };
 document.title='Splunk Pipeline Explorer · Build 130 · 29 Sep 2026';$('#topologyBuilder').dataset.buildNumber='130';$('#topologyBuilder').dataset.buildDate='2026-09-29';const builderStamp130=$('.builderBuildStamp');if(builderStamp130){builderStamp130.setAttribute('aria-label','Build 130, dated 29 September 2026');builderStamp130.querySelector('b').textContent='Build 130'}
 changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Canvas Group by','Arrange components in pipeline tier lanes, collapse component types into summary cards and merged relationships, highlight types, and save the view in bookmarks, profiles and exports.',true]);if(state.view==='changes')renderChanges();renderBuilder();
+</script>
+
+<style id="builder-grouping-polish-v131-styles">
+@media(min-width:1121px){
+  .topologyBuilder .builderPlaneBar .builderGroupingControl130{flex:0 0 auto;margin-left:4px;padding:0 5px;border-left:1px solid #365466;color:#b9d9e4}
+  .topologyBuilder .builderPlaneBar .builderGroupingControl130 select{width:143px;max-width:none;min-width:143px;padding:5px 7px;border:1px solid #456779;border-radius:7px;background:#102a38;color:#e4f6f8;font-size:11px}
+}
+.topologyBuilder #builderLargeNav{display:flex;flex-wrap:wrap;align-items:center;gap:7px;overflow:visible}
+.topologyBuilder #builderLargeNav>strong{flex:0 0 auto}
+.topologyBuilder #builderLargeNav select{flex:0 0 auto;min-width:145px;max-width:100%;width:auto}
+.topologyBuilder #builderLargeNav #builderNavigationBookmark{min-width:160px}
+.topologyBuilder #builderLargeNav #builderNavigationGroup{min-width:164px}
+.topologyBuilder #builderLargeNav .builderLargeNavStatus,.topologyBuilder #builderLargeNav .builderNavigationBreadcrumb{flex-basis:100%;justify-self:auto}
+.topologyBuilder .builderGroupChips130.groupStrip131{display:flex;flex-wrap:nowrap;align-items:center;gap:5px;max-height:45px;min-width:0;width:100%;margin:0 0 6px;padding:5px 7px;border:1px solid #304e60;border-radius:8px;background:#0c2430;overflow-x:auto;scrollbar-width:thin}
+.topologyBuilder .groupStrip131>*{flex:none;white-space:nowrap}
+.topologyBuilder .builderTypeHeader130{left:12px;top:8px;z-index:2;max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#102735;box-shadow:0 0 0 5px #102735}
+@media(max-width:1120px){.topologyBuilder .builderGroupingControl130{min-width:170px}.topologyBuilder #builderLargeNav select{min-width:140px}}
+@media(max-width:760px){.topologyBuilder .builderGroupingControl130.mobileQuick131{display:flex;width:100%;margin:0 0 6px;padding:5px 8px;border:1px solid #38586b;border-radius:7px;background:#102634}.topologyBuilder .builderGroupingControl130.mobileQuick131 select{flex:1;max-width:none}}
+</style>
+<script id="builder-grouping-polish-v131">
+/* Reuse the existing Group by selector and chips, including their handlers. */
+function builderGroupingChrome131(){
+  const control=$('#builderGroupBy130')?.closest('.builderGroupingControl130'),bar=$('.builderPlaneBar'),canvas=$('.builderCanvas'),workspace=$('.builderWorkspace'),panel=$('#builderLargeNav'),chips=panel?.querySelector('.builderGroupChips130')||workspace?.querySelector(':scope > .builderGroupChips130');
+  if(!control||!bar||!canvas||!workspace)return;
+  const desktop=window.matchMedia('(min-width:1121px)').matches;
+  $$('.builderPlaneBar .builderGroupingControl130,.builderWorkspace>.builderGroupingControl130').filter(element=>element!==control).forEach(element=>element.remove());
+  if(desktop){control.classList.remove('mobileQuick131');bar.querySelector('.unifiedPlaneChecks')?.after(control)}
+  else{control.classList.add('mobileQuick131');workspace.insertBefore(control,canvas)}
+  const active=state.builderGrouping.mode!=='none'||builderHighlightTypes130.size>0;
+  $$('.builderWorkspace>.builderGroupChips130').filter(element=>element!==chips).forEach(element=>element.remove());
+  if(chips&&active){chips.classList.add('groupStrip131');workspace.insertBefore(chips,canvas);chips.querySelectorAll('.builderGroupAction130').forEach(button=>chips.querySelector('span')?.after(button))}
+  else if(chips){chips.classList.remove('groupStrip131');if(panel&&chips.parentElement!==panel)panel.appendChild(chips)}
+  chips?.querySelectorAll('.builderGroupChip130').forEach(chip=>chip.setAttribute('aria-pressed',String(builderHighlightTypes130.has(chip.dataset.groupType))));
+}
+const builderRenderBefore131=renderBuilder;
+renderBuilder=function(...args){const result=builderRenderBefore131(...args);builderGroupingChrome131();return result};
+for(const query of ['(min-width:1121px)','(max-width:760px)'])window.matchMedia(query).addEventListener('change',()=>requestAnimationFrame(()=>{if(state.view==='builder')renderBuilder()}));
+/* Chips can toggle without a render. Keep the strip discoverable when highlighting from None. */
+const builderHighlightBefore131=builderGroupHighlightApply130;
+builderGroupHighlightApply130=function(...args){const result=builderHighlightBefore131(...args);builderGroupingChrome131();return result};
+
+/* Measure card positions in world coordinates; the viewport may be panned or zoomed. */
+function builderLaneCard131(node,world,layout){
+  const card=world.querySelector(`[data-unified-node-wrap="${node.id}"] .builderNode`),r=card?.getBoundingClientRect(),origin=world.getBoundingClientRect(),zoom=state.builderViewport?.zoom||1;
+  if(r?.width&&r?.height)return{x:(r.left-origin.left)/zoom,y:(r.top-origin.top)/zoom,w:r.width/zoom,h:r.height/zoom};
+  const point=layout.positions.get(node.id);return point?{x:point.x,y:point.y,w:190,h:165}:null
+}
+const builderLaneBefore131=builderGroupLane130;
+builderGroupLane130=function(world,layout,title,members,management=false){
+  if(!window.matchMedia('(max-width:760px)').matches||!['tier','type'].includes(state.builderGrouping.mode))return builderLaneBefore131(world,layout,title,members,management);
+  const order=[...builderTierNames130,'Management'],index=order.indexOf(title),rects=members.map(node=>builderLaneCard131(node,world,layout)).filter(Boolean);
+  let top,height;
+  if(rects.length){top=Math.max(12,Math.min(...rects.map(rect=>rect.y))-25);height=Math.max(44,Math.max(...rects.map(rect=>rect.y+rect.h))+23-top)}
+  else{
+    const tiers=order.map(label=>state.builderNodes.filter(node=>builderTierOf130(node)===(label==='Management'?'management':label.toLowerCase())).map(node=>builderLaneCard131(node,world,layout)).filter(Boolean));
+    const before=tiers.slice(0,index).flat(),after=tiers.slice(index+1).flat(),prior=before.length?Math.max(...before.map(rect=>rect.y+rect.h)):12,next=after.length?Math.min(...after.map(rect=>rect.y)):layout.height;
+    const precedingEmpty=tiers.slice(0,index).filter(group=>!group.length).length;
+    top=Math.max(12,Math.min(next-28,prior+8+precedingEmpty*27));height=24;
+  }
+  const lane=document.createElement('div');lane.className=`builderTierLane130 ${management?'management':''} ${members.length?'':'empty'}`;
+  lane.style.cssText=`left:22px;top:${top}px;width:${Math.max(276,layout.width-44)}px;height:${height}px`;
+  lane.innerHTML=`<strong>${builderEscape(title)} · ${members.length}</strong>`;world.insertBefore(lane,world.firstChild)
+};
+
+/* Spread a fan-out along the card border and retain perpendicular stubs. */
+function builderFanoutRank131(item,side,positions){
+  const peers=builderTraceEdges('all').filter(edge=>edge.plane===item.plane&&(side==='from'?edge.from===item.from:edge.to===item.to));
+  if(peers.length<2)return 0;
+  const endpoint=edge=>positions.get(side==='from'?edge.to:edge.from)||{x:0,y:0};
+  peers.sort((a,b)=>endpoint(a).y-endpoint(b).y||endpoint(a).x-endpoint(b).x||String(a.id).localeCompare(String(b.id)));
+  const index=peers.findIndex(edge=>String(edge.id)===String(item.id));return index<0?0:(index-(peers.length-1)/2)*16
+}
+function builderSideOffset131(box,side,delta){const point=builderV123SidePoint(box,side);if(side==='left'||side==='right')point.y+=Math.max(-box.h/2+15,Math.min(box.h/2-15,delta));else point.x+=Math.max(-box.w/2+15,Math.min(box.w/2-15,delta));return point}
+const builderRelationshipBefore131=relationshipPath;
+relationshipPath=function(item,positions){
+  const ordinary=builderRelationshipBefore131(item,positions);
+  if(!item?.edge||!positions?.has(item.from)||!positions?.has(item.to))return ordinary;
+  const fanout=builderFanoutRank131(item,'from',positions),fanin=builderFanoutRank131(item,'to',positions);
+  if(!fanout&&!fanin)return ordinary;
+  const source=builderCardBox(item.from,positions),target=builderCardBox(item.to,positions),points=ordinary.points;
+  if(!points?.length)return ordinary;
+  const first=points[0],second=points[1],last=points.at(-1),previous=points.at(-2);
+  const sourceSide=Math.abs((second?.x??first.x)-first.x)>Math.abs((second?.y??first.y)-first.y)?(second.x>first.x?'right':'left'):(second.y>first.y?'bottom':'top');
+  const targetSide=Math.abs(last.x-(previous?.x??last.x))>Math.abs(last.y-(previous?.y??last.y))?(last.x>previous.x?'left':'right'):(last.y>previous.y?'top':'bottom');
+  const borderA=builderSideOffset131(source,sourceSide,fanout),borderB=builderSideOffset131(target,targetSide,fanin),out=builderV123Normal(sourceSide),into=builderV123Normal(targetSide),a={x:borderA.x+out.x*3,y:borderA.y+out.y*3},b={x:borderB.x+into.x*3,y:borderB.y+into.y*3},start={x:a.x+out.x*22,y:a.y+out.y*22},end={x:b.x+into.x*22,y:b.y+into.y*22};
+  const routing=ensureRelationshipRouting(item.edge),boxes=state.builderNodes.filter(node=>positions.has(node.id)).map(node=>builderCardBox(node.id,positions));
+  const stops=[start,...routing.waypoints.map(point=>({...point})),end],middle=[];
+  for(let index=1;index<stops.length;index++){const part=builderV123RouteBetween(stops[index-1],stops[index],boxes,routing.style,true);middle.push(...(index===1?part:part.slice(1)))}
+  const routed=compactRoutePoints([a,...middle,b]),d=routing.style==='curved'?builderV123RoundedPath(routed):`M${routed.map(point=>`${point.x} ${point.y}`).join(' L')}`,mid=routeMidpoint(routed);
+  return{d,points:routed,label:{x:mid.x+routing.labelOffset.x,y:mid.y+routing.labelOffset.y},routing}
+};
+/* Labels follow the final path, then choose a clear spot away from the other fan-out lines. */
+function builderFanoutLabels131(){
+  const svg=$('#builderTree .unifiedConnectorLayer');if(!svg)return;
+  const layout=unifiedBuilderPositions(),edges=builderTraceEdges('all'),labels=[...svg.querySelectorAll('.edgeRouteLabel')],paths=[...svg.querySelectorAll('path.unifiedConnector')],cards=state.builderNodes.filter(node=>layout.positions.has(node.id)).map(node=>builderV123Pad(builderCardBox(node.id,layout.positions),2)),placed=[];
+  for(const label of labels){const edge=edges.find(item=>item.plane===label.dataset.routePlane&&String(item.id)===label.dataset.routeEdge),path=paths.find(item=>item.dataset.edgePlane===label.dataset.routePlane&&item.dataset.edgeId===label.dataset.routeEdge);
+    if(!edge||!path||!path.getTotalLength)continue;
+    const related=edges.filter(item=>item.plane===edge.plane&&(item.from===edge.from||item.to===edge.to));
+    if(related.length<2)continue;
+    const width=Number(label.querySelector('rect')?.getAttribute('width'))||100,offset=ensureRelationshipRouting(edge.edge).labelOffset,length=path.getTotalLength();if(!length)continue;
+    let best=null;for(const fraction of [.65,.72,.78,.58,.85,.45,.35,.25,.5,.2,.15,.1,.9,.95]){const point=path.getPointAtLength(length*fraction),box={x:point.x+offset.x-width/2,y:point.y+offset.y-11,w:width+27,h:22};
+      const hits=[...cards,...placed].filter(card=>box.x<card.x+card.w&&box.x+box.w>card.x&&box.y<card.y+card.h&&box.y+box.h>card.y).length;
+      let crossings=0;for(const other of paths){if(other===path||!other.getTotalLength||other.classList.contains('builderTypeHidden130'))continue;const total=other.getTotalLength();for(let k=1;k<total/8;k++){const p=other.getPointAtLength(k*8);if(p.x>box.x&&p.x<box.x+box.w&&p.y>box.y&&p.y<box.y+box.h){crossings++;break}}}
+      const score=hits*100+crossings*10+Math.abs(fraction-.65);if(!best||score<best.score)best={box,score};if(!hits&&!crossings)break
+    }if(best){label.setAttribute('transform',`translate(${best.box.x} ${best.box.y})`);placed.push(best.box)}
+  }
+}
+const builderPlaceLabelsBefore131=builderV123PlaceLabels;
+builderV123PlaceLabels=function(...args){const result=builderPlaceLabelsBefore131(...args);builderFanoutLabels131();return result};
+
+/* Keep every release stamp in step even when an earlier optional block fails. */
+document.title='Splunk Pipeline Explorer · Build 131 · 29 Sep 2026';$('#topologyBuilder').dataset.buildNumber='131';$('#topologyBuilder').dataset.buildDate='2026-09-29';const builderStamp131=$('.builderBuildStamp');if(builderStamp131){builderStamp131.setAttribute('aria-label','Build 131, dated 29 September 2026');builderStamp131.querySelector('b').textContent='Build 131';const time=builderStamp131.querySelector('time');if(time){time.dateTime='2026-09-29';time.textContent='29 Sep 2026'}}
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Group by layout repair','Use one lowercase tier key, expose Group by and highlights outside Find & navigate, measure mobile lanes from rendered cards, and separate fan-out routes and labels.',true]);
+if(state.view==='changes')renderChanges();renderBuilder();
 </script>
 
 </body>
