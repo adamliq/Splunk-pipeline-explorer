@@ -2,7 +2,7 @@
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Branch:** `claude/build-page-layout-bl6jk1` (fix commit `d401d2e`)
-**Status:** issues 1–6 are fixed on that branch. Issue 7 is still open and is the next task.
+**Status:** issues 1–6 are fixed on that branch. Issue 7 was implemented in the v113 upload, and the v113 review fixes are in v114 (see the end of this file). Keep `builder-density-polish-v114` in future builds.
 
 ## Read this first
 
@@ -96,3 +96,16 @@ if(state.view==='changes')renderChanges();
 - Every control that was reachable before is still reachable (search, isolate, bookmarks, profiles, review findings, tools, groups).
 - Focus mode (`.topologyBuilder.canvasFocus`) and full screen still hide the chrome, and the canvas still fills the space.
 - The document never scrolls horizontally (`document.documentElement.scrollWidth === innerWidth`).
+
+---
+
+## Update: v113 review and v114 fixes
+
+v113 met most of issue 7, but the canvas top was at y=528, and it introduced these problems. All are fixed in `<style id="builder-density-polish-v114-styles">` and `<script id="builder-density-polish-v114">`:
+
+1. **Error:** `insertBefore … not a child of this node` from `builderDensityLayout`. Chromium can fire the media-query `change` event while `matches` is still true (zoom, device-metric changes, print preview). Re-running the desktop layout then calls `insertBefore(dock, #builderGroupBar)` after the group bar has already been moved into the dock. **Fix:** replace the listener with one that only re-syncs when the dock is already connected. **Rule:** DOM-moving layout functions must be idempotent.
+2. **Header:** `#builderSaved` was moved out of `.builderPersistence`, so it lost its `width:175px` rule and stretched to about 575px at 15px text. Save and "Use in explorer" wrapped onto a second row. **Fix:** size the select inside `.builderDensityHeaderPrimary`, use `nowrap` on buttons and status, and hide the `kbd` hints on desktop. Undo and Redo get `title` and `aria-keyshortcuts` instead. The header went from 138px to 74px tall.
+3. **Dock:** the Containers bar was appended after the full-width `.builderDensityPanels`, so it dropped to its own row and left grid column 5 empty. **Fix:** pin `.builderGroupBar` to `grid-column:5; grid-row:1` and the panels to `grid-row:2`.
+4. **Toggle labels:** labels were inconsistently aligned (`space-between`), and the names themselves were truncated. **Fix:** left-align the labels and render the name in full with the status as a muted `<small>` that truncates. The full text is in the `title`.
+
+**Result at 1440×900:** the canvas top moved from 528 to 423, with 477px of canvas visible without scrolling. No errors at 1280, 1440, 1920 or 390, or across a 1440→1000→1440 resize.

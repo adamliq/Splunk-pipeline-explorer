@@ -3726,5 +3726,34 @@ changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['C
 if(state.view==='changes')renderChanges();
 </script>
 
+<style id="builder-density-polish-v114-styles">
+@media (min-width:1121px){
+  .builderDensityHeaderPrimary{flex-wrap:nowrap}
+  .builderDensityHeaderPrimary select{width:190px;padding:6px 9px;font-size:.7rem}
+  .builderDensityDock .builderGroupBar{grid-column:5;grid-row:1}
+  .builderDensityPanels{grid-row:2}
+  .builderDensityHeaderPrimary .builderBtn,.topologyBuilder .builderActionWrap .builderIoStatus{white-space:nowrap}
+  .builderDensityHeaderPrimary kbd{display:none}
+  .topologyBuilder .builderHead>div:first-child{flex:1 1 360px}
+  .builderDensityToggle{justify-content:flex-start}
+  .builderDensityToggle span{flex:1;min-width:0}
+  .builderDensityToggle small{margin-left:5px;color:#8fa9b8;font-weight:600}
+}
+</style>
+<script id="builder-density-polish-v114">
+/* Browsers can fire the media-query change event while it still matches (zoom, print
+   preview); re-running the desktop layout then throws in insertBefore. Skip it when applied. */
+builderDensityMedia.removeEventListener('change',builderDensityLayout);
+builderDensityMedia.addEventListener('change',()=>{if(builderDensityMedia.matches&&builderDensityDock.isConnected)builderDensitySync();else builderDensityLayout()});
+/* Show each toggle's name in full and let only its status truncate; keep the full text as a tooltip. */
+const builderDensitySyncBeforeLabels=builderDensitySync;
+builderDensitySync=function(){builderDensitySyncBeforeLabels();const names={builderFindNavigate:'Find & navigate',builderRuleProfileDisclosure:'Architecture profile',builderReviewDisclosure:'Review findings',builderSecondaryTools:'Tools'};for(const button of builderDensityDock.querySelectorAll('.builderDensityToggle')){const name=names[button.getAttribute('aria-controls')],label=button.querySelector('span'),status=label.textContent.slice(name.length).trim().replace(/^·\s*/,'');label.textContent=name;if(status){const small=document.createElement('small');small.textContent=status;label.appendChild(small)}button.title=status?`${name} · ${status}`:name}};
+/* Shortcut hints are hidden in the compact header, so expose them as tooltips. */
+for(const [id,keys,label] of [['builderUndo','Control+Z','Undo (Ctrl Z)'],['builderRedo','Control+Y','Redo (Ctrl Y)']]){const button=$('#'+id);if(button){button.title=label;button.setAttribute('aria-keyshortcuts',keys)}}
+if(builderDensityMedia.matches)builderDensitySync();
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Compact Builder header and dock polish','Keep history and save controls on one row, place containers beside the dock toggles and show each toggle name in full.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
 </body>
 </html>
