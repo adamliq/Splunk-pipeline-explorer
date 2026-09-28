@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 124 · 28 Sep 2026</title>
+  <title>Splunk Pipeline Explorer · Build 127 · 29 Sep 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,9 +202,9 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="124" data-build-date="2026-09-28">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="127" data-build-date="2026-09-29">
     <div class="builderHead">
-      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 124, dated 28 September 2026"><b>Build 124</b><time datetime="2026-09-28">28 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
+      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 127, dated 29 September 2026"><b>Build 127</b><time datetime="2026-09-29">29 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
         <div class="builderActions"><div class="builderHistoryControls"><button class="builderBtn" id="builderUndo" disabled>↶ Undo <kbd>Ctrl Z</kbd></button><button class="builderBtn" id="builderRedo" disabled>↷ Redo <kbd>Ctrl Y</kbd></button><button class="builderBtn" id="builderHistoryToggle" aria-expanded="false">History <span class="builderHistoryCount" id="builderHistoryCount">0</span></button></div><button class="builderBtn" id="builderLoadPath">Load selected path</button><button class="builderBtn" id="builderClear">Clear</button><button class="builderBtn" id="builderFailure">Open in Failure Lab</button><button class="builderBtn primary" id="builderUse">Use in explorer</button></div>
         <div class="builderPersistence"><select id="builderSaved" aria-label="Saved custom topologies"><option value="">Saved topologies</option></select><button class="builderBtn" id="builderSave">Save</button><button class="builderBtn" id="builderLoadSaved">Load</button><button class="builderBtn" id="builderImport">Import JSON</button><button class="builderBtn" id="builderExport">Export JSON</button><input id="builderImportFile" type="file" accept="application/json,.json" hidden></div>
@@ -4345,9 +4345,9 @@ relationshipPath=function(item,positions){
   let best=null;
   for(const [from,to] of [['right','left'],['left','right'],['bottom','top'],['top','bottom']]){
     const sideA=builderV123Normal(from),sideB=builderV123Normal(to),gap=builderV124FacingGap124(source,target,from),
-      stub=gap>0?Math.min(22,Math.max(2,(gap-4)/2)):22,
+      stub=22,
       borderA=builderV123SidePoint(source,from),borderB=builderV123SidePoint(target,to),
-      a={x:borderA.x+sideA.x,y:borderA.y+sideA.y},b={x:borderB.x+sideB.x*2,y:borderB.y+sideB.y*2},
+      a={x:borderA.x+sideA.x*3,y:borderA.y+sideA.y*3},b={x:borderB.x+sideB.x*3,y:borderB.y+sideB.y*3},
       start={x:a.x+sideA.x*stub,y:a.y+sideA.y*stub},end={x:b.x+sideB.x*stub,y:b.y+sideB.y*stub},
       stops=[start,...manual,end],middle=[];
     for(let index=1;index<stops.length;index++){
@@ -4456,6 +4456,514 @@ const builderV124Stamp124=$('.builderBuildStamp');if(builderV124Stamp124){builde
 changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Connector follow-up','Reroute after cards mount, choose clear anchor sides, separate overlapping free-placement cards and keep mobile labels clear at readable zoom.',true]);
 if(state.view==='changes')renderChanges();
 renderBuilder();
+</script>
+
+<style id="builder-architecture-pack-v125-styles">
+.topologyBuilder .builderRouteLabelHidden125{opacity:0;pointer-events:none}
+.topologyBuilder .unifiedConnectorHit:hover+.builderRouteLabelHidden125,
+.topologyBuilder .unifiedConnectorHit:focus-visible+.builderRouteLabelHidden125{opacity:1;pointer-events:all}
+.builderPackSections125{grid-column:1/-1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;border-top:1px solid #294558;padding-top:9px}
+.builderPackSections125>strong,.builderPackMeta125{grid-column:1/-1}
+.builderPackMeta125{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+.builderPackMeta125 label{display:grid!important;gap:4px;min-width:145px;flex:1;color:#b5c7d1;font-size:11px}
+.builderPackMeta125 input,.builderPackMeta125 select{min-width:0;border:1px solid #35576b;border-radius:6px;background:#081824;color:#edf5fa;padding:6px;font:inherit}
+.builderPackMeta125 output{color:#b9d0dd;font-size:11px;white-space:nowrap}
+.builderPresentationStage.multiPage .builderPresentationSheet.packTextPage125{display:block;overflow:auto;padding:20px;background:#f8fafc;color:#15283a}
+.packTextPage125 .packPreview125{max-width:100%;font-size:12px}
+.packPreview125 table{border-collapse:collapse;width:100%}.packPreview125 th,.packPreview125 td{border:1px solid #aec1cd;padding:5px;text-align:left}
+.packPreview125 th{background:#e2ebf1}.packPreview125 h1,.packPreview125 h2{color:#132f44}
+.packPreview125 .notSet{color:#7b2a00;background:#ffebc5;font-weight:700;padding:1px 4px;border-radius:3px}
+.packPreview125 .pageNote{background:#eaf1f5;border-left:3px solid #16607d;padding:7px}
+@media(max-width:760px){.builderPackSections125{grid-template-columns:1fr 1fr}.builderPackMeta125{display:grid;grid-template-columns:1fr}}
+</style>
+<script id="builder-architecture-pack-v125">
+/* Reject identical views, including a dimension whose only value covers every node. */
+const builderV125PageSpecsBefore125=architecturePageSpecs;
+architecturePageSpecs=function(){
+  const pages=builderV125PageSpecsBefore125(),seen=new Set();
+  return pages.filter(page=>{const key=JSON.stringify({ids:[...(page.scope.nodeIds||[])].sort((a,b)=>a-b),
+    planes:Object.entries(page.scope.planes||state.builderVisiblePlanes).filter(([,on])=>on).map(([plane])=>plane).sort()});
+    if(seen.has(key))return false;seen.add(key);return true});
+};
+/* The exported SVG draws 190x142 cards. Route with those exported card boxes and use the same 320px layout. */
+const builderV125SvgForScopeBefore125=architectureSvgForScope;
+architectureSvgForScope=function(scope,titleOverride=''){
+  if(!scope?.nodeIds?.length)return builderV125SvgForScopeBefore125(scope,titleOverride);
+  return withArchitectureExportScope(scope,counts=>{
+    const source=builderDiagramSvgBeforeNavigationExport(),doc=new DOMParser().parseFromString(source,'image/svg+xml');
+    if(doc.querySelector('parsererror'))throw new Error('The architecture SVG could not be rendered.');
+    const layout=unifiedBuilderPositions(),edges=builderTraceEdges('all').filter(edge=>state.builderVisiblePlanes[edge.plane]),
+      paths=[...doc.querySelectorAll('path[marker-end]')],previousBox=builderCardBox;
+    try{
+      builderCardBox=function(id,positions){const position=positions?.get(Number(id))||{x:0,y:0};return{x:position.x,y:position.y,w:190,h:142}};
+      edges.forEach((edge,index)=>{
+        const path=paths[index],from=layout.positions.get(edge.from),to=layout.positions.get(edge.to);
+        if(!path||!from||!to)return;
+        const direct=Math.abs(from.y-to.y)<.1&&to.x>=from.x+202&&
+          !state.builderNodes.some(node=>node.id!==edge.from&&node.id!==edge.to&&layout.positions.get(node.id)?.x>from.x&&layout.positions.get(node.id)?.x<to.x);
+        path.setAttribute('d',direct?`M${from.x+193} ${from.y+71} L${to.x-3} ${to.y+71}`:relationshipPath(edge,layout.positions).d);
+      });
+    }finally{builderCardBox=previousBox}
+    return decorateArchitectureSvg(new XMLSerializer().serializeToString(doc.documentElement),scope,counts,titleOverride);
+  });
+};
+/* Labels follow the drawn path. On constrained routes hide them until the connector is hovered. */
+const builderV125LabelsBefore125=builderV123PlaceLabels;
+builderV123PlaceLabels=function(){
+  builderV125LabelsBefore125();const svg=$('#builderTree .unifiedConnectorLayer');if(!svg)return;
+  if(resolvedUnifiedLayoutMode()==='vertical')return;
+  const layout=unifiedBuilderPositions(),boxes=state.builderNodes.filter(node=>layout.positions.has(node.id))
+    .map(node=>builderV123Pad(builderCardBox(node.id,layout.positions),4)),placed=[];
+  for(const label of svg.querySelectorAll('.edgeRouteLabel')){
+    const path=[...svg.querySelectorAll('path.unifiedConnector')].find(item=>item.dataset.edgePlane===label.dataset.routePlane&&item.dataset.edgeId===label.dataset.routeEdge);
+    if(!path)continue;
+    const width=Number(label.querySelector('rect')?.getAttribute('width'))||100,
+      edge=builderTraceEdges('all').find(item=>item.plane===label.dataset.routePlane&&String(item.id)===String(label.dataset.routeEdge));
+    if(!edge)continue;
+    const offset=ensureRelationshipRouting(edge.edge).labelOffset,length=path.getTotalLength();let clear=false;
+    for(const fraction of [.5,.35,.65,.25,.75,.15,.85]){
+      const point=path.getPointAtLength(length*fraction),x=point.x-width/2+offset.x,y=point.y-11+offset.y;
+      if([...boxes,...placed].some(box=>x<box.x+box.w&&x+width+27>box.x&&y<box.y+box.h&&y+22>box.y))continue;
+      label.setAttribute('transform',`translate(${x} ${y})`);placed.push({x,y,w:width+27,h:22});clear=true;break;
+    }
+    label.classList.toggle('builderRouteLabelHidden125',!clear);
+    label.querySelector('.builderEdgeIssueMarker')?.setAttribute('tabindex',clear?'0':'-1');
+  }
+};
+state.builderExport.sections=state.builderExport.sections||{cover:true,inventory:true,connections:true,findings:true,security:false,ownership:false,resilience:false,deployment:false,appendix:false};
+state.builderExport.owner=state.builderExport.owner||'';
+state.builderExport.printTheme=state.builderExport.printTheme||'light';
+state.builderExport.notes=state.builderExport.notes||{};
+function builderV125Text125(value){return builderEscape(String(value??''))}
+function builderV125Cell125(value){const text=String(value??'').trim();return text&&text!=='Unspecified'?builderV125Text125(text):'<span class="notSet">Not set</span>'}
+function builderV125Table125(headers,rows){return`<div class="tableScroll"><table><thead><tr>${headers.map(value=>`<th scope="col">${builderV125Text125(value)}</th>`).join('')}</tr></thead><tbody>${rows.length?rows.map(row=>`<tr>${row.map(value=>`<td>${value}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${headers.length}">No entries in this section.</td></tr>`}</tbody></table></div>`}
+function builderV125Page125(id,title,content){return{id,title,content}}
+function builderV125Chunks125(rows,size){return rows.length?Array.from({length:Math.ceil(rows.length/size)},(_,index)=>rows.slice(index*size,(index+1)*size)):[[]]}
+function builderV125PageNote125(id){const note=String(state.builderExport.notes[id]||'').trim();return note?`<p class="pageNote">${builderV125Text125(note)}</p>`:''}
+function builderV125EdgeName125(edge){const from=state.builderNodes.find(node=>node.id===edge.from),to=state.builderNodes.find(node=>node.id===edge.to);return`${from?componentInstanceLabel(from):`ID ${edge.from}`} → ${to?componentInstanceLabel(to):`ID ${edge.to}`}`}
+function builderV125CleanDoc125(value){
+  if(Array.isArray(value))return value.map(builderV125CleanDoc125);
+  if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).filter(([key])=>!/(password|secret|credential|api.?key|token)/i.test(key)).map(([key,entry])=>[key,builderV125CleanDoc125(entry)]));
+  return value;
+}
+function builderV125ContentPages125(){
+  const sections=state.builderExport.sections,pages=[],text=builderV125Text125,cell=builderV125Cell125,
+    inventory=builderInventoryRows(),edges=builderTraceEdges('all'),issues=unresolvedValues(),rules=evaluateArchitectureRules(),
+    errors=builderFindingSummary().errors,review=builderFindingSummary().review;
+  if(sections.inventory){
+    const rank={syslogSource:0,windowsEvent:0,fileSource:0,apiSource:0,hecClient:0,sqlDatabase:0,
+      syslog:1,uf:1,hecEndpoint:1,dbConnect:1,hf:2,ip:2,idx:3,s3:3,search:3};
+    const ordered=[...inventory].sort((a,b)=>(rank[state.builderNodes.find(node=>node.id===a.id)?.type]??4)-(rank[state.builderNodes.find(node=>node.id===b.id)?.type]??4)||a.id-b.id);
+    builderV125Chunks125(ordered,14).forEach((chunk,index)=>pages.push(builderV125Page125(`inventory-${index+1}`,
+      `Component inventory${ordered.length>14?` · ${index+1}`:''}`,builderV125Table125(
+      ['Name','Type','Role','Environment','Region','Group','Pipeline sets','In / Out','Management authority','Validation'],
+      chunk.map(row=>[text(row.name),text(row.componentType),text(row.role),cell(row.environment),cell(row.region),cell(row.group),
+        text(row.pipelineSets),text(`${row.incoming} / ${row.outgoing}`),cell(row.managementAuthority),text(row.validation)])))));
+  }
+  if(sections.connections)for(const [plane,label] of [['data','Event data'],['management','Fleet management'],['authentication','Interactive authentication']]){
+    const matching=edges.filter(edge=>edge.plane===plane);
+    builderV125Chunks125(matching,11).forEach((chunk,index)=>pages.push(builderV125Page125(`connections-${plane}-${index+1}`,
+      `${label} connections${matching.length>11?` · ${index+1}`:''}`,builderV125Table125(
+      ['From → To','Protocol','Endpoint','Port','TLS','Ack','Direction','Owner','Availability SLO','Latency SLO (s)','Retry','Criticality','Validation','Notes'],
+      chunk.map(edge=>{const d=ensureRelationshipDetails(edge.edge);return[text(builderV125EdgeName125(edge)),cell(d.protocol),cell(d.endpoint),cell(d.port),
+        cell(d.tls),cell(d.acknowledgement),cell(d.direction),cell(d.owner),cell(d.availabilitySlo),cell(d.latencySloSeconds),
+        cell(d.retryPolicy),cell(d.criticality),cell(d.validation),cell(d.notes)]})) )));
+  }
+  if(sections.findings){
+    const sorted=[...issues].sort((a,b)=>(a.severity==='error'?0:1)-(b.severity==='error'?0:1));
+    const passed=rules.filter(rule=>rule.status==='pass').length,failed=rules.filter(rule=>rule.status==='fail').length;
+    builderV125Chunks125(sorted,13).forEach((chunk,index)=>pages.push(builderV125Page125(`findings-${index+1}`,
+      `Review findings${sorted.length>13?` · ${index+1}`:''}`,`<p class="summary">${errors} errors · ${review} to review · ${rules.length} rules: ${passed} pass, ${failed} fail</p>`+
+      builderV125Table125(['Severity','Component or relationship','Title','Detail'],chunk.map(issue=>{
+        const node=state.builderNodes.find(item=>item.id===issue.nodeId),edge=issue.edge&&edges.find(item=>item.plane===issue.edge.plane&&String(item.id)===String(issue.edge.id));
+        return[text(issue.severity),text(node?componentInstanceLabel(node):edge?builderV125EdgeName125(edge):'Topology'),text(issue.title),text(issue.detail)]})))));
+    builderV125Chunks125(rules,11).forEach((chunk,index)=>pages.push(builderV125Page125(`rules-${index+1}`,
+      `Architecture rules${rules.length>11?` · ${index+1}`:''}`,builderV125Table125(['Rule','Severity','Status','Evidence','Affected components'],
+      chunk.map(rule=>[text(`${rule.id} · ${rule.title}`),text(rule.severity),text(rule.status==='disabled'?'Not applicable':rule.status),
+        cell(rule.evidence?.join('; ')),cell(rule.nodes?.map(id=>{const node=state.builderNodes.find(item=>item.id===id);return node?componentInstanceLabel(node):`ID ${id}`}).join('; '))])))));
+  }
+  if(sections.security){
+    const model=securityBoundaryModel(),zones=new Map();model.nodes.forEach(node=>{const name=node.zone?.name||'Unspecified';if(!zones.has(name))zones.set(name,[]);zones.get(name).push(componentInstanceLabel(node))});
+    const auth=state.builderNodes.filter(node=>isAuthProviderType(node.type));
+    pages.push(builderV125Page125('security','Security and identity',`<h3>Trust zones</h3>`+
+      builderV125Table125(['Zone','Components'],[...zones].map(([zone,names])=>[text(zone),text(names.join('; '))]))+
+      `<h3>Cross-zone connections</h3>`+builderV125Table125(['From → To','Zones','Protocol / handoff','TLS or encryption','Assessment'],
+        model.crossings.map(cross=>[text(`${componentInstanceLabel(cross.from)} → ${componentInstanceLabel(cross.to)}`),text(`${cross.from.zone.name} → ${cross.to.zone.name}`),
+          cell(cross.handoff),cell(cross.encryption),text(cross.reason)]))+
+      `<h3>Identity providers and access evidence</h3>`+builderV125Table125(['Provider','Method','MFA','Role / authority','Audit evidence'],
+        auth.map(node=>[text(componentInstanceLabel(node)),cell(node.providerProtocol),cell(node.providerMfa),cell(node.providerAuthority),cell(node.providerAudit)]))+
+      `<h3>Authentication links (metadata only)</h3>`+builderV125Table125(['From → To','Method','MFA','Role mapping','Audit evidence'],
+        state.builderAuthRelations.map(relation=>{const edge=edges.find(item=>item.plane==='authentication'&&item.id===relation.id);
+          return[text(edge?builderV125EdgeName125(edge):`${relation.from} → ${relation.to}`),cell(relation.method),cell(relation.mfa),
+            cell(relation.roleMapping?.join('; ')),cell(relation.auditEvidence)]}))+
+      `<h3>Security findings</h3><ul>${model.findings.map(item=>`<li>${text(`${item.severity}: ${item.text}`)}</li>`).join('')}</ul>`));
+  }
+  if(sections.ownership){
+    const model=responsibilityModel();pages.push(builderV125Page125('ownership','Ownership and handoffs',
+      `<p class="summary">Accountable owner: ${cell(model.accountable)}</p><h3>Component owners</h3>`+
+      builderV125Table125(['Component','Responsible'],model.nodes.map(node=>[text(componentInstanceLabel(node)),cell(node.owner)]))+
+      `<h3>Handover contracts</h3>`+builderV125Table125(['From → To','Producer','Consumer','Acceptance','Recovery'],
+        model.handoffs.map(item=>[text(`${componentInstanceLabel(item.from)} → ${componentInstanceLabel(item.to)}`),cell(item.producer),cell(item.consumer),cell(item.acceptance),cell(item.recovery)]))+
+      `<h3>RASCI</h3>`+builderV125Table125(['Item','Responsible','Accountable','Support','Consulted','Informed'],
+        model.rasci.map(item=>[item.item,item.responsible,item.accountable,item.support,item.consulted,item.informed].map(cell)))));
+  }
+  if(sections.resilience){
+    const report=JSON.parse(architectureReportJson()),capacity=report.capacity,dr=report.multiRegionDisasterRecovery,performance=report.performanceGuardrails;
+    const row=(name,value,assumption)=>[text(name),cell(value),text(assumption)];
+    pages.push(builderV125Page125('resilience','Resilience and performance',`<p>Modelled values depend on the stated inputs; confirm them against production observations.</p>`+
+      builderV125Table125(['Measure','Modelled result','Assumption or input'],[
+        row('Time to fill buffer (min)',capacity?.results?.timeToFillMinutes,`Buffer and event rate: ${JSON.stringify(capacity?.inputs||{})}`),
+        row('Beyond protected durability (GB)',capacity?.results?.unprotectedGb,`Protected capacity: ${capacity?.results?.protectedGb??'Not set'} GB`),
+        row('Recovery time (min)',report.recovery?.recoveryMinutes,`Recovery input: ${JSON.stringify(report.recovery?.inputs||{})}`),
+        row('DR RTO target met',dr?.objectives?.rtoTargetMet,`RTO target: ${dr?.objectives?.rtoMinutes??'Not set'} min`),
+        row('DR RPO target met',dr?.objectives?.rpoTargetMet,`Replication lag: ${dr?.objectives?.rpoSeconds??'Not set'} seconds`),
+        row('Capacity headroom (%)',performance?.results?.headroomPercent,`Performance input: ${JSON.stringify(performance?.inputs||{})}`)])));
+  }
+  if(sections.deployment){
+    const model=JSON.parse(deploymentManagementJson()),relationships=model.managementPlane?.relationships||[];
+    const configuration=state.builderNodes.filter(node=>['serverClass','deploymentApp'].includes(node.type));
+    pages.push(builderV125Page125('deployment','Deployment management',
+      `<p class="summary">${text(model.outageBehaviour)}</p><h3>Server classes and deployment apps</h3>`+
+      builderV125Table125(['Object','Type','Deployment Server','Client match or version','Assignments'],
+        configuration.map(node=>{const authority=state.builderNodes.find(item=>item.id===node.deploymentServerId);
+          return[text(componentInstanceLabel(node)),text(builderComponents[node.type]?.name||node.type),
+            cell(authority&&componentInstanceLabel(authority)),cell(node.type==='serverClass'?node.deploymentClientPattern:node.deploymentAppVersion),
+            cell(node.type==='serverClass'?(node.deploymentAppIds||[]).map(id=>{const app=state.builderNodes.find(item=>item.id===id);return app?componentInstanceLabel(app):`ID ${id}`}).join('; '):node.deploymentAppActivation)]}))+
+      `<h3>Deployment Server client relationships</h3>`+builderV125Table125(
+        ['Deployment Server → Client','Phone-home endpoint','Server classes','Assigned apps','Phone-home (s)','Status'],
+        relationships.map(item=>{const from=state.builderNodes.find(node=>node.id===item.from.id),to=state.builderNodes.find(node=>node.id===item.to.id);
+          return[text(`${from?componentInstanceLabel(from):item.from.id} → ${to?componentInstanceLabel(to):item.to.id}`),cell(item.targetUri),
+            cell(item.serverClasses?.join('; ')),cell(item.assignedApps?.join('; ')),cell(item.phoneHomeSeconds),cell(item.managementStatus)]}))+
+      `<h3>Failure scenarios</h3><p>${text(model.failureScenarios?.join(' · '))}</p>`));
+  }
+  if(sections.appendix){
+    const doc=builderV125CleanDoc125(topologyDocument('Architecture pack topology')),
+      missing=edges.flatMap(edge=>{const d=ensureRelationshipDetails(edge.edge);return['port','endpoint','owner'].filter(field=>!String(d[field]??'').trim()||d[field]==='Unspecified').map(field=>`${builderV125EdgeName125(edge)}: ${field} not set`)});
+    pages.push(builderV125Page125('appendix','Assumptions, legend and history',
+      `<h3>Open questions</h3><ul>${[...missing,...issues.map(item=>item.detail)].map(value=>`<li>${text(value)}</li>`).join('')||'<li>No open questions recorded.</li>'}</ul>`+
+      `<h3>Legend and glossary</h3>`+builderV125Table125(['Plane','Line style','Meaning'],[
+        ['Event data','Solid','Event transport and ingest'],['Fleet management','Dashed','Deployment configuration and control'],['Interactive authentication','Dotted','Identity and user access']].map(row=>row.map(text)))+
+      `<p>Muted badges indicate items to review; red badges indicate errors. Highlighted “Not set” cells are open configuration items.</p>`+
+      `<h3>Change history</h3><pre>${text(JSON.stringify(doc.changeHistory||[],null,2))}</pre>`));
+  }
+  return pages;
+}
+function builderV125PackPages125(){
+  const diagramPages=architecturePageSpecs().map(page=>builderV125Page125(`diagram-${page.id}`,page.title,
+    presentationSvgForArchitecturePage(page).replace(/^<\?xml[^>]*\?>/,'')));
+  const pages=[...builderV125ContentPages125(),...diagramPages];
+  if(state.builderExport.sections.cover){
+    const text=builderV125Text125,edges=builderTraceEdges('all'),summary=builderFindingSummary(),
+      title=state.builderPresentation.title||defaultPresentationTitle(),profile=builderRuleProfiles[state.builderRuleProfile]?.name||'Custom';
+    const toc=pages.map((page,index)=>`<li><span>${text(page.title)}</span><b>${index+2}</b></li>`).join('');
+    const cover=`<div class="coverMark">Splunk Pipeline Explorer · Architecture pack</div><h1>${text(title)}</h1>`+
+      `<p class="coverLead">Prepared ${text(formatPresentationDate(state.builderPresentation.date||localIsoDate()))} · ${text(state.builderPresentation.classification||state.securityClassification||'Security telemetry')}</p>`+
+      `<dl class="coverFacts"><div><dt>Owner / author</dt><dd>${builderV125Cell125(state.builderExport.owner)}</dd></div>`+
+      `<div><dt>Scope</dt><dd>Complete topology · ${text(profile)}</dd></div>`+
+      `<div><dt>Build</dt><dd>${text($('#topologyBuilder').dataset.buildNumber||'125')}</dd></div>`+
+      `<div><dt>Components / groups</dt><dd>${state.builderNodes.length} / ${state.builderGroups.length}</dd></div>`+
+      `<div><dt>Event / management / authentication connections</dt><dd>${['data','management','authentication'].map(plane=>edges.filter(edge=>edge.plane===plane).length).join(' / ')}</dd></div>`+
+      `<div><dt>Review</dt><dd>${summary.errors?'Review needed':'Valid'} · ${summary.errors} errors · ${summary.review} to review</dd></div></dl>`+
+      `<h2>Contents</h2><ol class="toc">${toc}</ol>`;
+    pages.unshift(builderV125Page125('cover','Cover and contents',cover));
+  }
+  return pages;
+}
+architecturePackHtml=function(){
+  const pages=builderV125PackPages125(),text=builderV125Text125,title=state.builderPresentation.title||defaultPresentationTitle(),
+    classification=state.builderPresentation.classification||state.securityClassification||'Security telemetry',
+    theme=state.builderExport.printTheme==='dark'?'dark':'light',
+    embedded=JSON.stringify(builderV125CleanDoc125(topologyDocument('Architecture pack topology'))).replace(/</g,'\\u003c');
+  return`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">`+
+    `<title>${text(title)} · Architecture pack</title><style>
+@page{size:A4 landscape;margin:8mm}*{box-sizing:border-box}body{margin:0;background:#e8eff3;color:#172d40;font-family:Inter,Segoe UI,Arial,sans-serif}
+.page{position:relative;min-height:100vh;padding:26px 32px 42px;margin:0 auto 16px;max-width:1500px;background:#fff;break-after:page;page-break-after:always}
+.page:last-of-type{break-after:auto;page-break-after:auto}.page h1{font-size:31px;margin:35px 0 10px}.page h2{font-size:20px;margin:0 0 12px}.page h3{font-size:14px;margin:16px 0 7px}
+.page p,.page li{font-size:12px;line-height:1.45}.pageHeader{display:flex;justify-content:space-between;gap:18px;border-bottom:1px solid #9eb5c5;padding-bottom:9px;margin-bottom:12px;color:#20465e}
+.pageHeader small{white-space:nowrap}.pageFooter{position:absolute;left:32px;right:32px;bottom:14px;border-top:1px solid #a8bac5;padding-top:7px;display:flex;justify-content:space-between;font-size:10px;color:#40596b}
+.coverMark{font-size:11px;text-transform:uppercase;letter-spacing:.13em;color:#275777}.coverLead{font-size:14px!important;color:#39596d}.coverFacts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.coverFacts div{border:1px solid #a3bccb;border-radius:6px;padding:9px}.coverFacts dt{font-size:10px;color:#486679}.coverFacts dd{margin:4px 0 0;font-weight:700;font-size:12px}
+.toc{columns:2;padding-left:20px}.toc li{break-inside:avoid;display:flex;justify-content:space-between;gap:12px;border-bottom:1px dotted #91aaba;margin:4px 14px 4px 0}
+.tableScroll{overflow:auto}table{width:100%;border-collapse:collapse;font-size:10px;line-height:1.25}thead{display:table-header-group}tr{break-inside:avoid;page-break-inside:avoid}
+th,td{border:1px solid #a4b8c6;padding:5px 6px;text-align:left;vertical-align:top;overflow-wrap:anywhere}th{background:#e2ebf0;color:#143d55}.notSet{color:#7b2a00;background:#ffebc5;font-weight:700;padding:1px 4px;border-radius:3px}
+.summary{font-weight:700;background:#e4edf3;border-left:3px solid #1f6483;padding:7px}.pageNote{background:#eaf1f5;border-left:3px solid #16607d;padding:7px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:9px}
+.diagram svg{display:block;width:100%;height:auto;max-height:calc(100vh - 112px)}
+body.theme-dark{background:#030a10;color:#eaf3f7}body.theme-dark .page{background:#071722;color:#eaf3f7}
+body.theme-dark .pageHeader,body.theme-dark .pageFooter,body.theme-dark .coverMark{color:#c7e3f1;border-color:#567284}
+body.theme-dark th,body.theme-dark .summary,body.theme-dark .pageNote{background:#18394b;color:#eaf3f7}
+body.theme-dark th,body.theme-dark td,body.theme-dark .coverFacts div{border-color:#537184}
+body.theme-dark .coverFacts dt,body.theme-dark .coverLead{color:#c7dfed}
+body.theme-light .diagram svg>rect:first-of-type{fill:#fff}body.theme-light .diagram svg .title{fill:#102f44}body.theme-light .diagram svg .subtitle,body.theme-light .diagram svg .legend{fill:#345164}
+body.theme-light .diagram svg path[stroke="#57c7e8"],body.theme-light .diagram svg line[stroke="#57c7e8"]{stroke:#006487}
+body.theme-light .diagram svg path[stroke="#2dd4bf"],body.theme-light .diagram svg line[stroke="#2dd4bf"]{stroke:#006853}
+body.theme-light .diagram svg path[stroke="#d28df5"],body.theme-light .diagram svg line[stroke="#d28df5"]{stroke:#71339b}
+@media print{body{margin:0!important;background:#fff!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+ .page{width:100%;max-width:none;min-height:178mm;margin:0;padding:4mm 4mm 14mm;break-after:page;page-break-after:always}
+ .page:last-of-type{break-after:auto;page-break-after:auto}.pageFooter{left:4mm;right:4mm;bottom:3mm}
+ .diagram svg{max-height:160mm}.page h1{margin-top:18mm}.tableScroll{overflow:visible}table{font-size:8px}th,td{padding:3px 4px}}
+</style></head><body class="theme-${theme}">`+
+    pages.map((page,index)=>`<section class="page ${page.id==='cover'?'cover':''}"><header class="pageHeader"><strong>${text(page.title)}</strong><small>${text(classification)}</small></header>`+
+      builderV125PageNote125(page.id)+`<div class="${page.id.startsWith('diagram-')?'diagram':'packPreview125'}">${page.content}</div>`+
+      `<footer class="pageFooter"><span>${text(title)} · ${text(state.builderExport.owner||'Owner not set')}</span><span>Page ${index+1} of ${pages.length} · ${text(page.title)}</span></footer></section>`).join('')+
+    `<script type="application/json" id="topology">${embedded}</scr${'ipt'}></body></html>`;
+};
+const builderV125DownloadBefore125=downloadArchitecturePack;
+downloadArchitecturePack=function(){try{const count=builderV125PackPages125().length;builderV125DownloadBefore125();builderStatus(`Exported architecture pack · ${count} pages`)}catch(error){builderStatus(`Architecture pack export failed: ${error.message}`,'error')}};
+const builderV125PresentationBefore125=updatePresentationDiagram;
+updatePresentationDiagram=function(){
+  if(!state.builderExport.multiPage)return builderV125PresentationBefore125();
+  const stage=$('#builderPresentationOverlay .builderPresentationStage');if(!stage)return;
+  try{const pages=builderV125PackPages125();stage.classList.add('multiPage');stage.innerHTML=pages.map((page,index)=>
+    `<article class="builderPresentationSheet ${page.id.startsWith('diagram-')?'':'packTextPage125'}"><span class="builderPresentationPageLabel">Page ${index+1} of ${pages.length} · ${builderV125Text125(page.title)}</span>`+
+    `<div class="${page.id.startsWith('diagram-')?'builderPresentationDiagram':'packPreview125'}">${builderV125PageNote125(page.id)}${page.content}</div></article>`).join('');
+    const badge=$('#builderPresentationOverlay .builderPresentationBadge');if(badge)badge.textContent=`${pages.length} architecture pack pages`;
+  }catch(error){stage.innerHTML=`<div class="builderPresentationEmpty">${builderV125Text125(error.message)}</div>`}
+};
+function builderV125RefreshOptions125(){
+  const options=$('#builderPackOptions');if(!options)return;
+  for(const input of options.querySelectorAll('[data-pack-section]'))input.checked=!!state.builderExport.sections[input.dataset.packSection];
+  const owner=$('#builderPackOwner125'),theme=$('#builderPackTheme125'),count=$('#builderPackPageCount125'),
+    select=$('#builderPackNotePage125'),note=$('#builderPackNote125');
+  if(owner&&document.activeElement!==owner)owner.value=state.builderExport.owner;
+  if(theme)theme.value=state.builderExport.printTheme;
+  if(count||select){
+    try{const pages=builderV125PackPages125();if(count)count.textContent=`${pages.length} pages`;
+      if(select){const current=select.value;select.replaceChildren(...pages.map(page=>new Option(page.title,page.id)));
+        if(pages.some(page=>page.id===current))select.value=current;
+        if(note&&document.activeElement!==note)note.value=state.builderExport.notes[select.value]||''}}
+    catch(error){if(count)count.textContent=error.message}
+  }
+}
+const builderV125EnsureOverlayBefore125=ensurePresentationOverlay;
+ensurePresentationOverlay=function(){
+  const overlay=builderV125EnsureOverlayBefore125(),options=$('#builderPackOptions');
+  if(options&&!$('#builderPackSections125')){
+    options.querySelector('strong')?.replaceChildren(document.createTextNode('Diagram pages'));
+    const sections=document.createElement('div');sections.id='builderPackSections125';sections.className='builderPackSections125';
+    sections.innerHTML='<strong>Sections</strong>'+[
+      ['cover','Cover'],['inventory','Inventory'],['connections','Connections'],['findings','Findings & rules'],
+      ['security','Security'],['ownership','Ownership'],['resilience','Resilience'],['deployment','Deployment'],['appendix','Appendix']]
+      .map(([key,label])=>`<label><input type="checkbox" data-pack-section="${key}"> ${label}</label>`).join('');
+    options.appendChild(sections);
+    const meta=document.createElement('div');meta.className='builderPackMeta125';meta.innerHTML=`<label>Owner or author<input id="builderPackOwner125" maxlength="120" placeholder="Optional owner"></label>`+
+      `<label>Print theme<select id="builderPackTheme125"><option value="light">Light</option><option value="dark">Dark</option></select></label>`+
+      `<label>Page note<select id="builderPackNotePage125" aria-label="Page to annotate"></select></label>`+
+      `<label>Note<input id="builderPackNote125" maxlength="300" placeholder="Optional context for reviewers"></label>`+
+      `<output id="builderPackPageCount125" aria-live="polite"></output>`;
+    options.appendChild(meta);
+    options.querySelectorAll('[data-pack-section]').forEach(input=>input.onchange=()=>{
+      state.builderExport.sections[input.dataset.packSection]=input.checked;builderV125RefreshOptions125();updatePresentationDiagram()
+    });
+    $('#builderPackOwner125').oninput=event=>{state.builderExport.owner=event.target.value;updatePresentationDiagram()};
+    $('#builderPackTheme125').onchange=event=>{state.builderExport.printTheme=event.target.value;updatePresentationDiagram()};
+    $('#builderPackNotePage125').onchange=event=>{$('#builderPackNote125').value=state.builderExport.notes[event.target.value]||''};
+    $('#builderPackNote125').oninput=event=>{state.builderExport.notes[$('#builderPackNotePage125').value]=event.target.value;updatePresentationDiagram()};
+    options.querySelectorAll('[data-pack-dimension]').forEach(input=>input.addEventListener('change',builderV125RefreshOptions125));
+  }
+  builderV125RefreshOptions125();return overlay;
+};
+const builderV125ControlsBefore125=updatePresentationExportControls;
+updatePresentationExportControls=function(...args){const result=builderV125ControlsBefore125(...args);builderV125RefreshOptions125();return result};
+/* A pack stores the same topology JSON used by Import JSON; the embedded script is inert. */
+async function builderV125ImportPack125(file){
+  if(!file)return;
+  try{
+    const source=await file.text();if(source.length>8_000_000)throw new Error('The architecture pack is too large to import.');
+    const document125=new DOMParser().parseFromString(source,'text/html'),embedded=document125.querySelector('script#topology[type="application/json"]');
+    if(!embedded)throw new Error('No re-importable topology was found in this architecture pack.');
+    const restored=JSON.parse(embedded.textContent),parsed=loadTopologyDocument(restored,'Imported');
+    renderSavedTopologies();builderStatus(`Imported “${parsed.name}” from architecture pack · review and save if required`);
+  }catch(error){builderStatus(`Architecture pack import failed: ${error.message}`,'error')}
+  finally{const input=$('#builderImportPackFile125');if(input)input.value=''}
+}
+function builderV125InstallImport125(){
+  const importButton=$('#builderImport');if(!importButton||$('#builderImportPack125'))return;
+  const button=document.createElement('button');button.type='button';button.id='builderImportPack125';
+  button.className='builderBtn';button.textContent='Import from architecture pack';
+  const input=document.createElement('input');input.id='builderImportPackFile125';input.type='file';input.accept='.html,text/html';input.hidden=true;
+  importButton.insertAdjacentElement('afterend',button);button.insertAdjacentElement('afterend',input);
+  button.onclick=()=>input.click();input.onchange=event=>builderV125ImportPack125(event.target.files?.[0]);
+}
+builderV125InstallImport125();
+const builderV125RenderBefore125=renderBuilder;
+renderBuilder=function(...args){const result=builderV125RenderBefore125(...args);builderV125InstallImport125();return result};
+const builderV125TopologyBefore125=topologyDocument;
+topologyDocument=function(...args){const doc=builderV125TopologyBefore125(...args);doc.exportPreferences={...doc.exportPreferences,
+  packSections:{...state.builderExport.sections},packOwner:state.builderExport.owner,packPrintTheme:state.builderExport.printTheme,
+  packNotes:{...state.builderExport.notes}};return doc};
+const builderV125LoadBefore125=loadTopologyDocument;
+loadTopologyDocument=function(doc,...args){const result=builderV125LoadBefore125(doc,...args),pref=doc?.exportPreferences||{};
+  if(pref.packSections)state.builderExport.sections={...state.builderExport.sections,...pref.packSections};
+  state.builderExport.owner=String(pref.packOwner||'').slice(0,120);
+  if(['light','dark'].includes(pref.packPrintTheme))state.builderExport.printTheme=pref.packPrintTheme;
+  state.builderExport.notes=pref.packNotes&&typeof pref.packNotes==='object'?{...pref.packNotes}:{};
+  return result};
+document.title='Splunk Pipeline Explorer · Build 125 · 28 Sep 2026';
+$('#topologyBuilder').dataset.buildNumber='125';$('#topologyBuilder').dataset.buildDate='2026-09-28';
+const builderV125Stamp125=$('.builderBuildStamp');if(builderV125Stamp125){builderV125Stamp125.setAttribute('aria-label','Build 125, dated 28 September 2026');builderV125Stamp125.querySelector('b').textContent='Build 125'}
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(
+  ['Connector label clearance','Keep labels off component cards and retain perpendicular endpoint stubs in close layouts.',true],
+  ['Architecture pack content','Export a cover, component and connection registers, findings, rules, security, ownership, resilience, deployment and a re-importable appendix with printable page numbers.',true],
+  ['Architecture pack options','Choose report sections, owner, print theme and page notes; omit duplicate diagram scopes and import a topology from an HTML pack.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
+<style id="builder-palette-pin-v126-styles">
+.topologyBuilder #builderPalettePin126{min-width:44px}
+.topologyBuilder #builderPalettePin126[aria-pressed="true"]{border-color:#8cddcf;background:#174a43;color:#e1fff1}
+.topologyBuilder.canvasPalettePinned #builderAddToggle[aria-pressed="true"]{border-color:#8cddcf!important}
+@media(min-width:1121px){
+  .topologyBuilder.canvasFirst.canvasPalettePinned:not(.canvasFocus) .builderGrid{
+    grid-template-columns:minmax(255px,300px) minmax(0,1fr)!important
+  }
+  .topologyBuilder.canvasFirst.canvasPalettePinned.canvasInspectorPinned:not(.canvasFocus) .builderGrid{
+    grid-template-columns:minmax(255px,290px) minmax(0,1fr) minmax(275px,305px)!important
+  }
+  .topologyBuilder.canvasFirst.canvasPalettePinned:not(.canvasFocus) .builderPalette{
+    display:block!important;position:sticky!important;grid-column:1;grid-row:1;align-self:start;
+    top:12px!important;left:auto!important;right:auto!important;bottom:auto!important;
+    width:auto!important;max-width:none!important;height:clamp(480px,calc(100dvh - 130px),760px)!important;
+    max-height:none;visibility:visible!important;z-index:3;overflow-y:auto;
+    border:0;border-right:1px solid #46667a;border-radius:0;box-shadow:none
+  }
+  .topologyBuilder.canvasFirst.canvasPalettePinned:not(.canvasFocus) .builderWorkspace{grid-column:2!important;grid-row:1;min-width:0}
+  .topologyBuilder.canvasFirst.canvasPalettePinned.canvasInspectorPinned:not(.canvasFocus) .builderInspector{
+    grid-column:3!important;grid-row:1
+  }
+}
+@media(pointer:coarse){.topologyBuilder #builderPalettePin126{min-height:40px}}
+</style>
+<script id="builder-palette-pin-v126">
+/* A pinned palette docks on desktop and persists until the user explicitly unpins or closes it. */
+const builderPalettePinKey126='splunkPipelineExplorer.palettePinned.v1';
+let builderPalettePinned126=false;
+try{builderPalettePinned126=localStorage.getItem(builderPalettePinKey126)==='true'}catch{}
+const builderPalettePin126=document.createElement('button');
+builderPalettePin126.type='button';builderPalettePin126.id='builderPalettePin126';
+builderPalettePin126.setAttribute('aria-controls','builderCanvasPalette');
+builderPalettePin126.setAttribute('aria-pressed','false');
+paletteHead.querySelector('div')?.prepend(builderPalettePin126);
+const builderPaletteSyncBefore126=syncCanvasPanels;
+syncCanvasPanels=function(...args){
+  if(builderPalettePinned126&&!state.builderCanvasFocus&&!builderPaletteChangePending)canvasPanelState.palette=true;
+  const result=builderPaletteSyncBefore126(...args);
+  const docked=builderPalettePinned126&&!builderPaletteChangePending;
+  canvasFirstRoot.classList.toggle('canvasPalettePinned',docked);
+  builderPalettePin126.setAttribute('aria-pressed',String(builderPalettePinned126));
+  builderPalettePin126.textContent=builderPalettePinned126?'Unpin':'Pin';
+  builderPalettePin126.title=builderPalettePinned126?'Return to a temporary palette':'Keep the component palette open beside the canvas';
+  $('#builderAddToggle')?.setAttribute('aria-pressed',String(builderPalettePinned126&&canvasPanelState.palette));
+  return result;
+};
+function builderPaletteSetPin126(pinned,{refit=true}={}){
+  builderPalettePinned126=!!pinned;
+  if(pinned)canvasPanelState.palette=true;
+  try{localStorage.setItem(builderPalettePinKey126,String(builderPalettePinned126))}catch{}
+  syncCanvasPanels();positionBuilderPalette();
+  if(refit&&state.view==='builder'&&!state.builderCanvasFocus)requestAnimationFrame(()=>fitBuilderView(false));
+}
+builderPalettePin126.onclick=()=>builderPaletteSetPin126(!builderPalettePinned126);
+const builderPaletteCloseBefore126=$('#builderPaletteDrawerClose').onclick;
+$('#builderPaletteDrawerClose').onclick=function(...args){builderPaletteSetPin126(false,{refit:false});const result=builderPaletteCloseBefore126.apply(this,args);if(state.view==='builder')requestAnimationFrame(()=>fitBuilderView(false));return result};
+for(const id of ['builderAddToggle','builderFocusAdd']){
+  const button=$('#'+id),prior=button?.onclick;if(!button||!prior)continue;
+  button.onclick=function(...args){
+    if(builderPalettePinned126&&!state.builderCanvasFocus){builderPaletteSetPin126(false,{refit:false});canvasPanelState.palette=false;syncCanvasPanels();button.focus();requestAnimationFrame(()=>fitBuilderView(false));return}
+    return prior.apply(this,args);
+  };
+}
+window.addEventListener('keydown',event=>{
+  if(event.key!=='Escape'||!builderPalettePinned126||!canvasPanelState.palette||builderPaletteChangePending||state.view!=='builder'||document.fullscreenElement)return;
+  if(event.target.closest?.('.builderObjectMenu,.builderIssuePopover'))return;
+  builderPalettePinned126=false;try{localStorage.setItem(builderPalettePinKey126,'false')}catch{}
+},true);
+const builderPaletteFitBefore126=fitBuilderView;
+fitBuilderView=function(...args){
+  if(!builderPalettePinned126||state.builderCanvasFocus||innerWidth<1121)return builderPaletteFitBefore126(...args);
+  const open=canvasPanelState.palette;canvasPanelState.palette=false;
+  try{return builderPaletteFitBefore126(...args)}finally{canvasPanelState.palette=open}
+};
+const builderPaletteRenderBefore126=renderBuilder;
+renderBuilder=function(...args){const result=builderPaletteRenderBefore126(...args);
+  if(builderPalettePinned126&&state.view==='builder'&&canvasPanelState.palette)renderPaletteSearch();
+  return result;
+};
+syncCanvasPanels();
+document.title='Splunk Pipeline Explorer · Build 126 · 29 Sep 2026';
+$('#topologyBuilder').dataset.buildNumber='126';$('#topologyBuilder').dataset.buildDate='2026-09-29';
+const builderPaletteStamp126=$('.builderBuildStamp');if(builderPaletteStamp126){builderPaletteStamp126.setAttribute('aria-label','Build 126, dated 29 September 2026');builderPaletteStamp126.querySelector('b').textContent='Build 126';const date=builderPaletteStamp126.querySelector('time');if(date){date.dateTime='2026-09-29';date.textContent='29 Sep 2026'}}
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Pinned component palette','Keep the searchable palette open while adding and selecting components, dock it beside the desktop canvas, and restore the pin across visits.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
+<style id="builder-relationship-auth-v127-styles">
+.topologyBuilder .relationshipInspectorGrid .relationshipAuthHint127{grid-column:1/-1;color:#9bb4c2;font-size:.66rem;line-height:1.4;margin:0 0 3px}
+.topologyBuilder .relationshipInspectorGrid [data-relationship-field="authenticationType"]:disabled{opacity:.62}
+</style>
+<script id="builder-relationship-auth-v127">
+/* Model the authentication mechanism on a relationship, never a credential value. */
+const builderAuthRequiredValues127=['Unknown','Yes','No'];
+const builderAuthTypeValues127=['Not specified','API key','HEC token','OAuth 2.0 / bearer token','Basic credentials','Mutual TLS certificate','AWS IAM / SigV4','SAML SSO','OpenID Connect','LDAP bind','Session cookie','Other','Not applicable'];
+function builderAuthApplies127(edge,protocol){
+  if(!edge)return false;
+  const handoff=String(protocol||edge.label||'').trim();
+  return !/^(?:udp|file handoff|local file(?: handoff)?|filesystem copy)$/i.test(handoff);
+}
+const builderAuthDefaultsBefore127=defaultRelationshipDetails;
+defaultRelationshipDetails=function(edge){
+  const details=builderAuthDefaultsBefore127(edge),handoff=String(details.protocol||'');
+  let required='Unknown',type='Not specified';
+  if(edge.plane==='authentication'){
+    required='Yes';
+    if(/saml/i.test(handoff))type='SAML SSO';
+    else if(/oidc|openid/i.test(handoff))type='OpenID Connect';
+    else if(/ldap/i.test(handoff))type='LDAP bind';
+  }else if(/hec/i.test(handoff)&&edge.target?.type==='hecEndpoint'){
+    required='Yes';type='HEC token';
+  }
+  return {...details,authenticationRequired:required,authenticationType:type};
+};
+const builderAuthSanitizeBefore127=sanitizeRelationshipDetails;
+sanitizeRelationshipDetails=function(value,defaults){
+  const details=builderAuthSanitizeBefore127(value,defaults),source=value&&typeof value==='object'?value:{};
+  const required=builderAuthRequiredValues127.includes(source.authenticationRequired)?source.authenticationRequired:defaults.authenticationRequired||'Unknown';
+  let type=builderAuthTypeValues127.includes(source.authenticationType)?source.authenticationType:defaults.authenticationType||'Not specified';
+  if(required==='No')type='Not applicable';
+  else if(type==='Not applicable')type='Not specified';
+  return {...details,authenticationRequired:required,authenticationType:type};
+};
+const builderAuthMarkupBefore127=relationshipInspectorMarkup;
+relationshipInspectorMarkup=function(){
+  const markup=builderAuthMarkupBefore127(),selected=state.builderSelectedEdge;
+  if(!selected||state.builderConnectionDraft)return markup;
+  const edge=builderEdgeRecord(selected.plane,selected.id);
+  if(!edge)return markup;
+  const details=ensureRelationshipDetails(edge);
+  if(!builderAuthApplies127(edge,details.protocol))return markup;
+  const required=`<label>Authentication required<select data-relationship-field="authenticationRequired">${relationshipOptionList(builderAuthRequiredValues127,details.authenticationRequired)}</select></label>`;
+  const type=`<label>Authentication type<select data-relationship-field="authenticationType" ${details.authenticationRequired==='No'?'disabled':''}>${relationshipOptionList(builderAuthTypeValues127.filter(value=>value!=='Not applicable'||details.authenticationRequired==='No'),details.authenticationType)}</select></label>`;
+  const hint='<p class="relationshipAuthHint127">Record the mechanism, not a secret. For REST polling, select API key only when the source uses one.</p>';
+  return markup.replace('<label>Acknowledgement',required+type+hint+'<label>Acknowledgement');
+};
+function builderAuthEdges127(){return [...state.builderNodes.filter(node=>node.parent!==null).map(node=>builderEdgeRecord('data',node.id)),...(state.builderDataRelations||[]).map(relation=>builderEdgeRecord('data',relation.id)),...state.builderRelations.map(relation=>builderEdgeRecord('management',relation.id)),...state.builderAuthRelations.map(relation=>builderEdgeRecord('authentication',relation.id))].filter(Boolean)}
+function builderAuthCell127(value){return String(value??'').replace(/\|/g,'\\|').replace(/[\r\n]+/g,' ')}
+const builderAuthReportBefore127=architectureReportMarkdown;
+architectureReportMarkdown=function(...args){
+  const report=builderAuthReportBefore127(...args),edges=builderAuthEdges127().filter(edge=>builderAuthApplies127(edge,ensureRelationshipDetails(edge).protocol));
+  const section=`## Relationship authentication\n\n| Relationship | Required | Authentication type |\n|---|---|---|\n${edges.map(edge=>{const details=ensureRelationshipDetails(edge);return`| ${builderAuthCell127(componentInstanceLabel(edge.source))} → ${builderAuthCell127(componentInstanceLabel(edge.target))} | ${details.authenticationRequired} | ${builderAuthCell127(details.authenticationType)} |`}).join('\n')||'| No applicable relationships | — | — |'}\n\n`;
+  return report.includes('## Failure analysis')?report.replace('## Failure analysis',section+'## Failure analysis'):report+'\n'+section;
+};
+const builderAuthTestsBefore127=generatedTestPlan;
+generatedTestPlan=function(...args){
+  const plan=builderAuthTestsBefore127(...args),edges=builderAuthEdges127().filter(edge=>builderAuthApplies127(edge,ensureRelationshipDetails(edge).protocol));
+  return plan+`\n\n## Relationship authentication checks\n\n${edges.map(edge=>{const details=ensureRelationshipDetails(edge),route=`${componentInstanceLabel(edge.source)} → ${componentInstanceLabel(edge.target)}`;return`- ${route}: authentication ${details.authenticationRequired.toLowerCase()}${details.authenticationRequired==='Yes'?` via ${details.authenticationType}`:''}; confirm the configured mechanism without recording credentials.`}).join('\n')||'- No applicable relationships.'}`;
+};
+document.title='Splunk Pipeline Explorer · Build 127 · 29 Sep 2026';
+$('#topologyBuilder').dataset.buildNumber='127';$('#topologyBuilder').dataset.buildDate='2026-09-29';
+const builderAuthStamp127=$('.builderBuildStamp');
+if(builderAuthStamp127){builderAuthStamp127.setAttribute('aria-label','Build 127, dated 29 September 2026');builderAuthStamp127.querySelector('b').textContent='Build 127';const date=builderAuthStamp127.querySelector('time');if(date){date.dateTime='2026-09-29';date.textContent='29 Sep 2026'}}
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Relationship authentication','Record whether an applicable connection needs authentication and which mechanism it uses; preserve this in topology JSON and assurance output without storing credentials.',true]);
+if(state.view==='changes')renderChanges();
 </script>
 
 </body>
