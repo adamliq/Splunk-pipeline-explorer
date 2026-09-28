@@ -215,7 +215,7 @@ Do this after section 8, or independently; the two touch different elements. Put
 
 ## 10. Next task: canvas, messaging and mobile polish (v118)
 
-Do this after sections 8 and 9. Put all changes in `<style id="builder-ui-polish-v118-styles">` and `<script id="builder-ui-polish-v118">`. Items are listed in priority order; **1, 5 and 8 have the most effect for the least effort.** These come from a visual review of the default desktop view, the open dock, the review popover and mobile after adding a node. The inspector, the Review drawer, Focus mode and text contrast were **not** reviewed; check them too while you're there.
+Do this after sections 8 and 9. Put all changes in `<style id="builder-ui-polish-v118-styles">` and `<script id="builder-ui-polish-v118">`. Items are listed in priority order; **1, 5 and 8 have the most effect for the least effort.** These come from a visual review of the default desktop view, the open dock, the review popover, the Inspector, the Review drawer, Focus mode and mobile, plus automated measurements of text size and contrast. Items 11–15 were added after the second pass.
 
 ### Canvas and node cards
 1. **Show plane pills only on hover or selection.** Under every node, `.builderConnectionHandles` shows "Event data", "Fleet management" and "Interactive authentication". That makes `.unifiedNodeWrap` 218–255px tall instead of about 150px. On desktop, show the pills only for the hovered, focused (`:focus-within`) or selected node (`.unifiedNodeWrap.multiSelected`, or whichever node holds `state.builderSelected`). Keep them in the layout with `visibility`/`opacity` so nodes don't jump. Keep them always visible on touch devices (`@media (pointer:coarse)`), where there is no hover. Then check that Fit (the measured bounds from v112) zooms in further, and that dragging from a handle still works.
@@ -236,6 +236,19 @@ Do this after sections 8 and 9. Put all changes in `<style id="builder-ui-polish
 ### Mobile
 10. **Show the Inspector as a bottom sheet on mobile.** At 390px wide, adding a node opens the Inspector full screen, over the canvas and the page header, so the new node can't be seen. Up to 760px wide, make the Inspector a bottom sheet about 60% of the viewport tall, with a drag handle that expands it to full height, plus a visible Close button. Keep the canvas above it scrolled so the selected node is in view. Keep Pin/Close working.
 
+### Found in the second review pass
+11. **Mobile: the canvas starts about two screens down.** At 390×844 the canvas top is at y=1763 (the document is 2619px tall). Above it are the page header, the page-wide search and pipeline filter, the view tabs (two rows), the builder header, the full toolbar (buttons wrap: "＋ Add" breaks onto two lines and "Inspector" is clipped), the plane toggles (labels wrap) and the search panel. Up to 760px wide:
+    - Collapse the toolbar into one row: ＋ Add, Inspector, and a "More" menu holding Focus canvas, Hide minimap, Presentation, Full screen, Navigate/Build/Validate/Export.
+    - Collapse the plane toggles into a compact "Planes (3)" menu.
+    - Keep the search and navigate panel collapsed by default, the same as the v113 desktop dock.
+    - Hide the builder description (see item 9), and hide `#search` and `#pipelineFilter` (see item 8).
+    - Target: canvas top at y ≤ 700 at 390×844, and no button label wraps or clips.
+12. **Anchor the desktop Inspector to the canvas.** It uses the same `position:fixed` rule as the palette (`.topologyBuilder.canvasFirst .builderInspector`). At 1440×900 it opens at the viewport's top-right, over the page stats chips and the "Operate" tab, and it hides the right-most node (Indexer). Anchor it inside the canvas's right edge, the mirror image of the palette fix in section 9 item 2, sized to the canvas and scrolling internally. While it's open, keep the selected node in view (pan if needed). The Review drawer (`openBuilderDrawer`) already sits within the builder section and is fine.
+13. **Focus mode should hide the page chrome.** `.topologyBuilder.canvasFocus` hides the builder header and dock, but the page header, the page-wide search and pipeline filter, and the view tabs stay visible (about 160px). In Focus mode, hide those too, so the focus bar is at the top of the viewport. Restore them on Exit focus or Esc. Also, in the focus bar, the standalone "Saved" text next to "Save" reads like a second button; render it as a muted status (`aria-live`) or merge it into the Save button ("Save ✓").
+14. **Minimum text size.** 57 visible text elements in the Builder are under 10px: node chips ("Production", "Unspecified") are 8.3px, the History count 8.8px, route labels ("TCP/TLS or UDP") 9px, dock statuses ("12 findings", "Splunk Enterprise") 9.1px, and menu labels ("Export scope", "Diagram") 9.0px. Raise all Builder text to at least 10px, and chips and labels on the canvas to at least 10.5px at 100% zoom. Canvas text also scales with zoom, so check it at the typical Fit zoom (about 100–115%).
+15. **Low-contrast count.** The dock's review count ("12", 11.2px) measures about 3.8:1 against its background; raise it to at least 4.5:1. (The contrast checker also flagged the node footer tier labels at 1.1:1, but they read fine visually; that was a background-detection error. Recheck them once item 2 changes the footer.)
+    - The Review drawer header already uses the wording "0 errors · 12 to review"; reuse that exact phrasing for item 5.
+
 ### Acceptance criteria
 - At 1440×900 with the default topology, nodes are at most about 170px tall when not selected, and Fit zoom goes up. Hovering, focusing or selecting a node shows its pills; making a connection by drag still works.
 - No node shows the same text in its header and footer, and no node shows "Production" twice.
@@ -244,5 +257,9 @@ Do this after sections 8 and 9. Put all changes in `<style id="builder-ui-polish
 - The build stamp, `<title>` and `data-build-*` attributes match the release.
 - In the Builder view, `#search` and `#pipelineFilter` are hidden, and they come back on Flow. The canvas top moves up by roughly their row height.
 - At 390×844, adding a node shows a bottom-sheet inspector with the new node visible above it.
+- At 390×844 the canvas top is at y ≤ 700, and no toolbar button label wraps or is clipped.
+- At 1440×900 the open Inspector sits within the canvas rectangle, and covers no page header, stats chips or view tabs.
+- In Focus mode, the page header, search, pipeline filter and view tabs are hidden, and they return on exit.
+- No visible Builder text is under 10px (automated check over `#topologyBuilder` text nodes), and every text element is at least 4.5:1 contrast, excluding decorative badges.
 - No `pageerror` at 1280, 1440, 1920 or 390, or across a 1440→1000→1440 resize. No horizontal page scroll. The v115 button sweep still passes.
 - Add a `changeRegister` entry the way v112–v115 do.
