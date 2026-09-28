@@ -3726,5 +3726,137 @@ changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['C
 if(state.view==='changes')renderChanges();
 </script>
 
+<style id="builder-density-polish-v114-styles">
+@media (min-width:1121px){
+  .builderDensityHeaderPrimary{flex-wrap:nowrap}
+  .builderDensityHeaderPrimary select{width:190px;padding:6px 9px;font-size:.7rem}
+  .builderDensityDock .builderGroupBar{grid-column:5;grid-row:1}
+  .builderDensityPanels{grid-row:2}
+  .builderDensityHeaderPrimary .builderBtn,.topologyBuilder .builderActionWrap .builderIoStatus{white-space:nowrap}
+  .builderDensityHeaderPrimary kbd{display:none}
+  .topologyBuilder .builderHead>div:first-child{flex:1 1 360px}
+  .builderDensityToggle{justify-content:flex-start}
+  .builderDensityToggle span{flex:1;min-width:0}
+  .builderDensityToggle small{margin-left:5px;color:#8fa9b8;font-weight:600}
+}
+</style>
+<script id="builder-density-polish-v114">
+/* Browsers can fire the media-query change event while it still matches (zoom, print
+   preview); re-running the desktop layout then throws in insertBefore. Skip it when applied. */
+builderDensityMedia.removeEventListener('change',builderDensityLayout);
+builderDensityMedia.addEventListener('change',()=>{if(builderDensityMedia.matches&&builderDensityDock.isConnected)builderDensitySync();else builderDensityLayout()});
+/* Show each toggle's name in full and let only its status truncate; keep the full text as a tooltip. */
+const builderDensitySyncBeforeLabels=builderDensitySync;
+builderDensitySync=function(){builderDensitySyncBeforeLabels();const names={builderFindNavigate:'Find & navigate',builderRuleProfileDisclosure:'Architecture profile',builderReviewDisclosure:'Review findings',builderSecondaryTools:'Tools'};for(const button of builderDensityDock.querySelectorAll('.builderDensityToggle')){const name=names[button.getAttribute('aria-controls')],label=button.querySelector('span'),status=label.textContent.slice(name.length).trim().replace(/^·\s*/,'');label.textContent=name;if(status){const small=document.createElement('small');small.textContent=status;label.appendChild(small)}button.title=status?`${name} · ${status}`:name}};
+/* Shortcut hints are hidden in the compact header, so expose them as tooltips. */
+for(const [id,keys,label] of [['builderUndo','Control+Z','Undo (Ctrl Z)'],['builderRedo','Control+Y','Redo (Ctrl Y)']]){const button=$('#'+id);if(button){button.title=label;button.setAttribute('aria-keyshortcuts',keys)}}
+if(builderDensityMedia.matches)builderDensitySync();
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Compact Builder header and dock polish','Keep history and save controls on one row, place containers beside the dock toggles and show each toggle name in full.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
+<style id="builder-toolbar-declutter-v115-styles">
+@media (min-width:1121px) and (pointer:fine){
+  .topologyBuilder .builderHead{padding-top:5px;padding-bottom:5px}
+  .topologyBuilder .builderWorkspace{padding-top:8px}
+  .topologyBuilder .builderDensityDock{margin-bottom:7px}
+  .topologyBuilder .builderToolbar{display:none}
+  .topologyBuilder .builderPlaneBar.unifiedPlaneBar{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;min-width:0;min-height:36px;padding:4px 7px;margin-bottom:7px}
+  .builderPlaneBar .unifiedPlaneChecks{flex:0 1 auto;min-width:0}
+  .builderPlaneBar .builderNavigation{display:flex;flex:1 1 auto;min-width:0;margin-left:auto;justify-content:flex-end;flex-wrap:nowrap}
+  .builderPlaneBar .builderAutoStatus{display:none}
+  .builderPlaneBar .builderCanvasQuickActions{margin:0}
+  .builderPlaneBar .builderNavMenuCluster{flex-wrap:nowrap}
+  .builderPlaneBar .unifiedPlaneHint{display:none}
+  .builderPlaneBar.unifiedPlaneBar.freePlaceActive{flex-wrap:wrap}
+  .builderPlaneBar.freePlaceActive .builderLayoutPersistence{flex:1 0 100%;min-width:0}
+  .builderPlaneBar .builderNavigation #builderZoomOut,.builderPlaneBar .builderNavigation #builderZoomIn,.builderPlaneBar .builderNavigation #builderZoomReadout,.builderPlaneBar .builderNavigation #builderMinimapToggle{display:none}
+  .builderPlaneBar #builderInspectorToggle[aria-pressed="true"],.builderPlaneBar #builderFocusToggle[aria-pressed="true"]{border-color:#83d8dd;background:#174452;color:#e8fafb}
+  .builderCanvas .builderCanvasChromeTop{position:absolute;left:10px;top:10px;z-index:36;display:flex;align-items:center;gap:9px;max-width:calc(100% - 86px)}
+  .builderCanvas .builderCanvasChromeTop #builderAddToggle{height:35px;border-color:#6bcfae;border-radius:99px;background:#174537;color:#e1ffeb;white-space:nowrap}
+  .builderCanvas .builderCanvasChromeTop #builderCanvasTitle{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#a0bac8;font-size:.65rem}
+  .builderCanvas #builderFullscreenToggle{position:absolute;right:10px;top:10px;z-index:36;display:grid;place-items:center;width:35px;height:35px;padding:0;font-size:1.15rem}
+  .builderCanvas .builderMobileZoomControls{display:flex;left:auto;top:auto;right:10px;bottom:116px;z-index:36;gap:3px;padding:3px}
+  .builderCanvas .builderMobileZoomButton{min-width:30px;height:30px;padding:0 5px;font-size:.82rem}
+  .builderCanvas .builderMobileZoomButton.fit{font-size:.62rem}
+  .builderCanvas #builderMobileZoomPercent{min-width:43px;cursor:pointer;border:0;background:transparent;font-family:inherit}
+  .builderCanvas #builderMobileZoomPercent:hover{color:#e5f7fc}
+  .topologyBuilder.minimapHidden .builderCanvas .builderMobileZoomControls{bottom:46px}
+  .builderCanvas .builderMinimap #builderMinimapCorner{position:absolute;right:3px;top:3px;z-index:4;border:1px solid #496779;border-radius:5px;padding:1px 5px;background:#112836;color:#d9eaf0;cursor:pointer;font-size:.7rem}
+  .builderCanvas #builderMapChip{position:absolute;right:10px;bottom:10px;z-index:36;display:none;border:1px solid #426475;border-radius:7px;padding:6px 9px;background:#102635;color:#e0eef1;cursor:pointer;font-size:.65rem}
+  .topologyBuilder.minimapHidden .builderCanvas #builderMapChip{display:block}
+  .builderCanvas .builderNavigationHint{max-width:calc(100% - 200px)}
+  .builderCanvas .builderNavigationHint .builderDragHelp{display:inline;margin-left:6px;font-size:inherit}
+  .builderMenuItems .unifiedLayoutControl{display:flex;margin:0;padding:5px 3px;justify-content:space-between;gap:8px;white-space:nowrap}
+  .builderMenuItems .unifiedLayoutControl select{min-width:125px;max-width:170px}
+  .topologyBuilder.presentationView .builderCanvasChromeTop #builderAddToggle{display:none!important}
+  .topologyBuilder:fullscreen .builderCanvas .builderMobileZoomControls{display:flex}
+}
+</style>
+<script id="builder-toolbar-declutter-v115">
+/* Move only existing controls; restore their original parents when desktop mode ends. */
+const builderToolbarMedia=window.matchMedia('(min-width:1121px) and (pointer:fine)');
+const builderToolbar=$('.builderToolbar'),builderPlaneBar=$('.builderPlaneBar'),builderCanvas=$('.builderCanvas');
+const builderNavOriginal=$('.builderNavigation'),builderToolbarMarkers=new Map();
+const builderCanvasChrome=document.createElement('div');builderCanvasChrome.className='builderCanvasChromeTop';
+const builderMapChip=document.createElement('button');builderMapChip.type='button';builderMapChip.id='builderMapChip';builderMapChip.textContent='Map';builderMapChip.setAttribute('aria-label','Show topology minimap');
+const builderMapCorner=document.createElement('button');builderMapCorner.type='button';builderMapCorner.id='builderMinimapCorner';builderMapCorner.textContent='▾';builderMapCorner.title='Hide topology minimap';builderMapCorner.setAttribute('aria-label','Hide topology minimap');
+function builderToolbarMove(node,parent){if(!node||!parent)return;if(!builderToolbarMarkers.has(node)){const marker=document.createComment('Toolbar original position');node.before(marker);builderToolbarMarkers.set(node,marker)}parent.appendChild(node)}
+function builderToolbarRestore(){for(const [node,marker] of builderToolbarMarkers)marker.replaceWith(node);builderToolbarMarkers.clear();builderCanvasChrome.remove();builderMapChip.remove();builderMapCorner.remove();const zoom=$('#builderMobileZoomPercent');zoom?.removeAttribute('role');zoom?.removeAttribute('tabindex');zoom?.removeAttribute('title')}
+function builderToolbarIcon(){const button=$('#builderFullscreenToggle');if(!button)return;const active=document.fullscreenElement===$('#topologyBuilder');if(builderToolbarMedia.matches){button.textContent='⤢';button.setAttribute('aria-label',active?'Exit full screen':'Full screen');button.title=active?'Exit full screen':'Full screen'}else button.removeAttribute('aria-label')}
+const syncBuilderFullscreenBeforeToolbar=syncBuilderFullscreenControls;
+syncBuilderFullscreenControls=function(...args){const result=syncBuilderFullscreenBeforeToolbar(...args);builderToolbarIcon();return result};
+function builderToolbarState(){const inspector=$('#builderInspectorToggle'),focus=$('#builderFocusToggle');inspector?.setAttribute('aria-pressed',String(!!canvasPanelState.inspector||!!canvasPanelState.pinned&&!state.builderCanvasFocus));focus?.setAttribute('aria-pressed',String(!!state.builderCanvasFocus));builderToolbarIcon()}
+const syncCanvasPanelsBeforeToolbar=syncCanvasPanels;
+syncCanvasPanels=function(...args){const result=syncCanvasPanelsBeforeToolbar(...args);builderToolbarState();return result};
+const focusBeforeToolbar=toggleBuilderCanvasFocus;
+toggleBuilderCanvasFocus=function(...args){const result=focusBeforeToolbar(...args);builderToolbarState();return result};
+function builderToolbarAttach(){
+  if(!builderToolbarMedia.matches){if(builderToolbarMarkers.size)builderToolbarRestore();builderToolbarIcon();return}
+  if(!builderCanvasChrome.isConnected)builderCanvas.appendChild(builderCanvasChrome);
+  builderToolbarMove($('#builderAddToggle'),builderCanvasChrome);
+  builderToolbarMove($('#builderCanvasTitle'),builderCanvasChrome);
+  const hint=$('.builderNavigationHint'),drag=$('.builderDragHelp');
+  if(drag&&hint)builderToolbarMove(drag,hint);
+  builderToolbarMove($('#builderFullscreenToggle'),builderCanvas);
+  builderToolbarMove($('#builderPresentationToggle'),exportItems);
+  if(!builderMapChip.isConnected)builderCanvas.appendChild(builderMapChip);
+  if(!builderMapCorner.isConnected)$('#builderMinimap')?.appendChild(builderMapCorner);
+  if(builderNavOriginal.parentElement!==builderPlaneBar)builderToolbarMove(builderNavOriginal,builderPlaneBar);
+  const control=builderPlaneBar.querySelector('.unifiedLayoutControl');if(control)navigateItems.appendChild(control);
+  const zoom=$('#builderMobileZoomPercent');if(zoom){zoom.setAttribute('role','button');zoom.setAttribute('tabindex','0');zoom.title='Reset zoom to 100%'}
+  builderToolbarState();
+}
+/* The plane bar is replaced during every Builder render. Park navigation first,
+   then move its new layout selector into Navigate after handlers are bound. */
+const renderUnifiedPlaneControlsBeforeToolbar=renderUnifiedPlaneControls;
+renderUnifiedPlaneControls=function(...args){
+  if(builderNavOriginal.parentElement===builderPlaneBar)builderToolbar.appendChild(builderNavOriginal);
+  navigateItems.querySelector('.unifiedLayoutControl')?.remove();
+  const result=renderUnifiedPlaneControlsBeforeToolbar(...args);
+  if(builderToolbarMedia.matches){const control=builderPlaneBar.querySelector('.unifiedLayoutControl');if(control)navigateItems.appendChild(control);builderToolbarAttach()}
+  return result;
+};
+builderMapChip.addEventListener('click',event=>{event.stopPropagation();$('#builderMinimapToggle')?.click()});
+builderMapCorner.addEventListener('pointerdown',event=>event.stopPropagation());
+builderMapCorner.addEventListener('click',event=>{event.stopPropagation();$('#builderMinimapToggle')?.click()});
+/* A canvas pointerdown closes an open palette before the Add click handler runs. */
+let builderAddWasOpen=false;
+document.addEventListener('pointerdown',event=>{if(builderToolbarMedia.matches&&event.target.closest?.('#builderAddToggle'))builderAddWasOpen=canvasPanelState.palette},true);
+$('#builderAddToggle')?.addEventListener('click',()=>{if(builderToolbarMedia.matches&&builderAddWasOpen){canvasPanelState.palette=false;syncCanvasPanels()}builderAddWasOpen=false});
+const builderZoomReset=$('#builderMobileZoomPercent');
+builderZoomReset?.addEventListener('click',event=>{if(!builderToolbarMedia.matches)return;event.preventDefault();event.stopPropagation();setBuilderZoom(1)});
+builderZoomReset?.addEventListener('keydown',event=>{if(builderToolbarMedia.matches&&(event.key==='Enter'||event.key===' ')){event.preventDefault();setBuilderZoom(1)}});
+const syncBuilderMinimapBeforeToolbar=syncBuilderMinimap;
+syncBuilderMinimap=function(...args){const result=syncBuilderMinimapBeforeToolbar(...args);builderMapChip.setAttribute('aria-hidden',String(!$('#topologyBuilder').classList.contains('minimapHidden')));return result};
+builderToolbarMedia.addEventListener('change',()=>{if(builderToolbarMedia.matches)builderToolbarAttach();else{builderToolbarRestore();renderUnifiedPlaneControls();syncBuilderFullscreenControls()}builderToolbarState()});
+/* Reserve space for the overlay controls when fitting a topology. */
+const fitBuilderViewBeforeToolbar=fitBuilderView;
+fitBuilderView=function(announce=false){if(!builderToolbarMedia.matches)return fitBuilderViewBeforeToolbar(announce);const canvas=$('.builderCanvas');if(!canvas?.clientWidth||!canvas?.clientHeight)return fitBuilderViewBeforeToolbar(announce);const bounds=builderVisibleFitBounds();if(!bounds)return fitBuilderViewBeforeToolbar(announce);const left=68,top=66,right=172,bottom=$('#topologyBuilder').classList.contains('minimapHidden')?82:154,width=Math.max(1,bounds.right-bounds.left),height=Math.max(1,bounds.bottom-bounds.top),roomWidth=Math.max(1,canvas.clientWidth-left-right),roomHeight=Math.max(1,canvas.clientHeight-top-bottom),zoom=clampBuilderZoom(Math.min(roomWidth/width,roomHeight/height,1.15));state.builderViewport.zoom=zoom;state.builderViewport.x=left+(roomWidth-width*zoom)/2-bounds.left*zoom;state.builderViewport.y=top+(roomHeight-height*zoom)/2-bounds.top*zoom;state.builderViewport.initialized=true;applyBuilderViewport();if(announce)builderStatus('Fit to view')};
+builderToolbarAttach();
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Builder canvas toolbar','Place Add, zoom, Fit, minimap and full screen on the canvas; combine relationship planes with Inspector, Focus and action menus on desktop.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
 </body>
 </html>
