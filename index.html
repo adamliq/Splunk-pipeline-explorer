@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 120 · 28 Sep 2026</title>
+  <title>Splunk Pipeline Explorer · Build 121 · 28 Sep 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,9 +202,9 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="120" data-build-date="2026-09-28">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="121" data-build-date="2026-09-28">
     <div class="builderHead">
-      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 120, dated 28 September 2026"><b>Build 120</b><time datetime="2026-09-28">28 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
+      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 121, dated 28 September 2026"><b>Build 121</b><time datetime="2026-09-28">28 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
         <div class="builderActions"><div class="builderHistoryControls"><button class="builderBtn" id="builderUndo" disabled>↶ Undo <kbd>Ctrl Z</kbd></button><button class="builderBtn" id="builderRedo" disabled>↷ Redo <kbd>Ctrl Y</kbd></button><button class="builderBtn" id="builderHistoryToggle" aria-expanded="false">History <span class="builderHistoryCount" id="builderHistoryCount">0</span></button></div><button class="builderBtn" id="builderLoadPath">Load selected path</button><button class="builderBtn" id="builderClear">Clear</button><button class="builderBtn" id="builderFailure">Open in Failure Lab</button><button class="builderBtn primary" id="builderUse">Use in explorer</button></div>
         <div class="builderPersistence"><select id="builderSaved" aria-label="Saved custom topologies"><option value="">Saved topologies</option></select><button class="builderBtn" id="builderSave">Save</button><button class="builderBtn" id="builderLoadSaved">Load</button><button class="builderBtn" id="builderImport">Import JSON</button><button class="builderBtn" id="builderExport">Export JSON</button><input id="builderImportFile" type="file" accept="application/json,.json" hidden></div>
@@ -3815,7 +3815,7 @@ if(state.view==='changes')renderChanges();
 <script id="builder-toolbar-declutter-v116">
 /* Move only existing controls; restore their original parents when desktop mode ends. */
 const builderToolbarMedia=window.matchMedia('(min-width:1121px) and (pointer:fine)');
-const builderToolbar=$('.builderToolbar'),builderPlaneBar=$('.builderPlaneBar'),builderCanvas=$('.builderCanvas');
+const builderToolbar=$('.builderToolbar'),builderPlaneBar=$('.builderPlaneBar'),builderToolbarCanvas=$('.builderCanvas');
 const builderNavOriginal=$('.builderNavigation'),builderToolbarMarkers=new Map();
 const builderCanvasChrome=document.createElement('div');builderCanvasChrome.className='builderCanvasChromeTop';
 const builderMapChip=document.createElement('button');builderMapChip.type='button';builderMapChip.id='builderMapChip';builderMapChip.textContent='Map';builderMapChip.setAttribute('aria-label','Show topology minimap');
@@ -3832,15 +3832,15 @@ const focusBeforeToolbar=toggleBuilderCanvasFocus;
 toggleBuilderCanvasFocus=function(...args){const result=focusBeforeToolbar(...args);builderToolbarState();return result};
 function builderToolbarAttach(){
   if(!builderToolbarMedia.matches){if(builderToolbarMarkers.size)builderToolbarRestore();builderToolbarIcon();return}
-  if(!builderCanvasChrome.isConnected)builderCanvas.appendChild(builderCanvasChrome);
+  if(!builderCanvasChrome.isConnected)builderToolbarCanvas.appendChild(builderCanvasChrome);
   builderToolbarMove($('#builderAddToggle'),builderCanvasChrome);
   builderToolbarMove($('#builderCanvasTitle'),builderCanvasChrome);
   const hint=$('.builderNavigationHint'),drag=$('.builderDragHelp');
   if(drag&&hint)builderToolbarMove(drag,hint);
-  builderToolbarMove($('#builderFullscreenToggle'),builderCanvas);
+  builderToolbarMove($('#builderFullscreenToggle'),builderToolbarCanvas);
   builderToolbarMove($('#builderPresentationToggle'),exportItems);
   $('#builderPrintPresent')?.after($('#builderPresentationToggle'));
-  if(!builderMapChip.isConnected)builderCanvas.appendChild(builderMapChip);
+  if(!builderMapChip.isConnected)builderToolbarCanvas.appendChild(builderMapChip);
   if(!builderMapCorner.isConnected)$('#builderMinimap')?.appendChild(builderMapCorner);
   if(builderNavOriginal.parentElement!==builderPlaneBar)builderToolbarMove(builderNavOriginal,builderPlaneBar);
   builderPlaneBar.querySelector('.unifiedPlaneChecks')?.after(builderNavOriginal);
@@ -4143,6 +4143,80 @@ syncBuilderMobileToolbar();if(builderSheetMedia.matches)renderUnifiedPlaneContro
 document.title='Splunk Pipeline Explorer · Build 120';$('#topologyBuilder').dataset.buildNumber='120';$('#topologyBuilder').dataset.buildDate='2026-09-28';const builderV120Stamp=$('.builderBuildStamp');if(builderV120Stamp){builderV120Stamp.setAttribute('aria-label','Build 120, dated 28 September 2026');builderV120Stamp.querySelector('b').textContent='Build 120';const date=builderV120Stamp.querySelector('time');date.dateTime='2026-09-28';date.textContent='28 Sep 2026'}
 polishBuilderCards();polishBuilderStatus();polishBuilderText();positionBuilderInspector();
 changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Builder canvas and mobile polish','Reduce node chrome, align validation wording, keep drawers inside the canvas and collapse mobile controls into compact menus and an Inspector sheet.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
+<style id="builder-review-fixes-v121-styles">
+@media (min-width:1121px){
+  .topologyBuilder .builderHead{min-width:0}
+  .topologyBuilder .builderHead>div:first-child{flex:1 1 185px;min-width:145px}
+  .topologyBuilder .builderActionWrap{flex:0 1 auto;min-width:0;max-width:calc(100% - 185px)}
+  .topologyBuilder .builderIoStatus{display:block;flex:0 1 240px;min-width:0;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .topologyBuilder .builderIoStatus:empty{display:none}
+  .topologyBuilder .builderDensityHeaderPrimary{flex:0 0 auto;min-width:0}
+  .topologyBuilder .builderDensityHeaderPrimary .builderBtn,.topologyBuilder #builderSaveState{white-space:nowrap}
+  .topologyBuilder.canvasFocus .builderFocusBar :is(#builderFocusAdd,#builderFocusInspector,#builderFocusPresentation,#builderFocusMinimap,#builderFocusFit,#builderFocusFullscreen),
+  .topologyBuilder.canvasFocus .builderBottomControls #builderFocusToggle{display:none!important}
+  .topologyBuilder.canvasFocus .builderFocusSaveStatus{color:#b8ccd3;font-weight:500}
+  .topologyBuilder.canvasFocus .builderFocusSaveStatus.dirty{color:#f5d69f}
+}
+@media (min-width:1121px) and (max-width:1399px){
+  .topologyBuilder .builderDensityHeaderPrimary{gap:4px}
+  .topologyBuilder .builderDensityHeaderPrimary select{width:145px}
+  .topologyBuilder .builderIoStatus{max-width:160px}
+}
+.topologyBuilder .builderValidation>b{display:none}
+.topologyBuilder .builderNodeIssueMarker.reviewOnly{min-width:23px;width:auto;height:23px;padding:0 4px;overflow:visible;background:#354f5d;color:#e0edf2;border-color:#8aa5b2}
+.topologyBuilder .builderEdgeIssueMarker.reviewOnly circle{r:11;fill:#354f5d;stroke:#8aa5b2}
+.topologyBuilder .builderEdgeIssueMarker.reviewOnly text{opacity:1;fill:#e0edf2}
+.topologyBuilder .builderStageMini{padding:2px 5px;margin-top:2px;line-height:1.18}
+.topologyBuilder .builderNode strong{margin-bottom:6px}
+.topologyBuilder .builderBuildTitle{position:relative}
+.topologyBuilder .builderHeaderInfo[aria-expanded="true"]{border-color:#92d9df;background:#205163}
+.builderHeaderInfoPopover{position:absolute;left:0;top:calc(100% + 6px);z-index:65;width:min(340px,calc(100vw - 42px));padding:11px 13px;border:1px solid #4b7183;border-radius:9px;background:#102b3b;color:#e0f0f3;box-shadow:0 12px 30px #000a;font-size:11px;line-height:1.45}
+.builderHeaderInfoPopover[hidden]{display:none!important}
+.topologyBuilder:not(.canvasPanelInspectorOpen):not(.canvasInspectorPinned) #builderInspectorDrawerClose{visibility:hidden}
+@media (max-width:760px){
+  .builderView .toolbar .seg{flex-wrap:wrap;overflow:visible;white-space:normal}
+  .topologyBuilder .builderNavigation{gap:4px}
+  .topologyBuilder .builderPlaneBar.unifiedPlaneBar{display:none!important}
+  .topologyBuilder .builderMobilePlanes{margin:0}
+  .topologyBuilder .builderMobilePlanes>summary{height:36px;padding:9px 7px}
+  .topologyBuilder .builderCanvas .builderMobileZoomControls{top:auto;bottom:9px;left:7px;right:auto}
+  .topologyBuilder .builderCanvas .builderMobileGestureHint{bottom:70px}
+}
+</style>
+<script id="builder-review-fixes-v121">
+/* Keep cross-script names unique: every classic script shares the global lexical scope. */
+const builderReviewStatusBefore121=builderStatus;
+builderStatus=function(message,...args){const result=builderReviewStatusBefore121(message,...args),status=$('#builderIoStatus');if(status)status.title=String(message);return result};
+$('#builderIoStatus').title=$('#builderIoStatus').textContent;
+/* The bottom control bar must remain clickable while either canvas panel is open. */
+const builderReviewInspectorPositionBefore121=positionBuilderInspector;
+positionBuilderInspector=function(...args){builderReviewInspectorPositionBefore121(...args);if(!builderInspectorAnchorMedia.matches||!canvasPanelState.inspector||canvasPanelState.pinned)return;const panel=$('#builderCanvasInspector'),canvas=$('.builderCanvas'),bar=$('.builderBottomControls');if(!panel||!bar||!canvas)return;const top=panel.getBoundingClientRect().top,limit=Math.min(innerHeight-8,canvas.getBoundingClientRect().bottom)-bar.getBoundingClientRect().height-16;panel.style.height=`${Math.max(100,limit-top)}px`};
+const builderReviewPalettePositionBefore121=positionBuilderPalette;
+positionBuilderPalette=function(...args){builderReviewPalettePositionBefore121(...args);if(!builderPaletteAnchorMedia.matches||!canvasPanelState.palette)return;const panel=$('#builderCanvasPalette'),canvas=$('.builderCanvas'),bar=$('.builderBottomControls');if(!panel||!bar||!canvas)return;const top=panel.getBoundingClientRect().top,limit=Math.min(innerHeight-8,canvas.getBoundingClientRect().bottom)-bar.getBoundingClientRect().height-16;panel.style.height=`${Math.max(100,limit-top)}px`};
+/* The compact mobile disclosure summaries receive the same wording as the desktop dock. */
+const builderReviewPolishStatusBefore121=polishBuilderStatus;
+polishBuilderStatus=function(...args){const result=builderReviewPolishStatusBefore121(...args),summary=builderFindingSummary(),review=$('#builderReviewDisclosureStatus'),tools=$('#builderSecondaryToolsStatus'),selected=state.builderNodes.find(node=>node.id===state.builderSelected);if(review)review.textContent=`· ${summary.review} to review${summary.errors?` · ${summary.errors} errors`:''}`;if(tools)tools.textContent=selected?`for ${componentInstanceLabel(selected)}`:'5 tools';return result};
+/* Free up the mobile canvas's top edge for the first node. */
+const builderReviewFitBefore121=fitBuilderView;
+fitBuilderView=function(announce=false){if(!builderSheetMedia.matches)return builderReviewFitBefore121(announce);const canvas=$('.builderCanvas'),bounds=builderVisibleFitBounds();if(!canvas?.clientWidth||!canvas?.clientHeight||!bounds)return builderReviewFitBefore121(announce);const left=26,top=48,right=26,bottom=92,width=Math.max(1,bounds.right-bounds.left),height=Math.max(1,bounds.bottom-bounds.top),roomWidth=Math.max(1,canvas.clientWidth-left-right),roomHeight=Math.max(1,canvas.clientHeight-top-bottom),zoom=clampBuilderZoom(Math.min(roomWidth/width,roomHeight/height,1.15));state.builderViewport.zoom=zoom;state.builderViewport.x=left+(roomWidth-width*zoom)/2-bounds.left*zoom;state.builderViewport.y=top+(roomHeight-height*zoom)/2-bounds.top*zoom;state.builderViewport.initialized=true;applyBuilderViewport();if(announce)builderStatus('Fit to view')};
+/* Move the existing mobile Planes control beside Add, Inspector and More. */
+const builderReviewPlanesBefore121=renderUnifiedPlaneControls;
+renderUnifiedPlaneControls=function(...args){$('.builderNavigation>.builderMobilePlanes')?.remove();builderMobileMoreBody.querySelector('#builderAlignmentBar')?.remove();const result=builderReviewPlanesBefore121(...args);if(builderSheetMedia.matches){const menu=$('.builderPlaneBar .builderMobilePlanes');if(menu)builderMobileMore.before(menu);const align=$('#builderAlignmentBar');if(align)builderMobileMoreBody.appendChild(align)}return result};
+/* Treat the information button as a keyboard and touch accessible disclosure. */
+const builderReviewInfoButton121=$('#builderHeaderInfo'),builderReviewInfoPopover121=document.createElement('div');
+if(builderReviewInfoButton121){builderReviewInfoPopover121.id='builderHeaderInfoPopover';builderReviewInfoPopover121.className='builderHeaderInfoPopover';builderReviewInfoPopover121.hidden=true;builderReviewInfoPopover121.textContent=builderInfoDescription;builderReviewInfoButton121.after(builderReviewInfoPopover121);builderReviewInfoButton121.setAttribute('aria-controls',builderReviewInfoPopover121.id);builderReviewInfoButton121.setAttribute('aria-expanded','false');builderReviewInfoButton121.onclick=()=>{builderReviewInfoPopover121.hidden=!builderReviewInfoPopover121.hidden;builderReviewInfoButton121.setAttribute('aria-expanded',String(!builderReviewInfoPopover121.hidden))};document.addEventListener('click',event=>{if(!event.target.closest?.('#builderHeaderInfo,#builderHeaderInfoPopover')){builderReviewInfoPopover121.hidden=true;builderReviewInfoButton121.setAttribute('aria-expanded','false')}});document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!builderReviewInfoPopover121.hidden){event.preventDefault();event.stopImmediatePropagation();builderReviewInfoPopover121.hidden=true;builderReviewInfoButton121.setAttribute('aria-expanded','false');builderReviewInfoButton121.focus()}},true)}
+/* Ask for a target after Change and allow Escape to cancel that choice. */
+const builderReviewChangeTargetBefore121=$('#builderPaletteChangeTarget').onclick;
+$('#builderPaletteChangeTarget').onclick=function(...args){const result=builderReviewChangeTargetBefore121.apply(this,args);builderStatus('Select the component to add after · Esc to cancel');return result};
+document.addEventListener('keydown',event=>{if(event.key!=='Escape'||!builderPaletteChangePending)return;event.preventDefault();event.stopImmediatePropagation();builderPaletteChangePending=false;openBuilderCanvasPalette()},true);
+const builderReviewSyncPanelsBefore121=syncCanvasPanels;
+syncCanvasPanels=function(...args){const result=builderReviewSyncPanelsBefore121(...args),close=$('#builderInspectorDrawerClose');if(close)close.tabIndex=canvasPanelState.inspector||canvasPanelState.pinned&&!state.builderCanvasFocus?0:-1;return result};
+syncCanvasPanels();polishBuilderStatus();positionBuilderInspector();positionBuilderPalette();if(builderSheetMedia.matches)renderUnifiedPlaneControls();
+document.title='Splunk Pipeline Explorer · Build 121 · 28 Sep 2026';$('#topologyBuilder').dataset.buildNumber='121';$('#topologyBuilder').dataset.buildDate='2026-09-28';const builderReviewStamp121=$('.builderBuildStamp');if(builderReviewStamp121){builderReviewStamp121.setAttribute('aria-label','Build 121, dated 28 September 2026');builderReviewStamp121.querySelector('b').textContent='Build 121'}
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Builder review fixes','Restore the desktop toolbar and keep the compact header, Focus actions, canvas panels, mobile controls and accessibility consistent.',true]);
 if(state.view==='changes')renderChanges();
 </script>
 
