@@ -1,8 +1,9 @@
 # Builder view: layout issues and fixes (handoff)
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
-**Branch:** `claude/build-page-layout-bl6jk1` (fix commit `d401d2e`)
-**Status:** issues 1–6 are fixed on that branch. Issue 7 was implemented in the v113 upload, and the v113 review fixes are in v114 (see the end of this file). Keep `builder-density-polish-v114` in future builds.
+**Branch:** `claude/build-page-layout-bl6jk1` (latest fix commit `f2a63c5`)
+**Status:** issues 1–6 are fixed (v112). Issue 7 was implemented in the v113 upload and polished in v114. Button fixes from a full sweep are in v115. **The next task is section 8 (v116).**
+**Important:** `main` (upload `1e42009`) contains v112 and v113 only. Start from this branch's `index.html`, which has v112–v115, and keep every `…-v112` to `…-v115` block in future builds.
 
 ## Read this first
 
