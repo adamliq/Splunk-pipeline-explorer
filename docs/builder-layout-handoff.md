@@ -2,7 +2,7 @@
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Branch:** `claude/build-page-layout-bl6jk1` (latest fix commit `f2a63c5`)
-**Status:** issues 1–6 are fixed (v112). Issue 7 was implemented in the v113 upload and polished in v114. Button fixes from a full sweep are in v115. **The next tasks are section 8 (toolbar, v116) and section 9 (＋ Add palette, v117).**
+**Status:** issues 1–6 are fixed (v112). Issue 7 was implemented in the v113 upload and polished in v114. Button fixes from a full sweep are in v115. **The next tasks are section 8 (toolbar, v116), section 9 (＋ Add palette, v117) and section 10 (canvas, messaging and mobile polish, v118).**
 **Important:** `main` (upload `1e42009`) contains v112 and v113 only. Start from this branch's `index.html`, which has v112–v115, and keep every `…-v112` to `…-v115` block in future builds.
 
 ## Read this first
@@ -209,4 +209,40 @@ Do this after section 8, or independently; the two touch different elements. Put
 - ↑/↓/Enter/Esc work, and focus returns to `#builderAddToggle` on close.
 - All 42 items still add a node when clicked (re-run the v115 sweep), and dragging an item onto a compatible node still connects it.
 - No `pageerror` at 1280, 1440, 1920 or 390, or across a 1440→1000→1440 resize. Mobile is unchanged apart from the inline descriptions and the label text.
+- Add a `changeRegister` entry the way v112–v115 do.
+
+---
+
+## 10. Next task: canvas, messaging and mobile polish (v118)
+
+Do this after sections 8 and 9. Put all changes in `<style id="builder-ui-polish-v118-styles">` and `<script id="builder-ui-polish-v118">`. Items are listed in priority order; **1, 5 and 8 have the most effect for the least effort.** These come from a visual review of the default desktop view, the open dock, the review popover and mobile after adding a node. The inspector, the Review drawer, Focus mode and text contrast were **not** reviewed; check them too while you're there.
+
+### Canvas and node cards
+1. **Show plane pills only on hover or selection.** Under every node, `.builderConnectionHandles` shows "Event data", "Fleet management" and "Interactive authentication". That makes `.unifiedNodeWrap` 218–255px tall instead of about 150px. On desktop, show the pills only for the hovered, focused (`:focus-within`) or selected node (`.unifiedNodeWrap.multiSelected`, or whichever node holds `state.builderSelected`). Keep them in the layout with `visibility`/`opacity` so nodes don't jump. Keep them always visible on touch devices (`@media (pointer:coarse)`), where there is no hover. Then check that Fit (the measured bounds from v112) zooms in further, and that dragging from a handle still works.
+   - **Watch out:** while a connection drag is in progress, keep the handles visible on every compatible target node (they already get an `incompatible` class). Otherwise nobody can finish a connection.
+2. **Remove the repeated tier label.** Each card shows its tier in the header (for example "SOURCE SYSTEM") and again in the coloured footer. Keep the header and use the footer only for extra facts ("2 pipeline sets", or a lane or status). Hide the footer when it would only repeat the header.
+3. **"Production" appears twice on each node.** The chips are environment, region and network zone, and the network zone falls back to the environment ("Defaults to group or environment" in the inspector). Hide the zone chip when it is only the fallback value. Where both environment and zone are shown, prefix them ("Env · Production", "Zone · DMZ").
+4. **Calm the review badges.** The starting topology shows an orange count on every node and every edge (12 findings), which reads as alarm. Colour them by severity: keep red for `error`. For review-only findings, use a small neutral dot or a muted outline badge, and show the count on hover or focus. Both `.builderNodeIssueMarker` and `.builderEdgeIssueMarker` need this. Keep them clickable (see v115) and keep their `aria-label`s.
+
+### Status and messaging
+5. **Remove the contradictory status.** `#builderValidation` says "Valid three-plane model · 0 issues" while the dock says "Review findings · 12 findings". Use one vocabulary everywhere, for example "Valid · 0 errors · 12 to review" in the validation bar, and "Review findings · 12 to review" in the dock toggle label (wrap `builderDensitySync` from v114). The "0 issues" pill should count errors only, and be labelled that way.
+6. **Keep the build stamp current.** The `<title>`, `#topologyBuilder[data-build-number]`/`[data-build-date]` and `.builderBuildStamp` still say "Build 111 · 28 Sep 2026", but the page includes v112–v115. Update all four together with every release.
+7. **Clarify the Tools label.** The dock toggle reads "Tools · 5 tools · Universal Forwarder 1". Change it to "Tools · for Universal Forwarder 1", or "Tools · 5" when nothing is selected, by adjusting how the v114 wrapper builds the status text.
+
+### Page-level space
+8. **Hide the page-wide search and pipeline filter in Builder.** `#search` and `#pipelineFilter` set `state.q`/`state.pipeline` and call `render()`, which drives the Flow view. Nothing Builder-specific appears to read them; **verify this first.** In the Builder view they take about 70px above the canvas and compete with the Builder's own `#builderSearchInput`. When `state.view==='builder'`, hide them, or shrink that row to just the view tabs, and restore them when leaving Builder. Also re-measure the canvas top against the section 8 target.
+9. **Shorten the header description.** "Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry." wraps to two lines on every visit. Move it into an ⓘ button next to the title (with a `title` or popover, and keyboard-focusable), or show it only while the canvas has no components.
+
+### Mobile
+10. **Show the Inspector as a bottom sheet on mobile.** At 390px wide, adding a node opens the Inspector full screen, over the canvas and the page header, so the new node can't be seen. Up to 760px wide, make the Inspector a bottom sheet about 60% of the viewport tall, with a drag handle that expands it to full height, plus a visible Close button. Keep the canvas above it scrolled so the selected node is in view. Keep Pin/Close working.
+
+### Acceptance criteria
+- At 1440×900 with the default topology, nodes are at most about 170px tall when not selected, and Fit zoom goes up. Hovering, focusing or selecting a node shows its pills; making a connection by drag still works.
+- No node shows the same text in its header and footer, and no node shows "Production" twice.
+- Review-only badges are visually muted, and error badges stay red. All badges are still clickable and keep their labels.
+- The validation bar and the dock use the same error/review wording and numbers.
+- The build stamp, `<title>` and `data-build-*` attributes match the release.
+- In the Builder view, `#search` and `#pipelineFilter` are hidden, and they come back on Flow. The canvas top moves up by roughly their row height.
+- At 390×844, adding a node shows a bottom-sheet inspector with the new node visible above it.
+- No `pageerror` at 1280, 1440, 1920 or 390, or across a 1440→1000→1440 resize. No horizontal page scroll. The v115 button sweep still passes.
 - Add a `changeRegister` entry the way v112–v115 do.
