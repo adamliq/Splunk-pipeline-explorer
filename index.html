@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 128 · 29 Sep 2026</title>
+  <title>Splunk Pipeline Explorer · Build 130 · 29 Sep 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,9 +202,9 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="128" data-build-date="2026-09-29">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="130" data-build-date="2026-09-29">
     <div class="builderHead">
-      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 128, dated 29 September 2026"><b>Build 128</b><time datetime="2026-09-29">29 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
+      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 130, dated 29 September 2026"><b>Build 130</b><time datetime="2026-09-29">29 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
         <div class="builderActions"><div class="builderHistoryControls"><button class="builderBtn" id="builderUndo" disabled>↶ Undo <kbd>Ctrl Z</kbd></button><button class="builderBtn" id="builderRedo" disabled>↷ Redo <kbd>Ctrl Y</kbd></button><button class="builderBtn" id="builderHistoryToggle" aria-expanded="false">History <span class="builderHistoryCount" id="builderHistoryCount">0</span></button></div><button class="builderBtn" id="builderLoadPath">Load selected path</button><button class="builderBtn" id="builderClear">Clear</button><button class="builderBtn" id="builderFailure">Open in Failure Lab</button><button class="builderBtn primary" id="builderUse">Use in explorer</button></div>
         <div class="builderPersistence"><select id="builderSaved" aria-label="Saved custom topologies"><option value="">Saved topologies</option></select><button class="builderBtn" id="builderSave">Save</button><button class="builderBtn" id="builderLoadSaved">Load</button><button class="builderBtn" id="builderImport">Import JSON</button><button class="builderBtn" id="builderExport">Export JSON</button><input id="builderImportFile" type="file" accept="application/json,.json" hidden></div>
@@ -5115,6 +5115,235 @@ $('#topologyBuilder').dataset.buildNumber='128';$('#topologyBuilder').dataset.bu
 const builderStamp128=$('.builderBuildStamp');if(builderStamp128){builderStamp128.setAttribute('aria-label','Build 128, dated 29 September 2026');builderStamp128.querySelector('b').textContent='Build 128';const date=builderStamp128.querySelector('time');if(date){date.dateTime='2026-09-29';date.textContent='29 Sep 2026'}}
 changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Architecture pack print polish','Place exported labels on final paths, enlarge and split connection registers, improve light-theme captions and omit empty section pages.',true],['Responsive palette and authentication summary','Keep a desktop palette pin dormant on mobile and show a direct authentication edit action for selected relationships.',true]);
 if(state.view==='changes')renderChanges();
+</script>
+
+<style id="builder-auth-summary-v129-styles">
+.topologyBuilder .builderRelationshipAuthSummary128.needsType129{border-color:#a67b43;background:#302619;color:#ffe0a6}
+</style>
+<script id="builder-auth-summary-v129">
+/* Keep the type independent of the required state, including legacy imports. */
+const builderAuthSanitizeBefore129=sanitizeRelationshipDetails;
+sanitizeRelationshipDetails=function(value,defaults){
+  const details=builderAuthSanitizeBefore129(value,defaults);
+  if(value&&typeof value==='object'&&builderAuthTypeValues127.includes(value.authenticationType))
+    details.authenticationType=value.authenticationType;
+  return details;
+};
+const builderAuthMarkupBefore129=relationshipInspectorMarkup;
+relationshipInspectorMarkup=function(){
+  const markup=builderAuthMarkupBefore129(),selected=state.builderSelectedEdge;
+  if(!selected||state.builderConnectionDraft)return markup;
+  const edge=builderEdgeRecord(selected.plane,selected.id);
+  if(!edge)return markup;
+  const details=ensureRelationshipDetails(edge);
+  return markup.replace(/<label>Authentication type<select data-relationship-field="authenticationType"[^>]*>[\s\S]*?<\/select><\/label>/,
+    `<label>Authentication type<select data-relationship-field="authenticationType">${relationshipOptionList(builderAuthTypeValues127,details.authenticationType)}</select></label>`);
+};
+const builderAuthSummaryBefore129=builderAuthSummarySync128;
+builderAuthSummarySync128=function(){
+  builderAuthSummaryBefore129();
+  if(builderAuthSummary128.hidden)return;
+  const selected=state.builderSelectedEdge,edge=selected&&builderEdgeRecord(selected.plane,selected.id),details=edge&&ensureRelationshipDetails(edge);
+  if(!details)return;
+  const type=details.authenticationType,required=details.authenticationRequired,
+    specified=type!=='Not specified'&&type!=='Not applicable';
+  const summary=required==='No'?(specified?`${type} · not required`:'not required'):
+    required==='Yes'?(specified?`${type} · required`:'required · type not set'):
+    type==='Not applicable'?'not applicable':specified?`${type} · requirement unknown`:'not specified';
+  builderAuthSummary128.querySelector('span').textContent=`Authentication: ${summary}`;
+  builderAuthSummary128.classList.toggle('needsType129',required==='Yes'&&!specified);
+};
+builderAuthSummarySync128();
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Authentication summary clarity','Show relationship authentication type and requirement independently, including an open item when required authentication has no type.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
+<style id="builder-grouping-v130-styles">
+.builderGroupingControl130{display:flex;align-items:center;gap:6px;color:#b9d0db;white-space:nowrap;font-size:10.5px}.builderGroupingControl130 select{max-width:170px;font-size:11px}
+.builderGroupChips130{grid-column:1/-1;display:flex;align-items:center;flex-wrap:wrap;gap:5px;min-width:0;padding:3px 0}.builderGroupChips130>span{font-size:10px;color:#92a9b9}.builderGroupChip130,.builderGroupAction130{border:1px solid #38576a;border-radius:99px;background:#102432;color:#bfd5df;padding:4px 9px;font-size:10px;cursor:pointer}.builderGroupChip130[aria-pressed="true"]{border-color:#65d9cd;background:#17443e;color:#e9fff9}.builderGroupChip130:focus-visible,.builderTypeHeader130:focus-visible,.builderTypeSummary130:focus-visible{outline:2px solid #81e8e0;outline-offset:2px}.builderGroupAction130{border-radius:7px}
+.unifiedBuilderWorld .builderTierLane130{position:absolute;z-index:0;pointer-events:none;border:1px solid rgba(90,151,170,.22);border-radius:13px;background:rgba(58,118,141,.055)}.builderTierLane130.management{border-color:rgba(45,212,191,.25);background:rgba(45,212,191,.04)}.builderTierLane130.empty{background:rgba(58,118,141,.025)}.builderTierLane130>strong{display:block;margin:11px 13px;color:#a4c4d2;font-size:11px;font-weight:700;letter-spacing:.035em}.builderTierLane130.management>strong{color:#8be8d5}
+.unifiedBuilderWorld .builderTypeBox130{position:absolute;z-index:1;border:1px dashed rgba(100,184,206,.52);border-radius:12px;background:rgba(27,70,91,.075);pointer-events:none}.builderTypeHeader130{position:absolute;left:8px;top:5px;border:0;border-radius:6px;background:#112a39;color:#cbebf4;padding:4px 8px;font-size:10.5px;pointer-events:auto;cursor:pointer}.builderTypeSummary130{position:absolute;z-index:4;display:flex;flex-direction:column;gap:6px;align-items:flex-start;justify-content:center;min-height:106px;width:190px;padding:13px 15px;border:2px solid #78d8e4;border-radius:11px;background:#102837;color:#efffff;text-align:left;cursor:pointer;box-shadow:5px 5px 0 #143346,9px 9px 0 #0b2230}.builderTypeSummary130 strong{font-size:13px}.builderTypeSummary130 small{color:#a9cbd5;font-size:10px}.builderTypeSummary130 em{font-size:10px;color:#87e6d8;font-style:normal}.builderTypeMerged130{fill:none;stroke-width:3;pointer-events:stroke;cursor:pointer}.builderTypeBadge130{pointer-events:auto;cursor:pointer}.builderTypeBadge130 rect{fill:#173648;stroke:#75d6e2}.builderTypeBadge130 text{font-size:11px;font-weight:700;fill:#ecffff}.unifiedBuilderWorld .builderTypeHidden130{display:none!important}.unifiedBuilderWorld .builderTypeDim130{opacity:.17;filter:saturate(.35)}
+.builderMergedList130{position:fixed;z-index:1010;max-width:min(360px,90vw);max-height:250px;overflow:auto;padding:12px 15px;border:1px solid #5b9caa;border-radius:10px;background:#102735;color:#dceff4;box-shadow:0 14px 32px #0009;font-size:11px}.builderMergedList130 strong{display:block;margin-bottom:6px}.builderMergedList130 ul{margin:0;padding-left:17px}.builderMergedList130 li{margin:4px 0}.builderMergedList130 button{float:right;border:0;background:transparent;color:inherit;cursor:pointer}
+@media(max-width:760px){.builderGroupingControl130{width:100%}.builderGroupingControl130 select{flex:1;max-width:none}.builderTierLane130>strong{margin:8px 10px}}
+</style>
+<script id="builder-grouping-v130">
+/* Presentation-only grouping; underlying nodes, relations, free positions and Undo stay intact. */
+const builderTierNames130=['Sources','Collection','Forwarding','Processing','Indexing','Search'];
+const builderTierLookup130={
+  sources:['sqlDatabase','windowsEvent','fileSource','scriptSource','apiSource','syslogSource','hecClient'],
+  collection:['syslog','apiCollector','awsLambda','azureFunction','hecEndpoint','dbConnect'],
+  forwarding:['uf','hf','streamForwarder'],processing:['ip','edgeProcessor'],indexing:['idx','s3','s3Dataset','indexerCluster'],search:['search','searchHead','shcCluster','shcMember','cloudSearchTier'],
+  management:['authUser','ds','licenseManager','monitoringConsole','indexerClusterManager','shcDeployer','authProviderCloud','authProviderOnPrem','streamServer','streamDefinition','soarCloud','soarOnPrem','soarPlaybook','s3FederatedConnection','s3DataCatalog','deploymentApp','serverClass']
+};
+const builderTierByType130=new Map(Object.entries(builderTierLookup130).flatMap(([tier,types])=>types.map(type=>[type,tier])));
+const builderManagementColumn130={ds:2,licenseManager:4,monitoringConsole:4,indexerClusterManager:4,shcDeployer:5,authProviderCloud:5,authProviderOnPrem:5,authUser:5,serverClass:2,deploymentApp:2,streamServer:1,streamDefinition:1,soarCloud:5,soarOnPrem:5,soarPlaybook:5,s3DataCatalog:5,s3FederatedConnection:5};
+const builderGroupingModes130=['none','tier','type','region','environment','containers'];
+function builderTierOf130(node){
+  const explicit=builderTierByType130.get(node.type);if(explicit)return explicit;
+  const name=`${builderComponents[node.type]?.name||node.type} ${builderComponents[node.type]?.type||''}`.toLowerCase();
+  if(/manager|monitor|deployment|identity|authentication provider|soar|stream server|cluster master|license/.test(name))return'management';
+  if(/index/.test(name))return'indexing';if(/search|federat/.test(name))return'search';if(/process|parsing/.test(name))return'processing';if(/forward/.test(name))return'forwarding';if(/collect|listener|relay/.test(name))return'collection';return'sources';
+}
+function builderGroupingClean130(value){return{mode:builderGroupingModes130.includes(value?.mode)?value.mode:'none',collapsedTypes:[...new Set((Array.isArray(value?.collapsedTypes)?value.collapsedTypes:[]).filter(type=>typeof type==='string'&&type in builderComponents))]}}
+state.builderGrouping=builderGroupingClean130(state.builderGrouping);
+let builderHighlightTypes130=new Set();
+let builderMobileDefaultedTypes130=new Set();
+function builderGroupingSet130(value){state.builderGrouping=builderGroupingClean130(value);renderBuilder();}
+const builderPositionsBefore130=unifiedBuilderPositions;
+unifiedBuilderPositions=function(...args){
+  const mode=state.builderGrouping.mode;
+  if(mode==='type'&&window.matchMedia('(max-width:760px)').matches){const counts=new Map();state.builderNodes.filter(node=>!node.groupId).forEach(node=>counts.set(node.type,(counts.get(node.type)||0)+1));for(const [type,count] of counts)if(count>=3&&!builderMobileDefaultedTypes130.has(type)){builderMobileDefaultedTypes130.add(type);if(!state.builderGrouping.collapsedTypes.includes(type))state.builderGrouping.collapsedTypes.push(type)}}
+  const layout=builderPositionsBefore130(...args);
+  if(!['tier','type','region','environment'].includes(mode)||layout.mode==='free'||!layout.positions.size)return layout;
+  const mobile=window.matchMedia('(max-width:760px)').matches;
+  if(mode==='region'||mode==='environment'){
+    const values=[...new Set(state.builderNodes.map(node=>String(node[mode]||'Unspecified')))].sort(),pitch=mobile?211:320;
+    let maxRows=0,mobileRow=0;values.forEach((value,column)=>{const members=state.builderNodes.filter(node=>String(node[mode]||'Unspecified')===value);maxRows=Math.max(maxRows,members.length);members.forEach((node,row)=>{const point=layout.positions.get(node.id);if(point){point.x=mobile?55:48+column*pitch;point.y=mobile?65+mobileRow++*pitch:65+row*235}})});
+    layout.width=mobile?Math.max(320,layout.width):Math.max(layout.width,48+values.length*pitch+25);
+    layout.height=Math.max(layout.height,65+(mobile?state.builderNodes.length*211:maxRows*235)+90);return layout
+  }
+  const byTier=new Map([...builderTierNames130,'management'].map(tier=>[tier,[]]));
+  state.builderNodes.forEach(node=>{if(layout.positions.has(node.id))byTier.get(builderTierOf130(node)).push(node)});
+  if(mode==='type')for(const members of byTier.values())members.sort((a,b)=>a.type.localeCompare(b.type)||a.id-b.id);
+  const slots=members=>{const result=[];for(const node of members){const last=result.at(-1);if(mode==='type'&&last?.[0]?.type===node.type&&state.builderGrouping.collapsedTypes.includes(node.type)&&!node.groupId)last.push(node);else result.push([node])}return result};
+  if(mobile){let y=58;for(const tier of [...builderTierNames130,'management']){
+    const nodes=byTier.get(tier);if(!nodes.length){y+=28;continue}
+    for(const batch of slots(nodes)){for(const node of batch){const point=layout.positions.get(node.id);point.x=55;point.y=y}y+=batch.some(node=>node.id===state.builderSelected)?254:211}y+=36
+  }layout.height=Math.max(430,y+80);layout.width=Math.max(320,layout.width);return layout}
+  const pitch=320,left=48,managementY=Math.max(350,...builderTierNames130.map(tier=>58+slots(byTier.get(tier)).length*235+35));
+  builderTierNames130.forEach((tier,column)=>slots(byTier.get(tier)).forEach((batch,row)=>batch.forEach(node=>{const point=layout.positions.get(node.id);point.x=left+column*pitch;point.y=65+row*235})));
+  const managementRows=new Map();for(const batch of slots(byTier.get('management'))){const column=builderManagementColumn130[batch[0].type]??2,row=managementRows.get(column)||0;managementRows.set(column,row+1);batch.forEach(node=>{const point=layout.positions.get(node.id);point.x=left+column*pitch;point.y=managementY+row*235})}
+  layout.width=Math.max(layout.width,left+6*pitch+25);layout.height=Math.max(layout.height,managementY+Math.max(1,...managementRows.values())*235+50);return layout;
+};
+const builderNavigationBefore130=renderLargeTopologyNavigation;
+renderLargeTopologyNavigation=function(...args){
+  const result=builderNavigationBefore130(...args),panel=$('#builderLargeNav'),isolate=$('#builderIsolateValue');if(!panel||!isolate)return result;
+  let label=document.createElement('label');label.className='builderGroupingControl130';label.textContent='Group by ';
+  const select=document.createElement('select');select.id='builderGroupBy130';select.setAttribute('aria-label','Group canvas by');
+  [['none','None'],['tier','Tier lanes'],['type','Component type'],['region','Region'],['environment','Environment'],['containers','My containers']].forEach(([value,name])=>select.add(new Option(name,value,false,state.builderGrouping.mode===value)));
+  select.onchange=()=>builderGroupingSet130({...state.builderGrouping,mode:select.value});label.appendChild(select);isolate.after(label);
+  const row=document.createElement('div');row.className='builderGroupChips130';row.setAttribute('aria-label','Highlight component types');
+  const counts=new Map();state.builderNodes.filter(largeNavNodeVisible).forEach(node=>counts.set(node.type,(counts.get(node.type)||0)+1));
+  row.appendChild(Object.assign(document.createElement('span'),{textContent:'Highlight'}));
+  for(const [type,count] of counts){const button=document.createElement('button');button.type='button';button.className='builderGroupChip130';button.dataset.groupType=type;button.setAttribute('aria-pressed',String(builderHighlightTypes130.has(type)));button.textContent=`${builderComponents[type]?.name||type} · ${count}`;button.onclick=event=>{if(!event.shiftKey){if(builderHighlightTypes130.size===1&&builderHighlightTypes130.has(type))builderHighlightTypes130.clear();else builderHighlightTypes130=new Set([type])}else if(builderHighlightTypes130.has(type))builderHighlightTypes130.delete(type);else builderHighlightTypes130.add(type);builderGroupHighlightApply130();panel.querySelectorAll('.builderGroupChip130').forEach(chip=>chip.setAttribute('aria-pressed',String(builderHighlightTypes130.has(chip.dataset.groupType))))};row.appendChild(button)}
+  if(state.builderGrouping.mode==='type')for(const [title,action] of [['Collapse types with 3+',true],['Expand all',false]]){const button=document.createElement('button');button.type='button';button.className='builderGroupAction130';button.textContent=title;button.onclick=()=>{state.builderGrouping.collapsedTypes=action?[...counts].filter(([,count])=>count>=3).map(([type])=>type):[];renderBuilder()};row.appendChild(button)}
+  panel.appendChild(row);return result;
+};
+function builderGroupHighlightApply130(){
+  const active=builderHighlightTypes130.size>0,nodes=new Map(state.builderNodes.map(node=>[node.id,node]));
+  $$('#builderTree .unifiedNodeWrap').forEach(wrap=>wrap.classList.toggle('builderTypeDim130',active&&!builderHighlightTypes130.has(nodes.get(+wrap.dataset.unifiedNodeWrap)?.type)));
+  $$('#builderTree .builderTypeSummary130').forEach(button=>button.classList.toggle('builderTypeDim130',active&&!builderHighlightTypes130.has(button.dataset.typeSummary)));
+  for(const edge of builderTraceEdges('all')){const dim=active&&![edge.from,edge.to].some(id=>builderHighlightTypes130.has(nodes.get(id)?.type));
+    $$(`#builderTree [data-edge-plane="${edge.plane}"][data-edge-id="${CSS.escape(String(edge.id))}"],#builderTree [data-route-plane="${edge.plane}"][data-route-edge="${CSS.escape(String(edge.id))}"]`).forEach(element=>element.classList.toggle('builderTypeDim130',dim))}
+}
+function builderGroupBounds130(members,layout,pad=14){const points=members.map(node=>layout.positions.get(node.id)).filter(Boolean);if(!points.length)return null;const x=Math.min(...points.map(p=>p.x))-pad,y=Math.min(...points.map(p=>p.y))-pad;return{x,y,w:Math.max(...points.map(p=>p.x+190))+pad-x,h:Math.max(...points.map(p=>p.y+175))+pad-y}}
+function builderGroupLane130(world,layout,title,members,management=false){const box=builderGroupBounds130(members,layout,18),lane=document.createElement('div');lane.className=`builderTierLane130 ${management?'management':''} ${members.length?'':'empty'}`;const mobile=window.matchMedia('(max-width:760px)').matches;
+  if(mobile){const order=[...builderTierNames130,'Management'],index=order.indexOf(title),prior=state.builderNodes.filter(node=>order.indexOf(builderTierOf130(node)==='management'?'Management':order.find(tier=>tier.toLowerCase()===builderTierOf130(node)))<index).map(node=>layout.positions.get(node.id)?.y).filter(Number.isFinite),y=box?.y??(prior.length?Math.max(...prior)+209:42);lane.style.cssText=`left:20px;top:${Math.max(12,y-28)}px;width:${Math.max(285,layout.width-38)}px;height:${box?box.h+40:24}px`}
+  else if(management){lane.style.cssText=`left:24px;top:${box?.y??layout.height-110}px;width:${Math.max(layout.width-48,1940)}px;height:${Math.max(45,box?.h??45)}px`}
+  else{const column=builderTierNames130.indexOf(title),dimension=column<0;lane.style.cssText=`left:${dimension?box?.x??30:30+column*320}px;top:${dimension?Math.max(18,(box?.y??46)-23):23}px;width:${dimension?box?.w??230:members.length?230:46}px;height:${dimension?Math.max(80,(box?.h??110)+30):Math.max(135,(box?.y??0)+(box?.h??0)+26)}px`}
+  lane.innerHTML=`<strong>${builderEscape(title)} · ${members.length}</strong>`;world.insertBefore(lane,world.firstChild)
+}
+function builderGroupTypeBox130(world,layout,type,members){const box=builderGroupBounds130(members,layout,10);if(!box)return;const wrapper=document.createElement('div');wrapper.className='builderTypeBox130';wrapper.style.cssText=`left:${box.x}px;top:${box.y-29}px;width:${box.w}px;height:${box.h+29}px`;
+  const header=document.createElement('button');header.type='button';header.className='builderTypeHeader130';header.textContent=`${builderComponents[type]?.name||type} · ${members.length} ▾`;header.setAttribute('aria-label',`Collapse ${builderComponents[type]?.name||type} group of ${members.length}`);header.onclick=()=>builderGroupingSet130({...state.builderGrouping,collapsedTypes:[...state.builderGrouping.collapsedTypes,type]});wrapper.appendChild(header);world.insertBefore(wrapper,world.firstChild)
+}
+function builderGroupMergedPath130(svg,item,layout){
+  const position=id=>{if(typeof id==='string'&&id.startsWith('type:')){const proxy=$(`#builderTree [data-type-summary="${CSS.escape(id.slice(5))}"]`);if(proxy)return{x:parseFloat(proxy.style.left),y:parseFloat(proxy.style.top),w:190,h:106}}return builderCardBox(id,layout.positions)};
+  const a=position(item.from),b=position(item.to);if(!a||!b)return;
+  const sides=builderV123AnchorSides(a,b),first=builderV123SidePoint(a,sides.from),last=builderV123SidePoint(b,sides.to),normalA=builderV123Normal(sides.from),normalB=builderV123Normal(sides.to);
+  const start={x:first.x+normalA.x*25,y:first.y+normalA.y*25},end={x:last.x+normalB.x*25,y:last.y+normalB.y*25},obstacles=state.builderNodes.filter(node=>layout.positions.has(node.id)&&!state.builderGrouping.collapsedTypes.includes(node.type)).map(node=>builderCardBox(node.id,layout.positions)),points=compactRoutePoints([first,...builderV123RouteBetween(start,end,obstacles,'orthogonal',true),last]),d=builderV123RoundedPath(points),mid=routeMidpoint(points),color=diagramPlaneStyle[item.plane]?.color||'#57c7e8',ns='http://www.w3.org/2000/svg';
+  const path=document.createElementNS(ns,'path');path.setAttribute('d',d);path.setAttribute('stroke',color);path.setAttribute('marker-end',`url(#unified-${item.plane}-arrow)`);path.classList.add('builderTypeMerged130');const title=document.createElementNS(ns,'title');title.textContent=`${item.edges.length} ${item.plane} relationships: ${item.edges.map(edge=>`${componentInstanceLabel(edge.edge.source)} → ${componentInstanceLabel(edge.edge.target)}`).join('; ')}`;path.appendChild(title);
+  const show=event=>{document.querySelector('.builderMergedList130')?.remove();const list=document.createElement('div');list.className='builderMergedList130';list.setAttribute('role','dialog');list.setAttribute('aria-label','Merged relationships');list.innerHTML=`<button type="button" aria-label="Close relationship list">×</button><strong>${item.edges.length} ${builderEscape(item.plane)} relationships</strong><ul>${item.edges.map(edge=>`<li>${builderEscape(componentInstanceLabel(edge.edge.source))} → ${builderEscape(componentInstanceLabel(edge.edge.target))}</li>`).join('')}</ul>`;document.body.appendChild(list);list.style.left=`${Math.min(innerWidth-375,Math.max(12,event?.clientX??innerWidth/2))}px`;list.style.top=`${Math.min(innerHeight-270,Math.max(12,event?.clientY??innerHeight/2))}px`;list.querySelector('button').onclick=()=>list.remove();list.querySelector('button').focus()};path.addEventListener('click',show);svg.appendChild(path);
+  const badge=document.createElementNS(ns,'g');badge.classList.add('builderTypeBadge130');badge.setAttribute('transform',`translate(${mid.x} ${mid.y-19})`);badge.setAttribute('role','button');badge.setAttribute('tabindex','0');badge.setAttribute('aria-label',`${item.edges.length} merged relationships; show members`);badge.innerHTML=`<rect x="-13" y="-12" width="26" height="24" rx="9"/><text text-anchor="middle" y="4">${item.edges.length}</text>`;badge.appendChild(title.cloneNode(true));badge.addEventListener('click',show);badge.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();show()}});svg.appendChild(badge)
+}
+function builderGroupDecorate130(){
+  const world=$('.unifiedBuilderWorld'),svg=$('#builderTree .unifiedConnectorLayer');if(!world||!svg)return;
+  world.querySelectorAll('.builderTierLane130,.builderTypeBox130,.builderTypeSummary130').forEach(el=>el.remove());svg.querySelectorAll('.builderTypeMerged130,.builderTypeBadge130').forEach(el=>el.remove());
+  $$('#builderTree .builderTypeHidden130,#builderTree .builderTypeDim130').forEach(el=>el.classList.remove('builderTypeHidden130','builderTypeDim130'));
+  const mode=state.builderGrouping.mode,layout=unifiedBuilderPositions(),nodes=state.builderNodes.filter(largeNavNodeVisible);
+  if(mode==='tier'||mode==='type'){
+    for(const tier of [...builderTierNames130,'Management'])builderGroupLane130(world,layout,tier,nodes.filter(n=>builderTierOf130(n)===(tier==='Management'?'management':tier.toLowerCase())),tier==='Management');
+  }else if(mode==='region'||mode==='environment'){
+    const dimensions=[...new Set(nodes.map(node=>String(node[mode]||'Unspecified')))];for(const value of dimensions)builderGroupLane130(world,layout,`${mode==='region'?'Region':'Environment'} · ${value}`,nodes.filter(node=>String(node[mode]||'Unspecified')===value));
+  }else if(mode==='containers'){
+    /* Existing .unifiedGroupBox elements represent user containers without modifying them. */
+    world.querySelectorAll('.unifiedGroupBox').forEach(box=>box.classList.add('builderGroupingContainer130'));
+  }
+  if(mode==='type'){
+    const grouped=new Map();for(const node of nodes){if(node.groupId)continue;const list=grouped.get(node.type)||[];list.push(node);grouped.set(node.type,list)}
+    const collapsed=new Map();for(const [type,members] of grouped){if(!state.builderGrouping.collapsedTypes.includes(type)){builderGroupTypeBox130(world,layout,type,members);continue}collapsed.set(type,members);
+      const box=builderGroupBounds130(members,layout,0),regions=new Set(members.map(node=>node.region||'Unspecified')),
+        reviews=unresolvedValues().filter(issue=>members.some(node=>node.id===issue.nodeId)).length,summary=document.createElement('button');summary.type='button';summary.className='builderTypeSummary130';summary.dataset.typeSummary=type;summary.style.left=`${box.x}px`;summary.style.top=`${box.y}px`;summary.innerHTML=`<strong>${builderEscape(builderComponents[type]?.name||type)} ×${members.length}</strong><small>${regions.size} region${regions.size===1?'':'s'} · ${reviews} to review</small><em>Expand group ↗</em>`;summary.onclick=()=>builderGroupingSet130({...state.builderGrouping,collapsedTypes:state.builderGrouping.collapsedTypes.filter(item=>item!==type)});world.appendChild(summary);for(const member of members)world.querySelector(`[data-unified-node-wrap="${member.id}"]`)?.classList.add('builderTypeHidden130')
+    }
+    const typeById=new Map([...collapsed].flatMap(([type,members])=>members.map(node=>[node.id,type]))),merged=new Map();
+    for(const edge of builderTraceEdges('all')){const source=typeById.get(edge.from),target=typeById.get(edge.to);if(!source&&!target)continue;
+      $$(`#builderTree [data-edge-plane="${edge.plane}"][data-edge-id="${CSS.escape(String(edge.id))}"],#builderTree [data-route-plane="${edge.plane}"][data-route-edge="${CSS.escape(String(edge.id))}"]`).forEach(el=>el.classList.add('builderTypeHidden130'));
+      const from=source?`type:${source}`:edge.from,to=target?`type:${target}`:edge.to;if(from===to)continue;const key=`${edge.plane}:${from}:${to}`,item=merged.get(key)||{plane:edge.plane,from,to,edges:[]};item.edges.push(edge);merged.set(key,item)
+    }for(const item of merged.values())builderGroupMergedPath130(svg,item,layout)
+  }
+  builderGroupHighlightApply130();renderBuilderMinimap();
+}
+const builderRenderBefore130=renderBuilder;
+renderBuilder=function(...args){const result=builderRenderBefore130(...args);builderGroupDecorate130();return result};
+/* Profiles, bookmarks and documents carry the view, not model mutations. */
+const builderProfileSanitizeBefore130=sanitizeLayoutProfile;
+sanitizeLayoutProfile=function(raw,index=0){return{...builderProfileSanitizeBefore130(raw,index),grouping:builderGroupingClean130(raw?.grouping)}};
+const builderProfileCurrentBefore130=currentLayoutProfile;
+currentLayoutProfile=function(...args){return{...builderProfileCurrentBefore130(...args),grouping:builderGroupingClean130(state.builderGrouping)}};
+const builderProfileComparableBefore130=layoutProfileComparable;
+layoutProfileComparable=function(profile){return builderProfileComparableBefore130(profile)+JSON.stringify(builderGroupingClean130(profile?.grouping))};
+const builderProfileApplyBefore130=applyLayoutProfile;
+applyLayoutProfile=function(profile,...args){state.builderGrouping=builderGroupingClean130(profile?.grouping);return builderProfileApplyBefore130(profile,...args)};
+const builderBookmarkDocumentBefore130=navigationBookmarkDocument;
+navigationBookmarkDocument=function(...args){return{...builderBookmarkDocumentBefore130(...args),grouping:builderGroupingClean130(state.builderGrouping)}};
+const builderBookmarkSanitizeBefore130=sanitizeNavigationBookmark;
+sanitizeNavigationBookmark=function(raw,...args){return{...builderBookmarkSanitizeBefore130(raw,...args),grouping:builderGroupingClean130(raw?.grouping)}};
+const builderBookmarkLoadBefore130=loadNavigationBookmark;
+loadNavigationBookmark=function(...args){const id=$('#builderNavigationBookmark')?.value,bookmark=state.builderLargeNavigation.bookmarks.find(item=>item.id===id),result=builderBookmarkLoadBefore130(...args);if(bookmark){state.builderGrouping=builderGroupingClean130(bookmark.grouping);renderBuilder()}return result};
+const builderDocumentBefore130=topologyDocument;
+topologyDocument=function(...args){const document130=builderDocumentBefore130(...args);document130.grouping=builderGroupingClean130(state.builderGrouping);return document130};
+const builderDocumentLoadBefore130=loadTopologyDocument;
+loadTopologyDocument=function(doc,...args){const result=builderDocumentLoadBefore130(doc,...args);state.builderGrouping=builderGroupingClean130(doc?.grouping??state.builderGrouping);renderBuilder();return result};
+/* Reuse the existing collapsed-group exporter for the navigation scope. */
+const builderExportScopeBefore130=architectureExportScopes;
+architectureExportScopes=function(...args){const scopes=builderExportScopeBefore130(...args),navigation=scopes.find(scope=>scope.key==='navigation');if(navigation&&state.builderGrouping.mode!=='none'){navigation.available=true;navigation.detail=[navigation.detail,`Grouped by ${state.builderGrouping.mode}`].filter(Boolean).join(' · ');navigation.grouping=builderGroupingClean130(state.builderGrouping)}return scopes};
+const builderExportWithScopeBefore130=withArchitectureExportScope;
+withArchitectureExportScope=function(scope,callback){
+  const types=scope?.key==='navigation'&&state.builderGrouping.mode==='type'?state.builderGrouping.collapsedTypes:[];
+  if(!types.length)return builderExportWithScopeBefore130(scope,callback);
+  const originalNodes=state.builderNodes,originalGroups=state.builderGroups,chosen=new Set(scope.nodeIds),groups=[];
+  const used=types.filter(type=>originalNodes.filter(node=>chosen.has(node.id)&&node.type===type&&!node.groupId).length>1);
+  if(!used.length)return builderExportWithScopeBefore130(scope,callback);
+  state.builderNodes=originalNodes.map(node=>{const index=used.indexOf(node.type);return index<0||node.groupId?node:{...node,groupId:`export-type-130-${index}`}});
+  state.builderGroups=[...originalGroups,...used.map((type,index)=>({id:`export-type-130-${index}`,name:`${builderComponents[type]?.name||type} ×${originalNodes.filter(node=>chosen.has(node.id)&&node.type===type&&!node.groupId).length}`,type:'Component type',color:'#78d8e4'}))];
+  try{return builderExportWithScopeBefore130({...scope,aggregateGroups:[...(scope.aggregateGroups||[]),...used.map((_,index)=>`export-type-130-${index}`)]},callback)}finally{state.builderNodes=originalNodes;state.builderGroups=originalGroups}
+};
+/* SVG, PNG and pack all pass through the scoped SVG generator. */
+const builderExportSvgBefore130=architectureSvgForScope;
+architectureSvgForScope=function(scope,...args){const source=builderExportSvgBefore130(scope,...args),mode=state.builderGrouping.mode;if(!['tier','type','region','environment','containers'].includes(mode))return source;
+  const xml=new DOMParser().parseFromString(source,'image/svg+xml');if(xml.querySelector('parsererror'))return source;
+  const root=xml.documentElement,body=[...root.children].find(el=>el.localName==='g'&&el.hasAttribute('transform'));
+  if(!body)return source;const NS='http://www.w3.org/2000/svg',group=xml.createElementNS(NS,'g');group.setAttribute('class','builderExportGrouping130');
+  const layout=unifiedBuilderPositions(),visible=state.builderNodes.filter(node=>scope.nodeIds.includes(node.id));
+  const labels=mode==='tier'||mode==='type'?[...builderTierNames130,'Management']:mode==='region'||mode==='environment'?[...new Set(visible.map(node=>String(node[mode]||'Unspecified')))]:[];
+  labels.forEach((label,index)=>{const members=visible.filter(node=>mode==='tier'||mode==='type'?builderTierOf130(node)===(label==='Management'?'management':label.toLowerCase()):String(node[mode]||'Unspecified')===label),box=builderGroupBounds130(members,layout,16);if(!box&&!['tier','type'].includes(mode))return;
+    const x=box?.x??30+index*320,y=box?.y??20,w=box?.w??46,h=box?.h??175;
+    const rect=xml.createElementNS(NS,'rect');for(const [key,value] of Object.entries({x,y,width:w,height:h,rx:12,fill:'#122c37','fill-opacity':'.3',stroke:'#547889','stroke-opacity':'.5'}))rect.setAttribute(key,String(value));group.appendChild(rect);
+    const text=xml.createElementNS(NS,'text');text.setAttribute('x',String(x+9));text.setAttribute('y',String(y+14));text.setAttribute('fill','#b0d3e2');text.setAttribute('font-size','11');text.textContent=`${label} · ${members.length}`;group.appendChild(text)});
+  body.insertBefore(group,body.firstChild);root.setAttribute('data-group-by',mode);return'<?xml version="1.0" encoding="UTF-8"?>'+new XMLSerializer().serializeToString(root)
+};
+const builderPackPagesBefore130=builderV125PackPages125;
+builderV125PackPages125=function(...args){const pages=builderPackPagesBefore130(...args),mode=state.builderGrouping.mode;if(mode==='none')return pages;
+  const scope=architectureExportScopes().find(item=>item.key==='navigation');if(!scope?.nodeIds?.length)return pages;
+  const title=`Current navigation view · ${mode==='tier'?'Tier lanes':mode==='type'?'Component type':mode==='containers'?'My containers':mode==='region'?'Region':'Environment'}`;
+  const svg=architectureSvgForScope(scope,title).replace(/^<\?xml[^>]*\?>/,'');
+  const page=builderV125Page125('grouped-navigation-130',title,svg);pages.push(page);
+  const cover=pages.find(item=>item.id==='cover');if(cover){const types=state.builderGrouping.collapsedTypes.map(type=>builderComponents[type]?.name||type).join(', ');
+    cover.content=cover.content.replace('</dl>',`<div><dt>Current Group by view</dt><dd>${builderV125Text125(title)}${types?` · collapsed: ${builderV125Text125(types)}`:''}</dd></div></dl>`)
+      .replace('</ol>',`<li><span>${builderV125Text125(title)}</span><b>${pages.length}</b></li></ol>`)}
+  return pages
+};
+document.title='Splunk Pipeline Explorer · Build 130 · 29 Sep 2026';$('#topologyBuilder').dataset.buildNumber='130';$('#topologyBuilder').dataset.buildDate='2026-09-29';const builderStamp130=$('.builderBuildStamp');if(builderStamp130){builderStamp130.setAttribute('aria-label','Build 130, dated 29 September 2026');builderStamp130.querySelector('b').textContent='Build 130'}
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Canvas Group by','Arrange components in pipeline tier lanes, collapse component types into summary cards and merged relationships, highlight types, and save the view in bookmarks, profiles and exports.',true]);if(state.view==='changes')renderChanges();renderBuilder();
 </script>
 
 </body>
