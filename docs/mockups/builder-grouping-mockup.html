@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Builder Grouping Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one working surface — header, Navigate-style control row, the canvas, then a short "what changes" note per mode.
+   Single dark look on purpose: it mocks the Builder's own dark canvas. */
+:root{
+  color-scheme:dark;
+  --bg:#07111b; --panel:#0c1a26; --panel-2:#0f2231; --line:#22384a; --line-2:#2d4a5f;
+  --fg:#e6f0f5; --muted:#8ea4b4; --faint:#5e7688; --accent:#57c7e8; --review:#c9a867;
+  --t-sources:#9d8cf5; --t-collection:#5fd3a8; --t-forwarding:#57c7e8; --t-processing:#d28df5;
+  --t-indexing:#f3bd61; --t-search:#6fa8ff; --t-management:#2dd4bf;
+  --font-ui:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 14px/1.5 var(--font-ui)}
+.wrap{max-width:1280px;margin:0 auto;padding-inline:16px;padding-block:20px 40px;display:grid;gap:14px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px}
+h1{margin:0;font-size:1.25rem;font-weight:600;letter-spacing:.005em;text-wrap:balance}
+.sub{margin:0;color:var(--muted);font-size:.86rem;max-width:70ch}
+.example{font:600 .66rem/1 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px;white-space:nowrap}
+
+/* Navigate-style control row */
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.ctl-label{font:600 .66rem/1 var(--font-code);letter-spacing:.09em;text-transform:uppercase;color:#baaaff}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:8px;overflow:hidden}
+.seg button{appearance:none;border:0;background:transparent;color:var(--muted);font:600 .8rem/1 var(--font-ui);padding:8px 12px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line-2)}
+.seg button[aria-pressed="true"]{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--fg)}
+.seg button:focus-visible,.btn:focus-visible,.chip:focus-visible,.gh:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{appearance:none;border:1px solid var(--line-2);background:var(--panel-2);color:var(--fg);font:600 .76rem/1 var(--font-ui);padding:8px 11px;border-radius:7px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.typeActions{display:flex;gap:8px}
+.status{margin-left:auto;color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums}
+
+/* Type chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chips .ctl-label{margin-right:4px;color:var(--muted)}
+.chip{appearance:none;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-2);background:transparent;color:var(--fg);font:500 .76rem/1 var(--font-ui);padding:6px 9px 6px 7px;border-radius:999px;cursor:pointer}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.chip b{font:600 .7rem/1 var(--font-code);color:var(--muted);font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.chipHint{color:var(--faint);font-size:.74rem}
+
+/* Canvas */
+.canvasWrap{border:1px solid var(--line);border-radius:12px;background-color:#07111b;background-image:radial-gradient(#1a2c3c 1px,transparent 1px);background-size:18px 18px;overflow-x:auto}
+svg{display:block}
+.lane rect{fill:#0b1b28;stroke:#1d3446}
+.lane text{font:600 10.5px var(--font-code);letter-spacing:.08em;text-transform:uppercase}
+.lane .count{fill:var(--muted)}
+.edge{fill:none;stroke-width:1.6}
+.edge.data{stroke:#4fb7d6}
+.edge.mgmt{stroke:var(--t-management);stroke-dasharray:6 5;opacity:.8}
+.edgeBadge circle{fill:#0e2635;stroke:#4fb7d6;stroke-width:1.3}
+.edgeBadge.mgmt circle{stroke:var(--t-management)}
+.edgeBadge text{font:600 10px var(--font-code);fill:var(--fg);text-anchor:middle;dominant-baseline:central}
+.edges{transition:opacity .25s ease}
+.edges.fading{opacity:0}
+.node{transition:transform .38s cubic-bezier(.3,.7,.2,1),opacity .25s ease;cursor:default}
+.node.hidden{opacity:0!important;pointer-events:none;visibility:hidden}
+.node.dim{opacity:.22}
+.node rect.card{fill:#0d1c29;stroke-width:1.5}
+.node.agg rect.card{fill:#10202e;stroke-width:2}
+.node.agg rect.stack{fill:#0d1c29;stroke-width:1}
+.node .tier{font:600 8.5px var(--font-code);letter-spacing:.09em;text-transform:uppercase}
+.node .name{font:600 12px var(--font-ui);fill:var(--fg)}
+.node .meta{font:400 10px var(--font-ui);fill:var(--muted)}
+.node .code{font:600 9px var(--font-code);fill:#07111b}
+.node.agg{cursor:pointer}
+.review circle{fill:#1c2a33;stroke:var(--review);stroke-width:1.2}
+.review text{font:600 9px var(--font-code);fill:var(--review);text-anchor:middle;dominant-baseline:central}
+.groupBox rect.box{fill:rgba(12,28,40,.55);stroke-dasharray:4 4;stroke-width:1.2}
+.gh{cursor:pointer}
+.gh text{font:600 10.5px var(--font-ui);fill:var(--fg)}
+.gh .cnt{font:600 10px var(--font-code);fill:var(--muted)}
+.gh .chev{font:600 10px var(--font-code);fill:var(--muted)}
+.groups{transition:opacity .25s ease}
+.groups.fading{opacity:0}
+
+/* Notes */
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.note{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:12px 14px;min-width:0}
+.note h2{margin:0 0 6px;font-size:.9rem;font-weight:600}
+.note ul{margin:0;padding-left:1.1em;color:var(--muted);font-size:.84rem;display:grid;gap:4px}
+.note strong{color:var(--fg);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:14px;color:var(--muted);font-size:.78rem;align-items:center}
+.legend svg{display:inline-block;vertical-align:middle}
+@media (prefers-reduced-motion:reduce){.node,.edges,.groups{transition:none}}
+@media (max-width:560px){.status{margin-left:0;width:100%}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Group by component type · Builder mockup</h1>
+      <p class="sub">Switch the canvas between no grouping, tier lanes and component-type groups. Click a type group's header (or a collapsed node) to collapse or expand it; click a chip to highlight a type.</p>
+    </div>
+    <span class="example">Example topology · 14 components</span>
+  </header>
+
+  <div class="controls" role="group" aria-label="Canvas grouping">
+    <span class="ctl-label" id="groupByLabel">Group by</span>
+    <div class="seg" role="group" aria-labelledby="groupByLabel">
+      <button type="button" id="mode-none" data-mode="none" aria-pressed="false">None</button>
+      <button type="button" id="mode-tier" data-mode="tier" aria-pressed="true">Tier lanes</button>
+      <button type="button" id="mode-type" data-mode="type" aria-pressed="false">Component type</button>
+    </div>
+    <div class="typeActions" id="typeActions" hidden>
+      <button type="button" class="btn" id="collapseBig">Collapse types with 2+</button>
+      <button type="button" class="btn" id="expandAll">Expand all</button>
+    </div>
+    <span class="status" id="status" aria-live="polite"></span>
+  </div>
+
+  <div class="chips" id="chips" role="group" aria-label="Highlight component types">
+    <span class="ctl-label">Highlight</span>
+  </div>
+
+  <div class="canvasWrap" id="canvasWrap">
+    <svg id="canvas" role="img" aria-label="Example Splunk topology drawn with the selected grouping">
+      <defs>
+        <marker id="arrowData" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#4fb7d6"/></marker>
+        <marker id="arrowMgmt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2dd4bf"/></marker>
+      </defs>
+      <g id="lanes"></g>
+      <g id="groups" class="groups"></g>
+      <g id="edges" class="edges"></g>
+      <g id="nodes"></g>
+    </svg>
+  </div>
+
+  <div class="legend">
+    <span><svg width="34" height="10"><line x1="1" y1="5" x2="33" y2="5" stroke="#4fb7d6" stroke-width="1.8"/></svg> Event data</span>
+    <span><svg width="34" height="10"><line x1="1" y1="5" x2="33" y2="5" stroke="#2dd4bf" stroke-width="1.8" stroke-dasharray="6 5"/></svg> Fleet management / licensing</span>
+    <span><svg width="18" height="18"><circle cx="9" cy="9" r="8" fill="#0e2635" stroke="#4fb7d6"/><text x="9" y="9.5" font-size="9" font-family="IBM Plex Mono,monospace" fill="#e6f0f5" text-anchor="middle" dominant-baseline="central">3</text></svg> Merged connections</span>
+    <span><svg width="18" height="18"><circle cx="9" cy="9" r="7.5" fill="#1c2a33" stroke="#c9a867"/><text x="9" y="9.5" font-size="9" font-family="IBM Plex Mono,monospace" fill="#c9a867" text-anchor="middle" dominant-baseline="central">1</text></svg> Items to review</span>
+  </div>
+
+  <div class="notes" id="notes"></div>
+</div>
+
+<script>
+(() => {
+  const TIERS = [
+    {key:'sources',    label:'Sources'},
+    {key:'collection', label:'Collection'},
+    {key:'forwarding', label:'Forwarding'},
+    {key:'processing', label:'Processing'},
+    {key:'indexing',   label:'Indexing'},
+    {key:'search',     label:'Search'}
+  ];
+  const TIER_LABEL = {sources:'Source system',collection:'Collection relay',forwarding:'Forwarding tier',processing:'Parsing tier',indexing:'Indexing tier',search:'Search tier',management:'Management'};
+  const TYPES = {
+    win:  {label:'Windows Event Log',    code:'WIN', tier:'sources'},
+    sys:  {label:'Syslog Source',        code:'SYS', tier:'sources'},
+    ssrv: {label:'Syslog Server',        code:'SS',  tier:'collection'},
+    uf:   {label:'Universal Forwarder',  code:'UF',  tier:'forwarding'},
+    hf:   {label:'Heavy Forwarder',      code:'HF',  tier:'processing'},
+    idx:  {label:'Indexer',              code:'IDX', tier:'indexing'},
+    sh:   {label:'Search Head',          code:'SH',  tier:'search'},
+    ds:   {label:'Deployment Server',    code:'DS',  tier:'management', col:2},
+    lm:   {label:'License Manager',      code:'LM',  tier:'management', col:4}
+  };
+  const NODES = [
+    {id:'win1', name:'Windows Event Log 1', type:'win', region:'Sydney'},
+    {id:'win2', name:'Windows Event Log 2', type:'win', region:'Melbourne'},
+    {id:'sys1', name:'Syslog Source 1',     type:'sys', region:'Sydney', review:1},
+    {id:'sys2', name:'Syslog Source 2',     type:'sys', region:'Sydney'},
+    {id:'ss1',  name:'Syslog Server 1',     type:'ssrv',region:'Sydney', review:1},
+    {id:'uf1',  name:'Universal Forwarder 1',type:'uf', region:'Sydney', review:1},
+    {id:'uf2',  name:'Universal Forwarder 2',type:'uf', region:'Melbourne'},
+    {id:'uf3',  name:'Universal Forwarder 3',type:'uf', region:'Sydney'},
+    {id:'hf1',  name:'Heavy Forwarder 1',   type:'hf',  region:'Sydney', review:2},
+    {id:'idx1', name:'Indexer 1',           type:'idx', region:'Sydney'},
+    {id:'idx2', name:'Indexer 2',           type:'idx', region:'Melbourne', review:1},
+    {id:'sh1',  name:'Search Head 1',       type:'sh',  region:'Sydney'},
+    {id:'ds1',  name:'Deployment Server 1', type:'ds',  region:'Sydney'},
+    {id:'lm1',  name:'License Manager 1',   type:'lm',  region:'Sydney'}
+  ];
+  const DATA = [['win1','uf1'],['win2','uf2'],['sys1','ss1'],['sys2','ss1'],['ss1','uf3'],['uf1','hf1'],['uf3','hf1'],['uf2','idx2'],['hf1','idx1'],['hf1','idx2'],['idx1','sh1'],['idx2','sh1']];
+  const MGMT = [['ds1','uf1'],['ds1','uf2'],['ds1','uf3'],['ds1','hf1'],['lm1','idx1'],['lm1','idx2']];
+
+  const W = 164, H = 58, COL = 200, PADL = 26, ROW = 74;
+  const TIER_INDEX = Object.fromEntries(TIERS.map((t,i)=>[t.key,i]));
+  const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const tierColor = t => cssVar('--t-'+t);
+  const colOf = type => TYPES[type].col ?? TIER_INDEX[TYPES[type].tier];
+  const colX = c => PADL + c*COL;
+
+  const state = {mode:'tier', collapsed:new Set(), highlight:new Set()};
+  const svg = document.getElementById('canvas');
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (tag, attrs={}, parent) => { const e=document.createElementNS(NS,tag); for(const [k,v] of Object.entries(attrs)) e.setAttribute(k,v); if(parent) parent.appendChild(e); return e; };
+  const typeOrder = Object.keys(TYPES);
+  const typeCount = t => NODES.filter(n=>n.type===t).length;
+  const reviewFor = ids => NODES.filter(n=>ids.includes(n.id)).reduce((s,n)=>s+(n.review||0),0);
+
+  /* ---------- Layout ---------- */
+  function layout(){
+    const pos = new Map(), lanes = [], boxes = [], proxies = [];
+    const mainTypes = typeOrder.filter(t=>TYPES[t].tier!=='management');
+    const mgmtTypes = typeOrder.filter(t=>TYPES[t].tier==='management');
+    const top = state.mode==='tier' ? 46 : 24;
+
+    if(state.mode!=='type'){
+      const byCol = new Map();
+      NODES.filter(n=>TYPES[n.type].tier!=='management').forEach(n=>{const c=colOf(n.type);(byCol.get(c)||byCol.set(c,[]).get(c)).push(n)});
+      const tallest = Math.max(...[...byCol.values()].map(a=>a.length));
+      const mainH = tallest*ROW;
+      byCol.forEach((list,c)=>{const off=(tallest-list.length)*ROW/2;list.forEach((n,i)=>pos.set(n.id,{x:colX(c),y:top+off+i*ROW}))});
+      const mgmtTop = top + mainH + (state.mode==='tier'?44:22);
+      NODES.filter(n=>TYPES[n.type].tier==='management').forEach(n=>pos.set(n.id,{x:colX(colOf(n.type)),y:mgmtTop}));
+      if(state.mode==='tier'){
+        TIERS.forEach((t,i)=>lanes.push({x:colX(i)-14,y:8,w:W+28,h:mainH+top-8+6,label:t.label,count:NODES.filter(n=>TYPES[n.type].tier===t.key).length,color:tierColor(t.key)}));
+        lanes.push({x:colX(0)-14,y:mgmtTop-30,w:colX(TIERS.length-1)+W+14-(colX(0)-14),h:H+44,label:'Management',count:NODES.filter(n=>TYPES[n.type].tier==='management').length,color:tierColor('management'),wide:true});
+      }
+      return {pos,lanes,boxes,proxies,height:mgmtTop+H+(state.mode==='tier'?22:24)};
+    }
+
+    // Component-type mode: a box per type, stacked inside its tier column; collapsed types become one node.
+    const GH = 26, GROW = 68, GAP = 16;
+    const colStacks = new Map();
+    mainTypes.forEach(t=>{const c=colOf(t);(colStacks.get(c)||colStacks.set(c,[]).get(c)).push(t)});
+    const blockH = t => state.collapsed.has(t) ? H+10 : GH + typeCount(t)*GROW + 2;
+    const colH = c => (colStacks.get(c)||[]).reduce((s,t,i)=>s+blockH(t)+(i?GAP:0),0);
+    const tallest = Math.max(...[...colStacks.keys()].map(colH));
+    colStacks.forEach((types,c)=>{
+      let y = top + (tallest-colH(c))/2;
+      types.forEach(t=>{placeType(t,c,y);y+=blockH(t)+GAP});
+    });
+    const mgmtTop = top + tallest + 34;
+    mgmtTypes.forEach(t=>placeType(t,colOf(t),mgmtTop));
+    const mgmtH = Math.max(...mgmtTypes.map(blockH));
+    return {pos,lanes,boxes,proxies,height:mgmtTop+mgmtH+24};
+
+    function placeType(t,c,y){
+      const members = NODES.filter(n=>n.type===t), x=colX(c);
+      if(state.collapsed.has(t)){
+        const p={x,y:y+5};
+        proxies.push({type:t,...p,ids:members.map(m=>m.id)});
+        members.forEach(m=>pos.set(m.id,{...p,hidden:true}));
+      } else {
+        boxes.push({type:t,x:x-10,y,w:W+20,h:GH+members.length*GROW+2});
+        members.forEach((m,i)=>pos.set(m.id,{x,y:y+GH+4+i*GROW}));
+      }
+    }
+  }
+
+  /* ---------- Rendering ---------- */
+  const nodeEls = new Map(), proxyEls = new Map();
+  function buildNodes(){
+    const layer = document.getElementById('nodes');
+    NODES.forEach(n=>{
+      const t=TYPES[n.type], color=tierColor(t.tier), g=el('g',{class:'node','data-id':n.id},layer);
+      el('title',{},g).textContent = `${n.name} · ${t.label} · ${n.region}${n.review?` · ${n.review} to review`:''}`;
+      el('rect',{class:'card',width:W,height:H,rx:8,stroke:color},g);
+      el('rect',{x:10,y:10,width:28,height:14,rx:3,fill:color},g);
+      el('text',{class:'code',x:24,y:20.5,'text-anchor':'middle'},g).textContent=t.code;
+      el('text',{class:'tier',x:44,y:20.5,fill:color},g).textContent=TIER_LABEL[t.tier];
+      el('text',{class:'name',x:10,y:39},g).textContent=n.name;
+      el('text',{class:'meta',x:10,y:51},g).textContent=n.region;
+      if(n.review){const r=el('g',{class:'review',transform:`translate(${W-2},2)`},g);el('circle',{r:8},r);el('text',{y:.5},r).textContent=n.review;}
+      nodeEls.set(n.id,g);
+    });
+    typeOrder.forEach(type=>{
+      const t=TYPES[type], color=tierColor(t.tier), ids=NODES.filter(n=>n.type===type).map(n=>n.id);
+      const g=el('g',{class:'node agg hidden','data-type':type,tabindex:0,role:'button','aria-label':`Expand ${t.label} group`},layer);
+      el('title',{},g).textContent=`${t.label} ×${ids.length} · click to expand`;
+      if(ids.length>1){el('rect',{class:'stack',x:6,y:-6,width:W,height:H,rx:8,stroke:color},g);}
+      if(ids.length>2){el('rect',{class:'stack',x:3,y:-3,width:W,height:H,rx:8,stroke:color},g);}
+      el('rect',{class:'card',width:W,height:H,rx:8,stroke:color},g);
+      el('rect',{x:10,y:10,width:28,height:14,rx:3,fill:color},g);
+      el('text',{class:'code',x:24,y:20.5,'text-anchor':'middle'},g).textContent=t.code;
+      el('text',{class:'tier',x:44,y:20.5,fill:color},g).textContent=TIER_LABEL[t.tier];
+      el('text',{class:'name',x:10,y:39},g).textContent=`${t.label} ×${ids.length}`;
+      const regions=[...new Set(NODES.filter(n=>n.type===type).map(n=>n.region))], rev=reviewFor(ids);
+      el('text',{class:'meta',x:10,y:51},g).textContent=`${regions.length>1?regions.length+' regions':regions[0]}${rev?` · ${rev} to review`:''}`;
+      const toggle=()=>{state.collapsed.delete(type);render(true)};
+      g.addEventListener('click',toggle);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}});
+      proxyEls.set(type,g);
+    });
+  }
+
+  function render(animate){
+    const L = layout();
+    const width = colX(TIERS.length-1)+W+PADL;
+    svg.setAttribute('viewBox',`0 0 ${width} ${L.height}`);
+    svg.setAttribute('width',width);svg.setAttribute('height',L.height);
+
+    // lanes
+    const lanes=document.getElementById('lanes');lanes.replaceChildren();
+    L.lanes.forEach(l=>{const g=el('g',{class:'lane'},lanes);el('rect',{x:l.x,y:l.y,width:l.w,height:l.h,rx:10},g);
+      const tx=el('text',{x:l.x+12,y:l.y+20,fill:l.color},g);tx.textContent=l.label;
+      const c=el('text',{class:'count',x:l.x+12+l.label.length*7.4+8,y:l.y+20},g);c.textContent=`· ${l.count}`;});
+
+    // type boxes
+    const groups=document.getElementById('groups');
+    const drawGroups=()=>{groups.replaceChildren();L.boxes.forEach(b=>{
+      const t=TYPES[b.type],color=tierColor(t.tier),n=typeCount(b.type),g=el('g',{class:'groupBox'},groups);
+      el('rect',{class:'box',x:b.x,y:b.y,width:b.w,height:b.h,rx:10,stroke:color},g);
+      const h=el('g',{class:'gh',tabindex:0,role:'button','aria-label':`Collapse ${t.label} group`},g);
+      el('rect',{x:b.x,y:b.y,width:b.w,height:24,fill:'transparent'},h);
+      el('text',{class:'chev',x:b.x+10,y:b.y+16},h).textContent='▾';
+      el('text',{x:b.x+24,y:b.y+16},h).textContent=t.label;
+      el('text',{class:'cnt',x:b.x+b.w-12,y:b.y+16,'text-anchor':'end'},h).textContent=n;
+      const toggle=()=>{state.collapsed.add(b.type);render(true)};
+      h.addEventListener('click',toggle);h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}});
+    })};
+
+    // nodes (persistent, animated)
+    NODES.forEach(n=>{const p=L.pos.get(n.id),g=nodeEls.get(n.id);g.style.transform=`translate(${p.x}px,${p.y}px)`;g.classList.toggle('hidden',!!p.hidden)});
+    typeOrder.forEach(t=>{const g=proxyEls.get(t),p=L.proxies.find(x=>x.type===t);
+      if(p){g.style.transform=`translate(${p.x}px,${p.y}px)`;g.classList.remove('hidden')}
+      else{const first=L.pos.get(NODES.find(n=>n.type===t).id);g.style.transform=`translate(${first.x}px,${first.y}px)`;g.classList.add('hidden')}});
+    applyHighlight();
+
+    // edges (merged when a type is collapsed)
+    const edges=document.getElementById('edges'), groupsEl=groups;
+    const drawEdges=()=>{edges.replaceChildren();
+      const endpoint=id=>{const n=NODES.find(x=>x.id===id);return state.mode==='type'&&state.collapsed.has(n.type)?'type:'+n.type:id};
+      const at=key=>{if(key.startsWith('type:')){const p=L.proxies.find(x=>'type:'+x.type===key);return {x:p.x,y:p.y,type:p.type}}const n=NODES.find(x=>x.id===key),p=L.pos.get(key);return {x:p.x,y:p.y,type:n.type}};
+      const merge=(list,kind)=>{const m=new Map();list.forEach(([a,b])=>{const A=endpoint(a),B=endpoint(b);if(A===B)return;const k=A+'>'+B;m.set(k,{a:A,b:B,count:(m.get(k)?.count||0)+1,kind})});return [...m.values()]};
+      [...merge(DATA,'data'),...merge(MGMT,'mgmt')].forEach(e=>{
+        const A=at(e.a),B=at(e.b);let d,mid;
+        if(e.kind==='data'){const x1=A.x+W,y1=A.y+H/2,x2=B.x-2,y2=B.y+H/2,dx=Math.max(40,(x2-x1)*.5);d=`M${x1} ${y1} C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`;mid={x:(x1+x2)/2,y:(y1+y2)/2}}
+        else{const x1=A.x+W/2,y1=A.y,x2=B.x+W/2+(B.x===A.x?0:0),y2=B.y+H+2,dy=Math.max(30,(y1-y2)*.45);d=`M${x1} ${y1} C${x1} ${y1-dy} ${x2} ${y2+dy} ${x2} ${y2}`;mid={x:(x1+x2)/2,y:(y1+y2)/2}}
+        const path=el('path',{class:`edge ${e.kind}`,d,'marker-end':`url(#${e.kind==='data'?'arrowData':'arrowMgmt'})`,'data-a':e.a,'data-b':e.b},edges);
+        const na=e.a.startsWith('type:')?TYPES[e.a.slice(5)].label:NODES.find(n=>n.id===e.a).name, nb=e.b.startsWith('type:')?TYPES[e.b.slice(5)].label:NODES.find(n=>n.id===e.b).name;
+        el('title',{},path).textContent=`${na} → ${nb}${e.count>1?` · ${e.count} connections`:''}`;
+        if(e.count>1){const bg=el('g',{class:`edgeBadge ${e.kind}`,transform:`translate(${mid.x},${mid.y})`},edges);el('circle',{r:9},bg);el('text',{y:.5},bg).textContent=e.count;el('title',{},bg).textContent=`${e.count} connections merged`;}
+      });
+      applyHighlight();
+    };
+    if(animate && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+      edges.classList.add('fading');groupsEl.classList.add('fading');
+      setTimeout(()=>{drawEdges();drawGroups();edges.classList.remove('fading');groupsEl.classList.remove('fading')},300);
+    } else {drawEdges();drawGroups()}
+
+    // status + controls
+    const visibleNodes = NODES.filter(n=>!L.pos.get(n.id).hidden).length + L.proxies.length;
+    document.getElementById('status').textContent = state.mode==='type'
+      ? `${visibleNodes} shapes on canvas · ${state.collapsed.size} type${state.collapsed.size===1?'':'s'} collapsed`
+      : `${NODES.length} components · ${DATA.length} event-data and ${MGMT.length} management connections`;
+    document.getElementById('typeActions').hidden = state.mode!=='type';
+    document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===state.mode)));
+    renderNotes();
+  }
+
+  function applyHighlight(){
+    const on = state.highlight.size>0;
+    NODES.forEach(n=>nodeEls.get(n.id).classList.toggle('dim',on&&!state.highlight.has(n.type)));
+    proxyEls.forEach((g,t)=>g.classList.toggle('dim',on&&!state.highlight.has(t)));
+    document.querySelectorAll('#edges path').forEach(p=>{
+      const typeOf=k=>k.startsWith('type:')?k.slice(5):NODES.find(n=>n.id===k).type;
+      const keep=!on||state.highlight.has(typeOf(p.dataset.a))||state.highlight.has(typeOf(p.dataset.b));
+      p.style.opacity=keep?'':'0.15';
+    });
+  }
+
+  /* ---------- Chips ---------- */
+  function buildChips(){
+    const box=document.getElementById('chips');
+    typeOrder.forEach(t=>{
+      const b=document.createElement('button');b.type='button';b.className='chip';b.id='chip-'+t;b.setAttribute('aria-pressed','false');
+      b.style.setProperty('--c',tierColor(TYPES[t].tier));
+      b.innerHTML=`<i></i>${TYPES[t].label} <b>${typeCount(t)}</b>`;
+      b.addEventListener('click',e=>{
+        if(!e.shiftKey && !(state.highlight.size===1&&state.highlight.has(t))){state.highlight=new Set([t])}
+        else if(state.highlight.has(t)){state.highlight.delete(t)} else {state.highlight.add(t)}
+        document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',String(state.highlight.has(c.id.slice(5)))));
+        applyHighlight();
+      });
+      box.appendChild(b);
+    });
+    const hint=document.createElement('span');hint.className='chipHint';hint.textContent='Shift-click to add a type · click again to clear';box.appendChild(hint);
+  }
+
+  /* ---------- Notes ---------- */
+  const NOTES = {
+    none:[['What you see','Today\'s canvas: components in pipeline columns with no grouping. Fine for small topologies; the structure is left to the reader.'],
+          ['When it stops working','Past 20–30 components the columns become long lists, and fleet-management lines cross the event-data path.']],
+    tier:[['Tier lanes','Each pipeline tier gets a labelled band with a count. Nodes sit in their tier\'s band, so the flow reads left to right and a connection that goes backwards stands out.'],
+          ['Management lane','Deployment Server, License Manager and other management roles move to a separate bottom lane, so dashed management lines stay off the event-data path.'],
+          ['Builder rules','A view, not saved containers. In free layout the lanes are drawn behind your hand-placed positions instead of moving nodes. Empty tiers shrink to a thin strip.']],
+    type:[['Type groups','Every component type gets a box inside its tier column. Click a box header to collapse it into one summary node showing the count, regions and items to review.'],
+          ['Merged connections','When a type is collapsed, its members\' connections merge into one line with a count badge. Try collapsing Universal Forwarder: three lines from Deployment Server become one marked "3".'],
+          ['Builder rules','Collapsed types are saved in navigation bookmarks and layout profiles, and the architecture pack exports the same collapsed view. Manual containers take priority over type boxes.']]
+  };
+  function renderNotes(){
+    const n=document.getElementById('notes');n.replaceChildren();
+    NOTES[state.mode].forEach(([h,t])=>{const d=document.createElement('section');d.className='note';d.innerHTML=`<h2>${h}</h2><ul><li>${t}</li></ul>`;n.appendChild(d)});
+    const chipNote=document.createElement('section');chipNote.className='note';
+    chipNote.innerHTML='<h2>Highlight chips</h2><ul><li>Work in every mode without moving anything. In the Builder, Shift-click would also select those components for bulk edit.</li></ul>';
+    n.appendChild(chipNote);
+  }
+
+  /* ---------- Wire up ---------- */
+  document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{state.mode=b.dataset.mode;render(true)}));
+  document.getElementById('collapseBig').addEventListener('click',()=>{typeOrder.forEach(t=>{if(typeCount(t)>=2)state.collapsed.add(t)});render(true)});
+  document.getElementById('expandAll').addEventListener('click',()=>{state.collapsed.clear();render(true)});
+  buildNodes();buildChips();render(false);
+})();
+</script>
+
+</html>

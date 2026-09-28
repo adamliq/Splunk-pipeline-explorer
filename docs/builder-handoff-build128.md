@@ -1,28 +1,27 @@
-# Builder handoff: Build 127 review
-
-> **Superseded by [`builder-handoff-build128.md`](builder-handoff-build128.md)**, the current task list (the same six open items plus the new Group-by feature). Kept as the Build 127 review record.
+# Builder handoff: tasks for Build 128
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
-**Reviewed:** `main` at `e4a1009` (Build 127, 29 Sep 2026: v125 architecture pack, v126 palette pin, v127 relationship authentication), also merged into branch `claude/build-page-layout-bl6jk1`
-**History:** `builder-handoff-build124.md` and earlier. This file replaces them as the task list.
+**Baseline:** `main` at `e4a1009` (Build 127, 29 Sep 2026), also merged into branch `claude/build-page-layout-bl6jk1`. There is no newer build; this is a new version of the task list, not a new review.
+**History:** `builder-handoff-build127.md` (the Build 127 review this list comes from) and earlier.
 **Tool:** `node tools/builder-connector-check.js index.html [screenshot-dir]` (Playwright/Chromium).
+**Mockup:** `docs/mockups/builder-grouping-mockup.html` (standalone; open it in a browser) for item 7.
 
 ## TL;DR
 
-Build 127 is in very good shape: **0 errors** on load, **179 buttons** with 0 errors, and **every connector scenario passes** while dragging and after drop. The architecture pack meets almost every acceptance check from the Build 124 handoff. **Six small items remain** (below); 1–3 are in the architecture pack.
+Build 127 is in very good shape: 0 errors, 179 buttons clean, and every connector scenario passes. This list has **six small fixes carried over from the Build 127 review** (items 1–6; 1–4 are in the architecture pack) and **one new feature, "Group by" on the canvas** (item 7), with an interactive mockup. Suggested order: items 1–6, then item 7 (tier lanes first, component type second).
 
 ## Rules for every future build (unchanged)
 
 - Start from the latest `index.html` on `main`; keep every versioned block (`…-v110` to `…-v127`).
 - **Never redeclare a top-level `const`, `let` or `function` name** (all classic scripts share one global scope; a duplicate makes the browser skip the whole script). Suffix new names with the block number.
-- One version number per block; the next is `…-v128`.
+- One version number per block; the next is `…-v128`. Build 128 may contain several blocks (for example `…-v128` for the fixes and `…-v129` for Group by); keep the build stamp on the highest.
 - Move existing DOM elements rather than recreating them; layout code must be idempotent.
 - Keep the build stamp consistent (title, `data-build-*`, `.builderBuildStamp`).
 - Before uploading: zero `pageerror` events at 1440×900 and 390×844 after clicking **Builder**, run `tools/builder-connector-check.js`, and export the architecture pack once.
 
 ---
 
-## Verified in Build 127
+## Baseline: verified in Build 127
 
 | Area | Result |
 |---|---|
@@ -41,7 +40,7 @@ Build 127 is in very good shape: **0 errors** on load, **179 buttons** with 0 er
 
 ---
 
-## Remaining work
+## Items 1–6: fixes carried over from the Build 127 review
 
 ### 1. Pack diagrams: the "Splunk-to-Splunk" label is detached from its line
 **Now:** in the pack's overview diagram (both themes), the UF → Indexer connector is now straight (the earlier loop over the top is fixed), but its label "Splunk-to-Splunk" sits **128px above the line**. The other two labels are 8px from their lines.
@@ -76,9 +75,56 @@ Build 127 is in very good shape: **0 errors** on load, **179 buttons** with 0 er
 
 ---
 
+## Item 7. New feature: "Group by" on the canvas (tier lanes and component type)
+
+**Mockup:** open `docs/mockups/builder-grouping-mockup.html` in a browser; it's a standalone, interactive page. It shows the three modes on an example 14-component topology and is the visual reference for this item. It's a mockup only: its layout and connectors are simplified, so build on the Builder's real layout, routing (v123/v124) and export code rather than copying its drawing code.
+
+### What exists today (don't duplicate)
+- **Isolate by** (`#builderIsolateBy`): complete topology / region / environment. Filters what's shown.
+- **Group containers** (`#builderNavigationGroup`, `state.builderGroups`): user-created boxes, collapsible (`largeNavCollapsed()`).
+- **Palette categories:** Sources, Collection, Processing, Destinations, Access & management, Deployment configuration, the clustering add-ons, Stream, SOAR, S3 federated search.
+- **Collapsed-group export:** `withArchitectureExportScope()` already turns a collapsed group into one proxy node and merges its edges. Reuse that logic for collapsed types.
+
+### Control
+Add **Group by** to the Navigate row (next to Isolate by), with options `None` · `Tier lanes` · `Component type` · `Region` · `Environment` · `My containers`. Store the choice in `state.builderGrouping = {mode, collapsedTypes:[]}`, and save it in navigation bookmarks, layout profiles and `topologyDocument()`.
+
+### Mode: Tier lanes (build first)
+- Labelled vertical bands in pipeline order (Sources, Collection, Forwarding, Processing, Indexing, Search), each with a count ("Forwarding · 3"). Derive a component's tier from its type (one lookup table, shared with the palette categories).
+- A separate **Management** lane along the bottom for Deployment Server, License Manager, Monitoring Console, cluster managers, identity providers and other non-event-data roles, placed under the column of the tier they manage, so fleet-management and authentication lines don't cross the event-data path.
+- Empty tiers collapse to a thin labelled strip.
+- In auto and horizontal layout, the lanes decide the x position (column = tier). In **free layout, never move nodes**: draw the lane backgrounds behind the user's positions instead, based on each lane's members.
+- Lanes are drawn behind nodes and connectors (not interactive), and they're included in SVG, PNG and architecture pack exports when this mode is on.
+
+### Mode: Component type (build second)
+- A dashed box per component type, inside its tier column, with a header "Universal Forwarder · 3" and a ▾ toggle. The header is a keyboard-focusable button.
+- **Collapse** turns the box into one summary node: "Universal Forwarder ×3", a meta line with regions ("2 regions") and review count ("1 to review"), and a stacked-card look. Clicking the summary node (or Enter) expands it again.
+- **Merged connectors:** while a type is collapsed, its members' connections to the same endpoint merge into one line with a count badge ("3"). Its tooltip and a click list the member connections. Connections between members of the same collapsed type are hidden.
+- Toolbar actions in this mode: "Collapse types with 3+" and "Expand all".
+- **Manual containers take priority:** a node in a user container stays in that container, and type boxes only group ungrouped nodes (or offer "Ignore my containers" as an explicit choice).
+- The architecture pack's "Current navigation view" scope exports the same collapsed view.
+
+### Highlight chips (works in every mode)
+A chip row under the controls: one chip per component type present, with a count. Click to highlight that type (dim the others and their unrelated connectors); Shift-click to add types; click again to clear. In the Builder, Shift-click could also select those nodes for bulk edit. Chips change no positions.
+
+### Rules
+- Grouping is a **view**. It never creates, edits or deletes `state.builderGroups`, and it never changes free-layout positions.
+- Must be idempotent across re-renders (`renderBuilder`, layout switches, resize) and must not redeclare any existing top-level name (suffix new names with the block number).
+- Keep the connector geometry guarantees: run `tools/builder-connector-check.js` in every grouping mode. Extend it with a scenario per mode, and one with Universal Forwarder collapsed, checking the merged line and its badge.
+- Mobile (≤760px): lanes stack vertically in pipeline order (tier headers as row labels); type groups collapse by default for types with 3 or more.
+
+### Acceptance check
+- Tier lanes: with the default topology, every node sits inside its tier's band; Deployment Server and License Manager are in the Management lane; lane counts match the node counts; in free layout, positions before and after switching are identical.
+- Component type: collapsing Universal Forwarder in a topology with 3 UFs managed by one Deployment Server shows one summary node and one Deployment Server → UF line with badge "3"; expanding restores the 3 nodes and 3 lines; Undo isn't affected (it's a view change).
+- The mode and collapsed types survive a reload through a saved layout profile or bookmark, and appear in the exported pack.
+- Chips: clicking "Indexer" dims every non-Indexer node; Shift-click "Search Head" adds it; clicking again clears.
+- 0 `pageerror` events; the button sweep and connector check pass in all modes.
+
+---
+
 ## How to verify (run before every upload)
 1. Zero `pageerror` events at 1280×800, 1440×900, 1920×1080 and 390×844, and across a 1440→1000→1440 resize.
 2. `node tools/builder-connector-check.js index.html shots/`: every scenario `OK`, while dragging and after drop.
 3. Button sweep: every `#topologyBuilder` button, on a fresh page, with its context revealed, gives no errors and a visible effect.
 4. Architecture pack: export with all sections and diagram pages on, then check the items above plus the Build 124 acceptance list (counts, "Not set", no secrets, page numbers in the PDF, re-import).
-5. Add a `changeRegister` entry for each new block.
+5. Group by: the item 7 acceptance check, and the connector check in every grouping mode.
+6. Add a `changeRegister` entry for each new block.
