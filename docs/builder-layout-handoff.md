@@ -1,6 +1,6 @@
 # Builder view: layout issues and fixes (handoff)
 
-> **Superseded.** Build 120 implements sections 8–10 below. For current tasks, use [`builder-handoff-build121.md`](builder-handoff-build121.md). This file is kept as history: it explains what each block from v112 to v118 fixes and why.
+> **Superseded.** Build 120 implements sections 8–10 below. For current tasks, use [`builder-handoff-build122.md`](builder-handoff-build122.md). This file is kept as history: it explains what each block from v112 to v118 fixes and why.
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Branch:** `claude/build-page-layout-bl6jk1` (latest fix commit `f2a63c5`)
