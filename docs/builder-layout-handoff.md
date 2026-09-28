@@ -1,5 +1,7 @@
 # Builder view: layout issues and fixes (handoff)
 
+> **Superseded.** Build 120 implements sections 8–10 below. For current tasks, use [`builder-handoff-build120.md`](builder-handoff-build120.md). This file is kept as history: it explains what each block from v112 to v118 fixes and why.
+
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Branch:** `claude/build-page-layout-bl6jk1` (latest fix commit `f2a63c5`)
 **Status:** issues 1–6 are fixed (v112). Issue 7 was implemented in the v113 upload and polished in v114. Button fixes from a full sweep are in v115. **The next tasks are section 8 (toolbar, v116), section 9 (＋ Add palette, v117) and section 10 (canvas, messaging and mobile polish, v118).**
