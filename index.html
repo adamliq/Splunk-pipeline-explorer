@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 111 · 28 Sep 2026</title>
+  <title>Splunk Pipeline Explorer · Build 120 · 28 Sep 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,9 +202,9 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="111" data-build-date="2026-09-28">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="120" data-build-date="2026-09-28">
     <div class="builderHead">
-      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 111, dated 28 September 2026"><b>Build 111</b><time datetime="2026-09-28">28 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
+      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 120, dated 28 September 2026"><b>Build 120</b><time datetime="2026-09-28">28 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
         <div class="builderActions"><div class="builderHistoryControls"><button class="builderBtn" id="builderUndo" disabled>↶ Undo <kbd>Ctrl Z</kbd></button><button class="builderBtn" id="builderRedo" disabled>↷ Redo <kbd>Ctrl Y</kbd></button><button class="builderBtn" id="builderHistoryToggle" aria-expanded="false">History <span class="builderHistoryCount" id="builderHistoryCount">0</span></button></div><button class="builderBtn" id="builderLoadPath">Load selected path</button><button class="builderBtn" id="builderClear">Clear</button><button class="builderBtn" id="builderFailure">Open in Failure Lab</button><button class="builderBtn primary" id="builderUse">Use in explorer</button></div>
         <div class="builderPersistence"><select id="builderSaved" aria-label="Saved custom topologies"><option value="">Saved topologies</option></select><button class="builderBtn" id="builderSave">Save</button><button class="builderBtn" id="builderLoadSaved">Load</button><button class="builderBtn" id="builderImport">Import JSON</button><button class="builderBtn" id="builderExport">Export JSON</button><input id="builderImportFile" type="file" accept="application/json,.json" hidden></div>
@@ -4033,6 +4033,116 @@ renderPaletteSearch();renderBuilderPaletteRecent();positionBuilderPalette();
 $('#topologyBuilder').dataset.buildNumber='119';
 const builderV119Stamp=$('.builderBuildStamp');if(builderV119Stamp){builderV119Stamp.setAttribute('aria-label','Build 119, dated 28 September 2026');builderV119Stamp.querySelector('b').textContent='Build 119'}
 changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Searchable Add palette','Rank whole-word component matches, show all matching groups, clarify add targets and compatibility, and keep recent components with keyboard access.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
+<style id="builder-ui-polish-v118-styles">
+/* Let the card, rather than three permanent handle rows, carry the hierarchy. */
+.topologyBuilder .unifiedNodeWrap>.builderConnectionHandles{position:absolute;left:0;right:0;top:calc(100% - 1px);z-index:8;visibility:hidden;opacity:0;transition:opacity .12s}
+.topologyBuilder .unifiedNodeWrap:hover>.builderConnectionHandles,.topologyBuilder .unifiedNodeWrap:focus-within>.builderConnectionHandles,.topologyBuilder .unifiedNodeWrap:has(.builderNode.selected)>.builderConnectionHandles,.topologyBuilder .unifiedNodeWrap.multiSelected>.builderConnectionHandles,.topologyBuilder.connectionDraftActive .unifiedNodeWrap>.builderConnectionHandles{visibility:visible;opacity:1}
+.topologyBuilder .builderBand[hidden],.topologyBuilder .unifiedNodeMeta span[hidden]{display:none!important}
+.topologyBuilder .builderNodeIssueMarker.reviewOnly{min-width:10px;width:10px;height:10px;overflow:hidden;padding:0;border-color:#8aa5b2;background:#405665;color:transparent;box-shadow:0 1px 4px #0008}
+.topologyBuilder .builderNodeIssueMarker.reviewOnly:is(:hover,:focus-visible){min-width:23px;width:auto;height:23px;padding:0 4px;overflow:visible;border-color:#b1cbd6;background:#37586a;color:#f1f9fb}
+.topologyBuilder .builderEdgeIssueMarker.reviewOnly circle{r:5;fill:#405665;stroke:#9eb9c4}
+.topologyBuilder .builderEdgeIssueMarker.reviewOnly text{opacity:0}
+.topologyBuilder .builderEdgeIssueMarker.reviewOnly:is(:hover,:focus-visible) circle{r:12;fill:#37586a;stroke:#c4dbe3}
+.topologyBuilder .builderEdgeIssueMarker.reviewOnly:is(:hover,:focus-visible) text{opacity:1}
+.builderView .toolbar{grid-template-columns:minmax(0,1fr);padding:7px 9px}
+.builderView .toolbar>.search,.builderView #pipelineFilter{display:none!important}
+.builderView .toolbar .seg{overflow-x:auto;min-width:0;white-space:nowrap}
+.builderView .toolbar .seg button{flex:none}
+.builderPageFocus .shell>header,.builderPageFocus .shell>.toolbar{display:none!important}
+.builderPageFocus .shell{padding-top:6px}
+.topologyBuilder .builderHead p{display:none}
+.builderHeaderInfo{display:inline-grid;place-items:center;width:23px;height:23px;border:1px solid #456879;border-radius:50%;background:#123043;color:#c7e7ef;cursor:help;font-size:12px}
+.builderMobileFindToggle,.builderSheetHandle{display:none}
+.topologyBuilder .builderFocusSaveStatus{color:#a7b8c3;font-size:10.5px;font-weight:500}
+.topologyBuilder .builderFocusSaveStatus.dirty{color:#ffda9d}
+.topologyBuilder.canvasFirst.canvasPanelInspectorOpen .builderInspector:not(.builderMobileSheet){bottom:auto;overflow-y:auto}
+@media (min-width:1121px) and (pointer:fine){.topologyBuilder.canvasFocus.canvasFirst.canvasPanelInspectorOpen .builderInspector{position:fixed}}
+.topologyBuilder .unifiedNodeMeta span,.topologyBuilder .builderStageMini,.topologyBuilder .builderBand,.topologyBuilder .connectionHandle,.topologyBuilder .builderHistoryCount,.topologyBuilder .builderDensityToggle small,.topologyBuilder .builderMenuItems .builderExportDivider{font-size:10.5px!important}
+.topologyBuilder .builderDensityToggle small,.topologyBuilder .builderPaletteSubtitle,.topologyBuilder .unifiedNodeMeta span{color:#b8ced9}
+.topologyBuilder .builderPaletteGroupCount{color:#c5dce4}
+.topologyBuilder .builderObjectMenu strong,.topologyBuilder .builderIssuePopover strong,.topologyBuilder .builderIssuePopover li,.topologyBuilder .builderMenuIssueSummary,.topologyBuilder .builderRouteLabel,.topologyBuilder .builderNodeManagement,.topologyBuilder .builderNodeAuthentication{font-size:10.5px!important}
+@media (pointer:coarse){.topologyBuilder .unifiedNodeWrap>.builderConnectionHandles{position:relative;top:auto;visibility:visible;opacity:1}}
+@media (max-width:760px){
+  .builderView .shell>header{margin-bottom:7px}
+  .builderView .toolbar{margin-bottom:7px}
+  .builderView .toolbar .seg{display:flex;flex-wrap:nowrap}
+  .builderView .toolbar .seg button{padding:7px 9px}
+  .topologyBuilder .builderHead{padding:6px 9px}
+  .topologyBuilder .builderWorkspace{padding:7px}
+  .topologyBuilder .builderToolbar{display:block;margin-bottom:6px}
+  .topologyBuilder .builderToolbar>span{display:none}
+  .topologyBuilder .builderNavigation{display:flex!important;align-items:center;justify-content:flex-start;flex-wrap:nowrap;width:100%;gap:5px}
+  .topologyBuilder .builderCanvasQuickActions{display:flex;gap:5px;margin:0}
+  .topologyBuilder .builderCanvasQuickActions button{width:auto!important;min-width:0!important;height:36px;white-space:nowrap;font-size:11px}
+  .topologyBuilder .builderNavigation>#builderZoomOut,.topologyBuilder .builderNavigation>#builderZoomIn,.topologyBuilder .builderNavigation>#builderZoomReadout,.topologyBuilder .builderNavigation>.builderZoomReadout,.topologyBuilder .builderNavigation>.builderAutoStatus{display:none!important}
+  .builderMobileMore{position:relative;margin-left:auto;z-index:48}
+  .builderMobileMore>summary,.builderMobilePlanes>summary,.builderMobileFindToggle{display:block;box-sizing:border-box;border:1px solid #466577;border-radius:7px;background:#102b3a;color:#d7ecf2;padding:8px 10px;list-style:none;cursor:pointer;font-size:11px;white-space:nowrap}
+  .builderMobileMore>summary::-webkit-details-marker,.builderMobilePlanes>summary::-webkit-details-marker{display:none}
+  .builderMobileMoreBody{position:absolute;right:0;top:calc(100% + 5px);width:min(315px,calc(100vw - 32px));max-height:65dvh;overflow:auto;display:grid;gap:7px;border:1px solid #406176;border-radius:9px;padding:8px;background:#0b1d2a;box-shadow:0 12px 30px #000b}
+  .builderMobileMore:not([open]) .builderMobileMoreBody{display:none}
+  .builderMobileMoreBody>.builderNavBtn,.builderMobileMoreBody>.builderCanvasQuickActions button{width:100%!important;min-height:34px;justify-content:flex-start;text-align:left;padding:6px 9px}
+  .builderMobileMoreBody .builderNavMenuCluster{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;width:100%}
+  .builderMobileMoreBody .builderActionWrap{display:grid;justify-items:stretch;gap:5px}
+  .builderMobileMoreBody .builderHistoryControls,.builderMobileMoreBody .builderPersistence{display:flex;flex-wrap:wrap;gap:5px}
+  .builderMobileMoreBody .builderPersistence select{width:100%}
+  .topologyBuilder .builderPlaneBar.unifiedPlaneBar{display:flex;align-items:center;min-height:36px;padding:4px 7px;margin-bottom:6px}
+  .topologyBuilder .builderPlaneBar .unifiedPlaneHint{display:none}
+  .builderMobilePlanes{position:relative;z-index:47}
+  .builderMobilePlanesBody{position:absolute;left:0;top:calc(100% + 5px);width:min(320px,calc(100vw - 40px));border:1px solid #436476;border-radius:8px;padding:7px;background:#0b1f2c;box-shadow:0 10px 24px #0009}
+  .builderMobilePlanes:not([open]) .builderMobilePlanesBody{display:none}
+  .builderMobilePlanesBody .unifiedPlaneChecks{display:grid;grid-template-columns:1fr;gap:5px}
+  .builderMobilePlanesBody .unifiedPlaneCheck{justify-content:flex-start;padding:6px 8px;font-size:11px}
+  .builderMobileFindToggle{width:100%;margin-bottom:6px;text-align:left}
+  .topologyBuilder.canvasFocus .builderMobileFindToggle{display:none}
+  .builderWorkspace:not(.builderMobileFindOpen) #builderSearchBar,.builderWorkspace:not(.builderMobileFindOpen) #builderLargeNav{display:none!important}
+  .topologyBuilder.canvasFirst.canvasPanelInspectorOpen .builderInspector,.topologyBuilder.canvasFirst.canvasInspectorPinned .builderInspector.builderMobileSheet{display:block!important;box-sizing:border-box;position:fixed!important;top:auto!important;bottom:0!important;left:0!important;right:0!important;width:100%!important;height:60dvh!important;max-height:100dvh;border-radius:14px 14px 0 0;z-index:90}
+  .topologyBuilder.canvasFirst.canvasPanelInspectorOpen .builderInspector.builderSheetExpanded{height:100dvh!important;border-radius:0}
+  .builderSheetHandle{display:block;width:52px;height:5px;margin:1px auto 7px;border:0;border-radius:99px;background:#7399aa;cursor:ns-resize}
+}
+</style>
+<script id="builder-ui-polish-v118">
+/* Card decoration follows the last Builder render, after issue markers are attached. */
+function polishBuilderCards(){const draft=!!state.builderConnectionDraft;$('#topologyBuilder').classList.toggle('connectionDraftActive',draft);for(const wrap of $$('#builderTree .unifiedNodeWrap')){const node=state.builderNodes.find(item=>item.id===Number(wrap.dataset.unifiedNodeWrap)),card=wrap.querySelector('.builderNode');if(!node||!card)continue;const band=card.querySelector('.builderBand'),tier=card.querySelector('small')?.textContent?.trim()||'';if(band){if(node.sets===2&&['uf','hf','idx'].includes(node.type)){band.textContent='2 pipeline sets';band.hidden=false}else band.hidden=band.textContent.trim()===tier}const chips=card.querySelectorAll('.unifiedNodeMeta span'),env=node.environment||'Unspecified',zone=networkNodeZone(node);if(chips.length===3){chips[0].textContent=`Env · ${env}`;chips[2].textContent=`Zone · ${zone}`;chips[2].hidden=zone===env||!node.networkZone&&!builderGroupById(node.groupId)}}for(const marker of $$('#builderTree .builderNodeIssueMarker,#builderTree .builderEdgeIssueMarker'))marker.classList.toggle('reviewOnly',!marker.classList.contains('error'))}
+function builderFindingSummary(){const issues=unresolvedValues(),validation=builderValidation(),errors=Math.max(issues.filter(item=>item.severity==='error').length,validation.errors.length),review=issues.filter(item=>item.severity!=='error').length;return{errors,review}}
+function polishBuilderStatus(){const {errors,review}=builderFindingSummary(),bar=$('#builderValidation');if(bar){bar.querySelector('strong').textContent=`${errors?'Needs attention':'Valid'} · ${errors} errors · ${review} to review`;bar.querySelector('b').textContent=`${errors} errors`;bar.querySelector('small').textContent=errors?builderValidation().errors[0]||'Resolve the errors to use this model.':review?'Review findings for component and connection details.':'No review findings.'}const reviewButton=$('.builderDensityToggle[aria-controls="builderReviewDisclosure"]'),toolsButton=$('.builderDensityToggle[aria-controls="builderSecondaryTools"]');if(reviewButton){const span=reviewButton.querySelector('span');span.textContent='Review findings';const small=document.createElement('small');small.textContent=`· ${review} to review${errors?` · ${errors} errors`:''}`;span.appendChild(small);reviewButton.title=`Review findings · ${errors} errors · ${review} to review`}if(toolsButton){const selected=state.builderNodes.find(node=>node.id===state.builderSelected),span=toolsButton.querySelector('span');span.textContent='Tools';const small=document.createElement('small');small.textContent=selected?`· for ${componentInstanceLabel(selected)}`:'· 5';span.appendChild(small);toolsButton.title=span.textContent}}
+const builderDensitySyncBeforeUiPolish=builderDensitySync;
+builderDensitySync=function(...args){const result=builderDensitySyncBeforeUiPolish(...args);polishBuilderStatus();return result};
+const renderBuilderBeforeUiPolish=renderBuilder;
+renderBuilder=function(...args){const result=renderBuilderBeforeUiPolish(...args);polishBuilderCards();polishBuilderStatus();requestAnimationFrame(()=>{polishBuilderText();positionBuilderInspector()});return result};
+const builderInfoDescription=$('.builderHead p')?.textContent?.trim();
+if(builderInfoDescription){const info=document.createElement('button');info.id='builderHeaderInfo';info.className='builderHeaderInfo';info.type='button';info.textContent='ⓘ';info.title=builderInfoDescription;info.setAttribute('aria-label',builderInfoDescription);$('.builderHead h2').after(info)}
+$('#builderFocusSaveStatus')?.setAttribute('role','status');$('#builderFocusSaveStatus')?.setAttribute('aria-live','polite');
+const toggleBuilderCanvasFocusBeforeUiPolish=toggleBuilderCanvasFocus;
+toggleBuilderCanvasFocus=function(...args){const result=toggleBuilderCanvasFocusBeforeUiPolish(...args);document.body.classList.toggle('builderPageFocus',!!state.builderCanvasFocus);if(state.builderCanvasFocus)requestAnimationFrame(()=>$('#topologyBuilder')?.scrollIntoView({block:'start'}));return result};
+document.body.classList.toggle('builderPageFocus',!!state.builderCanvasFocus);
+function polishBuilderText(){for(const element of $$('#topologyBuilder *')){if(![...element.childNodes].some(node=>node.nodeType===Node.TEXT_NODE&&node.textContent.trim()))continue;const font=parseFloat(getComputedStyle(element).fontSize);const floor=element.closest('#builderTree')?10.5:10;if(font&&font<floor)element.style.fontSize=`${floor}px`}}
+/* Canvas anchored Inspector mirrors the palette and only pans on overlap. */
+const builderInspectorAnchorMedia=window.matchMedia('(min-width:1121px) and (pointer:fine)'),builderSheetMedia=window.matchMedia('(max-width:760px)');
+function positionBuilderInspector(){const panel=$('#builderCanvasInspector'),canvas=$('.builderCanvas');if(!panel||!canvas)return;panel.classList.toggle('builderMobileSheet',builderSheetMedia.matches);if(builderSheetMedia.matches){for(const key of ['top','right','left','bottom','height','width'])panel.style.removeProperty(key);if(!canvasPanelState.inspector)return;const rect=canvas.getBoundingClientRect();if(rect.top>8)window.scrollBy({top:rect.top-8,behavior:'instant'});const selected=$(`#builderTree .unifiedNodeWrap[data-unified-node-wrap="${state.builderSelected}"]`),box=selected?.getBoundingClientRect(),sheetTop=innerHeight*.4;if(box&&box.bottom>sheetTop-14){state.builderViewport.y-=box.bottom-sheetTop+28;applyBuilderViewport()}return}if(!builderInspectorAnchorMedia.matches||!canvasPanelState.inspector||canvasPanelState.pinned){for(const key of ['top','right','left','bottom','height','width'])panel.style.removeProperty(key);return}const rect=canvas.getBoundingClientRect(),top=Math.max(8,rect.top),bottom=Math.min(innerHeight-8,rect.bottom);panel.style.top=`${top}px`;panel.style.right=`${Math.max(8,innerWidth-rect.right+5)}px`;panel.style.height=`${Math.max(1,bottom-top)}px`;panel.style.width=`${Math.min(340,rect.width-10)}px`;panel.style.bottom='auto';panel.style.left='auto';const selected=$(`#builderTree .unifiedNodeWrap[data-unified-node-wrap="${state.builderSelected}"]`),box=selected?.getBoundingClientRect(),panelRect=panel.getBoundingClientRect();if(box&&box.right>panelRect.left-12&&box.left<panelRect.right&&box.bottom>panelRect.top&&box.top<panelRect.bottom){state.builderViewport.x-=box.right-panelRect.left+24;applyBuilderViewport()}}
+const syncCanvasPanelsBeforeUiPolish=syncCanvasPanels;
+syncCanvasPanels=function(...args){const result=syncCanvasPanelsBeforeUiPolish(...args);requestAnimationFrame(positionBuilderInspector);return result};
+window.addEventListener('scroll',positionBuilderInspector,{passive:true});window.addEventListener('resize',positionBuilderInspector);builderInspectorAnchorMedia.addEventListener('change',positionBuilderInspector);builderSheetMedia.addEventListener('change',positionBuilderInspector);
+const sheetHandle=document.createElement('button');sheetHandle.type='button';sheetHandle.className='builderSheetHandle';sheetHandle.title='Expand or collapse Inspector';sheetHandle.setAttribute('aria-label','Expand or collapse Inspector');$('.builderInspector .builderCanvasPanelHeader')?.prepend(sheetHandle);
+let builderSheetTouchY=null,builderSheetWasDragged=false;sheetHandle.onclick=()=>{if(builderSheetWasDragged){builderSheetWasDragged=false;return}$('#builderCanvasInspector')?.classList.toggle('builderSheetExpanded')};sheetHandle.addEventListener('pointerdown',event=>{builderSheetTouchY=event.clientY;builderSheetWasDragged=false});sheetHandle.addEventListener('pointerup',event=>{if(builderSheetTouchY!==null&&Math.abs(event.clientY-builderSheetTouchY)>30){builderSheetWasDragged=true;$('#builderCanvasInspector')?.classList.toggle('builderSheetExpanded',event.clientY<builderSheetTouchY)}builderSheetTouchY=null});
+$('#builderInspectorDrawerClose').addEventListener('click',()=>{if(!builderSheetMedia.matches||!canvasPanelState.pinned)return;canvasPanelState.pinned=false;try{localStorage.setItem('splunkPipelineExplorer.inspectorPinned.v1','false')}catch{}syncCanvasPanels()});
+/* Mobile menus hold the existing toolbar controls, preserving their onclick handlers. */
+const builderMobileMore=document.createElement('details');builderMobileMore.className='builderMobileMore';builderMobileMore.innerHTML='<summary>More</summary><div class="builderMobileMoreBody"></div>';
+const builderMobileMoreBody=builderMobileMore.querySelector('.builderMobileMoreBody'),builderMobileMoves=new Map();
+function builderMobileMove(node){if(!node)return;if(!builderMobileMoves.has(node)){const marker=document.createComment('Mobile toolbar original position');node.before(marker);builderMobileMoves.set(node,marker)}builderMobileMoreBody.appendChild(node)}
+function syncBuilderMobileToolbar(){if(builderSheetMedia.matches){const navigation=$('.builderNavigation');if(!builderMobileMore.isConnected)navigation?.appendChild(builderMobileMore);for(const node of [...navigation.children])if(node!==builderMobileMore&&!node.classList.contains('builderCanvasQuickActions')&&!['builderZoomOut','builderZoomIn','builderZoomReadout'].includes(node.id))builderMobileMove(node);builderMobileMove($('.builderActionWrap'));return}for(const [node,marker] of builderMobileMoves)marker.replaceWith(node);builderMobileMoves.clear();builderMobileMore.remove();if(builderToolbarMedia.matches)builderToolbarAttach()}
+builderSheetMedia.addEventListener('change',syncBuilderMobileToolbar);
+const builderMobileFind=document.createElement('button');builderMobileFind.type='button';builderMobileFind.className='builderMobileFindToggle';builderMobileFind.textContent='Find & navigate ▸';builderMobileFind.setAttribute('aria-controls','builderSearchBar builderLargeNav');builderMobileFind.setAttribute('aria-expanded','false');$('.builderWorkspace').insertBefore(builderMobileFind,$('.builderCanvas'));
+builderMobileFind.onclick=()=>{const workspace=$('.builderWorkspace'),open=workspace.classList.toggle('builderMobileFindOpen');builderMobileFind.setAttribute('aria-expanded',String(open));builderMobileFind.textContent=`Find & navigate ${open?'▾':'▸'}`;if(open)$('#builderSearchInput')?.focus()};
+const renderUnifiedPlaneControlsBeforeUiPolish=renderUnifiedPlaneControls;
+renderUnifiedPlaneControls=function(...args){builderMobileMoreBody.querySelector('.unifiedLayoutControl')?.remove();const result=renderUnifiedPlaneControlsBeforeUiPolish(...args);if(builderSheetMedia.matches){const bar=$('.builderPlaneBar'),checks=bar?.querySelector('.unifiedPlaneChecks');if(checks){const menu=document.createElement('details');menu.className='builderMobilePlanes';const count=Object.values(state.builderVisiblePlanes).filter(Boolean).length;menu.innerHTML=`<summary>Planes (${count})</summary><div class="builderMobilePlanesBody"></div>`;checks.before(menu);menu.querySelector('.builderMobilePlanesBody').appendChild(checks)}const layout=bar?.querySelector('.unifiedLayoutControl');if(layout)builderMobileMoreBody.appendChild(layout)}return result};
+builderSheetMedia.addEventListener('change',()=>{renderUnifiedPlaneControls();if(builderSheetMedia.matches){$('.builderWorkspace')?.classList.remove('builderMobileFindOpen');builderMobileFind.setAttribute('aria-expanded','false');builderMobileFind.textContent='Find & navigate ▸'}});
+syncBuilderMobileToolbar();if(builderSheetMedia.matches)renderUnifiedPlaneControls();
+document.title='Splunk Pipeline Explorer · Build 120';$('#topologyBuilder').dataset.buildNumber='120';$('#topologyBuilder').dataset.buildDate='2026-09-28';const builderV120Stamp=$('.builderBuildStamp');if(builderV120Stamp){builderV120Stamp.setAttribute('aria-label','Build 120, dated 28 September 2026');builderV120Stamp.querySelector('b').textContent='Build 120';const date=builderV120Stamp.querySelector('time');date.dateTime='2026-09-28';date.textContent='28 Sep 2026'}
+polishBuilderCards();polishBuilderStatus();polishBuilderText();positionBuilderInspector();
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Builder canvas and mobile polish','Reduce node chrome, align validation wording, keep drawers inside the canvas and collapse mobile controls into compact menus and an Inspector sheet.',true]);
 if(state.view==='changes')renderChanges();
 </script>
 
