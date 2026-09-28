@@ -2,7 +2,7 @@
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Branch:** `claude/build-page-layout-bl6jk1` (latest fix commit `f2a63c5`)
-**Status:** issues 1–6 are fixed (v112). Issue 7 was implemented in the v113 upload and polished in v114. Button fixes from a full sweep are in v115. **The next task is section 8 (v116).**
+**Status:** issues 1–6 are fixed (v112). Issue 7 was implemented in the v113 upload and polished in v114. Button fixes from a full sweep are in v115. **The next tasks are section 8 (toolbar, v116) and section 9 (＋ Add palette, v117).**
 **Important:** `main` (upload `1e42009`) contains v112 and v113 only. Start from this branch's `index.html`, which has v112–v115, and keep every `…-v112` to `…-v115` block in future builds.
 
 ## Read this first
@@ -162,3 +162,51 @@ Bugs found, all fixed in `<style id="builder-button-fixes-v115-styles">` and `<s
 Minor, not changed:
 - Clicking the palette group that is already open doesn't collapse it; the single-open accordion always keeps one group open.
 - The `+ Add` suggestions only list components compatible with the selected node. The full list below them doesn't mark incompatible items. Now that incompatible items are added unconnected rather than refused, this is lower priority, but a muted "adds unconnected" hint on them would help.
+
+---
+
+## 9. Next task: ＋ Add palette improvements (v117)
+
+Do this after section 8, or independently; the two touch different elements. Put all changes in `<style id="builder-add-palette-v117-styles">` and `<script id="builder-add-palette-v117">`. Move and extend the existing elements; don't recreate them.
+
+### Current state
+- The palette is the `aside.builderPalette` with `id="builderCanvasPalette"`, opened by `#builderAddToggle` or `openBuilderCanvasPalette()`. Its parts: `#builderPaletteQuery` (search), `#builderPaletteCount`, `#builderSuggestions` ("Compatible next component"), `#builderPaletteEmpty` and `#builderPaletteDrawerClose`. There are 11 groups: each `.builderPaletteToggle` has `aria-controls="builderPaletteSectionN"`, and the section contains `[data-builder-add]` item buttons (42 items in total, all `draggable`).
+- **Search:** `renderPaletteSearch()` matches each item's text, type, name, **stages** and type description. The single-open accordion (`<script id="builder-palette-accordion-v110">`: `accordionGroups`, `accordionActive`, `syncPaletteAccordion()`) then opens only the first group that has matches.
+- **Position:** the rule `.topologyBuilder.canvasFirst .builderPalette{position:fixed;top:clamp(12px,6vh,72px);bottom:12px;…}` pins it to the viewport's top-left. At 1440×900 it measures 310×834 at x=12, y=54, while the canvas starts at y=423.
+- **Adding:** palette clicks attach to `state.builderSelected`. Since v115, an incompatible pick is added unconnected with a status message; compatibility comes from `dataCapability(source,{id:-1,type})`.
+
+### Must fix (bugs or near-bugs)
+1. **Search opens the wrong group and hides the best matches.** Typing "hec" opens *Deployment configuration → Deployment App*, which matches only because a stage text contains "c**hec**ksum". The 2 matches in Sources and 6 in Collection stay collapsed.
+   - While the search box has text, expand **every** group that has matches (bypass the single-open accordion), and restore single-open behaviour when the search is cleared.
+   - Rank matches: exact or prefix name and type match > word match in the name > description or stage match. Order the groups by their best match, and items within a group by rank.
+   - Stage and description matches must be whole-word (or word-prefix) matches, so "hec" no longer matches "checksum".
+   - Enter in `#builderPaletteQuery` adds the top-ranked item.
+2. **Anchor the palette to the canvas.** It currently covers the page header and toolbar, and it hides the canvas's left-most node. On desktop (min-width 1121px), position it inside the canvas's left edge: top and bottom aligned to `.builderCanvas`, about 300px wide, scrolling internally. If the page is scrolled so the canvas is partly off-screen, clamp it to the visible part of the canvas. While it's open, the canvas's Fit/auto-pan should keep nodes clear of it (or shift the fit area right by its width). The mobile layout stays as it is.
+3. **Put the data path first.** Reorder the groups to: Sources, Collection, Processing, Destinations, then Access & management, Deployment configuration, Indexer clustering, Search head clustering, S3 federated search, Splunk Stream, Splunk SOAR. Reorder the DOM nodes (keep the section ids) and update `accordionGroups` to match, so the default open group is Sources.
+
+### Make adding clearer
+4. **Mark items that can't connect.** For the full list, compute `dataCapability(selectedNode,{id:-1,type})` for every item whenever the palette opens or the selection changes. Invalid items get a muted "adds unconnected" tag, and the reason goes in their `title`. Independent types (User, identity providers, DS, Stream, SOAR and other types that intentionally ignore the parent) get no tag. Don't disable anything; v115 adds these items unconnected.
+5. **Show the add target.** At the top of the palette show "Adding after: <selected name> · Change", plus a "New unconnected" toggle. With it on, palette clicks call `addBuilderNode(type,null)`. "Change" closes the palette so the user can select another node, then reopens it. With nothing selected, show "Adding as a new unconnected component".
+6. **Show descriptions inline.** Show the first clause of each item's `title` (up to the first " · " or ".") as a one-line muted subtitle under its name, truncated with ellipsis. Keep the full text in `title`. This matters on touch devices, which have no hover.
+
+### Speed it up
+7. **Recent row:** above the groups, show chips for the last 5 component types added. Keep the list in `localStorage` under a builder-specific key, wrapped in try/catch, and fall back to hiding the row. Clicking a chip adds that type, the same as the item would.
+8. **Keyboard:** with focus in the search box or the list, ↑/↓ move through the visible items (roving `tabindex` or `aria-activedescendant`), Enter adds the item, and Esc closes the palette and returns focus to `#builderAddToggle`. `A` pressed over a focused canvas opens the palette; don't take over `/`, which v113 uses for Find & navigate.
+9. **Accordion:** clicking the open group's header collapses it. Currently one group is always forced open.
+10. **Drag hint:** under the search box, add a muted line: "Click to add · or drag onto the canvas or onto a component".
+
+### Polish
+- Shorten wrapping labels: "Authentication Provider · Cloud" / "· On premises" → "Identity provider · Cloud" / "Identity provider · On-prem". Change only the displayed label: don't rename types or `builderComponents` keys, which saved topologies depend on.
+- Show `#builderPaletteCount` ("42 components") as muted text on the same row as the search box, not as a separate heading-like line.
+
+### Acceptance criteria
+- Search "hec": every group with a match expands, HEC client and HEC endpoint are the first two results, and Deployment App is not listed. Enter adds HEC client (or whichever item is ranked first).
+- Search "idx" or "indexer": Indexer is the first result. Clearing the search restores the single-open accordion with Sources open.
+- At 1440×900 the open palette sits within the canvas rectangle, and no part of the page header or toolbar is covered.
+- With Universal Forwarder selected, Windows Event Log and Search Head show "adds unconnected", Heavy Forwarder and Indexer don't, and User/Administrator shows no tag.
+- "New unconnected" on: clicking Indexer adds it with `parent===null`.
+- The Recent row survives a reload, and with `localStorage` blocked the page renders without errors.
+- ↑/↓/Enter/Esc work, and focus returns to `#builderAddToggle` on close.
+- All 42 items still add a node when clicked (re-run the v115 sweep), and dragging an item onto a compatible node still connects it.
+- No `pageerror` at 1280, 1440, 1920 or 390, or across a 1440→1000→1440 resize. Mobile is unchanged apart from the inline descriptions and the label text.
+- Add a `changeRegister` entry the way v112–v115 do.
