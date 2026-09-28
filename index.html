@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 123 · 28 Sep 2026</title>
+  <title>Splunk Pipeline Explorer · Build 124 · 28 Sep 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,9 +202,9 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="123" data-build-date="2026-09-28">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="124" data-build-date="2026-09-28">
     <div class="builderHead">
-      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 123, dated 28 September 2026"><b>Build 123</b><time datetime="2026-09-28">28 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
+      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 124, dated 28 September 2026"><b>Build 124</b><time datetime="2026-09-28">28 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
         <div class="builderActions"><div class="builderHistoryControls"><button class="builderBtn" id="builderUndo" disabled>↶ Undo <kbd>Ctrl Z</kbd></button><button class="builderBtn" id="builderRedo" disabled>↷ Redo <kbd>Ctrl Y</kbd></button><button class="builderBtn" id="builderHistoryToggle" aria-expanded="false">History <span class="builderHistoryCount" id="builderHistoryCount">0</span></button></div><button class="builderBtn" id="builderLoadPath">Load selected path</button><button class="builderBtn" id="builderClear">Clear</button><button class="builderBtn" id="builderFailure">Open in Failure Lab</button><button class="builderBtn primary" id="builderUse">Use in explorer</button></div>
         <div class="builderPersistence"><select id="builderSaved" aria-label="Saved custom topologies"><option value="">Saved topologies</option></select><button class="builderBtn" id="builderSave">Save</button><button class="builderBtn" id="builderLoadSaved">Load</button><button class="builderBtn" id="builderImport">Import JSON</button><button class="builderBtn" id="builderExport">Export JSON</button><input id="builderImportFile" type="file" accept="application/json,.json" hidden></div>
@@ -4284,7 +4284,7 @@ if(state.view==='changes')renderChanges();
 </style>
 <script id="builder-connector-geometry-v123">
 /* Measure the rendered card, including its changing text height, in world coordinates. */
-function builderCardBox(id,positions){const node=$(`#builderTree [data-unified-node-wrap="${id}"] .builderNode`),world=$('.unifiedBuilderWorld'),zoom=state.builderViewport?.zoom||1,position=positions?.get(Number(id))||state.builderFreePositions?.[id];if(node&&world){const rect=node.getBoundingClientRect(),origin=world.getBoundingClientRect();if(rect.width&&rect.height)return{x:position?.x??(rect.left-origin.left)/zoom,y:position?.y??(rect.top-origin.top)/zoom,w:rect.width/zoom,h:rect.height/zoom}}return{x:position?.x??0,y:position?.y??0,w:175,h:160}}
+function builderCardBox(id,positions){const node=$(`#builderTree [data-unified-node-wrap="${id}"] .builderNode`),world=$('.unifiedBuilderWorld'),zoom=state.builderViewport?.zoom||1,position=positions?.get(Number(id))||state.builderFreePositions?.[id];if(node&&world){const rect=node.getBoundingClientRect(),origin=world.getBoundingClientRect();if(rect.width&&rect.height)return{x:position?.x??(rect.left-origin.left)/zoom,y:position?.y??(rect.top-origin.top)/zoom,w:rect.width/zoom,h:rect.height/zoom}}return{x:position?.x??0,y:position?.y??0,w:190,h:160}}
 function builderV123AnchorSides(a,b){const gap=24,ay=a.y+a.h/2,by=b.y+b.h/2;let from,to;if(b.x>=a.x+a.w+gap){from='right';to='left'}else if(b.x+b.w+gap<=a.x){from='left';to='right'}else if(b.y>=a.y+a.h+gap){from='bottom';to='top'}else if(b.y+b.h+gap<=a.y){from='top';to='bottom'}else{from=by>=ay?'bottom':'top';to=by>=ay?'top':'bottom'}return{from,to}}
 function builderV123SidePoint(box,side){return side==='right'?{x:box.x+box.w,y:box.y+box.h/2}:side==='left'?{x:box.x,y:box.y+box.h/2}:side==='top'?{x:box.x+box.w/2,y:box.y}:{x:box.x+box.w/2,y:box.y+box.h}}
 function builderV123Normal(side){return side==='left'?{x:-1,y:0}:side==='right'?{x:1,y:0}:side==='top'?{x:0,y:-1}:{x:0,y:1}}
@@ -4297,7 +4297,7 @@ relationshipPath=function(item,positions){if(!item?.edge||!positions?.has(item.f
 /* Once the path exists, place labels on the actual drawn curve and keep their badges with them. */
 function builderV123PlaceLabels(){const svg=$('#builderTree .unifiedConnectorLayer');if(!svg)return;const positions=unifiedBuilderPositions().positions,boxes=state.builderNodes.filter(node=>positions.has(node.id)).map(node=>builderV123Pad(builderCardBox(node.id,positions),1)),placed=[],edges=builderTraceEdges('all'),paths=[...svg.querySelectorAll('path.unifiedConnector')],markerKeys=[...new Set(unresolvedValues().filter(issue=>issue.edge).map(issue=>`${issue.edge.plane}:${issue.edge.id}`))].filter(key=>{const [plane,...rest]=key.split(':');return paths.some(path=>path.dataset.edgePlane===plane&&path.dataset.edgeId===rest.join(':'))}),freeMarkers=[...svg.querySelectorAll('.builderEdgeIssueMarker:not([data-geometry-edge])')];freeMarkers.forEach((marker,index)=>{const key=markerKeys[index];if(key)marker.dataset.geometryEdge=key});for(const label of svg.querySelectorAll('.edgeRouteLabel')){const plane=label.dataset.routePlane,id=label.dataset.routeEdge,edge=edges.find(value=>value.plane===plane&&String(value.id)===String(id)),path=paths.find(value=>value.dataset.edgePlane===plane&&value.dataset.edgeId===id),width=Number(label.querySelector('rect')?.getAttribute('width'))||100;if(!edge||!path||!path.getTotalLength)continue;let length;try{length=path.getTotalLength()}catch{continue}if(!length)continue;const offset=ensureRelationshipRouting(edge.edge).labelOffset;let best=null;for(const fraction of [.5,.45,.4,.38,.36,.35,.34,.32,.3,.55,.6,.25,.7,.2,.8,.15,.85]){const point=path.getPointAtLength(length*fraction),x=point.x+offset.x-width/2,y=point.y+offset.y-11,rect={x,y,w:width+26,h:22},hits=[...boxes,...placed].filter(box=>x<box.x+box.w&&x+rect.w>box.x&&y<box.y+box.h&&y+22>box.y).length,candidate={x,y,hits,rect};if(!best||hits<best.hits)best=candidate;if(!hits)break}label.setAttribute('transform',`translate(${best.x} ${best.y})`);placed.push(best.rect);const marker=[...svg.querySelectorAll('.builderEdgeIssueMarker')].find(value=>value.dataset.geometryEdge===`${plane}:${id}`);if(marker){marker.setAttribute('transform',`translate(${width+15} 11)`);if(marker.parentNode!==label)label.appendChild(marker);if(!marker.dataset.geometryWired){marker.dataset.geometryWired='true';marker.addEventListener('pointerdown',event=>event.stopPropagation())}}}}
 const builderV123RenderBefore123=renderBuilder;
-renderBuilder=function(...args){const result=builderV123RenderBefore123(...args);builderV123PlaceLabels();return result};
+renderBuilder=function(...args){const result=builderV123RenderBefore123(...args);updateFreeConnectorGeometry();return result};
 updateFreeConnectorGeometry=function(){const positions=unifiedBuilderPositions().positions;for(const edge of builderTraceEdges('all')){if(!positions.has(edge.from)||!positions.has(edge.to))continue;const route=relationshipPath(edge,positions);for(const path of $$(`#builderTree [data-edge-plane="${edge.plane}"][data-edge-id="${CSS.escape(String(edge.id))}"]`))path.setAttribute('d',route.d)}builderV123PlaceLabels()};
 $('#builderTree')?.addEventListener('pointermove',event=>{if(event.target.closest?.('.edgeRouteLabel,[data-route-waypoint]'))requestAnimationFrame(builderV123PlaceLabels)});
 /* Free placement starts from the same wide column spacing as horizontal layout. */
@@ -4312,6 +4312,148 @@ unifiedBuilderPositions=function(){const layout=builderV123PositionsBefore123();
 const builderV123SaveState123=$('#builderSaveState');if(builderV123SaveState123){const sync=()=>{const value=builderV123SaveState123.textContent.trim();if(value)builderV123SaveState123.title=value};sync();new MutationObserver(sync).observe(builderV123SaveState123,{childList:true,subtree:true,characterData:true})}
 document.title='Splunk Pipeline Explorer · Build 123 · 28 Sep 2026';$('#topologyBuilder').dataset.buildNumber='123';$('#topologyBuilder').dataset.buildDate='2026-09-28';const builderV123Stamp123=$('.builderBuildStamp');if(builderV123Stamp123){builderV123Stamp123.setAttribute('aria-label','Build 123, dated 28 September 2026');builderV123Stamp123.querySelector('b').textContent='Build 123'}
 changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Measured connector geometry','Anchor relationships to rendered card borders with perpendicular stubs, route around card boxes, keep labels and review markers on the drawn path and space mobile handles.',true]);
+if(state.view==='changes')renderChanges();
+renderBuilder();
+</script>
+
+<style id="builder-connector-followup-v124-styles">
+/* Keep the mobile connector labels beside the line and legible at fitted zoom. */
+@media(max-width:760px){.topologyBuilder .unifiedBuilderWorld.verticalLayout .edgeRouteLabel{pointer-events:all}}
+</style>
+<script id="builder-connector-followup-v124">
+/* A narrow gap still admits facing side anchors; do not force a top/bottom route through the target. */
+function builderV124InsideLength124(a,b,box){
+  let near=0,far=1;const dx=b.x-a.x,dy=b.y-a.y;
+  for(const [p,q] of [[-dx,a.x-box.x],[dx,box.x+box.w-a.x],[-dy,a.y-box.y],[dy,box.y+box.h-a.y]]){
+    if(Math.abs(p)<1e-8){if(q<0)return 0;continue}
+    const t=q/p;if(p<0)near=Math.max(near,t);else far=Math.min(far,t);
+    if(near>far)return 0;
+  }
+  return Math.max(0,far-near)*Math.hypot(dx,dy);
+}
+function builderV124FacingGap124(source,target,side){
+  return side==='right'?target.x-source.x-source.w:side==='left'?source.x-target.x-target.w:
+    side==='bottom'?target.y-source.y-source.h:source.y-target.y-target.h;
+}
+const builderV124RelationshipBefore124=relationshipPath;
+relationshipPath=function(item,positions){
+  if(!item?.edge||!positions?.has(item.from)||!positions?.has(item.to))return builderV124RelationshipBefore124(item,positions);
+  const source=builderCardBox(item.from,positions),target=builderCardBox(item.to,positions),
+    boxes=state.builderNodes.filter(node=>positions.has(node.id)).map(node=>builderCardBox(node.id,positions)),
+    routing=ensureRelationshipRouting(item.edge),details=ensureRelationshipDetails(item.edge),
+    manual=routing.waypoints.map(point=>({...point})),labelWidth=Math.max(76,Math.min(220,String(details.protocol||'').slice(0,34).length*5.8+18));
+  let best=null;
+  for(const [from,to] of [['right','left'],['left','right'],['bottom','top'],['top','bottom']]){
+    const sideA=builderV123Normal(from),sideB=builderV123Normal(to),gap=builderV124FacingGap124(source,target,from),
+      stub=gap>0?Math.min(22,Math.max(2,(gap-4)/2)):22,
+      borderA=builderV123SidePoint(source,from),borderB=builderV123SidePoint(target,to),
+      a={x:borderA.x+sideA.x,y:borderA.y+sideA.y},b={x:borderB.x+sideB.x*2,y:borderB.y+sideB.y*2},
+      start={x:a.x+sideA.x*stub,y:a.y+sideA.y*stub},end={x:b.x+sideB.x*stub,y:b.y+sideB.y*stub},
+      stops=[start,...manual,end],middle=[];
+    for(let index=1;index<stops.length;index++){
+      const portion=builderV123RouteBetween(stops[index-1],stops[index],boxes,routing.style,true,
+        !manual.length&&gap<labelWidth+27?labelWidth+27:0);
+      middle.push(...(index===1?portion:portion.slice(1)));
+    }
+    const points=compactRoutePoints([a,...middle,b]);let length=0,inside=0,padded=0;
+    for(let index=1;index<points.length;index++){
+      const first=points[index-1],last=points[index];length+=Math.hypot(last.x-first.x,last.y-first.y);
+      for(const box of boxes){inside+=builderV124InsideLength124(first,last,builderV123Pad(box,-.5));
+        padded+=builderV124InsideLength124(first,last,builderV123Pad(box,4))}
+    }
+    const facing=gap>0?0:gap<0?Math.abs(gap)*4:20,
+      score=inside*1000000+padded*15+length+facing+points.length*8;
+    if(!best||score<best.score)best={points,score};
+  }
+  const points=best.points,d=routing.style==='curved'?builderV123RoundedPath(points):
+    `M${points.map(point=>`${point.x} ${point.y}`).join(' L')}`,mid=routeMidpoint(points);
+  return{d,points,label:{x:mid.x+routing.labelOffset.x,y:mid.y+routing.labelOffset.y},routing};
+};
+/* Resolve overlaps before the original pointerup handler records its single Undo entry. */
+function builderV124ClearDrop124(id,wrap){
+  const positions=new Map(state.builderNodes.map(node=>[node.id,state.builderFreePositions[node.id]]).filter(([,point])=>point)),
+    current=builderCardBox(id,positions),other=state.builderNodes.filter(node=>node.id!==id&&positions.has(node.id))
+      .map(node=>({node,box:builderCardBox(node.id,positions)}));
+  const hit=(x,y)=>other.find(({box})=>x<box.x+box.w+16&&x+current.w>box.x-16&&
+    y<box.y+box.h+16&&y+current.h>box.y-16);
+  const first=hit(current.x,current.y);if(!first)return;
+  const candidates=[];
+  for(let radius=20;radius<=1200;radius+=20){
+    for(const [dx,dy] of [[radius,0],[0,radius],[-radius,0],[0,-radius],
+      [radius,radius],[-radius,radius],[radius,-radius],[-radius,-radius]]){
+      const x=Math.max(24,current.x+dx),y=Math.max(24,current.y+dy);
+      if(!hit(x,y)){candidates.push({x,y,distance:Math.hypot(x-current.x,y-current.y)});break}
+    }
+    if(candidates.length)break;
+  }
+  if(!candidates.length)return;
+  const next=candidates.sort((a,b)=>a.distance-b.distance)[0];
+  state.builderFreePositions[id]={x:next.x,y:next.y};
+  wrap.style.left=`${next.x}px`;wrap.style.top=`${next.y}px`;
+  setTimeout(()=>builderStatus(`Moved to avoid overlapping ${componentInstanceLabel(first.node)}`),0);
+}
+const builderV124WireFreeBefore124=wireFreePlaceDragging;
+wireFreePlaceDragging=function(...args){
+  const result=builderV124WireFreeBefore124(...args);
+  if(resolvedUnifiedLayoutMode()==='free')for(const wrap of $$('#builderTree .unifiedNodeWrap')){
+    const button=wrap.querySelector('.builderNode');if(!button||button.dataset.dropClearance124)continue;
+    button.dataset.dropClearance124='true';
+    button.addEventListener('pointerup',()=>{
+      if(wrap.classList.contains('freeDragging'))builderV124ClearDrop124(Number(wrap.dataset.unifiedNodeWrap),wrap)
+    },true);
+  }
+  return result;
+};
+/* Compact untouched rows; selected touch handles alone reserve an extra gutter. */
+const builderV124PositionsBefore124=unifiedBuilderPositions;
+unifiedBuilderPositions=function(){
+  const layout=builderV124PositionsBefore124();if(layout.mode!=='vertical')return layout;
+  const ordered=[...layout.positions.entries()].sort((a,b)=>a[1].y-b[1].y),zoom=state.builderViewport?.zoom||1;
+  let y=ordered[0]?.[1].y||48;
+  for(const [id,position] of ordered){
+    const box=builderCardBox(id,layout.positions),handles=$(`#builderTree [data-unified-node-wrap="${id}"] .builderConnectionHandles`),
+      handleHeight=id===state.builderSelected?(handles?.getBoundingClientRect().height/zoom||55):0;
+    position.y=y;y+=Math.max(225,box.h+handleHeight+90);
+  }
+  layout.height=Math.max(430,y+30);return layout;
+};
+const builderV124LabelsBefore124=builderV123PlaceLabels;
+builderV123PlaceLabels=function(){
+  builderV124LabelsBefore124();if(resolvedUnifiedLayoutMode()!=='vertical')return;
+  const svg=$('#builderTree .unifiedConnectorLayer');if(!svg)return;
+  const positions=unifiedBuilderPositions().positions,zoom=state.builderViewport?.zoom||1,
+    cardBoxes=state.builderNodes.filter(node=>positions.has(node.id)).map(node=>builderCardBox(node.id,positions));
+  const handles=$(`#builderTree [data-unified-node-wrap="${state.builderSelected}"] .builderConnectionHandles`),
+    handleRect=handles?.getBoundingClientRect(),selected=cardBoxes.find(box=>positions.get(state.builderSelected)?.x===box.x&&positions.get(state.builderSelected)?.y===box.y),
+    handleBox=selected&&handleRect?{x:selected.x,y:selected.y+selected.h,w:selected.w,h:handleRect.height/zoom}:null;
+  for(const label of svg.querySelectorAll('.edgeRouteLabel')){
+    const path=[...svg.querySelectorAll('path.unifiedConnector')].find(value=>value.dataset.edgePlane===label.dataset.routePlane&&value.dataset.edgeId===label.dataset.routeEdge);
+    if(!path)continue;const width=Number(label.querySelector('rect')?.getAttribute('width'))||100;
+    const edge=builderTraceEdges('all').find(value=>value.plane===label.dataset.routePlane&&String(value.id)===String(label.dataset.routeEdge));
+    if(!edge)continue;const offset=ensureRelationshipRouting(edge.edge).labelOffset;
+    for(const fraction of [.5,.6,.4,.65,.35,.7,.3]){
+      const point=path.getPointAtLength(path.getTotalLength()*fraction),x=point.x+14+offset.x,y=point.y-11+offset.y,
+        rect={x,y,w:width+26,h:22};
+      if([...cardBoxes,handleBox].filter(Boolean).some(box=>rect.x<box.x+box.w&&rect.x+rect.w>box.x&&rect.y<box.y+box.h&&rect.y+rect.h>box.y))continue;
+      label.setAttribute('transform',`translate(${x} ${y})`);break;
+    }
+  }
+};
+const builderV124FitBefore124=fitBuilderView;
+fitBuilderView=function(...args){
+  const result=builderV124FitBefore124(...args);
+  if(resolvedUnifiedLayoutMode()!=='vertical'||state.view!=='builder'||state.builderViewport.zoom>=.7)return result;
+  const canvas=$('.builderCanvas'),positions=unifiedBuilderPositions().positions,box=builderCardBox(state.builderSelected,positions),zoom=.7;
+  if(!canvas?.clientWidth||!positions.has(state.builderSelected))return result;
+  state.builderViewport.zoom=zoom;
+  state.builderViewport.x=canvas.clientWidth/2-(box.x+box.w/2)*zoom;
+  state.builderViewport.y=canvas.clientHeight/2-(box.y+box.h/2)*zoom;
+  applyBuilderViewport();return result;
+};
+document.title='Splunk Pipeline Explorer · Build 124 · 28 Sep 2026';
+$('#topologyBuilder').dataset.buildNumber='124';$('#topologyBuilder').dataset.buildDate='2026-09-28';
+const builderV124Stamp124=$('.builderBuildStamp');if(builderV124Stamp124){builderV124Stamp124.setAttribute('aria-label','Build 124, dated 28 September 2026');builderV124Stamp124.querySelector('b').textContent='Build 124'}
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Connector follow-up','Reroute after cards mount, choose clear anchor sides, separate overlapping free-placement cards and keep mobile labels clear at readable zoom.',true]);
 if(state.view==='changes')renderChanges();
 renderBuilder();
 </script>
