@@ -1,5 +1,7 @@
 # Builder handoff: Build 120 review
 
+> **Superseded by [`builder-handoff-build121.md`](builder-handoff-build121.md).** Build 121 fixes the P0 and most of the items below. Kept as history.
+
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Reviewed:** `main` at `6dd679e` (Build 120, 28 Sep 2026), also merged into branch `claude/build-page-layout-bl6jk1`
 **History:** `docs/builder-layout-handoff.md` explains blocks v112–v118 and why each exists. This file replaces it as the task list.
