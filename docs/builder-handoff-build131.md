@@ -1,25 +1,24 @@
-# Builder handoff: Build 130 review
-
-> **Superseded by [`builder-handoff-build131.md`](builder-handoff-build131.md)**, the current task list (the same open items plus the new OV-1 page). Kept as the Build 130 review record.
+# Builder handoff: tasks for Build 131
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
-**Reviewed:** `main` at `44f1086` (Build 130, 29 Sep 2026: `builder-auth-summary-v129`, `builder-grouping-v130`), also merged into branch `claude/build-page-layout-bl6jk1`
-**History:** `builder-handoff-build128.md` (the task list this build implements) and earlier.
+**Baseline:** `main` at `44f1086` (Build 130, 29 Sep 2026), also merged into branch `claude/build-page-layout-bl6jk1`. There is no newer build; this is a new version of the task list, not a new review.
+**History:** `builder-handoff-build130.md` (the Build 130 review these items come from) and earlier.
 **Tool:** `node tools/builder-connector-check.js index.html [screenshot-dir]` (Playwright/Chromium).
-**Mockup:** `docs/mockups/builder-grouping-mockup.html` (the Group-by reference).
+**Mockups:** `docs/mockups/builder-grouping-mockup.html` (Group by) and **`docs/mockups/architecture-ov1-mockup.html` (the new OV-1 page, item 7)**. Both are standalone; open them in a browser.
 
 ## TL;DR
 
-- **v129 (authentication summary): done.** All nine combinations give the specified wording.
-- **v130 (Group by): P0 crash.** Selecting **Tier lanes** or **Component type** in the normal (auto/horizontal) layout throws `TypeError: Cannot read properties of undefined (reading 'push')` and draws nothing. The cause is a tier-name case mismatch, and **the one-line fix is tested below.** With that fix applied, almost all of the Group-by acceptance checks pass.
-- Four smaller issues remain after the fix (items 2–5), plus two optional extras (item 6).
-- Regression checks on the build as uploaded are clean (0 load errors, 183 buttons, 8 of 8 connector scenarios), but none of them touch the Group-by dropdown. **Add a grouping check to the pre-upload routine** (see "How to verify").
+1. **P0 first:** Group by → Tier lanes / Component type crashes in the normal layout. A tested one-line fix is in item 1.
+2. **Items 2–6:** smaller Group-by, connector and mobile issues, plus optional authentication extras, carried over from the Build 130 review.
+3. **Item 7 (new feature): an OV-1 High-Level Operational Concept page** in the architecture pack, generated mostly from data the Builder already holds, with three new optional fields.
 
-## Rules for every future build
+Suggested order: item 1, then 2–5, then item 7 (6 is optional).
+
+## Rules for every future build (unchanged)
 
 - Start from the latest `index.html` on `main`; keep every versioned block (`…-v110` to `…-v130`).
 - **Never redeclare a top-level `const`, `let` or `function` name** (all classic scripts share one global scope). Suffix new names with the block number.
-- One version number per block; the next is `…-v131`.
+- One version number per block; the next is `…-v131` (for example `…-v131` for the fixes and `…-v132` for the OV-1 page; keep the build stamp on the highest).
 - Move existing DOM elements rather than recreating them; layout code must be idempotent.
 - Keep the build stamp consistent (title, `data-build-*`, `.builderBuildStamp`).
 - **Use one form for keys.** When a value is both a lookup key and a display label (like tier names), keep a lowercase key and a separate label: `{key:'sources', label:'Sources'}`. Never look a map up with its display label. This is exactly how the P0 happened.
@@ -27,7 +26,7 @@
 
 ---
 
-## Verified in Build 130
+## Baseline: verified in Build 130
 
 | Item | Result |
 |---|---|
@@ -105,10 +104,53 @@ The cleaner long-term fix is one list of `{key, label}` pairs with lowercase key
 
 ---
 
+## 7. New feature: OV-1 High-Level Operational Concept page in the architecture pack
+
+**Mockup:** `docs/mockups/architecture-ov1-mockup.html` (example data: Sydney and Melbourne sites, AWS, a multisite indexer cluster). It's the visual and content reference. Its SVG is hand-drawn, so generate the real page from the model rather than copying coordinates.
+
+### What the page contains (in order)
+1. **Classification banners** at top and bottom (the pack's existing classification text), plus a **title block**: view name "OV-1 · High-Level Operational Concept Graphic", architecture title, scope, owner/author ("Not set" when empty), build number and prepared date.
+2. **Mission line:** one sentence (new field, see below). Omit the line when empty; don't print a placeholder.
+3. **Concept graphic** (SVG) with four zones, left to right:
+   - **Sites and cloud:** one box per distinct component **region** (e.g. "Sydney data centre · site 1"), plus one box per cloud source family (AWS Lambda, Azure Function, …). Inside each box are that region's **source** components.
+   - **Collection and forwarding:** collection and forwarding tiers (syslog relays, UFs, HF/HEC, Edge/Ingest Processor).
+   - **Platform:** indexing and search tiers, with a nested **Management** box (Deployment Server, License Manager, Monitoring Console, cluster managers).
+   - **People and response:** user/administrator components, identity providers and SOAR.
+   Use the same tier lookup as Group by → Tier lanes (after the item 1 fix), so zones and lanes always agree.
+4. **Collapse by type:** within each site box and zone, show one pictogram per component **type** with a count or "instances represented" figure ("Universal Forwarders · ≈165"), not one card per node. Reuse the Group by → Component type aggregation (v130), and the collapsed-group export (`withArchitectureExportScope`).
+5. **Line styles by plane,** the same colours as the canvas: event data solid, fleet management dashed, interactive authentication dotted, plus **alerts and response** (search → SOAR, search → people) in a fourth colour. Merge parallel relationships between the same two aggregated shapes into one line.
+6. **Flow tags** from relationship details, kept short: protocol · TLS · port · acknowledgement, and the authentication type where set (for example "S2S · TLS · 9997 · ACK", "SAML · MFA", "phone-home · 8089").
+7. **Numbered operational threads** (circled numbers on the graphic, and a matching list below it), in this fixed order, each shown only when present:
+   1 Collect (sources → collection), 2 Forward (collection → indexing), 3 Index and replicate (indexer cluster / multisite), 4 Search and detect (search tier), 5 Manage the fleet (management plane), 6 Authenticate (authentication plane), 7 Respond (SOAR).
+   Each list item is one or two plain sentences, generated from the components and relationship details in that thread.
+8. **Legend** (the four line styles and the thread marker) and **key measures** (6 tiles): availability SLO and latency SLO (from relationship details on the event path; show the strictest), licensed ingest (capacity model), copies across sites (indexer cluster settings), sending hosts and services (sum of "instances represented"), and items to review (review findings, in the review colour).
+9. **Footer:** architecture title, owner, "Generated from Builder topology", and "Page n of N · OV-1".
+
+### New optional fields
+- **Mission statement:** one sentence in the pack options (`state.builderExport.ov1.mission`).
+- **People and roles:** a small list in the pack options, each entry {name, coverage (for example "24×7"), notes}. It is shown in the People zone next to any user/identity components already in the topology.
+- **Instances represented:** an optional number on source and forwarder components (Inspector → Component identity), used for the counts in step 4 and the "sending hosts" measure. Store it on the node, and include it in `topologyDocument()`, the inventory table and re-import.
+All three are saved in the topology document and layout profiles. Empty values show as "Not set" in the pack's open-questions appendix.
+
+### Pack integration
+- Add **"OV-1 operational concept"** to the pack's Sections checkboxes, on by default. It goes straight after the cover, before the inventory, and appears in the table of contents.
+- Light and dark themes via the pack's existing theme tokens. In the light theme, check that every text on the page background is ≥ 4.5:1 (the Build 128 rule).
+- Print: the graphic fits one A4-landscape page at ≥ 9pt text; the numbered list may continue onto the next page.
+- In the on-screen pack preview, hovering over or selecting a thread number highlights that thread's lines and list item, as in the mockup. This is optional in the downloaded HTML and absent in print.
+
+### Acceptance check
+- Default topology: the OV-1 page shows one site box ("Unspecified" region), zones with Syslog Source / Syslog Server / Universal Forwarder / Indexer, threads 1–2 only, 3 event-data lines, and review count 12. Nothing appears for planes or tiers that aren't present.
+- The Build 130 test topology (3 UFs + Deployment Server): UFs shown as one "Universal Forwarder · 3" pictogram; thread 5 appears with a dashed line from Deployment Server to it, tagged "phone-home · 8089".
+- Two regions: two site boxes, each containing only its own sources.
+- Mission, people and instance counts show when set and are absent (or "Not set" in the appendix) when not; values survive export → re-import.
+- Light theme contrast ≥ 4.5:1 for page text; the Chromium PDF has the OV-1 on page 2 with page numbers; 0 `pageerror` events while previewing and downloading.
+
+---
+
 ## How to verify (run before every upload)
 1. Zero `pageerror` events at 1280×800, 1440×900, 1920×1080 and 390×844, and across a 1440→1000→1440 resize.
 2. **Grouping sweep:** switch `#builderGroupBy130` through all six options in auto/horizontal layout and in free layout, with the default topology and a 3-UF + Deployment Server topology. Expect 0 errors, and nodes inside their lanes.
 3. `node tools/builder-connector-check.js index.html shots/`: every scenario `OK` (scenario 9 once added, in each grouping mode).
-4. Button sweep: every `#topologyBuilder` button, on a fresh page, with its context revealed, gives no errors and a visible effect. Note that dropdowns such as Group by aren't covered by the button sweep, so item 2 of this list covers them.
-5. Architecture pack: export with all sections on, in both themes; the Build 128 checks still pass.
+4. Button sweep: every `#topologyBuilder` button, on a fresh page, with its context revealed, gives no errors and a visible effect. Note that dropdowns such as Group by aren't covered by the button sweep, so step 2 above covers them.
+5. Architecture pack: export with all sections on (including OV-1), in both themes; the Build 128 checks and the item 7 acceptance check pass.
 6. Add a `changeRegister` entry for each new block.

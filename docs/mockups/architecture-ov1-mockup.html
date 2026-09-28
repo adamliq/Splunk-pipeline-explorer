@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OV-1 Operational Concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one printed architecture-pack page — classification banners, DoDAF title block, mission line,
+   the pictorial concept graphic, then the numbered operational narrative beside legend and measures.
+   Colour carries meaning only: one hue per relationship plane, as in the Builder. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --zone-2:#e3ebf1;
+  --data:#0f7fa6; --mgmt:#11897a; --auth:#7a4fc4; --resp:#c2621b; --review:#8a5a00;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --icon:#26435a; --icon-fill:#dde8ef; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --zone-2:#16293a;
+  --data:#4fb7d6; --mgmt:#2dd4bf; --auth:#b39cff; --resp:#f09a55; --review:#e0b567;
+  --class-bg:#e0b567; --class-fg:#1b1204; --icon:#b9d2e0; --icon-fill:#183044; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --zone-2:#16293a;
+  --data:#4fb7d6; --mgmt:#2dd4bf; --auth:#b39cff; --resp:#f09a55; --review:#e0b567;
+  --class-bg:#e0b567; --class-fg:#1b1204; --icon:#b9d2e0; --icon-fill:#183044; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.bottom{border-radius:0 0 3px 3px}.banner.top{border-radius:3px 3px 0 0}
+.inner{padding:18px 22px 20px;display:grid;gap:16px}
+
+/* Title block, laid out like a drawing title block */
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;letter-spacing:.005em;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}}
+
+.mission{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;align-items:baseline;border-left:3px solid var(--data);padding:4px 0 4px 12px}
+.mission .tb-k{grid-row:span 2}
+.mission p{margin:0;font:500 1rem/1.45 var(--font-body);max-width:95ch}
+
+/* Diagram */
+.figure{border:1px solid var(--rule);border-radius:3px;overflow-x:auto;background:var(--sheet)}
+.figure svg{display:block;min-width:980px;width:100%;height:auto}
+.zone rect{fill:var(--zone);stroke:var(--rule)}
+.zone text{font:600 11px var(--font-code);letter-spacing:.12em;fill:var(--muted)}
+.site rect{fill:var(--sheet);stroke:var(--rule);stroke-dasharray:5 4}
+.site text{font:600 11.5px var(--font-title);fill:var(--ink-2)}
+.nd .ic{fill:var(--icon-fill);stroke:var(--icon);stroke-width:1.4}
+.nd .ic-line{stroke:var(--icon);stroke-width:1.4;fill:none}
+.nd .ic-dot{fill:var(--icon)}
+.nd .lbl{font:600 12.5px var(--font-title);fill:var(--ink)}
+.nd .sub{font:400 10.5px var(--font-body);fill:var(--muted)}
+.flow{fill:none;stroke-width:2;transition:opacity .2s}
+.flow.data{stroke:var(--data)}
+.flow.mgmt{stroke:var(--mgmt);stroke-dasharray:7 5}
+.flow.auth{stroke:var(--auth);stroke-dasharray:2 4;stroke-linecap:round}
+.flow.resp{stroke:var(--resp)}
+.flowtag{font:500 10px var(--font-code);fill:var(--ink-2)}
+.num circle{fill:var(--sheet);stroke:var(--ink);stroke-width:1.4}
+.num text{font:700 11px var(--font-code);fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+.num{cursor:pointer}
+.num:focus-visible circle{stroke:var(--focus);stroke-width:3}
+svg.focusing [data-thread]{opacity:.12}
+svg.focusing [data-thread].on{opacity:1}
+svg.focusing .num.on circle{fill:var(--ink)}
+svg.focusing .num.on text{fill:var(--sheet)}
+
+/* Narrative + side panels */
+.lower{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px}
+@media (max-width:860px){.lower{grid-template-columns:1fr}}
+h2{margin:0 0 8px;font:600 .72rem/1 var(--font-code);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+ol.threads{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+ol.threads li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:7px 8px;border-radius:4px;cursor:pointer}
+ol.threads li:hover,ol.threads li.on{background:var(--zone)}
+ol.threads li:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.tn{width:24px;height:24px;border-radius:50%;border:1.4px solid var(--ink);display:grid;place-items:center;font:700 11px var(--font-code)}
+ol.threads b{font:600 .92rem/1.3 var(--font-title);display:block}
+ol.threads span.t{color:var(--ink-2);font-size:.86rem}
+.side{display:grid;gap:14px;align-content:start}
+.legend{display:grid;gap:6px;font-size:.84rem;color:var(--ink-2)}
+.legend div{display:flex;align-items:center;gap:10px}
+.measures{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--rule)}
+.measures div{padding:8px 10px;border-top:1px solid var(--rule);border-left:1px solid var(--rule)}
+.measures div:nth-child(-n+2){border-top:0}.measures div:nth-child(odd){border-left:0}
+.measures b{display:block;font:600 1.05rem/1.2 var(--font-title);font-variant-numeric:tabular-nums}
+.measures small{color:var(--muted);font-size:.74rem}
+.measures .rev b{color:var(--review)}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;color:var(--muted);font-size:.76rem;border-top:1px solid var(--rule);padding-top:8px}
+
+/* Generation notes (outside the printed sheet) */
+.gen{border:1px dashed var(--rule);border-radius:6px;padding:14px 16px;display:grid;gap:10px;background:var(--sheet)}
+.gen h3{margin:0;font:600 1rem/1.3 var(--font-title)}
+.gen p{margin:0;color:var(--ink-2);font-size:.88rem;max-width:90ch}
+.gen table{border-collapse:collapse;width:100%;font-size:.84rem}
+.gen th,.gen td{text-align:left;padding:6px 8px;border-top:1px solid var(--rule);vertical-align:top}
+.gen th{font:600 .66rem/1.2 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-top:0}
+.gen td:first-child{font-weight:600;white-space:nowrap}
+.gen .tag{font:600 .66rem/1 var(--font-code);padding:3px 6px;border-radius:3px;white-space:nowrap}
+.tag.have{background:color-mix(in srgb,var(--mgmt) 16%,transparent);color:var(--mgmt)}
+.tag.new{background:color-mix(in srgb,var(--review) 18%,transparent);color:var(--review)}
+.tablewrap{overflow-x:auto}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+@media (prefers-reduced-motion:reduce){.flow{transition:none}}
+</style>
+
+<div class="page">
+  <span class="example">Mockup · example architecture pack page · example data</span>
+
+  <article class="sheet" aria-label="OV-1 page of the architecture pack">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big">OV-1 · High-Level Operational Concept Graphic</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Scope</span><span class="tb-v">Complete topology · Splunk Enterprise</span></div>
+        <div><span class="tb-k">Owner / author</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">130 · 29 Sep 2026</span></div>
+      </div>
+
+      <div class="mission">
+        <span class="tb-k">Mission</span>
+        <p>Collect security telemetry from two data centres and AWS, keep two indexed copies across sites, and give the SOC searchable, alertable data within 60 seconds, 24×7.</p>
+      </div>
+
+      <div class="figure">
+        <svg id="ov1" viewBox="0 0 1200 640" role="img" aria-labelledby="ov1-title ov1-desc">
+          <title id="ov1-title">OV-1 high-level operational concept for the Splunk security telemetry architecture</title>
+          <desc id="ov1-desc">Sources in Sydney, Melbourne and AWS send events through forwarders and syslog relays to a multisite indexer cluster. A search head cluster serves SOC analysts and triggers SOAR playbooks. A Deployment Server manages the forwarder fleet, and users sign in through an identity provider.</desc>
+          <defs>
+            <marker id="aData" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--data)"/></marker>
+            <marker id="aMgmt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--mgmt)"/></marker>
+            <marker id="aAuth" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--auth)"/></marker>
+            <marker id="aResp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--resp)"/></marker>
+          </defs>
+
+          <!-- Zones -->
+          <g class="zone"><rect x="16" y="16" width="304" height="608" rx="6"/><text x="30" y="40">ENTERPRISE SITES &amp; CLOUD</text></g>
+          <g class="zone"><rect x="336" y="16" width="270" height="608" rx="6"/><text x="350" y="40">COLLECTION &amp; FORWARDING</text></g>
+          <g class="zone"><rect x="622" y="16" width="334" height="608" rx="6"/><text x="636" y="40">SPLUNK ENTERPRISE PLATFORM</text></g>
+          <g class="zone"><rect x="972" y="16" width="212" height="608" rx="6"/><text x="986" y="40">PEOPLE &amp; RESPONSE</text></g>
+
+          <!-- Sites -->
+          <g class="site"><rect x="30" y="56" width="276" height="214" rx="5"/><text x="44" y="76">Sydney data centre · site 1</text></g>
+          <g class="site"><rect x="30" y="286" width="276" height="196" rx="5"/><text x="44" y="306">Melbourne data centre · site 2</text></g>
+          <g class="site"><rect x="30" y="498" width="276" height="112" rx="5"/><text x="44" y="518">AWS · ap-southeast-2</text></g>
+          <g class="site"><rect x="636" y="56" width="306" height="218" rx="5"/><text x="650" y="76">Indexer cluster · multisite · RF 2 / SF 2</text></g>
+          <g class="site"><rect x="636" y="420" width="306" height="190" rx="5"/><text x="650" y="440">Management</text></g>
+
+          <!-- Flows (drawn under nodes) -->
+          <g id="flows">
+            <!-- 1 collect -->
+            <path data-thread="1" class="flow data" marker-end="url(#aData)" d="M292 118 C330 118 334 150 350 150"/>
+            <path data-thread="1" class="flow data" marker-end="url(#aData)" d="M292 348 C332 348 330 160 350 158"/>
+            <path data-thread="1" class="flow data" marker-end="url(#aData)" d="M292 206 C330 206 330 330 350 332"/>
+            <path data-thread="1" class="flow data" marker-end="url(#aData)" d="M292 424 C330 424 330 344 350 342"/>
+            <path data-thread="1" class="flow data" marker-end="url(#aData)" d="M292 562 C328 562 332 540 350 540"/>
+            <!-- 2 forward -->
+            <path data-thread="2" class="flow data" marker-end="url(#aData)" d="M592 150 C620 150 628 120 650 120"/>
+            <path data-thread="2" class="flow data" marker-end="url(#aData)" d="M592 338 C624 338 626 200 650 198"/>
+            <path data-thread="2" class="flow data" marker-end="url(#aData)" d="M592 540 C628 540 618 214 650 208"/>
+            <!-- 3 replicate -->
+            <path data-thread="3" class="flow data" marker-start="url(#aData)" marker-end="url(#aData)" d="M920 132 L920 190"/>
+            <!-- 4 search -->
+            <path data-thread="4" class="flow data" marker-end="url(#aData)" d="M760 314 L760 262"/>
+            <path data-thread="4" class="flow resp" marker-end="url(#aResp)" d="M944 330 C962 330 956 118 1000 118"/>
+            <!-- 5 manage -->
+            <path data-thread="5" class="flow mgmt" marker-end="url(#aMgmt)" d="M650 482 C602 482 596 206 552 190"/>
+            <path data-thread="5" class="flow mgmt" marker-end="url(#aMgmt)" d="M650 486 C612 486 602 392 552 378"/>
+            <path data-thread="5" class="flow mgmt" marker-end="url(#aMgmt)" d="M650 490 C616 490 604 520 580 526"/>
+            <!-- 6 authenticate -->
+            <path data-thread="6" class="flow auth" marker-end="url(#aAuth)" d="M1030 150 L1030 348"/>
+            <path data-thread="6" class="flow auth" marker-end="url(#aAuth)" d="M1060 274 L1060 348"/>
+            <path data-thread="6" class="flow auth" marker-end="url(#aAuth)" d="M1004 384 C972 384 966 346 946 342"/>
+            <!-- 7 respond -->
+            <path data-thread="7" class="flow resp" marker-end="url(#aResp)" d="M944 352 C968 356 964 522 1000 522"/>
+          </g>
+
+          <!-- Flow tags -->
+          <g class="flowtag">
+            <text x="406" y="196" data-thread="2">to indexers: S2S · TLS · 9997 · ACK</text>
+            <text x="892" y="165" text-anchor="end" data-thread="3">replication</text>
+            <text x="770" y="292" data-thread="4">distributed search</text>
+            <text x="586" y="610" data-thread="5">phone-home · 8089</text>
+            <text x="1068" y="316" data-thread="6">SAML · MFA</text>
+            <text x="984" y="462" data-thread="7">notable events</text>
+          </g>
+
+          <!-- Nodes: icon (44x44) + label + sub -->
+          <!-- Sydney -->
+          <g class="nd" transform="translate(46 96)"><rect class="ic" width="40" height="44" rx="3"/><path class="ic-line" d="M6 12H34M6 22H34M6 32H34"/><circle class="ic-dot" cx="30" cy="7" r="1.6"/>
+            <text class="lbl" x="54" y="18">Windows servers</text><text class="sub" x="54" y="34">≈120 hosts · Security, Sysmon</text></g>
+          <g class="nd" transform="translate(46 184)"><rect class="ic" width="40" height="44" rx="3"/><path class="ic-line" d="M4 14H36M4 26H36M16 4V14M28 14V26M12 26V38M28 26V38"/>
+            <text class="lbl" x="54" y="18">Firewalls &amp; network</text><text class="sub" x="54" y="34">syslog · UDP/TCP 514</text></g>
+          <!-- Melbourne -->
+          <g class="nd" transform="translate(46 326)"><rect class="ic" width="40" height="44" rx="3"/><path class="ic-line" d="M6 12H34M6 22H34M6 32H34"/><circle class="ic-dot" cx="30" cy="7" r="1.6"/>
+            <text class="lbl" x="54" y="18">Windows servers</text><text class="sub" x="54" y="34">≈45 hosts · Security</text></g>
+          <g class="nd" transform="translate(46 402)"><rect class="ic" width="40" height="44" rx="3"/><path class="ic-line" d="M8 12H32M8 22H32M8 32H24"/><circle class="ic-dot" cx="31" cy="32" r="2"/>
+            <text class="lbl" x="54" y="18">Syslog appliances</text><text class="sub" x="54" y="34">TCP 514 · TLS 6514</text></g>
+          <!-- AWS -->
+          <g class="nd" transform="translate(46 540)"><path class="ic" d="M10 36C3 36 1 28 7 25C6 17 15 13 20 18C23 10 36 12 35 21C41 22 41 36 34 36Z"/>
+            <text class="lbl" x="54" y="18">CloudTrail &amp; GuardDuty</text><text class="sub" x="54" y="34">Lambda → HEC · HTTPS 8088</text></g>
+
+          <!-- Collection -->
+          <g class="nd" transform="translate(352 128)"><rect class="ic" width="40" height="44" rx="3"/><path class="ic-line" d="M8 22H30M24 15L31 22L24 29"/>
+            <text class="lbl" x="54" y="18">Universal Forwarders</text><text class="sub" x="54" y="34">on Windows hosts · ≈165</text></g>
+          <g class="nd" transform="translate(352 316)"><rect class="ic" width="40" height="44" rx="3"/><path class="ic-line" d="M6 14H34M6 30H34M20 14V30"/><circle class="ic-dot" cx="12" cy="22" r="2"/><circle class="ic-dot" cx="28" cy="22" r="2"/>
+            <text class="lbl" x="54" y="18">Syslog relays · 1 per site</text><text class="sub" x="54" y="34">rsyslog + UF · file handoff</text></g>
+          <g class="nd" transform="translate(352 518)"><rect class="ic" width="40" height="44" rx="3"/><path class="ic-line" d="M8 12H32L24 24V34L16 38V24Z"/>
+            <text class="lbl" x="54" y="18">Heavy Forwarder · HEC</text><text class="sub" x="54" y="34">parsing · PII masking</text></g>
+
+          <!-- Platform -->
+          <g class="nd" transform="translate(652 96)"><rect class="ic" width="40" height="44" rx="3"/><ellipse class="ic-line" cx="20" cy="12" rx="12" ry="4"/><path class="ic-line" d="M8 12V32C8 36 32 36 32 32V12M8 22C8 26 32 26 32 22"/>
+            <text class="lbl" x="54" y="18">Indexers · site 1 (Sydney)</text><text class="sub" x="54" y="34">4 peers · hot/warm on SSD</text></g>
+          <g class="nd" transform="translate(652 186)"><rect class="ic" width="40" height="44" rx="3"/><ellipse class="ic-line" cx="20" cy="12" rx="12" ry="4"/><path class="ic-line" d="M8 12V32C8 36 32 36 32 32V12M8 22C8 26 32 26 32 22"/>
+            <text class="lbl" x="54" y="18">Indexers · site 2 (Melbourne)</text><text class="sub" x="54" y="34">4 peers · replica copies</text></g>
+          <g class="nd" transform="translate(718 314)"><rect class="ic" width="40" height="44" rx="3"/><circle class="ic-line" cx="18" cy="20" r="8"/><path class="ic-line" d="M24 26L32 34"/>
+            <text class="lbl" x="54" y="18">Search head cluster</text><text class="sub" x="54" y="34">Enterprise Security · 3 members</text></g>
+          <g class="nd" transform="translate(652 458)"><rect class="ic" width="40" height="44" rx="3"/><path class="ic-line" d="M8 30H32M12 30V16H28V30M16 20H24"/>
+            <text class="lbl" x="54" y="18">Deployment Server</text><text class="sub" x="54" y="34">server classes · apps</text></g>
+          <g class="nd" transform="translate(652 536)"><rect class="ic" width="40" height="44" rx="3"/><path class="ic-line" d="M8 32L16 22L22 28L32 14"/>
+            <text class="lbl" x="54" y="18">License Mgr · Monitoring Console</text><text class="sub" x="54" y="34">ingest ≈180 GB/day</text></g>
+
+          <!-- People & response -->
+          <g class="nd" transform="translate(1004 96)"><circle class="ic" cx="14" cy="12" r="7"/><path class="ic" d="M2 40C2 28 26 28 26 40Z"/><circle class="ic" cx="30" cy="14" r="6"/><path class="ic" d="M20 40C20 30 40 30 40 40Z"/>
+            <text class="lbl" x="0" y="64">SOC analysts · 24×7</text><text class="sub" x="0" y="78">dashboards · triage</text></g>
+          <g class="nd" transform="translate(1040 214)"><circle class="ic" cx="14" cy="12" r="7"/><path class="ic" d="M2 40C2 28 26 28 26 40Z"/>
+            <text class="lbl" x="-36" y="62">Platform administrators</text></g>
+          <g class="nd" transform="translate(1004 360)"><path class="ic" d="M20 2L36 8V20C36 30 28 38 20 42C12 38 4 30 4 20V8Z"/><path class="ic-line" d="M13 21L18 26L28 15"/>
+            <text class="lbl" x="0" y="62">Identity provider</text><text class="sub" x="0" y="76">SAML SSO · MFA</text></g>
+          <g class="nd" transform="translate(1004 500)"><rect class="ic" width="40" height="44" rx="3"/><path class="ic-line" d="M10 14H30M10 22H30M10 30H22"/><circle class="ic-dot" cx="30" cy="31" r="3"/>
+            <text class="lbl" x="0" y="62">SOAR &amp; ticketing</text><text class="sub" x="0" y="76">playbooks · cases</text></g>
+
+          <!-- Thread markers -->
+          <g id="markers">
+            <g class="num" data-thread="1" data-n="1" tabindex="0" role="button" aria-label="Thread 1: collect"><circle cx="322" cy="276" r="11"/><text x="322" y="276.5">1</text></g>
+            <g class="num" data-thread="2" data-n="2" tabindex="0" role="button" aria-label="Thread 2: forward"><circle cx="622" cy="150" r="11"/><text x="622" y="150.5">2</text></g>
+            <g class="num" data-thread="3" data-n="3" tabindex="0" role="button" aria-label="Thread 3: index and replicate"><circle cx="906" cy="161" r="11"/><text x="906" y="161.5">3</text></g>
+            <g class="num" data-thread="4" data-n="4" tabindex="0" role="button" aria-label="Thread 4: search and detect"><circle cx="744" cy="288" r="11"/><text x="744" y="288.5">4</text></g>
+            <g class="num" data-thread="5" data-n="5" tabindex="0" role="button" aria-label="Thread 5: manage the fleet"><circle cx="604" cy="430" r="11"/><text x="604" y="430.5">5</text></g>
+            <g class="num" data-thread="6" data-n="6" tabindex="0" role="button" aria-label="Thread 6: authenticate"><circle cx="1030" cy="300" r="11"/><text x="1030" y="300.5">6</text></g>
+            <g class="num" data-thread="7" data-n="7" tabindex="0" role="button" aria-label="Thread 7: respond"><circle cx="958" cy="440" r="11"/><text x="958" y="440.5">7</text></g>
+          </g>
+        </svg>
+      </div>
+
+      <div class="lower">
+        <section aria-labelledby="threads-h">
+          <h2 id="threads-h">Operational threads</h2>
+          <ol class="threads" id="threads">
+            <li data-thread="1" tabindex="0"><span class="tn">1</span><div><b>Collect</b><span class="t">Windows hosts run Universal Forwarders. Firewalls and appliances send syslog to a relay in each site. AWS services push CloudTrail and GuardDuty findings through Lambda to HEC.</span></div></li>
+            <li data-thread="2" tabindex="0"><span class="tn">2</span><div><b>Forward</b><span class="t">Forwarders send Splunk-to-Splunk over TLS on TCP 9997 with indexer acknowledgement, to the indexers in their own site.</span></div></li>
+            <li data-thread="3" tabindex="0"><span class="tn">3</span><div><b>Index and replicate</b><span class="t">The multisite indexer cluster keeps two searchable copies, one in Sydney and one in Melbourne (RF 2 / SF 2).</span></div></li>
+            <li data-thread="4" tabindex="0"><span class="tn">4</span><div><b>Search and detect</b><span class="t">The search head cluster runs Enterprise Security correlation searches and serves dashboards to the SOC.</span></div></li>
+            <li data-thread="5" tabindex="0"><span class="tn">5</span><div><b>Manage the fleet</b><span class="t">The Deployment Server delivers apps and configuration to the forwarders over phone-home on TCP 8089. The License Manager tracks daily ingest.</span></div></li>
+            <li data-thread="6" tabindex="0"><span class="tn">6</span><div><b>Authenticate</b><span class="t">Analysts and administrators sign in through the identity provider with SAML SSO and MFA. The model records the mechanism only, never credentials.</span></div></li>
+            <li data-thread="7" tabindex="0"><span class="tn">7</span><div><b>Respond</b><span class="t">Notable events start SOAR playbooks and open tickets for the on-call analyst.</span></div></li>
+          </ol>
+        </section>
+
+        <div class="side">
+          <section aria-labelledby="legend-h">
+            <h2 id="legend-h">Legend</h2>
+            <div class="legend">
+              <div><svg width="44" height="10" aria-hidden="true"><line x1="1" y1="5" x2="43" y2="5" style="stroke:var(--data)" stroke-width="2.2"/></svg>Event data</div>
+              <div><svg width="44" height="10" aria-hidden="true"><line x1="1" y1="5" x2="43" y2="5" style="stroke:var(--mgmt)" stroke-width="2.2" stroke-dasharray="7 5"/></svg>Fleet management</div>
+              <div><svg width="44" height="10" aria-hidden="true"><line x1="2" y1="5" x2="43" y2="5" style="stroke:var(--auth)" stroke-width="2.2" stroke-dasharray="2 4" stroke-linecap="round"/></svg>Interactive authentication</div>
+              <div><svg width="44" height="10" aria-hidden="true"><line x1="1" y1="5" x2="43" y2="5" style="stroke:var(--resp)" stroke-width="2.2"/></svg>Alerts and response</div>
+              <div><svg width="44" height="22" aria-hidden="true"><circle cx="11" cy="11" r="9" style="fill:var(--sheet);stroke:var(--ink)" stroke-width="1.4"/><text x="11" y="11.5" text-anchor="middle" dominant-baseline="central" style="fill:var(--ink);font:700 10px var(--font-code)">n</text></svg>Operational thread (select to highlight)</div>
+            </div>
+          </section>
+          <section aria-labelledby="measures-h">
+            <h2 id="measures-h">Key measures</h2>
+            <div class="measures">
+              <div><b>99.9 %</b><small>availability SLO, event path</small></div>
+              <div><b>≤ 60 s</b><small>source-to-searchable latency SLO</small></div>
+              <div><b>≈ 180 GB/day</b><small>licensed ingest</small></div>
+              <div><b>2 copies</b><small>across sites (RF 2 / SF 2)</small></div>
+              <div><b>≈ 330</b><small>sending hosts and services</small></div>
+              <div class="rev"><b>12</b><small>items to review</small></div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Owner not set · Generated from Builder topology (example data)</span><span>Page 2 of 16 · OV-1</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </article>
+
+  <section class="gen" aria-labelledby="gen-h">
+    <h3 id="gen-h">How the Builder could generate this page</h3>
+    <p>Most of the OV-1 comes from data the Builder already holds. A few operational facts that aren't modelled yet would be new, optional fields in the architecture pack's options, shown as "Not set" until filled in.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>OV-1 element</th><th>Source</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Site boxes</td><td>Component <em>region</em> values (Sydney, Melbourne) and cloud source types (AWS Lambda, Azure Function)</td><td><span class="tag have">Exists</span></td></tr>
+          <tr><td>Zones</td><td>Tier of each component type, the same lookup as Group by → Tier lanes, with management roles in one zone</td><td><span class="tag have">Exists</span></td></tr>
+          <tr><td>Line styles</td><td>Relationship planes (event data, fleet management, interactive authentication); SOAR links as response</td><td><span class="tag have">Exists</span></td></tr>
+          <tr><td>Flow tags</td><td>Relationship details: protocol, port, TLS, acknowledgement, authentication type</td><td><span class="tag have">Exists</span></td></tr>
+          <tr><td>Threads 1–7</td><td>Event path from sources to search, then management, authentication and response planes, numbered in that order</td><td><span class="tag have">Exists</span></td></tr>
+          <tr><td>Key measures</td><td>Relationship SLOs, capacity model (ingest), indexer cluster settings, review findings</td><td><span class="tag have">Exists</span></td></tr>
+          <tr><td>Collapsed counts</td><td>Group by → Component type: "Universal Forwarders ≈165" instead of 165 cards</td><td><span class="tag have">Exists</span></td></tr>
+          <tr><td>Mission statement</td><td>One sentence in the pack options</td><td><span class="tag new">New field</span></td></tr>
+          <tr><td>People and roles</td><td>Actor names, coverage (24×7) and counts in the pack options; user and identity components already exist</td><td><span class="tag new">New field</span></td></tr>
+          <tr><td>Host counts per site</td><td>An optional "instances represented" number on source and forwarder components</td><td><span class="tag new">New field</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const svg = document.getElementById('ov1');
+  const items = [...document.querySelectorAll('#threads li')];
+  let pinned = null;
+  function focus(n){
+    if(!n){svg.classList.remove('focusing');svg.querySelectorAll('.on').forEach(e=>e.classList.remove('on'));items.forEach(i=>i.classList.remove('on'));return;}
+    svg.classList.add('focusing');
+    svg.querySelectorAll('[data-thread]').forEach(e=>e.classList.toggle('on',e.dataset.thread===n));
+    items.forEach(i=>i.classList.toggle('on',i.dataset.thread===n));
+  }
+  const toggle = n => { pinned = pinned===n ? null : n; focus(pinned); };
+  const bind = (el, n) => {
+    el.addEventListener('mouseenter',()=>{ if(!pinned) focus(n); });
+    el.addEventListener('mouseleave',()=>{ if(!pinned) focus(null); });
+    el.addEventListener('click',()=>toggle(n));
+    el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(n); } });
+  };
+  items.forEach(i=>bind(i,i.dataset.thread));
+  svg.querySelectorAll('.num').forEach(m=>bind(m,m.dataset.thread));
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ pinned=null; focus(null); } });
+})();
+</script>
+
+</html>
