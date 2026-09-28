@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 125 · 28 Sep 2026</title>
+  <title>Splunk Pipeline Explorer · Build 126 · 29 Sep 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,9 +202,9 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="125" data-build-date="2026-09-28">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="126" data-build-date="2026-09-29">
     <div class="builderHead">
-      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 125, dated 28 September 2026"><b>Build 125</b><time datetime="2026-09-28">28 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
+      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 126, dated 29 September 2026"><b>Build 126</b><time datetime="2026-09-29">29 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
         <div class="builderActions"><div class="builderHistoryControls"><button class="builderBtn" id="builderUndo" disabled>↶ Undo <kbd>Ctrl Z</kbd></button><button class="builderBtn" id="builderRedo" disabled>↷ Redo <kbd>Ctrl Y</kbd></button><button class="builderBtn" id="builderHistoryToggle" aria-expanded="false">History <span class="builderHistoryCount" id="builderHistoryCount">0</span></button></div><button class="builderBtn" id="builderLoadPath">Load selected path</button><button class="builderBtn" id="builderClear">Clear</button><button class="builderBtn" id="builderFailure">Open in Failure Lab</button><button class="builderBtn primary" id="builderUse">Use in explorer</button></div>
         <div class="builderPersistence"><select id="builderSaved" aria-label="Saved custom topologies"><option value="">Saved topologies</option></select><button class="builderBtn" id="builderSave">Save</button><button class="builderBtn" id="builderLoadSaved">Load</button><button class="builderBtn" id="builderImport">Import JSON</button><button class="builderBtn" id="builderExport">Export JSON</button><input id="builderImportFile" type="file" accept="application/json,.json" hidden></div>
@@ -4805,6 +4805,94 @@ changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(
   ['Connector label clearance','Keep labels off component cards and retain perpendicular endpoint stubs in close layouts.',true],
   ['Architecture pack content','Export a cover, component and connection registers, findings, rules, security, ownership, resilience, deployment and a re-importable appendix with printable page numbers.',true],
   ['Architecture pack options','Choose report sections, owner, print theme and page notes; omit duplicate diagram scopes and import a topology from an HTML pack.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
+<style id="builder-palette-pin-v126-styles">
+.topologyBuilder #builderPalettePin126{min-width:44px}
+.topologyBuilder #builderPalettePin126[aria-pressed="true"]{border-color:#8cddcf;background:#174a43;color:#e1fff1}
+.topologyBuilder.canvasPalettePinned #builderAddToggle[aria-pressed="true"]{border-color:#8cddcf!important}
+@media(min-width:1121px){
+  .topologyBuilder.canvasFirst.canvasPalettePinned:not(.canvasFocus) .builderGrid{
+    grid-template-columns:minmax(255px,300px) minmax(0,1fr)!important
+  }
+  .topologyBuilder.canvasFirst.canvasPalettePinned.canvasInspectorPinned:not(.canvasFocus) .builderGrid{
+    grid-template-columns:minmax(255px,290px) minmax(0,1fr) minmax(275px,305px)!important
+  }
+  .topologyBuilder.canvasFirst.canvasPalettePinned:not(.canvasFocus) .builderPalette{
+    display:block!important;position:sticky!important;grid-column:1;grid-row:1;align-self:start;
+    top:12px!important;left:auto!important;right:auto!important;bottom:auto!important;
+    width:auto!important;max-width:none!important;height:clamp(480px,calc(100dvh - 130px),760px)!important;
+    max-height:none;visibility:visible!important;z-index:3;overflow-y:auto;
+    border:0;border-right:1px solid #46667a;border-radius:0;box-shadow:none
+  }
+  .topologyBuilder.canvasFirst.canvasPalettePinned:not(.canvasFocus) .builderWorkspace{grid-column:2!important;grid-row:1;min-width:0}
+  .topologyBuilder.canvasFirst.canvasPalettePinned.canvasInspectorPinned:not(.canvasFocus) .builderInspector{
+    grid-column:3!important;grid-row:1
+  }
+}
+@media(pointer:coarse){.topologyBuilder #builderPalettePin126{min-height:40px}}
+</style>
+<script id="builder-palette-pin-v126">
+/* A pinned palette docks on desktop and persists until the user explicitly unpins or closes it. */
+const builderPalettePinKey126='splunkPipelineExplorer.palettePinned.v1';
+let builderPalettePinned126=false;
+try{builderPalettePinned126=localStorage.getItem(builderPalettePinKey126)==='true'}catch{}
+const builderPalettePin126=document.createElement('button');
+builderPalettePin126.type='button';builderPalettePin126.id='builderPalettePin126';
+builderPalettePin126.setAttribute('aria-controls','builderCanvasPalette');
+builderPalettePin126.setAttribute('aria-pressed','false');
+paletteHead.querySelector('div')?.prepend(builderPalettePin126);
+const builderPaletteSyncBefore126=syncCanvasPanels;
+syncCanvasPanels=function(...args){
+  if(builderPalettePinned126&&!state.builderCanvasFocus&&!builderPaletteChangePending)canvasPanelState.palette=true;
+  const result=builderPaletteSyncBefore126(...args);
+  const docked=builderPalettePinned126&&!builderPaletteChangePending;
+  canvasFirstRoot.classList.toggle('canvasPalettePinned',docked);
+  builderPalettePin126.setAttribute('aria-pressed',String(builderPalettePinned126));
+  builderPalettePin126.textContent=builderPalettePinned126?'Unpin':'Pin';
+  builderPalettePin126.title=builderPalettePinned126?'Return to a temporary palette':'Keep the component palette open beside the canvas';
+  $('#builderAddToggle')?.setAttribute('aria-pressed',String(builderPalettePinned126&&canvasPanelState.palette));
+  return result;
+};
+function builderPaletteSetPin126(pinned,{refit=true}={}){
+  builderPalettePinned126=!!pinned;
+  if(pinned)canvasPanelState.palette=true;
+  try{localStorage.setItem(builderPalettePinKey126,String(builderPalettePinned126))}catch{}
+  syncCanvasPanels();positionBuilderPalette();
+  if(refit&&state.view==='builder'&&!state.builderCanvasFocus)requestAnimationFrame(()=>fitBuilderView(false));
+}
+builderPalettePin126.onclick=()=>builderPaletteSetPin126(!builderPalettePinned126);
+const builderPaletteCloseBefore126=$('#builderPaletteDrawerClose').onclick;
+$('#builderPaletteDrawerClose').onclick=function(...args){builderPaletteSetPin126(false,{refit:false});const result=builderPaletteCloseBefore126.apply(this,args);if(state.view==='builder')requestAnimationFrame(()=>fitBuilderView(false));return result};
+for(const id of ['builderAddToggle','builderFocusAdd']){
+  const button=$('#'+id),prior=button?.onclick;if(!button||!prior)continue;
+  button.onclick=function(...args){
+    if(builderPalettePinned126&&!state.builderCanvasFocus){builderPaletteSetPin126(false,{refit:false});canvasPanelState.palette=false;syncCanvasPanels();button.focus();requestAnimationFrame(()=>fitBuilderView(false));return}
+    return prior.apply(this,args);
+  };
+}
+window.addEventListener('keydown',event=>{
+  if(event.key!=='Escape'||!builderPalettePinned126||!canvasPanelState.palette||builderPaletteChangePending||state.view!=='builder'||document.fullscreenElement)return;
+  if(event.target.closest?.('.builderObjectMenu,.builderIssuePopover'))return;
+  builderPalettePinned126=false;try{localStorage.setItem(builderPalettePinKey126,'false')}catch{}
+},true);
+const builderPaletteFitBefore126=fitBuilderView;
+fitBuilderView=function(...args){
+  if(!builderPalettePinned126||state.builderCanvasFocus||innerWidth<1121)return builderPaletteFitBefore126(...args);
+  const open=canvasPanelState.palette;canvasPanelState.palette=false;
+  try{return builderPaletteFitBefore126(...args)}finally{canvasPanelState.palette=open}
+};
+const builderPaletteRenderBefore126=renderBuilder;
+renderBuilder=function(...args){const result=builderPaletteRenderBefore126(...args);
+  if(builderPalettePinned126&&state.view==='builder'&&canvasPanelState.palette)renderPaletteSearch();
+  return result;
+};
+syncCanvasPanels();
+document.title='Splunk Pipeline Explorer · Build 126 · 29 Sep 2026';
+$('#topologyBuilder').dataset.buildNumber='126';$('#topologyBuilder').dataset.buildDate='2026-09-29';
+const builderPaletteStamp126=$('.builderBuildStamp');if(builderPaletteStamp126){builderPaletteStamp126.setAttribute('aria-label','Build 126, dated 29 September 2026');builderPaletteStamp126.querySelector('b').textContent='Build 126';const date=builderPaletteStamp126.querySelector('time');if(date){date.dateTime='2026-09-29';date.textContent='29 Sep 2026'}}
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Pinned component palette','Keep the searchable palette open while adding and selecting components, dock it beside the desktop canvas, and restore the pin across visits.',true]);
 if(state.view==='changes')renderChanges();
 </script>
 
