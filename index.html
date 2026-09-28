@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 126 · 29 Sep 2026</title>
+  <title>Splunk Pipeline Explorer · Build 127 · 29 Sep 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,9 +202,9 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="126" data-build-date="2026-09-29">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="127" data-build-date="2026-09-29">
     <div class="builderHead">
-      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 126, dated 29 September 2026"><b>Build 126</b><time datetime="2026-09-29">29 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
+      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 127, dated 29 September 2026"><b>Build 127</b><time datetime="2026-09-29">29 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
         <div class="builderActions"><div class="builderHistoryControls"><button class="builderBtn" id="builderUndo" disabled>↶ Undo <kbd>Ctrl Z</kbd></button><button class="builderBtn" id="builderRedo" disabled>↷ Redo <kbd>Ctrl Y</kbd></button><button class="builderBtn" id="builderHistoryToggle" aria-expanded="false">History <span class="builderHistoryCount" id="builderHistoryCount">0</span></button></div><button class="builderBtn" id="builderLoadPath">Load selected path</button><button class="builderBtn" id="builderClear">Clear</button><button class="builderBtn" id="builderFailure">Open in Failure Lab</button><button class="builderBtn primary" id="builderUse">Use in explorer</button></div>
         <div class="builderPersistence"><select id="builderSaved" aria-label="Saved custom topologies"><option value="">Saved topologies</option></select><button class="builderBtn" id="builderSave">Save</button><button class="builderBtn" id="builderLoadSaved">Load</button><button class="builderBtn" id="builderImport">Import JSON</button><button class="builderBtn" id="builderExport">Export JSON</button><input id="builderImportFile" type="file" accept="application/json,.json" hidden></div>
@@ -4893,6 +4893,76 @@ document.title='Splunk Pipeline Explorer · Build 126 · 29 Sep 2026';
 $('#topologyBuilder').dataset.buildNumber='126';$('#topologyBuilder').dataset.buildDate='2026-09-29';
 const builderPaletteStamp126=$('.builderBuildStamp');if(builderPaletteStamp126){builderPaletteStamp126.setAttribute('aria-label','Build 126, dated 29 September 2026');builderPaletteStamp126.querySelector('b').textContent='Build 126';const date=builderPaletteStamp126.querySelector('time');if(date){date.dateTime='2026-09-29';date.textContent='29 Sep 2026'}}
 changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Pinned component palette','Keep the searchable palette open while adding and selecting components, dock it beside the desktop canvas, and restore the pin across visits.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
+<style id="builder-relationship-auth-v127-styles">
+.topologyBuilder .relationshipInspectorGrid .relationshipAuthHint127{grid-column:1/-1;color:#9bb4c2;font-size:.66rem;line-height:1.4;margin:0 0 3px}
+.topologyBuilder .relationshipInspectorGrid [data-relationship-field="authenticationType"]:disabled{opacity:.62}
+</style>
+<script id="builder-relationship-auth-v127">
+/* Model the authentication mechanism on a relationship, never a credential value. */
+const builderAuthRequiredValues127=['Unknown','Yes','No'];
+const builderAuthTypeValues127=['Not specified','API key','HEC token','OAuth 2.0 / bearer token','Basic credentials','Mutual TLS certificate','AWS IAM / SigV4','SAML SSO','OpenID Connect','LDAP bind','Session cookie','Other','Not applicable'];
+function builderAuthApplies127(edge,protocol){
+  if(!edge)return false;
+  const handoff=String(protocol||edge.label||'').trim();
+  return !/^(?:udp|file handoff|local file(?: handoff)?|filesystem copy)$/i.test(handoff);
+}
+const builderAuthDefaultsBefore127=defaultRelationshipDetails;
+defaultRelationshipDetails=function(edge){
+  const details=builderAuthDefaultsBefore127(edge),handoff=String(details.protocol||'');
+  let required='Unknown',type='Not specified';
+  if(edge.plane==='authentication'){
+    required='Yes';
+    if(/saml/i.test(handoff))type='SAML SSO';
+    else if(/oidc|openid/i.test(handoff))type='OpenID Connect';
+    else if(/ldap/i.test(handoff))type='LDAP bind';
+  }else if(/hec/i.test(handoff)&&edge.target?.type==='hecEndpoint'){
+    required='Yes';type='HEC token';
+  }
+  return {...details,authenticationRequired:required,authenticationType:type};
+};
+const builderAuthSanitizeBefore127=sanitizeRelationshipDetails;
+sanitizeRelationshipDetails=function(value,defaults){
+  const details=builderAuthSanitizeBefore127(value,defaults),source=value&&typeof value==='object'?value:{};
+  const required=builderAuthRequiredValues127.includes(source.authenticationRequired)?source.authenticationRequired:defaults.authenticationRequired||'Unknown';
+  let type=builderAuthTypeValues127.includes(source.authenticationType)?source.authenticationType:defaults.authenticationType||'Not specified';
+  if(required==='No')type='Not applicable';
+  else if(type==='Not applicable')type='Not specified';
+  return {...details,authenticationRequired:required,authenticationType:type};
+};
+const builderAuthMarkupBefore127=relationshipInspectorMarkup;
+relationshipInspectorMarkup=function(){
+  const markup=builderAuthMarkupBefore127(),selected=state.builderSelectedEdge;
+  if(!selected||state.builderConnectionDraft)return markup;
+  const edge=builderEdgeRecord(selected.plane,selected.id);
+  if(!edge)return markup;
+  const details=ensureRelationshipDetails(edge);
+  if(!builderAuthApplies127(edge,details.protocol))return markup;
+  const required=`<label>Authentication required<select data-relationship-field="authenticationRequired">${relationshipOptionList(builderAuthRequiredValues127,details.authenticationRequired)}</select></label>`;
+  const type=`<label>Authentication type<select data-relationship-field="authenticationType" ${details.authenticationRequired==='No'?'disabled':''}>${relationshipOptionList(builderAuthTypeValues127.filter(value=>value!=='Not applicable'||details.authenticationRequired==='No'),details.authenticationType)}</select></label>`;
+  const hint='<p class="relationshipAuthHint127">Record the mechanism, not a secret. For REST polling, select API key only when the source uses one.</p>';
+  return markup.replace('<label>Acknowledgement',required+type+hint+'<label>Acknowledgement');
+};
+function builderAuthEdges127(){return [...state.builderNodes.filter(node=>node.parent!==null).map(node=>builderEdgeRecord('data',node.id)),...(state.builderDataRelations||[]).map(relation=>builderEdgeRecord('data',relation.id)),...state.builderRelations.map(relation=>builderEdgeRecord('management',relation.id)),...state.builderAuthRelations.map(relation=>builderEdgeRecord('authentication',relation.id))].filter(Boolean)}
+function builderAuthCell127(value){return String(value??'').replace(/\|/g,'\\|').replace(/[\r\n]+/g,' ')}
+const builderAuthReportBefore127=architectureReportMarkdown;
+architectureReportMarkdown=function(...args){
+  const report=builderAuthReportBefore127(...args),edges=builderAuthEdges127().filter(edge=>builderAuthApplies127(edge,ensureRelationshipDetails(edge).protocol));
+  const section=`## Relationship authentication\n\n| Relationship | Required | Authentication type |\n|---|---|---|\n${edges.map(edge=>{const details=ensureRelationshipDetails(edge);return`| ${builderAuthCell127(componentInstanceLabel(edge.source))} → ${builderAuthCell127(componentInstanceLabel(edge.target))} | ${details.authenticationRequired} | ${builderAuthCell127(details.authenticationType)} |`}).join('\n')||'| No applicable relationships | — | — |'}\n\n`;
+  return report.includes('## Failure analysis')?report.replace('## Failure analysis',section+'## Failure analysis'):report+'\n'+section;
+};
+const builderAuthTestsBefore127=generatedTestPlan;
+generatedTestPlan=function(...args){
+  const plan=builderAuthTestsBefore127(...args),edges=builderAuthEdges127().filter(edge=>builderAuthApplies127(edge,ensureRelationshipDetails(edge).protocol));
+  return plan+`\n\n## Relationship authentication checks\n\n${edges.map(edge=>{const details=ensureRelationshipDetails(edge),route=`${componentInstanceLabel(edge.source)} → ${componentInstanceLabel(edge.target)}`;return`- ${route}: authentication ${details.authenticationRequired.toLowerCase()}${details.authenticationRequired==='Yes'?` via ${details.authenticationType}`:''}; confirm the configured mechanism without recording credentials.`}).join('\n')||'- No applicable relationships.'}`;
+};
+document.title='Splunk Pipeline Explorer · Build 127 · 29 Sep 2026';
+$('#topologyBuilder').dataset.buildNumber='127';$('#topologyBuilder').dataset.buildDate='2026-09-29';
+const builderAuthStamp127=$('.builderBuildStamp');
+if(builderAuthStamp127){builderAuthStamp127.setAttribute('aria-label','Build 127, dated 29 September 2026');builderAuthStamp127.querySelector('b').textContent='Build 127';const date=builderAuthStamp127.querySelector('time');if(date){date.dateTime='2026-09-29';date.textContent='29 Sep 2026'}}
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Relationship authentication','Record whether an applicable connection needs authentication and which mechanism it uses; preserve this in topology JSON and assurance output without storing credentials.',true]);
 if(state.view==='changes')renderChanges();
 </script>
 
