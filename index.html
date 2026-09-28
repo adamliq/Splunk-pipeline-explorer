@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 127 · 29 Sep 2026</title>
+  <title>Splunk Pipeline Explorer · Build 128 · 29 Sep 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,9 +202,9 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="127" data-build-date="2026-09-29">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="128" data-build-date="2026-09-29">
     <div class="builderHead">
-      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 127, dated 29 September 2026"><b>Build 127</b><time datetime="2026-09-29">29 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
+      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 128, dated 29 September 2026"><b>Build 128</b><time datetime="2026-09-29">29 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
         <div class="builderActions"><div class="builderHistoryControls"><button class="builderBtn" id="builderUndo" disabled>↶ Undo <kbd>Ctrl Z</kbd></button><button class="builderBtn" id="builderRedo" disabled>↷ Redo <kbd>Ctrl Y</kbd></button><button class="builderBtn" id="builderHistoryToggle" aria-expanded="false">History <span class="builderHistoryCount" id="builderHistoryCount">0</span></button></div><button class="builderBtn" id="builderLoadPath">Load selected path</button><button class="builderBtn" id="builderClear">Clear</button><button class="builderBtn" id="builderFailure">Open in Failure Lab</button><button class="builderBtn primary" id="builderUse">Use in explorer</button></div>
         <div class="builderPersistence"><select id="builderSaved" aria-label="Saved custom topologies"><option value="">Saved topologies</option></select><button class="builderBtn" id="builderSave">Save</button><button class="builderBtn" id="builderLoadSaved">Load</button><button class="builderBtn" id="builderImport">Import JSON</button><button class="builderBtn" id="builderExport">Export JSON</button><input id="builderImportFile" type="file" accept="application/json,.json" hidden></div>
@@ -4963,6 +4963,157 @@ $('#topologyBuilder').dataset.buildNumber='127';$('#topologyBuilder').dataset.bu
 const builderAuthStamp127=$('.builderBuildStamp');
 if(builderAuthStamp127){builderAuthStamp127.setAttribute('aria-label','Build 127, dated 29 September 2026');builderAuthStamp127.querySelector('b').textContent='Build 127';const date=builderAuthStamp127.querySelector('time');if(date){date.dateTime='2026-09-29';date.textContent='29 Sep 2026'}}
 changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Relationship authentication','Record whether an applicable connection needs authentication and which mechanism it uses; preserve this in topology JSON and assurance output without storing credentials.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
+<style id="builder-review-polish-v128-styles">
+.topologyBuilder #builderPalettePin126[hidden]{display:none!important}
+.topologyBuilder .builderRelationshipAuthSummary128{display:flex;align-items:center;justify-content:space-between;gap:9px;margin:9px 0 12px;padding:9px 10px;border:1px solid #35576b;border-radius:8px;background:#0b1e2a;color:#cfdfeb;font-size:.72rem;line-height:1.35}
+.topologyBuilder .builderRelationshipAuthSummary128[hidden]{display:none!important}
+.builderRelationshipAuthSummary128 span{min-width:0;overflow-wrap:anywhere}
+.builderRelationshipAuthSummary128 button{flex:none;border:1px solid #487085;border-radius:6px;padding:5px 8px;background:#133345;color:#d9f2f2;font-size:.69rem;cursor:pointer}
+.builderRelationshipAuthSummary128 button:hover,.builderRelationshipAuthSummary128 button:focus-visible{border-color:#83d4df}
+</style>
+<script id="builder-review-polish-v128">
+/* Keep the desktop pin preference without opening a full-screen drawer on mobile. */
+const builderPaletteMedia128=window.matchMedia('(min-width:1121px)');
+let builderPaletteRemembered128=builderPalettePinned126;
+const builderPaletteSyncBefore128=syncCanvasPanels;
+syncCanvasPanels=function(...args){
+  if(builderPaletteMedia128.matches)builderPaletteRemembered128=builderPalettePinned126;
+  const result=builderPaletteSyncBefore128(...args);
+  builderPalettePin126.hidden=!builderPaletteMedia128.matches;
+  builderPalettePin126.disabled=!builderPaletteMedia128.matches;
+  if(!builderPaletteMedia128.matches)builderPalettePin126.title='Pin is available on wider screens';
+  return result;
+};
+function builderPaletteResponsive128(){
+  if(builderPaletteMedia128.matches){builderPalettePinned126=builderPaletteRemembered128}
+  else{builderPaletteRemembered128=builderPalettePinned126||builderPaletteRemembered128;builderPalettePinned126=false;canvasPanelState.palette=false}
+  syncCanvasPanels();
+  positionBuilderPalette();
+  if(state.view==='builder'&&!state.builderCanvasFocus)requestAnimationFrame(()=>fitBuilderView(false));
+}
+builderPaletteMedia128.addEventListener('change',builderPaletteResponsive128);
+builderPaletteResponsive128();
+const builderPaletteCloseBefore128=$('#builderPaletteDrawerClose').onclick;
+$('#builderPaletteDrawerClose').onclick=function(...args){
+  if(!builderPaletteMedia128.matches)return builderPaletteCloseBefore126.apply(this,args);
+  return builderPaletteCloseBefore128.apply(this,args);
+};
+
+/* Reposition exported labels after v125 changes the actual connector paths. */
+const builderPackSvgBefore128=architectureSvgForScope;
+architectureSvgForScope=function(scope,titleOverride=''){
+  const source=builderPackSvgBefore128(scope,titleOverride),doc=new DOMParser().parseFromString(source,'image/svg+xml');
+  if(doc.querySelector('parsererror'))return source;
+  const root=doc.documentElement,topology=[...root.children].filter(child=>child.localName==='g').at(-1);
+  if(!topology)return source;
+  const paths=[...topology.children].filter(child=>child.localName==='path'&&child.hasAttribute('marker-end'));
+  const labels=[...topology.children].filter(child=>child.localName==='g'&&child.querySelector(':scope > rect[height="22"]:not([width="190"])'));
+  const boxes=[...topology.children].filter(child=>child.localName==='g'&&child.querySelector(':scope > rect[width="190"][height="142"]'))
+    .map(child=>{const coords=String(child.getAttribute('transform')||'').match(/translate\(\s*([-\d.]+)[ ,]+([-\d.]+)/);return coords?{x:Number(coords[1]),y:Number(coords[2]),w:190,h:142}:null}).filter(Boolean);
+  const offsets=withArchitectureExportScope(scope,()=>builderTraceEdges('all').filter(edge=>state.builderVisiblePlanes[edge.plane])
+    .map(edge=>({...ensureRelationshipRouting(edge.edge).labelOffset})));
+  paths.forEach((path,index)=>{
+    const label=labels[index],width=Number(label?.querySelector(':scope > rect')?.getAttribute('width'))||0;
+    if(!label||!width)return;
+    let pointAt=null;
+    try{const length=path.getTotalLength();if(length>0)pointAt=fraction=>path.getPointAtLength(length*fraction)}catch{}
+    if(!pointAt){const line=String(path.getAttribute('d')||'').match(/^M\s*([-\d.]+)[ ,]+([-\d.]+)\s*L\s*([-\d.]+)[ ,]+([-\d.]+)\s*$/i);
+      if(line){const [x1,y1,x2,y2]=line.slice(1).map(Number);pointAt=fraction=>({x:x1+(x2-x1)*fraction,y:y1+(y2-y1)*fraction})}}
+    if(!pointAt)return;
+    const offset=offsets[index]||{x:0,y:0};let best=null;
+    for(const fraction of [.5,.45,.55,.4,.6,.35,.65,.3,.7]){
+      const point=pointAt(fraction),x=point.x-width/2+offset.x,y=point.y-11+offset.y,
+        overlap=boxes.some(box=>x<box.x+box.w+4&&x+width>box.x-4&&y<box.y+box.h+4&&y+22>box.y-4);
+      if(!best)best={x,y};
+      if(!overlap){best={x,y};break}
+    }
+    label.setAttribute('transform',`translate(${best.x} ${best.y})`);
+    const badge=label.querySelector('.builderEdgeIssueMarker');
+    if(badge)badge.setAttribute('transform',`translate(${width+15} 11)`);
+  });
+  return'<?xml version="1.0" encoding="UTF-8"?>'+new XMLSerializer().serializeToString(root);
+};
+
+/* Split wide connection registers and omit empty planes before the TOC is counted. */
+const builderPackContentBefore128=builderV125ContentPages125;
+builderV125ContentPages125=function(){
+  const originals=builderPackContentBefore128(),edges=builderTraceEdges('all'),pages=[];
+  const empty=['management','authentication'].filter(plane=>!edges.some(edge=>edge.plane===plane));
+  const notice=state.builderExport.sections.connections&&empty.length?`<p class="summary">No ${empty.map(plane=>plane==='management'?'fleet-management':'interactive-authentication').join(' or ')} connections in this topology.</p>`:'';
+  for(const page of originals){
+    const match=page.id.match(/^connections-(data|management|authentication)-(\d+)$/);
+    if(match){
+      const plane=match[1],index=Number(match[2]),chunk=edges.filter(edge=>edge.plane===plane).slice((index-1)*11,index*11);
+      if(!chunk.length)continue;
+      const label={data:'Event data',management:'Fleet management',authentication:'Interactive authentication'}[plane],name=edge=>builderV125Text125(builderV125EdgeName125(edge));
+      const transport=builderV125Table125(['From → To','Protocol','Endpoint','Port','TLS','Authentication required','Authentication type','Direction'],
+        chunk.map(edge=>{const d=ensureRelationshipDetails(edge.edge),auth=builderAuthApplies127(edge.edge,d.protocol);
+          return[name(edge),builderV125Cell125(d.protocol),builderV125Cell125(d.endpoint),builderV125Cell125(d.port),builderV125Cell125(d.tls),
+            builderV125Cell125(auth?d.authenticationRequired:'Not applicable'),builderV125Cell125(auth?d.authenticationType:'Not applicable'),builderV125Cell125(d.direction)]}));
+      const assurance=builderV125Table125(['From → To','Acknowledgement','Owner','Availability SLO','Latency SLO (s)','Retry / replay','Criticality','Validation','Notes'],
+        chunk.map(edge=>{const d=ensureRelationshipDetails(edge.edge);return[name(edge),builderV125Cell125(d.acknowledgement),builderV125Cell125(d.owner),
+          builderV125Cell125(d.availabilitySlo),builderV125Cell125(d.latencySloSeconds),builderV125Cell125(d.retryPolicy),
+          builderV125Cell125(d.criticality),builderV125Cell125(d.validation),builderV125Cell125(d.notes)]}));
+      pages.push(builderV125Page125(`${page.id}-transport`,`${label} · transport${index>1?` ${index}`:''}`,(plane==='data'&&index===1?notice:'')+transport));
+      pages.push(builderV125Page125(`${page.id}-assurance`,`${label} · assurance${index>1?` ${index}`:''}`,assurance));
+    }else if(page.id==='deployment'&&!state.builderNodes.some(node=>node.type==='ds'))continue;
+    else pages.push(page);
+  }
+  if(notice&&!pages.some(page=>page.id==='connections-data-1-transport')&&pages.length)pages[0].content=notice+pages[0].content;
+  return pages;
+};
+const builderPackPagesBefore128=builderV125PackPages125;
+builderV125PackPages125=function(){
+  const pages=builderPackPagesBefore128(),edges=builderTraceEdges('all');
+  if(state.builderExport.sections.connections&&!edges.length&&pages[0]?.id==='cover'&&!pages.some(page=>page.content.includes('connections in this topology.')))
+    pages[0].content+='<p class="summary">No connections in this topology.</p>';
+  return pages;
+};
+const builderPackHtmlBefore128=architecturePackHtml;
+architecturePackHtml=function(){
+  const html=builderPackHtmlBefore128();
+  const css=`\n/* Build 128: readable, wrapping register cells and accessible light SVG captions. */
+.packPreview125 table{width:100%;max-width:100%;table-layout:fixed;font-size:13px}
+.packPreview125 th,.packPreview125 td{font-size:13px;overflow-wrap:anywhere;white-space:normal;word-break:normal}
+body.theme-light .diagram svg .classification{fill:#8a5a00!important}
+body.theme-light .diagram svg .legend,body.theme-light .diagram svg .subtitle{fill:#345164!important}
+@media print{.packPreview125 table{table-layout:fixed;font-size:9.5pt!important}
+.packPreview125 th,.packPreview125 td{font-size:9.5pt!important;line-height:1.18;overflow-wrap:anywhere;padding:2px 3px}}
+`;
+  return html.replace('</style></head>',css+'</style></head>');
+};
+
+/* Surface relationship authentication above the collapsed advanced Inspector. */
+const builderAuthSummary128=document.createElement('div');
+builderAuthSummary128.id='builderRelationshipAuthSummary128';builderAuthSummary128.className='builderRelationshipAuthSummary128';
+builderAuthSummary128.hidden=true;
+$('#builderInspectorBasic')?.insertAdjacentElement('afterend',builderAuthSummary128);
+function builderAuthSummarySync128(){
+  const selected=state.builderSelectedEdge,edge=selected&&!state.builderConnectionDraft?builderEdgeRecord(selected.plane,selected.id):null;
+  const d=edge&&ensureRelationshipDetails(edge);
+  if(!d||!builderAuthApplies127(edge,d.protocol)){builderAuthSummary128.hidden=true;builderAuthSummary128.replaceChildren();return}
+  builderAuthSummary128.hidden=false;
+  const summary=d.authenticationRequired==='No'?'Authentication: not required':d.authenticationRequired==='Yes'&&d.authenticationType!=='Not specified'
+    ?`Authentication: ${d.authenticationType} · required`:'Authentication: not specified';
+  const span=document.createElement('span'),button=document.createElement('button');span.textContent=summary;
+  button.type='button';button.textContent=d.authenticationRequired==='Unknown'?'Set…':'Edit';button.setAttribute('aria-label','Edit relationship authentication');
+  button.onclick=()=>{const advanced=$('#builderInspectorAdvanced');if(advanced)advanced.open=true;
+    const type=$('#builderRelationshipInspector [data-relationship-field="authenticationType"]');
+    const field=type&&!type.disabled?type:$('#builderRelationshipInspector [data-relationship-field="authenticationRequired"]');
+    field?.focus({preventScroll:true});field?.scrollIntoView({block:'nearest'})};
+  builderAuthSummary128.replaceChildren(span,button);
+}
+const builderAuthInspectorBefore128=renderSelectedBuilderEdgeInspector;
+renderSelectedBuilderEdgeInspector=function(...args){const result=builderAuthInspectorBefore128(...args);builderAuthSummarySync128();return result};
+builderAuthSummarySync128();
+
+document.title='Splunk Pipeline Explorer · Build 128 · 29 Sep 2026';
+$('#topologyBuilder').dataset.buildNumber='128';$('#topologyBuilder').dataset.buildDate='2026-09-29';
+const builderStamp128=$('.builderBuildStamp');if(builderStamp128){builderStamp128.setAttribute('aria-label','Build 128, dated 29 September 2026');builderStamp128.querySelector('b').textContent='Build 128';const date=builderStamp128.querySelector('time');if(date){date.dateTime='2026-09-29';date.textContent='29 Sep 2026'}}
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Architecture pack print polish','Place exported labels on final paths, enlarge and split connection registers, improve light-theme captions and omit empty section pages.',true],['Responsive palette and authentication summary','Keep a desktop palette pin dormant on mobile and show a direct authentication edit action for selected relationships.',true]);
 if(state.view==='changes')renderChanges();
 </script>
 
