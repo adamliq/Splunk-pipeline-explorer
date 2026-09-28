@@ -3646,5 +3646,85 @@ changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['B
 if(state.view==='changes')renderChanges();
 </script>
 
+<style id="builder-desktop-density-v113-styles">
+@media (min-width:1121px){
+  .topologyBuilder .builderHead{align-items:center;gap:10px;padding:8px 14px}
+  .topologyBuilder .builderHead>div:first-child{min-width:0}
+  .topologyBuilder .builderHead p{margin-top:2px;line-height:1.2}
+  .topologyBuilder .builderWorkspace{padding:10px}
+  .topologyBuilder .builderToolbar,.topologyBuilder .builderPlaneBar{margin-bottom:7px}
+  .topologyBuilder .builderActionWrap{display:flex;align-items:center;gap:8px;min-width:0}
+  .builderDensityHeaderPrimary{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap}
+  .builderDensityHeaderPrimary .builderHistoryControls{display:flex;gap:5px}
+  .builderDensityHeaderPrimary .builderBtn{padding:6px 8px}
+  .topologyBuilder .builderIoStatus:empty{display:none}
+  .builderDensityExtraActions{display:grid;gap:8px;min-width:0}
+  .builderDensityExtraActions .builderActions,.builderDensityExtraActions .builderPersistence{justify-content:flex-start}
+  .builderDensityDock{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(225px,1.5fr);gap:6px;align-items:center;margin:0 0 9px;min-width:0}
+  .builderDensityToggle{display:flex;align-items:center;justify-content:space-between;gap:5px;min-width:0;min-height:35px;padding:6px 9px;border:1px solid #355669;border-radius:8px;background:#0d2130;color:#d2e7ee;font-weight:700;font-size:.68rem;line-height:1.2;font-family:inherit;cursor:pointer;text-align:left;white-space:nowrap}
+  .builderDensityToggle::before{content:'▸';color:#84cedc}
+  .builderDensityToggle[aria-expanded="true"]::before{content:'▾'}
+  .builderDensityToggle span{overflow:hidden;text-overflow:ellipsis}
+  .builderDensityToggle:focus-visible{outline:2px solid #8fd5df;outline-offset:2px}
+  .builderDensityDock .builderGroupBar{min-width:0;margin:0;min-height:35px;padding:3px 5px;overflow:hidden}
+  .builderDensityDock .builderGroupBar>span{display:none}
+  .builderDensityDock .builderGroupChips{min-width:0;overflow:auto;scrollbar-width:thin}
+  .builderDensityDock .builderGroupAdd{padding:5px 7px;font-size:.61rem}
+  .builderDensityPanels{grid-column:1/-1;min-width:0}
+  .builderDensityPanels:empty{display:none}
+  .builderDensityPanels>details:not([open]){display:none}
+  .builderDensityPanels>details[open]{margin:0;min-width:0}
+  .builderDensityPanels>details>summary{display:none}
+  .builderDensityPanels .builderFindNavigateBody{display:grid;gap:6px;padding:8px;border:1px solid #355669;border-radius:9px;background:#0d2130;overflow-x:auto}
+  .builderDensityPanels .builderSearchBar,.builderDensityPanels .builderLargeNav{margin:0}
+  .builderDensityPanels .builderSecondaryToolsBody{max-height:52vh;overflow:auto}
+  .topologyBuilder .builderCanvas{min-height:clamp(480px,calc(100dvh - 300px),760px)}
+  .topologyBuilder.canvasFocus .builderDensityDock,.topologyBuilder:fullscreen .builderDensityDock{display:none!important}
+  .topologyBuilder.canvasFocus .builderCanvas{min-height:max(560px,calc(100dvh - 165px))}
+  .topologyBuilder:fullscreen .builderCanvas{min-height:340px}
+}
+</style>
+<script id="builder-desktop-density-v113">
+/* Keep the existing control nodes and their listeners; restore their positions on narrow screens. */
+const builderDensityMedia=window.matchMedia('(min-width:1121px)'),builderDensityWorkspace=$('.builderWorkspace');
+const builderDensityDock=document.createElement('div');builderDensityDock.className='builderDensityDock';builderDensityDock.setAttribute('aria-label','Find, review and group controls');
+const builderDensityPanels=document.createElement('div');builderDensityPanels.className='builderDensityPanels';
+const builderFindNavigate=document.createElement('details');builderFindNavigate.id='builderFindNavigate';builderFindNavigate.innerHTML='<summary>Find &amp; navigate</summary><div class="builderFindNavigateBody"></div>';
+const builderDensityHeaderPrimary=document.createElement('div');builderDensityHeaderPrimary.className='builderDensityHeaderPrimary';
+const builderDensityExtraActions=document.createElement('div');builderDensityExtraActions.className='builderDensityExtraActions';
+const builderDensityMoves=new Map();
+function builderDensityMove(node,target){if(!node||!target)return;if(!builderDensityMoves.has(node)){const marker=document.createComment('Builder original position');node.before(marker);builderDensityMoves.set(node,marker)}target.appendChild(node)}
+function builderDensityRestore(){for(const [node,marker] of builderDensityMoves){marker.replaceWith(node)}builderDensityMoves.clear()}
+const builderDensityPanelIds=['builderFindNavigate','builderRuleProfileDisclosure','builderReviewDisclosure','builderSecondaryTools'];
+for(const [index,label] of ['Find & navigate','Architecture profile','Review findings','Tools'].entries()){
+  const button=document.createElement('button');button.type='button';button.className='builderDensityToggle';button.setAttribute('aria-controls',builderDensityPanelIds[index]);button.setAttribute('aria-expanded','false');button.innerHTML=`<span>${label}</span>`;
+  button.addEventListener('click',()=>{const target=$('#'+builderDensityPanelIds[index]),next=!target.open;for(const id of builderDensityPanelIds){const panel=$('#'+id);if(panel&&panel!==target)panel.open=false}target.open=next;builderDensitySync();if(next&&index===0)$('#builderSearchInput')?.focus()});
+  builderDensityDock.appendChild(button);
+}
+builderDensityDock.appendChild(builderDensityPanels);
+function builderDensitySync(){for(const button of builderDensityDock.querySelectorAll('.builderDensityToggle')){const panel=$('#'+button.getAttribute('aria-controls'));button.setAttribute('aria-expanded',String(!!panel?.open));const label=button.querySelector('span');if(panel?.id==='builderRuleProfileDisclosure')label.textContent='Architecture profile '+($('#builderRuleProfileDisclosureStatus')?.textContent||'');if(panel?.id==='builderReviewDisclosure')label.textContent='Review findings '+($('#builderReviewDisclosureStatus')?.textContent||'');if(panel?.id==='builderSecondaryTools')label.textContent='Tools '+($('#builderSecondaryToolsStatus')?.textContent||'')}}
+function builderDensityLayout(){
+  if(!builderDensityMedia.matches){builderDensityRestore();builderDensityDock.remove();builderFindNavigate.remove();builderDensityHeaderPrimary.remove();builderDensityExtraActions.remove();return}
+  const group=$('#builderGroupBar');builderDensityWorkspace.insertBefore(builderDensityDock,group);
+  builderDensityMove(group,builderDensityDock);
+  builderDensityPanels.appendChild(builderFindNavigate);
+  for(const id of ['builderSearchBar','builderLargeNav'])builderDensityMove($('#'+id),builderFindNavigate.querySelector('.builderFindNavigateBody'));
+  for(const id of builderDensityPanelIds.slice(1))builderDensityMove($('#'+id),builderDensityPanels);
+  const actionWrap=$('.builderActionWrap');actionWrap.prepend(builderDensityHeaderPrimary);
+  for(const selector of ['.builderHistoryControls','#builderSaved','#builderSave','#builderUse'])builderDensityMove($(selector),builderDensityHeaderPrimary);
+  $('#builderSecondaryToolsBody')?.prepend(builderDensityExtraActions);
+  for(const selector of ['.builderActions','.builderPersistence'])builderDensityMove($(selector),builderDensityExtraActions);
+  builderDensitySync();
+}
+for(const id of builderDensityPanelIds.slice(1))$('#'+id)?.addEventListener('toggle',builderDensitySync);
+builderFindNavigate.addEventListener('toggle',builderDensitySync);
+builderDensityMedia.addEventListener('change',builderDensityLayout);
+document.addEventListener('keydown',event=>{if(builderDensityMedia.matches&&state.view==='builder'&&event.key==='/'&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&!event.target.matches?.('input,textarea,select,[contenteditable="true"]')){builderFindNavigate.open=true;builderDensitySync()}},true);
+const renderBuilderBeforeDensity=renderBuilder;renderBuilder=function(...args){const result=renderBuilderBeforeDensity(...args);if(builderDensityMedia.matches)builderDensitySync();return result};
+builderDensityLayout();
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Compact desktop Builder workspace','Place search, navigation, architecture profile, Review findings, Tools and containers in one expandable row; show history and save controls beside the title.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
 </body>
 </html>
