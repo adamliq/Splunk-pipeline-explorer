@@ -1,6 +1,6 @@
 # Builder handoff: Build 127 review
 
-> **Superseded by [`builder-handoff-build128.md`](builder-handoff-build128.md)** (Build 128 review: five of these six items are fixed; see that file for what remains, plus the Group-by feature). Kept as the Build 127 review record.
+> **Superseded by [`builder-handoff-build130.md`](builder-handoff-build130.md)** (Build 128 review: five of these six items are fixed; see that file for what remains, plus the Group-by feature). Kept as the Build 127 review record.
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Reviewed:** `main` at `e4a1009` (Build 127, 29 Sep 2026: v125 architecture pack, v126 palette pin, v127 relationship authentication), also merged into branch `claude/build-page-layout-bl6jk1`

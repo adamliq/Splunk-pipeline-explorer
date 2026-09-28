@@ -1,6 +1,6 @@
 # Builder handoff: Build 122 review
 
-> **Superseded by [`builder-handoff-build128.md`](builder-handoff-build128.md).** Build 123 addresses the items below; see that file for what remains. Kept as history.
+> **Superseded by [`builder-handoff-build130.md`](builder-handoff-build130.md).** Build 123 addresses the items below; see that file for what remains. Kept as history.
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Reviewed:** `main` at `f716f72` (Build 122, 28 Sep 2026), also merged into branch `claude/build-page-layout-bl6jk1`
