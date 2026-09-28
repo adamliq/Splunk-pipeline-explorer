@@ -4,15 +4,16 @@
 **Baseline:** `main` at `44f1086` (Build 130, 29 Sep 2026), also merged into branch `claude/build-page-layout-bl6jk1`. There is no newer build; this is a new version of the task list, not a new review.
 **History:** `builder-handoff-build130.md` (the Build 130 review these items come from) and earlier.
 **Tool:** `node tools/builder-connector-check.js index.html [screenshot-dir]` (Playwright/Chromium).
-**Mockups:** `docs/mockups/builder-grouping-mockup.html` (Group by) and **`docs/mockups/architecture-ov1-mockup.html` (the new OV-1 page, item 7)**. Both are standalone; open them in a browser.
+**Mockups:** `docs/mockups/builder-grouping-mockup.html` (Group by), **`docs/mockups/architecture-ov1-mockup.html` (the new OV-1 page, item 7)** and **`docs/mockups/architecture-ov2-mockup.html` (the new OV-2 page, item 8)**. All are standalone; open them in a browser.
 
 ## TL;DR
 
 1. **P0 first:** Group by → Tier lanes / Component type crashes in the normal layout. A tested one-line fix is in item 1.
 2. **Items 2–6:** smaller Group-by, connector and mobile issues, plus optional authentication extras, carried over from the Build 130 review.
 3. **Item 7 (new feature): an OV-1 High-Level Operational Concept page** in the architecture pack, generated mostly from data the Builder already holds, with three new optional fields.
+4. **Item 8 (new feature): an OV-2 Operational Resource Flow page** (operational nodes, needlines, a resource flow table and an operational node table). It reuses item 7's tier and region grouping and adds three optional per-connection fields.
 
-Suggested order: item 1, then 2–5, then item 7 (6 is optional).
+Suggested order: item 1, then 2–5, then item 7, then item 8 (6 is optional).
 
 ## Rules for every future build (unchanged)
 
@@ -147,10 +148,70 @@ All three are saved in the topology document and layout profiles. Empty values s
 
 ---
 
+## 8. New feature: OV-2 Operational Resource Flow page in the architecture pack
+
+**Mockup:** `docs/mockups/architecture-ov2-mockup.html` (same example data as the OV-1 mockup). It's the visual and content reference. Its SVG coordinates and the `NEEDLINES`/`FLOWS`/`NODES` arrays in its script are hand-written sample data; generate the real page from the model.
+
+**Idea:** OV-2 is the same topology seen one level up. **Operational nodes** replace components, **needlines** replace individual connections, and a **resource flow** table lists what each needline carries. OV-1 shows the concept; OV-2 is the table an assessor checks.
+
+### What the page contains (in order)
+1. **Classification banners and title block,** as on the OV-1 page, with the view name "OV-2 · Operational Resource Flow Description", and a one-line purpose: "Who exchanges what information with whom, to support which activity, and how it's protected."
+2. **Diagram** (SVG):
+   - **Location frames:** one per region; one "Cloud" frame for cloud source types and cloud identity/SOAR components; platform tiers that span several regions go in one **"Multisite"** frame. People and response components go in a **"Security operations"** frame.
+   - **Operational nodes** (`ON-1`, `ON-2`, …): one per **tier × region** group, using the same tier lookup as Group by → Tier lanes (item 1 fix) and the same zones as OV-1. Management components (Deployment Server, License Manager, Monitoring Console, cluster managers) form one "Platform management" node per region. Each node box shows its ID, name, activity (from the tier, for example "Collect, buffer and forward") and a short "realised by" line.
+   - **Default node names:** "<Tier label> · <Region>" (for example "Site collection · Sydney"), editable in the pack options (`state.builderExport.ov2.nodeNames[nodeKey]`, where `nodeKey` is `tier|region`).
+   - **Needlines** (`N1`, `N2`, …): all connections between the same two operational nodes merge into one needline. Number them in pipeline order (sources → collection → indexing → search → people), then management, authentication and response. Line style by plane, the same as OV-1 (event data solid, fleet management dashed, authentication dotted, alerts and response in the fourth colour). Each needline has a pill with its ID and the IDs of its flows ("N1 · RF-01, RF-02").
+   - A needline carrying a flagged flow (see "Flows to review") gets the review colour on its pill.
+3. **Legend:** the four line styles, the review marker, and "Node" / "Location frame".
+4. **Resource flows table** (the core of the page). One row per connection, or per distinct resource when a connection has several. Columns:
+   | Column | Source |
+   |---|---|
+   | Flow ID (`RF-01`…) | Generated, in needline order |
+   | Needline | Its needline ID |
+   | From → To | Operational node IDs (a chain such as "ON-10 → ON-11 → ON-8" for authentication) |
+   | Resource exchanged | **New field** (see below); "Not set" when empty |
+   | Activity supported | **New field**; "Not set" when empty |
+   | Transport and protection | Relationship details: protocol, port, TLS, acknowledgement, authentication type ("S2S TCP 9997 · TLS · indexer ACK") |
+   | Timeliness | Latency SLO; poll interval for management flows; "on demand" for search |
+   | Classification | **New field**; defaults to the pack classification |
+
+   Flagged rows show a review marker and the finding text (for example RF-02, "PII over an unencrypted handoff").
+5. **Operational nodes table:** ID, name, activity, location, and **Realised by** (the member component types with counts or "instances represented", as in OV-1). This traces each OV-2 node to the component diagrams later in the pack.
+6. **Footer:** as on OV-1, with "Page n of N · OV-2".
+
+### Flows to review
+Mark a flow (and its needline) when the review rules already produce a **security** finding on that connection, for example sensitive data over a handoff without TLS, or "Authentication required = Yes" with no type (item 6). Use `evaluateArchitectureRules()`; don't add new rules for this page.
+
+### New optional fields (per connection, in the connection inspector's Advanced section, next to authentication)
+- **Resource exchanged:** short text, for example "Windows Security and Sysmon events".
+- **Activity supported:** short text, or a pick from a per-pack list of activities (`state.builderExport.ov2.activities`), for example "Detect host compromise".
+- **Classification:** a dropdown whose first option is "Same as pack (<pack classification>)", then the pack's classification values. Use it when a flow carries less than the pack level (for example configuration bundles → "Internal").
+Store all three in the relationship details (`ensureRelationshipDetails(edge)`), and include them in `topologyDocument()`, the connection register table and re-import. **No free-text fields for secrets**, as with authentication. Empty "Resource exchanged" and "Activity supported" values go in the open-questions appendix as "Not set".
+
+### Interaction (on-screen preview only)
+Hovering over or clicking a needline pill, a flow row or a node row highlights the matching needline, its two end nodes and its rows in both tables, and dims the rest; Esc clears it (as in the mockup). This is optional in the downloaded HTML and absent in print.
+
+### Pack integration
+- Add **"OV-2 operational resource flows"** to the pack's Sections checkboxes, on by default, straight after OV-1, in the table of contents.
+- Light and dark themes via the pack's theme tokens; light theme text on the page background ≥ 4.5:1.
+- Print: the diagram fits one A4-landscape page at ≥ 9pt; the tables follow at ≥ 9.5pt (the Build 128 rule), with header rows repeating; wide tables wrap cell text rather than shrink it.
+- At phone width, the diagram and tables scroll inside their own boxes; the page itself never scrolls sideways.
+
+### Acceptance check
+- **Default topology:** 4 operational nodes (sources, collection, forwarding, indexing, all in the "Unspecified" region frame), 3 needlines, 3 flows; "Resource exchanged" and "Activity supported" show "Not set" and are listed in the appendix.
+- **Build 130 test topology** (3 UFs + Deployment Server): the UFs sit in one node; the Deployment Server is a "Platform management" node with one dashed needline to it; the three phone-home connections merge into one needline with one flow row per distinct resource.
+- **Two regions:** separate location frames and nodes per region; the indexing and search nodes go in the "Multisite" frame when their components span both regions.
+- **A flagged connection** (syslog without TLS carrying PII): its flow row and needline pill show the review marker, and the finding text matches the findings table.
+- The three new fields survive export → re-import; "Classification" falls back to the pack classification when not set.
+- Every connection in the topology appears in exactly one flow row (flow count ≥ connection count; no connection missing).
+- The Chromium PDF has OV-2 after OV-1, with page numbers; 0 `pageerror` events while previewing and downloading.
+
+---
+
 ## How to verify (run before every upload)
 1. Zero `pageerror` events at 1280×800, 1440×900, 1920×1080 and 390×844, and across a 1440→1000→1440 resize.
 2. **Grouping sweep:** switch `#builderGroupBy130` through all six options in auto/horizontal layout and in free layout, with the default topology and a 3-UF + Deployment Server topology. Expect 0 errors, and nodes inside their lanes.
 3. `node tools/builder-connector-check.js index.html shots/`: every scenario `OK` (scenario 9 once added, in each grouping mode).
 4. Button sweep: every `#topologyBuilder` button, on a fresh page, with its context revealed, gives no errors and a visible effect. Note that dropdowns such as Group by aren't covered by the button sweep, so step 2 above covers them.
-5. Architecture pack: export with all sections on (including OV-1), in both themes; the Build 128 checks and the item 7 acceptance check pass.
+5. Architecture pack: export with all sections on (including OV-1 and OV-2), in both themes; the Build 128 checks and the item 7 and item 8 acceptance checks pass.
 6. Add a `changeRegister` entry for each new block.
