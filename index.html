@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 121 · 28 Sep 2026</title>
+  <title>Splunk Pipeline Explorer · Build 122 · 28 Sep 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,9 +202,9 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="121" data-build-date="2026-09-28">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="122" data-build-date="2026-09-28">
     <div class="builderHead">
-      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 121, dated 28 September 2026"><b>Build 121</b><time datetime="2026-09-28">28 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
+      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 122, dated 28 September 2026"><b>Build 122</b><time datetime="2026-09-28">28 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
         <div class="builderActions"><div class="builderHistoryControls"><button class="builderBtn" id="builderUndo" disabled>↶ Undo <kbd>Ctrl Z</kbd></button><button class="builderBtn" id="builderRedo" disabled>↷ Redo <kbd>Ctrl Y</kbd></button><button class="builderBtn" id="builderHistoryToggle" aria-expanded="false">History <span class="builderHistoryCount" id="builderHistoryCount">0</span></button></div><button class="builderBtn" id="builderLoadPath">Load selected path</button><button class="builderBtn" id="builderClear">Clear</button><button class="builderBtn" id="builderFailure">Open in Failure Lab</button><button class="builderBtn primary" id="builderUse">Use in explorer</button></div>
         <div class="builderPersistence"><select id="builderSaved" aria-label="Saved custom topologies"><option value="">Saved topologies</option></select><button class="builderBtn" id="builderSave">Save</button><button class="builderBtn" id="builderLoadSaved">Load</button><button class="builderBtn" id="builderImport">Import JSON</button><button class="builderBtn" id="builderExport">Export JSON</button><input id="builderImportFile" type="file" accept="application/json,.json" hidden></div>
@@ -4217,6 +4217,58 @@ syncCanvasPanels=function(...args){const result=builderReviewSyncPanelsBefore121
 syncCanvasPanels();polishBuilderStatus();positionBuilderInspector();positionBuilderPalette();if(builderSheetMedia.matches)renderUnifiedPlaneControls();
 document.title='Splunk Pipeline Explorer · Build 121 · 28 Sep 2026';$('#topologyBuilder').dataset.buildNumber='121';$('#topologyBuilder').dataset.buildDate='2026-09-28';const builderReviewStamp121=$('.builderBuildStamp');if(builderReviewStamp121){builderReviewStamp121.setAttribute('aria-label','Build 121, dated 28 September 2026');builderReviewStamp121.querySelector('b').textContent='Build 121'}
 changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Builder review fixes','Restore the desktop toolbar and keep the compact header, Focus actions, canvas panels, mobile controls and accessibility consistent.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+
+<style id="builder-final-polish-v122-styles">
+@media (min-width:1121px){
+  .topologyBuilder .builderBuildTitle{flex-wrap:nowrap;white-space:nowrap}
+  .topologyBuilder .builderBuildTitle h2{white-space:nowrap}
+  .topologyBuilder .builderHead>div:first-child{flex:1 1 auto;min-width:0}
+}
+.topologyBuilder .builderCanvasStatusToast{position:absolute;top:8px;left:50%;z-index:75;display:none;align-items:flex-start;gap:8px;box-sizing:border-box;max-width:min(540px,calc(100% - 90px));padding:8px 9px 8px 12px;border:1px solid #6392a0;border-radius:9px;background:#102f3c;box-shadow:0 8px 26px #000b;transform:translateX(-50%);color:#e6f5f7}
+.topologyBuilder .builderCanvasStatusToast.isVisible{display:flex}
+.topologyBuilder .builderCanvasStatusToast .builderIoStatus{display:block;flex:1 1 auto;min-width:0;max-width:none;overflow:visible;text-overflow:clip;white-space:normal;line-height:1.4;font-size:11px}
+.topologyBuilder .builderCanvasStatusToast button{flex:0 0 auto;border:0;background:transparent;color:#e5f5f6;cursor:pointer;font-size:16px;line-height:1}
+.topologyBuilder .builderPalette .builderPaletteSearch{grid-template-columns:minmax(0,1fr)}
+.topologyBuilder .builderPalette .builderPaletteSearch input{grid-column:1;width:100%}
+.topologyBuilder .builderPalette .builderPaletteSearch #builderPaletteCount{grid-column:1;grid-row:2;text-align:left}
+.topologyBuilder .builderPalette .builderPaletteDragHint{grid-column:1;grid-row:3}
+.topologyBuilder .builderPaletteTarget{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
+.topologyBuilder .builderPaletteTarget label{grid-column:1/-1;justify-self:start;margin-left:0;gap:5px}
+.topologyBuilder .builderPaletteTarget label input{margin:0}
+.topologyBuilder .builderUnconnectedLane{position:absolute;z-index:2;color:#a9c8d4;font-size:11px;font-weight:700;letter-spacing:.03em;pointer-events:none}
+.topologyBuilder .unifiedNodeWrap.builderJustAdded .builderNode{box-shadow:0 0 0 3px #83dcb8,0 0 18px #83dcb888}
+@media (min-width:1121px) and (max-width:1399px){
+  .topologyBuilder:is(.canvasPanelInspectorOpen,.canvasPanelPaletteOpen) .builderNavigationHint,
+  .topologyBuilder:is(.canvasPanelInspectorOpen,.canvasPanelPaletteOpen) .builderMinimap{display:none!important}
+}
+@media (max-width:760px){.topologyBuilder .builderCanvasStatusToast{max-width:calc(100% - 20px)}}
+</style>
+<script id="builder-final-polish-v122">
+/* Move the existing live status node into a readable, dismissible canvas toast. */
+const builderFinalCanvas122=$('.builderCanvas'),builderFinalStatus122=$('#builderIoStatus'),builderFinalToast122=document.createElement('div');
+builderFinalToast122.className='builderCanvasStatusToast';const builderFinalToastClose122=document.createElement('button');builderFinalToastClose122.type='button';builderFinalToastClose122.textContent='×';builderFinalToastClose122.setAttribute('aria-label','Dismiss Builder message');builderFinalToast122.append(builderFinalStatus122,builderFinalToastClose122);builderFinalCanvas122.appendChild(builderFinalToast122);
+builderFinalStatus122.setAttribute('role','status');builderFinalStatus122.setAttribute('aria-live','polite');
+let builderFinalToastTimer122=null;
+function builderFinalHideToast122(){clearTimeout(builderFinalToastTimer122);builderFinalToast122.classList.remove('isVisible');builderFinalStatus122.textContent=''}
+builderFinalToastClose122.onclick=builderFinalHideToast122;
+const builderFinalStatusBefore122=builderStatus;
+builderStatus=function(message,...args){const result=builderFinalStatusBefore122(message,...args);builderFinalToast122.classList.toggle('isVisible',!!builderFinalStatus122.textContent);clearTimeout(builderFinalToastTimer122);if(builderFinalStatus122.textContent)builderFinalToastTimer122=setTimeout(builderFinalHideToast122,6000);return result};
+/* Isolated event components occupy a stable left column, without changing the positions of connected routes. */
+function builderFinalLooseNodes122(){const nodes=state.builderNodes,related=new Set();for(const node of nodes)if(node.parent!==null){related.add(node.id);related.add(node.parent)}for(const relation of state.builderDataRelations||[]){related.add(relation.from);related.add(relation.to)}for(const relation of [...state.builderRelations,...state.builderAuthRelations]){related.add(relation.from);related.add(relation.to)}return nodes.filter(node=>node.parent===null&&!related.has(node.id)&&!builderPaletteIndependentTypes.has(node.type))}
+const builderFinalPositionsBefore122=unifiedBuilderPositions;
+unifiedBuilderPositions=function(){if(resolvedUnifiedLayoutMode()!=='horizontal')return builderFinalPositionsBefore122();const loose=builderFinalLooseNodes122(),original=state.builderNodes;if(!loose.length||loose.length===original.length)return builderFinalPositionsBefore122();let layout;try{state.builderNodes=original.filter(node=>!loose.includes(node));layout=builderFinalPositionsBefore122()}finally{state.builderNodes=original}const startX=Math.min(...[...layout.positions.values()].map(point=>point.x))-240,startY=Math.min(...[...layout.positions.values()].map(point=>point.y));loose.forEach((node,index)=>layout.positions.set(node.id,{x:startX,y:startY+index*205}));layout.height=Math.max(layout.height,startY+loose.length*205+40);return layout};
+const builderFinalRenderCanvasBefore122=renderUnifiedBuilderCanvas;
+renderUnifiedBuilderCanvas=function(...args){const result=builderFinalRenderCanvasBefore122(...args),world=$('.unifiedBuilderWorld');if(world&&resolvedUnifiedLayoutMode()==='horizontal'){const loose=builderFinalLooseNodes122(),first=loose[0],position=first&&unifiedBuilderPositions().positions.get(first.id);if(position){const label=document.createElement('span');label.className='builderUnconnectedLane';label.style.left=`${position.x}px`;label.style.top=`${position.y-27}px`;label.textContent='Unconnected · drag to connect';world.appendChild(label)}}return result};
+/* Leave labels in the vertical connector gutter instead of on the next card's border. */
+const builderFinalPositionsWithLane122=unifiedBuilderPositions;
+unifiedBuilderPositions=function(){const layout=builderFinalPositionsWithLane122();if(layout.mode!=='vertical')return layout;const ordered=[...layout.positions.values()].map(point=>point.y).sort((a,b)=>a-b),indexes=new Map([...new Set(ordered)].map((y,index)=>[y,index]));layout.positions.forEach(point=>{point.y+=indexes.get(point.y)*34});layout.height+=Math.max(0,indexes.size-1)*34;return layout};
+/* Adding a loose node keeps the node visible without reducing the canvas to tiny text. */
+const builderFinalAddBefore122=addBuilderNode;
+addBuilderNode=function(type,parent=null){const known=new Set(state.builderNodes.map(node=>node.id)),result=builderFinalAddBefore122(type,parent),added=state.builderNodes.find(node=>!known.has(node.id));if(!added||!builderPaletteClickAdd||resolvedUnifiedLayoutMode()!=='horizontal'||!builderFinalLooseNodes122().some(node=>node.id===added.id))return result;setTimeout(()=>requestAnimationFrame(()=>{const canvas=$('.builderCanvas'),wrap=$(`#builderTree .unifiedNodeWrap[data-unified-node-wrap="${added.id}"]`);if(!canvas||!wrap||!canvas.clientWidth)return;state.builderViewport.zoom=Math.max(.85,state.builderViewport.zoom||1);applyBuilderViewport();const rect=canvas.getBoundingClientRect(),box=wrap.getBoundingClientRect(),left=rect.left+(canvasPanelState.palette?325:26),right=rect.right-(canvasPanelState.inspector?355:26);if(box.left<left)state.builderViewport.x+=left-box.left;else if(box.right>right)state.builderViewport.x-=box.right-right;const above=rect.top+55,below=rect.bottom-76;if(box.top<above)state.builderViewport.y+=above-box.top;else if(box.bottom>below)state.builderViewport.y-=box.bottom-below;applyBuilderViewport();wrap.classList.add('builderJustAdded');setTimeout(()=>wrap.classList.remove('builderJustAdded'),2400)}),30);return result};
+document.title='Splunk Pipeline Explorer · Build 122 · 28 Sep 2026';$('#topologyBuilder').dataset.buildNumber='122';$('#topologyBuilder').dataset.buildDate='2026-09-28';const builderFinalStamp122=$('.builderBuildStamp');if(builderFinalStamp122){builderFinalStamp122.setAttribute('aria-label','Build 122, dated 28 September 2026');builderFinalStamp122.querySelector('b').textContent='Build 122'}
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Builder final layout polish','Keep status messages in a readable canvas toast, preserve connected routes when adding isolated components, widen palette search and clear mobile connector labels.',true]);
 if(state.view==='changes')renderChanges();
 </script>
 
