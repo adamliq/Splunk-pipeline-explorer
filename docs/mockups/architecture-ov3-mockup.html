@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>
+<title>OV-3 Resource Flow Matrix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack page matching the OV-1 mockup — banners, title block, purpose line, the node/needline graphic
+   in location frames, then the resource flow table (the heart of an OV-2) and the operational node table for traceability.
+   Colour carries meaning only: one hue per relationship plane; review colour marks flows that need attention. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --data:#0f7fa6; --mgmt:#11897a; --auth:#7a4fc4; --resp:#c2621b; --review:#8a5a00; --hi:#fff4d6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --data:#4fb7d6; --mgmt:#2dd4bf; --auth:#b39cff; --resp:#f09a55; --review:#e0b567; --hi:#2a2412;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --data:#4fb7d6; --mgmt:#2dd4bf; --auth:#b39cff; --resp:#f09a55; --review:#e0b567; --hi:#2a2412;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*,.gen>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--data);padding:4px 0 4px 12px}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+
+/* Summary line: completeness is the point of an OV-3, so it leads */
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+/* Controls */
+.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;border:1px solid var(--rule);border-radius:4px;padding:10px 12px;background:var(--zone)}
+.controls .grp{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.controls .lbl{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.chip{font:500 .8rem/1 var(--font-body);color:var(--ink);background:var(--sheet);border:1px solid var(--rule);border-radius:999px;padding:6px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.chip[aria-pressed="true"]{border-color:var(--ink-2);background:var(--node);box-shadow:inset 0 0 0 1px var(--ink-2)}
+.chip[aria-pressed="false"]{color:var(--muted)}
+.chip:focus-visible,.cell:focus-visible,input:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.controls label.cb{display:inline-flex;gap:6px;align-items:center;font-size:.82rem;cursor:pointer}
+.controls input[type=search]{font:400 .84rem var(--font-body);color:var(--ink);background:var(--sheet);border:1px solid var(--rule);border-radius:4px;padding:6px 9px;width:min(240px,100%)}
+.plane{display:inline-block;width:20px;height:0;border-top-width:2.4px;border-top-style:solid;vertical-align:middle}
+.plane.data{border-top-color:var(--data)} .plane.mgmt{border-top-color:var(--mgmt);border-top-style:dashed}
+.plane.auth{border-top-color:var(--auth);border-top-style:dotted} .plane.resp{border-top-color:var(--resp)}
+
+/* The matrix table */
+h2{margin:0 0 8px;font:600 .72rem/1 var(--font-code);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.hint{margin:0 0 8px;color:var(--muted);font-size:.8rem;max-width:100ch}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);max-width:100%}
+table.m{border-collapse:separate;border-spacing:0;width:100%;font-size:.78rem}
+.m th,.m td{text-align:left;padding:6px 8px;border-top:1px solid var(--rule);border-left:1px solid color-mix(in srgb,var(--rule) 55%,transparent);vertical-align:top;background:var(--sheet)}
+.m thead th{border-top:0;background:var(--zone);font:600 .6rem/1.3 var(--font-code);letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap}
+.m thead tr.groups th{font-size:.62rem;color:var(--ink);text-align:left;border-bottom:1px solid var(--rule)}
+.m thead tr.groups th span{color:var(--muted);font-weight:500;letter-spacing:.04em;text-transform:none;font-family:var(--font-body);margin-left:6px}
+.m .gs{border-left:2px solid var(--rule)}
+.m .stick{position:sticky;left:0;z-index:1;border-left:0}
+.m .stick2{position:sticky;left:64px;z-index:1;box-shadow:1px 0 0 var(--rule)}
+.m td.stick,.m th.stick{width:64px;min-width:64px}
+.m td.stick2{min-width:190px;max-width:230px;font-weight:600;color:var(--ink)}
+.m td.code{font:600 .72rem/1.3 var(--font-code);white-space:nowrap}
+.m td .on{font:600 .7rem/1 var(--font-code);color:var(--ink-2);display:block;margin-bottom:2px}
+.m td.nw{white-space:nowrap}
+.m td.w{min-width:150px}
+.m tr.rf{cursor:pointer}
+.m tr.rf:hover td{background:var(--zone)}
+.m tr.rf.sel td{background:var(--hi)}
+.m tr.rf:focus-visible td{box-shadow:inset 0 2px 0 var(--focus),inset 0 -2px 0 var(--focus)}
+.m tr.rf.flagged td.stick{box-shadow:inset 3px 0 0 var(--review)}
+.m .fl{color:var(--review);font-weight:600}
+.crit{font:600 .66rem/1 var(--font-code);padding:3px 6px;border-radius:3px;white-space:nowrap;letter-spacing:.03em}
+.crit.c1{background:color-mix(in srgb,var(--resp) 18%,transparent);color:var(--resp)}
+.crit.c2{background:color-mix(in srgb,var(--data) 16%,transparent);color:var(--data)}
+.crit.c3{background:var(--zone);color:var(--ink-2)}
+.m tr.detail td{background:var(--hi);border-top:0;padding:10px 12px 14px}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px 24px;max-width:1100px;position:sticky;left:12px}
+.detail-grid h4{margin:0 0 4px;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail-grid ul{margin:0;padding-left:18px}
+.detail-grid p{margin:0}
+table.m.hide-exch .g-exch,table.m.hide-perf .g-perf,table.m.hide-ia .g-ia,table.m.hide-sec .g-sec{display:none}
+.empty{padding:16px;color:var(--muted)}
+
+/* Producer × consumer grid */
+.pc{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.pc{grid-template-columns:minmax(0,1fr)}}
+.pc>*{min-width:0}
+.gridwrap{overflow-x:auto;max-width:100%}
+table.x{border-collapse:collapse;font:600 .72rem/1 var(--font-code)}
+.x th{color:var(--ink-2);font-weight:600;padding:3px 5px;white-space:nowrap}
+.x thead th{height:34px;vertical-align:bottom;text-align:center}
+.x tbody th{text-align:right}
+.x td{padding:2px}
+.cell{width:34px;height:30px;border:1px solid var(--rule);border-radius:3px;background:var(--sheet);color:var(--ink);font:600 .74rem var(--font-code);cursor:pointer;display:grid;place-items:center;padding:0}
+.cell.z{cursor:default;color:transparent;background:var(--zone);border-color:transparent}
+.cell.data{border-color:var(--data);background:color-mix(in srgb,var(--data) 14%,var(--sheet))}
+.cell.mgmt{border-color:var(--mgmt);border-style:dashed;background:color-mix(in srgb,var(--mgmt) 12%,var(--sheet))}
+.cell.auth{border-color:var(--auth);border-style:dotted;border-width:2px;background:color-mix(in srgb,var(--auth) 12%,var(--sheet))}
+.cell.resp{border-color:var(--resp);background:color-mix(in srgb,var(--resp) 12%,var(--sheet))}
+.cell.flag{box-shadow:0 0 0 2px var(--review)}
+.cell.sel{outline:2px solid var(--ink);outline-offset:4px}
+.x .axis{font:600 .6rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.nodes{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 16px;font-size:.8rem}
+.nodes li{display:flex;gap:8px;align-items:baseline}
+.nodes code{font:600 .7rem var(--font-code);color:var(--ink-2);min-width:40px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:.8rem;color:var(--ink-2);align-items:center;margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.sw{width:16px;height:14px;border-radius:2px;border:1px solid var(--rule);display:inline-block}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;color:var(--muted);font-size:.76rem;border-top:1px solid var(--rule);padding-top:8px}
+
+.gen{border:1px dashed var(--rule);border-radius:6px;padding:14px 16px;display:grid;gap:10px;background:var(--sheet)}
+.gen h3{margin:0;font:600 1rem/1.3 var(--font-title)}
+.gen p{margin:0;color:var(--ink-2);font-size:.88rem;max-width:90ch}
+.gen table{border-collapse:collapse;width:100%;min-width:640px;font-size:.84rem}
+.gen th,.gen td{text-align:left;padding:6px 8px;border-top:1px solid var(--rule);vertical-align:top}
+.gen thead th{border-top:0;font:600 .62rem/1.3 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.gen td:first-child{font-weight:600;white-space:nowrap}
+.tag{font:600 .66rem/1 var(--font-code);padding:3px 6px;border-radius:3px;white-space:nowrap}
+.tag.have{background:color-mix(in srgb,var(--mgmt) 16%,transparent);color:var(--mgmt)}
+.tag.der{background:color-mix(in srgb,var(--data) 14%,transparent);color:var(--data)}
+.tag.new{background:color-mix(in srgb,var(--review) 18%,transparent);color:var(--review)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="page">
+  <span class="example">Mockup · example architecture pack page · example data</span>
+
+  <article class="sheet" aria-label="OV-3 page of the architecture pack">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big">OV-3 · Operational Resource Flow Matrix</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Scope</span><span class="tb-v">Complete topology · Splunk Enterprise</span></div>
+        <div><span class="tb-k">Owner / author</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">130 · 29 Sep 2026</span></div>
+      </div>
+
+      <div class="purpose">
+        <span class="tb-k">Purpose</span>
+        <p>Every resource flow from the OV-2, one row each, with the attributes an assessor checks: what triggers it, how critical it is, how often and how much, how it's protected, and how it's classified. Flow IDs and node IDs match the OV-2 page.</p>
+      </div>
+
+      <div class="summary" id="summary" aria-live="polite"></div>
+
+      <div class="controls" role="group" aria-label="Filter the matrix">
+        <div class="grp" id="planeChips"><span class="lbl">Plane</span></div>
+        <div class="grp" id="groupChips"><span class="lbl">Columns</span></div>
+        <div class="grp">
+          <label class="cb"><input type="checkbox" id="onlyReview"> Only flows to review</label>
+          <label class="cb"><input type="checkbox" id="onlyGaps"> Only rows with gaps</label>
+        </div>
+        <div class="grp"><label for="q" class="lbl">Find</label><input type="search" id="q" placeholder="Resource, node, port…"></div>
+      </div>
+
+      <section>
+        <h2>Resource flow matrix</h2>
+        <p class="hint">Select a row to see the Builder connections that realise it and any finding. The first two columns stay in view while you scroll sideways.</p>
+        <div class="tablewrap">
+          <table class="m" id="matrix">
+            <thead>
+              <tr class="groups">
+                <th class="stick" rowspan="1"></th><th class="stick2"></th>
+                <th colspan="2" class="gs">Producer</th>
+                <th colspan="2" class="gs">Consumer</th>
+                <th colspan="3" class="gs g-exch">Nature of exchange<span>why it happens</span></th>
+                <th colspan="3" class="gs g-perf">Performance<span>how often, how fast, how much</span></th>
+                <th colspan="4" class="gs g-ia">Assurance<span>how it's protected</span></th>
+                <th colspan="2" class="gs g-sec">Security<span>how it's handled</span></th>
+              </tr>
+              <tr>
+                <th class="stick">Flow</th><th class="stick2">Resource exchanged</th>
+                <th class="gs">Node</th><th>Activity</th>
+                <th class="gs">Node</th><th>Activity</th>
+                <th class="gs g-exch">Plane</th><th class="g-exch">Trigger</th><th class="g-exch">Criticality</th>
+                <th class="gs g-perf">Periodicity</th><th class="g-perf">Timeliness</th><th class="g-perf">Volume</th>
+                <th class="gs g-ia">Transport</th><th class="g-ia">Authentication</th><th class="g-ia">Integrity</th><th class="g-ia">Availability</th>
+                <th class="gs g-sec">Classification</th><th class="g-sec">Handling</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="pc">
+        <div>
+          <h2>Producer × consumer</h2>
+          <p class="hint">Flow count per pair of nodes. Select a cell to filter the matrix to that pair.</p>
+          <div class="gridwrap"><table class="x" id="xgrid"></table></div>
+          <div class="legend">
+            <span><i class="sw" style="border-color:var(--data);background:color-mix(in srgb,var(--data) 14%,var(--sheet))"></i>Event data</span>
+            <span><i class="sw" style="border:1px dashed var(--mgmt);background:color-mix(in srgb,var(--mgmt) 12%,var(--sheet))"></i>Fleet management</span>
+            <span><i class="sw" style="border:2px dotted var(--auth)"></i>Authentication</span>
+            <span><i class="sw" style="border-color:var(--resp);background:color-mix(in srgb,var(--resp) 12%,var(--sheet))"></i>Alerts and response</span>
+            <span><i class="sw" style="box-shadow:0 0 0 2px var(--review)"></i>Contains a flow to review</span>
+          </div>
+        </div>
+        <div>
+          <h2>Operational nodes (from OV-2)</h2>
+          <ul class="nodes" id="nodeList"></ul>
+        </div>
+      </section>
+
+      <div class="foot">
+        <span>Splunk security telemetry architecture · Owner <span class="notset">Not set</span> · Generated from Builder topology</span>
+        <span>Page 4 of 21 · OV-3</span>
+      </div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </article>
+
+  <aside class="gen" aria-labelledby="gen-h">
+    <h3 id="gen-h">How the Builder could generate this page</h3>
+    <p>OV-3 is the OV-2's resource flow table with every attribute spelled out. Most columns already exist in each connection's details or can be worked out from them. Two short fields are new, and two OV-2 fields are reused. Any empty attribute shows "Not set" here and in the open-questions appendix, which is how the page doubles as a completeness check.</p>
+    <div class="tablewrap" style="border:0">
+      <table>
+        <thead><tr><th>Column</th><th>Source</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Flow, needline, nodes</td><td>The same IDs as the OV-2 page, so both pages cross-reference</td><td><span class="tag have">Exists</span></td></tr>
+          <tr><td>Resource, activities, classification</td><td>The per-connection fields introduced for OV-2 (resource exchanged, activity supported, classification override)</td><td><span class="tag have">From OV-2</span></td></tr>
+          <tr><td>Plane</td><td>Relationship plane: event data, fleet management, authentication; search → SOAR and search → people become alerts and response</td><td><span class="tag have">Exists</span></td></tr>
+          <tr><td>Periodicity</td><td>Continuous for event data; poll interval for phone-home; per sign-in for authentication; "on demand" for search</td><td><span class="tag der">Derived</span></td></tr>
+          <tr><td>Timeliness, availability</td><td>Connection latency SLO and availability SLO</td><td><span class="tag have">Exists</span></td></tr>
+          <tr><td>Volume</td><td>Capacity model: daily ingest of the sources behind the connection, rolled up per flow</td><td><span class="tag der">Derived</span></td></tr>
+          <tr><td>Transport, authentication, integrity</td><td>Protocol, port and TLS; authentication type and requirement; indexer acknowledgement or persistent queue</td><td><span class="tag have">Exists</span></td></tr>
+          <tr><td>Trigger</td><td>A dropdown per connection: Event, Schedule, Request, Sign-in. The default comes from the plane</td><td><span class="tag new">New field</span></td></tr>
+          <tr><td>Criticality</td><td>A dropdown per connection: Mission critical, Essential, Routine</td><td><span class="tag new">New field</span></td></tr>
+          <tr><td>Handling</td><td>Pack-level handling caveats (for example "Privacy Act · PII") applied to flows whose classification carries PII</td><td><span class="tag der">Derived</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </aside>
+</div>
+
+<script>
+(() => {
+  const NODES = {
+    'ON-1':'Sydney event sources','ON-2':'Melbourne event sources','ON-3':'Cloud event sources','ON-4':'Site collection · Sydney',
+    'ON-5':'Site collection · Melbourne','ON-6':'Cloud ingestion','ON-7':'Indexing service','ON-8':'Search and detection',
+    'ON-9':'Platform management','ON-10':'Security operations centre','ON-11':'Identity services','ON-12':'Response and cases'
+  };
+  const PLANES = {data:'Event data',mgmt:'Fleet management',auth:'Authentication',resp:'Alerts and response'};
+  const CRIT = {'Mission critical':'c1','Essential':'c2','Routine':'c3'};
+  // id, needline, plane, resource, from, fromAct, to[], toAct, trigger, crit, period, time, volume, transport, auth, integrity, avail, cls, handling, finding, realised[]
+  const F = [
+    ['RF-01','N1','data','Windows Security and Sysmon events','ON-1','Generate host events',['ON-4'],'Collect and buffer','Event','Mission critical','Continuous','≤ 60 s','≈ 38 GB/day','UF on host · local monitor','Not applicable (local)','UF persistent queue','99.9%','Security telemetry','Internal SOC use',null,['Windows Server ×120 → Universal Forwarder (on host)']],
+    ['RF-02','N1','data','Firewall and network syslog','ON-1','Generate network events',['ON-4'],'Collect and buffer','Event','Mission critical','Continuous','≤ 60 s','≈ 22 GB/day','Syslog UDP/TCP 514 · no TLS','None','None (UDP can drop)','99.9%','Security telemetry + PII','Privacy Act · PII','PII over an unencrypted handoff. Move the devices to TLS syslog on 6514, or place the syslog relay on the same segment and record the exception.',['Firewall ×30 → Syslog Server · Sydney']],
+    ['RF-03','N2','data','Windows Security events','ON-2','Generate host events',['ON-5'],'Collect and buffer','Event','Mission critical','Continuous','≤ 60 s','≈ 14 GB/day','UF on host · local monitor','Not applicable (local)','UF persistent queue','99.9%','Security telemetry','Internal SOC use',null,['Windows Server ×45 → Universal Forwarder (on host)']],
+    ['RF-04','N2','data','Appliance syslog','ON-2','Generate appliance events',['ON-5'],'Collect and buffer','Event','Essential','Continuous','≤ 60 s','≈ 6 GB/day','Syslog TCP · TLS 6514','Server certificate','TCP + TLS','99.5%','Security telemetry + PII','Privacy Act · PII',null,['Syslog appliance ×12 → Syslog Server · Melbourne']],
+    ['RF-05','N3','data','CloudTrail and GuardDuty findings (JSON)','ON-3','Emit audit findings',['ON-6'],'Receive and parse','Event','Essential','Batched','≤ 5 min','≈ 9 GB/day','HTTPS HEC 8088 · TLS','HEC token','HEC indexer acknowledgement','99.5%','Security telemetry','Internal SOC use',null,['AWS Lambda source → HEC endpoint (Heavy Forwarder)']],
+    ['RF-06','N4','data','Forwarded events · Sydney','ON-4','Forward',['ON-7'],'Index and replicate','Event','Mission critical','Continuous','≤ 60 s','≈ 60 GB/day','S2S TCP 9997 · TLS','Mutual TLS certificate','Indexer acknowledgement','99.9%','Security telemetry + PII','Privacy Act · PII',null,['Universal Forwarder (Sydney) → Indexer cluster','Syslog Server · Sydney → Indexer cluster']],
+    ['RF-07','N5','data','Forwarded events · Melbourne','ON-5','Forward',['ON-7'],'Index and replicate','Event','Mission critical','Continuous','≤ 60 s','≈ 20 GB/day','S2S TCP 9997 · TLS','Mutual TLS certificate','Indexer acknowledgement','99.9%','Security telemetry + PII','Privacy Act · PII',null,['Universal Forwarder (Melbourne) → Indexer cluster','Syslog Server · Melbourne → Indexer cluster']],
+    ['RF-08','N6','data','Parsed cloud events, PII masked','ON-6','Parse and mask',['ON-7'],'Index and replicate','Event','Essential','Continuous','≤ 5 min','≈ 9 GB/day','S2S TCP 9997 · TLS','Mutual TLS certificate','Indexer acknowledgement','99.5%','Security telemetry','Internal SOC use',null,['Heavy Forwarder → Indexer cluster']],
+    ['RF-09','N7','data','Search results','ON-7','Serve search',['ON-8'],'Correlate and detect','Request','Mission critical','On demand','≤ 10 s (p95)','≈ 3 GB/day','Distributed search · HTTPS 8089 · TLS','Splunk trust (pass4SymmKey)','TLS','99.9%','Security telemetry + PII','Privacy Act · PII',null,['Search head cluster ↔ Indexer cluster']],
+    ['RF-10','N8','resp','Notable events and dashboards','ON-8','Raise alerts',['ON-10'],'Triage alerts','Event','Mission critical','Near real time','≤ 2 min','≈ 400 notables/day','HTTPS 443 · TLS','SAML session','TLS','99.9%','Security telemetry + PII','Privacy Act · PII',null,['Search head cluster → User / administrator']],
+    ['RF-11','N9','resp','Notable events for playbooks','ON-8','Raise alerts',['ON-12'],'Contain and respond','Event','Mission critical','Near real time','≤ 1 min','≈ 400 events/day','HTTPS REST 443 · TLS','API token','TLS · retry queue','99.5%','Security telemetry + PII','Privacy Act · PII',null,['Search head cluster → Splunk SOAR']],
+    ['RF-12','N10','mgmt','Apps and configuration bundles','ON-9','Configure fleet',['ON-4','ON-5','ON-6'],'Apply configuration','Schedule','Essential','60 s poll','≤ 15 min to apply','≈ 200 MB per rollout','Phone-home HTTPS 8089 · TLS','Server certificate','Bundle checksum','99%','Internal','None',null,['Deployment Server → Universal Forwarder (×165)','Deployment Server → Heavy Forwarder']],
+    ['RF-13','N11','auth','Authentication assertion','ON-11','Authenticate people',['ON-8'],'Grant analyst access','Sign-in','Essential','Per sign-in','≤ 5 s',null,'SAML 2.0 · HTTPS 443','SAML · MFA','Signed assertion','99.9%','Internal','None','Volume is not set. Add expected sign-ins per day to size the identity provider.',['Authentication Provider · Cloud → Search head cluster']],
+    ['RF-14','N12','resp','Cases and ticket updates','ON-12','Track cases',['ON-10'],'Track response to closure','Event',null,'Per case','≤ 5 min','≈ 60 cases/day','HTTPS 443 · TLS','SSO session','TLS','99.5%','Security telemetry','Internal SOC use','Criticality is not set.',['Splunk SOAR → User / administrator']],
+    ['RF-15','N13','mgmt','Licence usage and health metrics','ON-7','Report usage',['ON-9'],'Manage capacity and licence','Schedule','Routine','5 min','≤ 15 min','≈ 1 GB/day','Internal logs · REST 8089 · TLS','Splunk trust (pass4SymmKey)','TLS','99%','Internal','None',null,['Indexer cluster → License Manager','Indexer cluster → Monitoring Console']]
+  ].map(r=>({id:r[0],nl:r[1],plane:r[2],res:r[3],from:r[4],fromAct:r[5],to:r[6],toAct:r[7],trig:r[8],crit:r[9],per:r[10],time:r[11],vol:r[12],tx:r[13],auth:r[14],integ:r[15],avail:r[16],cls:r[17],hand:r[18],finding:r[19],real:r[20],
+      review:!!r[19]&&r[0]==='RF-02', gaps:[r[8],r[9],r[12]].some(v=>v==null)}));
+
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const v=x=>x==null?'<span class="notset">Not set</span>':esc(x);
+  const st={planes:new Set(Object.keys(PLANES)),groups:new Set(['exch','perf','ia','sec']),review:false,gaps:false,q:'',pair:null,sel:null};
+
+  // Controls
+  const pc=document.getElementById('planeChips');
+  Object.entries(PLANES).forEach(([k,label])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.setAttribute('aria-pressed','true');
+    b.innerHTML=`<i class="plane ${k}"></i>${label}`;b.onclick=()=>{st.planes.has(k)?st.planes.delete(k):st.planes.add(k);b.setAttribute('aria-pressed',st.planes.has(k));render()};pc.append(b)});
+  const gc=document.getElementById('groupChips');
+  [['exch','Exchange'],['perf','Performance'],['ia','Assurance'],['sec','Security']].forEach(([k,label])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.setAttribute('aria-pressed','true');b.textContent=label;
+    b.onclick=()=>{st.groups.has(k)?st.groups.delete(k):st.groups.add(k);b.setAttribute('aria-pressed',st.groups.has(k));document.getElementById('matrix').classList.toggle('hide-'+k,!st.groups.has(k))};gc.append(b)});
+  document.getElementById('onlyReview').onchange=e=>{st.review=e.target.checked;render()};
+  document.getElementById('onlyGaps').onchange=e=>{st.gaps=e.target.checked;render()};
+  document.getElementById('q').oninput=e=>{st.q=e.target.value.trim().toLowerCase();render()};
+
+  const visible=f=>st.planes.has(f.plane)&&(!st.review||f.review)&&(!st.gaps||f.gaps)&&(!st.pair||(f.from===st.pair[0]&&f.to.includes(st.pair[1])))
+    &&(!st.q||JSON.stringify([f.id,f.res,f.from,f.to,f.fromAct,f.toAct,f.tx,f.auth,NODES[f.from],...f.to.map(t=>NODES[t])]).toLowerCase().includes(st.q));
+
+  const tbody=document.getElementById('rows');
+  function render(){
+    const rows=F.filter(visible);
+    tbody.innerHTML=rows.length?'':'<tr><td colspan="20" class="empty">No flows match these filters.</td></tr>';
+    rows.forEach(f=>{
+      const tr=document.createElement('tr');tr.className='rf'+(f.review?' flagged':'')+(st.sel===f.id?' sel':'');tr.tabIndex=0;tr.dataset.id=f.id;
+      tr.setAttribute('aria-expanded',st.sel===f.id);
+      tr.innerHTML=`<td class="stick code">${f.id}<br><span style="color:var(--muted)">${f.nl}</span>${f.review?'<br><span class="fl" title="Flow to review">▲ review</span>':''}</td>
+        <td class="stick2">${esc(f.res)}</td>
+        <td class="gs w"><span class="on">${f.from}</span>${esc(NODES[f.from])}</td><td class="w">${esc(f.fromAct)}</td>
+        <td class="gs w"><span class="on">${f.to.join(', ')}</span>${f.to.map(t=>esc(NODES[t])).join('; ')}</td><td class="w">${esc(f.toAct)}</td>
+        <td class="gs g-exch nw"><i class="plane ${f.plane}"></i> ${PLANES[f.plane]}</td><td class="g-exch">${v(f.trig)}</td>
+        <td class="g-exch">${f.crit?`<span class="crit ${CRIT[f.crit]}">${esc(f.crit)}</span>`:v(null)}</td>
+        <td class="gs g-perf nw">${v(f.per)}</td><td class="g-perf nw">${v(f.time)}</td><td class="g-perf nw">${v(f.vol)}</td>
+        <td class="gs g-ia w${f.review?' fl':''}">${esc(f.tx)}</td><td class="g-ia w${f.auth==='None'?' fl':''}">${esc(f.auth)}</td><td class="g-ia w">${esc(f.integ)}</td><td class="g-ia nw">${esc(f.avail)}</td>
+        <td class="gs g-sec w">${esc(f.cls)}</td><td class="g-sec w">${esc(f.hand)}</td>`;
+      tr.onclick=()=>{st.sel=st.sel===f.id?null:f.id;render()};
+      tr.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tr.click();requestAnimationFrame(()=>tbody.querySelector(`tr[data-id="${f.id}"]`)?.focus())}};
+      tbody.append(tr);
+      if(st.sel===f.id){const d=document.createElement('tr');d.className='detail';
+        d.innerHTML=`<td colspan="20"><div class="detail-grid">
+          <div><h4>Realised by Builder connections</h4><ul>${f.real.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></div>
+          <div><h4>${f.review?'Finding to review':'Notes'}</h4><p class="${f.review?'fl':''}">${f.finding?esc(f.finding):'No findings on this flow.'}</p></div>
+          <div><h4>Traces to</h4><p>OV-2 needline ${f.nl} · connection register rows for ${esc(f.real.length)} connection${f.real.length>1?'s':''}</p></div></div></td>`;
+        tbody.append(d)}
+    });
+    const shown=rows.length, rv=F.filter(f=>f.review).length, gaps=F.reduce((n,f)=>n+[f.trig,f.crit,f.vol].filter(x=>x==null).length,0);
+    document.getElementById('summary').innerHTML=`<span><b>${F.length}</b>resource flows</span><span><b>${new Set(F.map(f=>f.nl)).size}</b>needlines</span><span><b>${Object.keys(NODES).length}</b>operational nodes</span>
+      <span class="rv"><b>${rv}</b>flow to review</span><span class="rv"><b>${gaps}</b>attributes not set</span>${shown<F.length?`<span>Showing <b>${shown}</b>of ${F.length}${st.pair?` · ${st.pair[0]} → ${st.pair[1]} <button type="button" class="chip" id="clearPair">Clear pair</button>`:''}</span>`:''}`;
+    document.getElementById('clearPair')?.addEventListener('click',()=>{st.pair=null;render()});
+    drawGrid();
+  }
+
+  // Producer × consumer grid
+  const ids=Object.keys(NODES), xg=document.getElementById('xgrid');
+  function drawGrid(){
+    let h=`<thead><tr><th class="axis" style="text-align:right">From ↓ · To →</th>${ids.map(i=>`<th title="${esc(NODES[i])}">${i.replace('ON-','')}</th>`).join('')}</tr></thead><tbody>`;
+    ids.forEach(a=>{h+=`<tr><th title="${esc(NODES[a])}">${a}</th>`;ids.forEach(b=>{
+      const fl=F.filter(f=>f.from===a&&f.to.includes(b)&&st.planes.has(f.plane));
+      if(!fl.length){h+=`<td><span class="cell z" aria-hidden="true"></span></td>`;return}
+      const sel=st.pair&&st.pair[0]===a&&st.pair[1]===b;
+      h+=`<td><button type="button" class="cell ${fl[0].plane}${fl.some(f=>f.review)?' flag':''}${sel?' sel':''}" data-a="${a}" data-b="${b}" aria-pressed="${!!sel}" aria-label="${fl.length} flow${fl.length>1?'s':''} from ${esc(NODES[a])} to ${esc(NODES[b])}">${fl.length}</button></td>`})
+      h+='</tr>'});
+    xg.innerHTML=h+'</tbody>';
+    xg.querySelectorAll('button.cell').forEach(c=>c.onclick=()=>{const p=[c.dataset.a,c.dataset.b];st.pair=st.pair&&st.pair[0]===p[0]&&st.pair[1]===p[1]?null:p;st.sel=null;render()});
+  }
+  document.getElementById('nodeList').innerHTML=ids.map(i=>`<li><code>${i}</code><span>${esc(NODES[i])}</span></li>`).join('');
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(st.sel||st.pair)){st.sel=null;st.pair=null;render()}});
+  render();
+})();
+</script>
+
+</body></html>

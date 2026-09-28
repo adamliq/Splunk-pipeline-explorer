@@ -4,7 +4,7 @@
 **Baseline:** `main` at `44f1086` (Build 130, 29 Sep 2026), also merged into branch `claude/build-page-layout-bl6jk1`. There is no newer build; this is a new version of the task list, not a new review.
 **History:** `builder-handoff-build130.md` (the Build 130 review these items come from) and earlier.
 **Tool:** `node tools/builder-connector-check.js index.html [screenshot-dir]` (Playwright/Chromium).
-**Mockups:** `docs/mockups/builder-grouping-mockup.html` (Group by), **`docs/mockups/architecture-ov1-mockup.html` (the new OV-1 page, item 7)** and **`docs/mockups/architecture-ov2-mockup.html` (the new OV-2 page, item 8)**. All are standalone; open them in a browser.
+**Mockups:** `docs/mockups/builder-grouping-mockup.html` (Group by), **`docs/mockups/architecture-ov1-mockup.html` (the new OV-1 page, item 7)** , **`docs/mockups/architecture-ov2-mockup.html` (the new OV-2 page, item 8)** and **`docs/mockups/architecture-ov3-mockup.html` (the new OV-3 page, item 9)**. All are standalone; open them in a browser.
 
 ## TL;DR
 
@@ -12,8 +12,9 @@
 2. **Items 2–6:** smaller Group-by, connector and mobile issues, plus optional authentication extras, carried over from the Build 130 review.
 3. **Item 7 (new feature): an OV-1 High-Level Operational Concept page** in the architecture pack, generated mostly from data the Builder already holds, with three new optional fields.
 4. **Item 8 (new feature): an OV-2 Operational Resource Flow page** (operational nodes, needlines, a resource flow table and an operational node table). It reuses item 7's tier and region grouping and adds three optional per-connection fields.
+5. **Item 9 (new feature): an OV-3 Operational Resource Flow Matrix page:** every OV-2 flow as one row with its exchange, performance, assurance and security attributes, plus a producer × consumer grid. It reuses the OV-2 fields and adds two dropdowns per connection (Trigger, Criticality).
 
-Suggested order: item 1, then 2–5, then item 7, then item 8 (6 is optional).
+Suggested order: item 1, then 2–5, then items 7, 8 and 9 in that order (each page builds on the one before; 6 is optional).
 
 ## Rules for every future build (unchanged)
 
@@ -208,10 +209,60 @@ Hovering over or clicking a needline pill, a flow row or a node row highlights t
 
 ---
 
+## 9. New feature: OV-3 Operational Resource Flow Matrix page in the architecture pack
+
+**Mockup:** `docs/mockups/architecture-ov3-mockup.html` (same example data as the OV-1 and OV-2 mockups; flow, needline and node IDs match the OV-2 mockup). Its `F` and `NODES` arrays are hand-written sample data; generate the real page from the model.
+
+**Idea:** OV-3 is the OV-2 resource flow table with every attribute spelled out, one row per flow. It's the page an assessor reads line by line, and every empty attribute shows as "Not set", so it also works as a completeness check. **Build it on the same flow list as item 8** (one function returns the operational nodes, needlines and flows; OV-2 and OV-3 both call it), so IDs always match.
+
+### What the page contains (in order)
+1. **Classification banners and title block,** as on OV-1 and OV-2, with the view name "OV-3 · Operational Resource Flow Matrix", and a one-line purpose.
+2. **Summary line:** counts of resource flows, needlines, operational nodes, flows to review (review colour) and attributes not set (review colour). Not big tiles; one line of text.
+3. **Resource flow matrix:** one row per flow, in OV-2 flow order. Two header rows: column groups, then columns.
+   | Group | Columns | Source |
+   |---|---|---|
+   | (fixed) | Flow (ID + needline ID, plus a "▲ review" marker), Resource exchanged | OV-2 flow list |
+   | Producer | Node (ID + name), Activity | OV-2 node; producer activity from the tier ("Collect and buffer", "Forward", …) or the connection's "Activity supported" |
+   | Consumer | Node (ID + name; several IDs when one flow goes to several nodes, e.g. Deployment Server → ON-4, ON-5, ON-6), Activity | as Producer |
+   | Nature of exchange | Plane, **Trigger**, **Criticality** | Relationship plane; two **new fields** (below) |
+   | Performance | Periodicity, Timeliness, Volume | Derived periodicity (continuous for event data, poll interval for phone-home, per sign-in for authentication, "on demand" for search); latency SLO; volume from the capacity model (daily ingest of the sources behind the connection, summed per flow) |
+   | Assurance | Transport (protocol · port · TLS), Authentication, Integrity (indexer acknowledgement, persistent queue, "None (UDP can drop)"), Availability SLO | Connection details |
+   | Security | Classification, Handling | OV-2 classification field; handling = pack-level caveat (new pack option `state.builderExport.handlingCaveat`, e.g. "Privacy Act · PII") applied to flows whose classification includes PII, else "None" |
+
+   - Criticality shows as a small chip (Mission critical / Essential / Routine). Empty values show "Not set".
+   - A flow to review has a review-colour stripe on its first cell; the offending cells (e.g. "no TLS" transport, "None" authentication) are in the review colour.
+   - **On screen:** the first two columns stay in view while scrolling sideways (`position:sticky`). Selecting a row (click, or Enter/Space) opens a detail row underneath: **Realised by Builder connections** (the component-level connections merged into this flow), the finding text (or "No findings on this flow"), and **Traces to** (the OV-2 needline and the connection register rows).
+4. **Producer × consumer grid:** a node × node table of flow counts (rows = producer, columns = consumer), each non-empty cell coloured and styled by plane (as the line styles), with a review ring if any of its flows is flagged. On screen, selecting a cell filters the matrix to that pair; Esc clears the filter and any selected row. Next to it, the node ID → name list from OV-2.
+5. **Footer:** as on OV-1 and OV-2, with "Page n of N · OV-3".
+
+### Filters (on-screen preview only)
+Plane toggles (the four planes), column-group toggles (Exchange, Performance, Assurance, Security), "Only flows to review", "Only rows with gaps" (any of Trigger, Criticality or Volume not set), and a text search across flow ID, resource, node IDs and names, activities, transport and authentication. The summary line shows "Showing n of N" (and the selected pair, with a Clear button) while a filter is active. Filters don't apply to the downloaded or printed pack: the pack always shows every flow and every column.
+
+### New optional fields (per connection, next to the OV-2 fields)
+- **Trigger:** dropdown: Event, Schedule, Request, Sign-in. The default comes from the plane (event data → Event, fleet management → Schedule, authentication → Sign-in, search → Request), shown as "(default)" until the user picks one.
+- **Criticality:** dropdown: Not set, Mission critical, Essential, Routine. No default.
+Store both in the relationship details (`ensureRelationshipDetails(edge)`), include them in `topologyDocument()`, the connection register and re-import. Unset Criticality, and Volume when the capacity model has no figure, go in the open-questions appendix.
+
+### Pack integration
+- Add **"OV-3 resource flow matrix"** to the pack's Sections checkboxes, on by default, straight after OV-2, in the table of contents.
+- **Print:** A4 landscape, ≥ 9.5pt table text, header rows repeating. The matrix has 18 columns, so split it across **two printed tables** with the Flow and Resource columns repeated in both: (a) Producer, Consumer, Nature of exchange; (b) Performance, Assurance, Security. Don't shrink the text to fit. The producer × consumer grid goes on its own page after them.
+- Light and dark themes via the pack tokens; light-theme page text ≥ 4.5:1; the grid's plane fills keep the count legible (≥ 4.5:1) in both themes.
+- At phone width the matrix and grid scroll inside their own boxes; the page never scrolls sideways.
+
+### Acceptance check
+- OV-2 and OV-3 list the same flow IDs, needline IDs and node IDs, in the same order, for the default topology, the Build 130 test topology (3 UFs + Deployment Server) and a two-region topology.
+- Default topology: 3 rows; Trigger shows "Event (default)"; Criticality "Not set" on all three, and the summary line and the appendix both count them.
+- The flagged connection from item 8 (syslog without TLS carrying PII) has the review stripe, its Transport and Authentication cells in the review colour, and the same finding text as the findings table.
+- The grid's cell counts add up to the number of flow–consumer pairs; a multi-consumer flow (Deployment Server → three collection nodes) appears in three cells and one matrix row.
+- Trigger and Criticality survive export → re-import.
+- The Chromium PDF shows OV-3 after OV-2, the matrix split into two tables with the Flow and Resource columns in both, no clipped columns, and page numbers; 0 `pageerror` events while previewing and downloading.
+
+---
+
 ## How to verify (run before every upload)
 1. Zero `pageerror` events at 1280×800, 1440×900, 1920×1080 and 390×844, and across a 1440→1000→1440 resize.
 2. **Grouping sweep:** switch `#builderGroupBy130` through all six options in auto/horizontal layout and in free layout, with the default topology and a 3-UF + Deployment Server topology. Expect 0 errors, and nodes inside their lanes.
 3. `node tools/builder-connector-check.js index.html shots/`: every scenario `OK` (scenario 9 once added, in each grouping mode).
 4. Button sweep: every `#topologyBuilder` button, on a fresh page, with its context revealed, gives no errors and a visible effect. Note that dropdowns such as Group by aren't covered by the button sweep, so step 2 above covers them.
-5. Architecture pack: export with all sections on (including OV-1 and OV-2), in both themes; the Build 128 checks and the item 7 and item 8 acceptance checks pass.
+5. Architecture pack: export with all sections on (including OV-1, OV-2 and OV-3), in both themes; the Build 128 checks and the item 7, 8 and 9 acceptance checks pass.
 6. Add a `changeRegister` entry for each new block.
