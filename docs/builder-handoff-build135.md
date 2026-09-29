@@ -133,6 +133,8 @@ Let the table be wider than its box on screen (`min-width` about 1100px, scrolli
 
 ## 8. OV-1 graphic: layout
 
+> **Full spec now in [`builder-handoff-ov1-diagram.md`](builder-handoff-ov1-diagram.md)** (a comparison with the mockup, and a visual rework of the whole diagram). The points below are a subset; follow that file.
+
 **Now (default and 3-UF topologies):**
 - All four zones are about 320px tall, while their contents use the top 100px.
 - "People and response" is drawn empty when the topology has no such components.

@@ -1,0 +1,1239 @@
+{
+ "schema": "splunk-pipeline-explorer/topology",
+ "version": 5,
+ "name": "Custom topology",
+ "exportedAt": "2026-09-29T02:57:58.601Z",
+ "topology": {
+  "nodes": [
+   {
+    "id": 1,
+    "type": "syslogSource",
+    "parent": null,
+    "sets": 1,
+    "transport": "Automatic",
+    "ack": false,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": false,
+    "instanceName": "Firewalls and network devices",
+    "region": "Sydney",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": null,
+    "networkZone": "",
+    "subnet": "",
+    "instancesRepresented": 30
+   },
+   {
+    "id": 2,
+    "type": "syslog",
+    "parent": 1,
+    "sets": 1,
+    "transport": "Automatic",
+    "ack": false,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": false,
+    "instanceName": "Syslog Server 1",
+    "region": "Sydney",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": {
+     "protocol": "TCP/TLS or UDP",
+     "endpoint": "Syslog Server 1",
+     "port": 0,
+     "tls": "Not applicable",
+     "acknowledgement": "None",
+     "direction": "Unidirectional",
+     "owner": "Log onboarding team",
+     "availabilitySlo": 99.9,
+     "latencySloSeconds": 60,
+     "retryPolicy": "Sender retry policy",
+     "criticality": "High",
+     "validation": "Review",
+     "dependency": "Downstream collection and detection",
+     "notes": "",
+     "authenticationRequired": "Unknown",
+     "authenticationType": "Not specified",
+     "resourceExchanged": "",
+     "activitySupported": "",
+     "flowClassification": "",
+     "flowTrigger": "",
+     "flowCriticality": ""
+    },
+    "networkZone": "",
+    "subnet": "",
+    "relationshipRouting": {
+     "style": "curved",
+     "avoidNodes": true,
+     "waypoints": [],
+     "labelOffset": {
+      "x": 0,
+      "y": 0
+     }
+    }
+   },
+   {
+    "id": 3,
+    "type": "uf",
+    "parent": 2,
+    "sets": 2,
+    "transport": "Automatic",
+    "ack": true,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": true,
+    "instanceName": "Universal Forwarder 1",
+    "region": "Sydney",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": {
+     "protocol": "File handoff",
+     "endpoint": "Universal Forwarder 1",
+     "port": 0,
+     "tls": "Not applicable",
+     "acknowledgement": "Indexer acknowledgement",
+     "direction": "Unidirectional",
+     "owner": "Log onboarding team",
+     "availabilitySlo": 99.9,
+     "latencySloSeconds": 60,
+     "retryPolicy": "Sender retry policy",
+     "criticality": "High",
+     "validation": "Review",
+     "dependency": "Downstream collection and detection",
+     "notes": "",
+     "authenticationRequired": "Unknown",
+     "authenticationType": "Not specified",
+     "resourceExchanged": "",
+     "activitySupported": "",
+     "flowClassification": "",
+     "flowTrigger": "",
+     "flowCriticality": ""
+    },
+    "networkZone": "",
+    "subnet": "",
+    "relationshipRouting": {
+     "style": "curved",
+     "avoidNodes": true,
+     "waypoints": [],
+     "labelOffset": {
+      "x": 0,
+      "y": 0
+     }
+    },
+    "deploymentObservedApps": {},
+    "instancesRepresented": 120
+   },
+   {
+    "id": 4,
+    "type": "idx",
+    "parent": 3,
+    "sets": 2,
+    "transport": "Automatic",
+    "ack": false,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": false,
+    "instanceName": "Indexer 1",
+    "region": "Multisite",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": {
+     "protocol": "Splunk-to-Splunk",
+     "endpoint": "Indexer 1",
+     "port": 0,
+     "tls": "Required",
+     "acknowledgement": "None",
+     "direction": "Unidirectional",
+     "owner": "Splunk platform team",
+     "availabilitySlo": 99.9,
+     "latencySloSeconds": 60,
+     "retryPolicy": "Sender retry policy",
+     "criticality": "High",
+     "validation": "Review",
+     "dependency": "Downstream collection and detection",
+     "notes": "",
+     "authenticationRequired": "Unknown",
+     "authenticationType": "Not specified",
+     "resourceExchanged": "",
+     "activitySupported": "",
+     "flowClassification": "",
+     "flowTrigger": "",
+     "flowCriticality": ""
+    },
+    "networkZone": "",
+    "subnet": "",
+    "relationshipRouting": {
+     "style": "curved",
+     "avoidNodes": true,
+     "waypoints": [],
+     "labelOffset": {
+      "x": 0,
+      "y": 0
+     }
+    },
+    "indexClusterId": null,
+    "indexClusterSite": "",
+    "instancesRepresented": 8
+   },
+   {
+    "id": 5,
+    "type": "windowsEvent",
+    "parent": null,
+    "sets": 1,
+    "transport": "Automatic",
+    "ack": false,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": false,
+    "instanceName": "Windows Event Log 1",
+    "region": "Sydney",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": null,
+    "networkZone": "",
+    "subnet": "",
+    "instancesRepresented": 120
+   },
+   {
+    "id": 6,
+    "type": "syslogSource",
+    "parent": null,
+    "sets": 1,
+    "transport": "Automatic",
+    "ack": false,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": false,
+    "instanceName": "Syslog Source 2",
+    "region": "Melbourne",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": null,
+    "networkZone": "",
+    "subnet": "",
+    "instancesRepresented": 12
+   },
+   {
+    "id": 7,
+    "type": "syslog",
+    "parent": 6,
+    "sets": 1,
+    "transport": "Automatic",
+    "ack": false,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": false,
+    "instanceName": "Syslog Server 2",
+    "region": "Melbourne",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": {
+     "protocol": "TCP/TLS or UDP",
+     "endpoint": "Syslog Server 2",
+     "port": 0,
+     "tls": "Not applicable",
+     "acknowledgement": "None",
+     "direction": "Unidirectional",
+     "owner": "Log onboarding team",
+     "availabilitySlo": 99.9,
+     "latencySloSeconds": 60,
+     "retryPolicy": "Sender retry policy",
+     "criticality": "High",
+     "validation": "Review",
+     "dependency": "Downstream collection and detection",
+     "notes": "",
+     "authenticationRequired": "Unknown",
+     "authenticationType": "Not specified",
+     "resourceExchanged": "",
+     "activitySupported": "",
+     "flowClassification": "",
+     "flowTrigger": "",
+     "flowCriticality": ""
+    },
+    "networkZone": "",
+    "subnet": "",
+    "relationshipRouting": {
+     "style": "curved",
+     "avoidNodes": true,
+     "waypoints": [],
+     "labelOffset": {
+      "x": 0,
+      "y": 0
+     }
+    }
+   },
+   {
+    "id": 8,
+    "type": "uf",
+    "parent": 7,
+    "sets": 1,
+    "transport": "Automatic",
+    "ack": true,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": true,
+    "instanceName": "Universal Forwarder 2",
+    "region": "Melbourne",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": {
+     "protocol": "File handoff",
+     "endpoint": "Universal Forwarder 2",
+     "port": 0,
+     "tls": "Not applicable",
+     "acknowledgement": "Indexer acknowledgement",
+     "direction": "Unidirectional",
+     "owner": "Log onboarding team",
+     "availabilitySlo": 99.9,
+     "latencySloSeconds": 60,
+     "retryPolicy": "Sender retry policy",
+     "criticality": "High",
+     "validation": "Review",
+     "dependency": "Downstream collection and detection",
+     "notes": "",
+     "authenticationRequired": "Unknown",
+     "authenticationType": "Not specified",
+     "resourceExchanged": "",
+     "activitySupported": "",
+     "flowClassification": "",
+     "flowTrigger": "",
+     "flowCriticality": ""
+    },
+    "networkZone": "",
+    "subnet": "",
+    "relationshipRouting": {
+     "style": "curved",
+     "avoidNodes": true,
+     "waypoints": [],
+     "labelOffset": {
+      "x": 0,
+      "y": 0
+     }
+    },
+    "deploymentObservedApps": {},
+    "instancesRepresented": 45
+   },
+   {
+    "id": 9,
+    "type": "awsLambda",
+    "parent": null,
+    "sets": 1,
+    "transport": "Automatic",
+    "ack": false,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": false,
+    "instanceName": "AWS Lambda 1",
+    "region": "AWS ap-southeast-2",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": null,
+    "networkZone": "",
+    "subnet": ""
+   },
+   {
+    "id": 10,
+    "type": "hf",
+    "parent": 9,
+    "sets": 1,
+    "transport": "Automatic",
+    "ack": false,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": true,
+    "instanceName": "Heavy Forwarder 1",
+    "region": "Sydney",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": {
+     "protocol": "Direct HEC HTTPS 8088",
+     "endpoint": "Heavy Forwarder 1",
+     "port": 8088,
+     "tls": "Required",
+     "acknowledgement": "None",
+     "direction": "Unidirectional",
+     "owner": "Splunk platform team",
+     "availabilitySlo": 99.9,
+     "latencySloSeconds": 60,
+     "retryPolicy": "Sender retry policy",
+     "criticality": "High",
+     "validation": "Review",
+     "dependency": "Downstream collection and detection",
+     "notes": "",
+     "authenticationRequired": "Unknown",
+     "authenticationType": "Not specified",
+     "resourceExchanged": "",
+     "activitySupported": "",
+     "flowClassification": "",
+     "flowTrigger": "",
+     "flowCriticality": ""
+    },
+    "networkZone": "",
+    "subnet": "",
+    "relationshipRouting": {
+     "style": "curved",
+     "avoidNodes": true,
+     "waypoints": [],
+     "labelOffset": {
+      "x": 0,
+      "y": 0
+     }
+    },
+    "deploymentObservedApps": {}
+   },
+   {
+    "id": 11,
+    "type": "search",
+    "parent": 4,
+    "sets": 1,
+    "transport": "Automatic",
+    "ack": false,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": false,
+    "instanceName": "Search Head 1",
+    "region": "Multisite",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": {
+     "protocol": "Search dispatch",
+     "endpoint": "Search Head 1",
+     "port": 0,
+     "tls": "Required",
+     "acknowledgement": "None",
+     "direction": "Unidirectional",
+     "owner": "Splunk platform team",
+     "availabilitySlo": 99.9,
+     "latencySloSeconds": 60,
+     "retryPolicy": "Sender retry policy",
+     "criticality": "High",
+     "validation": "Review",
+     "dependency": "Downstream collection and detection",
+     "notes": "",
+     "authenticationRequired": "Unknown",
+     "authenticationType": "Not specified",
+     "resourceExchanged": "",
+     "activitySupported": "",
+     "flowClassification": "",
+     "flowTrigger": "",
+     "flowCriticality": ""
+    },
+    "networkZone": "",
+    "subnet": "",
+    "relationshipRouting": {
+     "style": "curved",
+     "avoidNodes": true,
+     "waypoints": [],
+     "labelOffset": {
+      "x": 0,
+      "y": 0
+     }
+    }
+   },
+   {
+    "id": 12,
+    "type": "soarCloud",
+    "parent": null,
+    "sets": 1,
+    "transport": "Automatic",
+    "ack": false,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": false,
+    "instanceName": "Splunk SOAR · Cloud 1",
+    "region": "Cloud",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": null,
+    "networkZone": "",
+    "subnet": ""
+   },
+   {
+    "id": 13,
+    "type": "authUser",
+    "parent": null,
+    "sets": 1,
+    "transport": "Automatic",
+    "ack": false,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": false,
+    "displayName": "Administrator 1",
+    "persona": "Splunk platform administrator",
+    "identityOwner": "Identity and access management",
+    "instanceName": "Administrator 1",
+    "region": "Security operations",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": null,
+    "networkZone": "",
+    "subnet": "",
+    "instancesRepresented": 12
+   },
+   {
+    "id": 14,
+    "type": "authProviderCloud",
+    "parent": null,
+    "sets": 1,
+    "transport": "Automatic",
+    "ack": false,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": false,
+    "instanceName": "Authentication Provider · Cloud 1",
+    "region": "Cloud",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": null,
+    "networkZone": "",
+    "subnet": "",
+    "providerProtocol": "SAML SSO",
+    "providerEndpoint": "",
+    "providerAuthority": "",
+    "providerAudit": "",
+    "providerMfa": "unknown"
+   },
+   {
+    "id": 15,
+    "type": "ds",
+    "parent": null,
+    "sets": 1,
+    "transport": "Automatic",
+    "ack": false,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": false,
+    "instanceName": "Deployment Server 1",
+    "region": "Sydney",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": null,
+    "networkZone": "",
+    "subnet": ""
+   },
+   {
+    "id": 16,
+    "type": "licenseManager",
+    "parent": null,
+    "sets": 1,
+    "transport": "Automatic",
+    "ack": false,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": false,
+    "instanceName": "License Manager 1",
+    "region": "Sydney",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": null,
+    "networkZone": "",
+    "subnet": ""
+   },
+   {
+    "id": 17,
+    "type": "monitoringConsole",
+    "parent": null,
+    "sets": 1,
+    "transport": "Automatic",
+    "ack": false,
+    "persistent": false,
+    "eventStatus": "healthy",
+    "managementRequired": false,
+    "instanceName": "Monitoring Console 1",
+    "region": "Sydney",
+    "environment": "Production",
+    "groupId": null,
+    "relationshipDetails": null,
+    "networkZone": "",
+    "subnet": ""
+   }
+  ],
+  "relationships": [
+   {
+    "id": "rel-1",
+    "from": 15,
+    "to": 3,
+    "plane": "management",
+    "type": "deployment_client",
+    "authority": "active",
+    "targetUri": "deployment.example.gov.au",
+    "port": 8089,
+    "phoneHome": 60,
+    "clientName": "",
+    "serverClasses": [],
+    "apps": [],
+    "desiredVersion": "",
+    "deliveredVersion": "",
+    "effectiveVersion": "",
+    "lastPhoneHome": "",
+    "activation": "reload",
+    "managementStatus": "unknown",
+    "managedRequired": true,
+    "relationshipDetails": {
+     "protocol": "Phone-home and app delivery",
+     "endpoint": "deployment.example.gov.au",
+     "port": 8089,
+     "tls": "Required",
+     "acknowledgement": "Application response",
+     "direction": "Request-response",
+     "owner": "Log onboarding team",
+     "availabilitySlo": 99.9,
+     "latencySloSeconds": 30,
+     "retryPolicy": "Client retry with backoff",
+     "criticality": "High",
+     "validation": "Review",
+     "dependency": "Configuration currency",
+     "notes": "",
+     "authenticationRequired": "Unknown",
+     "authenticationType": "Not specified",
+     "resourceExchanged": "",
+     "activitySupported": "",
+     "flowClassification": "",
+     "flowTrigger": "",
+     "flowCriticality": ""
+    },
+    "relationshipRouting": {
+     "style": "curved",
+     "avoidNodes": true,
+     "waypoints": [],
+     "labelOffset": {
+      "x": 0,
+      "y": 0
+     }
+    }
+   },
+   {
+    "id": "rel-2",
+    "from": 15,
+    "to": 8,
+    "plane": "management",
+    "type": "deployment_client",
+    "authority": "active",
+    "targetUri": "deployment.example.gov.au",
+    "port": 8089,
+    "phoneHome": 60,
+    "clientName": "",
+    "serverClasses": [],
+    "apps": [],
+    "desiredVersion": "",
+    "deliveredVersion": "",
+    "effectiveVersion": "",
+    "lastPhoneHome": "",
+    "activation": "reload",
+    "managementStatus": "unknown",
+    "managedRequired": true,
+    "relationshipDetails": {
+     "protocol": "Phone-home and app delivery",
+     "endpoint": "deployment.example.gov.au",
+     "port": 8089,
+     "tls": "Required",
+     "acknowledgement": "Application response",
+     "direction": "Request-response",
+     "owner": "Log onboarding team",
+     "availabilitySlo": 99.9,
+     "latencySloSeconds": 30,
+     "retryPolicy": "Client retry with backoff",
+     "criticality": "High",
+     "validation": "Review",
+     "dependency": "Configuration currency",
+     "notes": "",
+     "authenticationRequired": "Unknown",
+     "authenticationType": "Not specified",
+     "resourceExchanged": "",
+     "activitySupported": "",
+     "flowClassification": "",
+     "flowTrigger": "",
+     "flowCriticality": ""
+    },
+    "relationshipRouting": {
+     "style": "curved",
+     "avoidNodes": true,
+     "waypoints": [],
+     "labelOffset": {
+      "x": 0,
+      "y": 0
+     }
+    }
+   },
+   {
+    "id": "rel-3",
+    "from": 15,
+    "to": 10,
+    "plane": "management",
+    "type": "deployment_client",
+    "authority": "active",
+    "targetUri": "deployment.example.gov.au",
+    "port": 8089,
+    "phoneHome": 60,
+    "clientName": "",
+    "serverClasses": [],
+    "apps": [],
+    "desiredVersion": "",
+    "deliveredVersion": "",
+    "effectiveVersion": "",
+    "lastPhoneHome": "",
+    "activation": "reload",
+    "managementStatus": "unknown",
+    "managedRequired": true,
+    "relationshipDetails": {
+     "protocol": "Phone-home and app delivery",
+     "endpoint": "deployment.example.gov.au",
+     "port": 8089,
+     "tls": "Required",
+     "acknowledgement": "Application response",
+     "direction": "Request-response",
+     "owner": "Splunk platform team",
+     "availabilitySlo": 99.9,
+     "latencySloSeconds": 30,
+     "retryPolicy": "Client retry with backoff",
+     "criticality": "High",
+     "validation": "Review",
+     "dependency": "Configuration currency",
+     "notes": "",
+     "authenticationRequired": "Unknown",
+     "authenticationType": "Not specified",
+     "resourceExchanged": "",
+     "activitySupported": "",
+     "flowClassification": "",
+     "flowTrigger": "",
+     "flowCriticality": ""
+    },
+    "relationshipRouting": {
+     "style": "curved",
+     "avoidNodes": true,
+     "waypoints": [],
+     "labelOffset": {
+      "x": 0,
+      "y": 0
+     }
+    }
+   }
+  ],
+  "authRelationships": [
+   {
+    "id": "auth-rel-1",
+    "from": 13,
+    "to": 14,
+    "plane": "authentication",
+    "type": "identity_authentication",
+    "method": "SAML SSO",
+    "identityProvider": "Cloud authentication provider",
+    "mfa": "unknown",
+    "endpoint": "Splunk Web :8000 / management REST :8089",
+    "accessRoute": "Privileged access workstation + VPN",
+    "roleMapping": [],
+    "sessionMinutes": 30,
+    "auditEvidence": "",
+    "breakGlass": "tested",
+    "status": "review",
+    "relationshipDetails": {
+     "protocol": "SAML SSO",
+     "endpoint": "Splunk Web :8000 / management REST :8089",
+     "port": 0,
+     "tls": "Required",
+     "acknowledgement": "Session established",
+     "direction": "Request-response",
+     "owner": "Identity and access management",
+     "availabilitySlo": 99.9,
+     "latencySloSeconds": 30,
+     "retryPolicy": "Client retry with backoff",
+     "criticality": "High",
+     "validation": "Review",
+     "dependency": "Administrative access",
+     "notes": "",
+     "authenticationRequired": "Yes",
+     "authenticationType": "SAML SSO",
+     "resourceExchanged": "",
+     "activitySupported": "",
+     "flowClassification": "",
+     "flowTrigger": "",
+     "flowCriticality": ""
+    },
+    "relationshipRouting": {
+     "style": "curved",
+     "avoidNodes": true,
+     "waypoints": [],
+     "labelOffset": {
+      "x": 0,
+      "y": 0
+     }
+    }
+   },
+   {
+    "id": "auth-rel-2",
+    "from": 14,
+    "to": 11,
+    "plane": "authentication",
+    "type": "identity_federation",
+    "method": "SAML SSO",
+    "identityProvider": "Cloud authentication provider",
+    "mfa": "unknown",
+    "endpoint": "Splunk Web :8000 through search-tier load balancer",
+    "accessRoute": "Privileged access workstation + VPN",
+    "roleMapping": [
+     "admin"
+    ],
+    "sessionMinutes": 30,
+    "auditEvidence": "",
+    "breakGlass": "tested",
+    "status": "review",
+    "relationshipDetails": {
+     "protocol": "SAML SSO",
+     "endpoint": "Splunk Web :8000 through search-tier load balancer",
+     "port": 0,
+     "tls": "Required",
+     "acknowledgement": "Session established",
+     "direction": "Request-response",
+     "owner": "Splunk platform team",
+     "availabilitySlo": 99.9,
+     "latencySloSeconds": 30,
+     "retryPolicy": "Client retry with backoff",
+     "criticality": "High",
+     "validation": "Review",
+     "dependency": "Administrative access",
+     "notes": "",
+     "authenticationRequired": "Yes",
+     "authenticationType": "SAML SSO",
+     "resourceExchanged": "",
+     "activitySupported": "",
+     "flowClassification": "",
+     "flowTrigger": "",
+     "flowCriticality": ""
+    },
+    "relationshipRouting": {
+     "style": "curved",
+     "avoidNodes": true,
+     "waypoints": [],
+     "labelOffset": {
+      "x": 0,
+      "y": 0
+     }
+    }
+   }
+  ],
+  "groups": [],
+  "dataRelationships": []
+ },
+ "governance": {
+  "securityClassification": "Security telemetry + PII",
+  "securityEnvironment": "Production",
+  "responsibilityAccountable": "Security telemetry service owner",
+  "responsibilityOwners": {
+   "1": "Source / application owner",
+   "2": "Log onboarding team",
+   "3": "Log onboarding team",
+   "4": "Splunk platform team",
+   "5": "Source / application owner",
+   "6": "Source / application owner",
+   "7": "Log onboarding team",
+   "8": "Log onboarding team",
+   "9": "Cloud platform team",
+   "10": "Splunk platform team",
+   "11": "Splunk platform team",
+   "12": "Security operations team",
+   "13": "Identity and access management",
+   "14": "Identity and access management",
+   "15": "Splunk platform team",
+   "16": "Splunk platform team",
+   "17": "Splunk platform team"
+  }
+ },
+ "changeHistory": {
+  "scope": "current browser session",
+  "exportedAt": "2026-09-29T02:57:58.602Z",
+  "applied": [],
+  "undone": []
+ },
+ "canvas": {
+  "layout": "auto",
+  "positions": {},
+  "snap": {
+   "enabled": false,
+   "gridSize": 20
+  }
+ },
+ "layoutProfiles": {
+  "schema": "splunk-pipeline-explorer/layout-profiles",
+  "version": 1,
+  "activeProfileId": "layout-1790650674834-4lydb",
+  "profiles": [
+   {
+    "id": "layout-1790650674834-4lydb",
+    "name": "Logical architecture",
+    "kind": "Logical architecture",
+    "layout": "auto",
+    "positions": {},
+    "viewport": {
+     "zoom": 0.9973912759894724,
+     "x": -24.81738931926307,
+     "y": 68.70190202600983,
+     "initialized": true
+    },
+    "snap": {
+     "enabled": false,
+     "gridSize": 20
+    },
+    "visiblePlanes": {
+     "data": true,
+     "management": true,
+     "authentication": true
+    },
+    "updatedAt": "2026-09-29T02:57:58.601Z",
+    "grouping": {
+     "mode": "none",
+     "collapsedTypes": []
+    },
+    "ov1": {
+     "mission": "Detect, investigate and contain security threats across both data centres and AWS within 15 minutes, 24×7.",
+     "people": []
+    },
+    "representedInstances": {
+     "1": 30,
+     "3": 120,
+     "4": 8,
+     "5": 120,
+     "6": 12,
+     "8": 45,
+     "13": 12
+    },
+    "ov2": {
+     "nodeNames": {},
+     "activities": []
+    },
+    "handlingCaveat": ""
+   },
+   {
+    "id": "layout-1790650674835-qxt0g",
+    "name": "Physical deployment",
+    "kind": "Physical deployment",
+    "layout": "horizontal",
+    "positions": {
+     "1": {
+      "x": 48,
+      "y": 58
+     },
+     "2": {
+      "x": 318,
+      "y": 58
+     },
+     "3": {
+      "x": 588,
+      "y": 58
+     },
+     "4": {
+      "x": 858,
+      "y": 58
+     }
+    },
+    "viewport": {
+     "zoom": 1,
+     "x": 0,
+     "y": 0,
+     "initialized": false
+    },
+    "snap": {
+     "enabled": false,
+     "gridSize": 20
+    },
+    "visiblePlanes": {
+     "data": true,
+     "management": true,
+     "authentication": false
+    },
+    "updatedAt": "2026-09-29T02:57:54.835Z",
+    "grouping": {
+     "mode": "none",
+     "collapsedTypes": []
+    },
+    "ov1": {
+     "mission": "",
+     "people": []
+    },
+    "representedInstances": {},
+    "ov2": {
+     "nodeNames": {},
+     "activities": []
+    },
+    "handlingCaveat": ""
+   },
+   {
+    "id": "layout-1790650674835-rjcb5",
+    "name": "Security boundaries",
+    "kind": "Security boundaries",
+    "layout": "free",
+    "positions": {
+     "1": {
+      "x": 48,
+      "y": 58
+     },
+     "2": {
+      "x": 318,
+      "y": 58
+     },
+     "3": {
+      "x": 588,
+      "y": 58
+     },
+     "4": {
+      "x": 858,
+      "y": 58
+     }
+    },
+    "viewport": {
+     "zoom": 1,
+     "x": 0,
+     "y": 0,
+     "initialized": false
+    },
+    "snap": {
+     "enabled": false,
+     "gridSize": 20
+    },
+    "visiblePlanes": {
+     "data": true,
+     "management": true,
+     "authentication": true
+    },
+    "updatedAt": "2026-09-29T02:57:54.835Z",
+    "grouping": {
+     "mode": "none",
+     "collapsedTypes": []
+    },
+    "ov1": {
+     "mission": "",
+     "people": []
+    },
+    "representedInstances": {},
+    "ov2": {
+     "nodeNames": {},
+     "activities": []
+    },
+    "handlingCaveat": ""
+   },
+   {
+    "id": "layout-1790650674835-9k7v0",
+    "name": "Responsibility view",
+    "kind": "Responsibility view",
+    "layout": "vertical",
+    "positions": {
+     "1": {
+      "x": 48,
+      "y": 58
+     },
+     "2": {
+      "x": 318,
+      "y": 58
+     },
+     "3": {
+      "x": 588,
+      "y": 58
+     },
+     "4": {
+      "x": 858,
+      "y": 58
+     }
+    },
+    "viewport": {
+     "zoom": 1,
+     "x": 0,
+     "y": 0,
+     "initialized": false
+    },
+    "snap": {
+     "enabled": false,
+     "gridSize": 20
+    },
+    "visiblePlanes": {
+     "data": true,
+     "management": true,
+     "authentication": true
+    },
+    "updatedAt": "2026-09-29T02:57:54.835Z",
+    "grouping": {
+     "mode": "none",
+     "collapsedTypes": []
+    },
+    "ov1": {
+     "mission": "",
+     "people": []
+    },
+    "representedInstances": {},
+    "ov2": {
+     "nodeNames": {},
+     "activities": []
+    },
+    "handlingCaveat": ""
+   },
+   {
+    "id": "layout-1790650674835-s3hsd",
+    "name": "Failure-response view",
+    "kind": "Failure-response view",
+    "layout": "free",
+    "positions": {
+     "1": {
+      "x": 48,
+      "y": 58
+     },
+     "2": {
+      "x": 318,
+      "y": 58
+     },
+     "3": {
+      "x": 588,
+      "y": 58
+     },
+     "4": {
+      "x": 858,
+      "y": 58
+     }
+    },
+    "viewport": {
+     "zoom": 1,
+     "x": 0,
+     "y": 0,
+     "initialized": false
+    },
+    "snap": {
+     "enabled": false,
+     "gridSize": 20
+    },
+    "visiblePlanes": {
+     "data": true,
+     "management": true,
+     "authentication": false
+    },
+    "updatedAt": "2026-09-29T02:57:54.835Z",
+    "grouping": {
+     "mode": "none",
+     "collapsedTypes": []
+    },
+    "ov1": {
+     "mission": "",
+     "people": []
+    },
+    "representedInstances": {},
+    "ov2": {
+     "nodeNames": {},
+     "activities": []
+    },
+    "handlingCaveat": ""
+   }
+  ]
+ },
+ "navigation": {
+  "schema": "splunk-pipeline-explorer/navigation-bookmarks",
+  "version": 1,
+  "bookmarks": []
+ },
+ "statistics": {
+  "calculatedAt": "2026-09-29T02:57:58.611Z",
+  "components": 17,
+  "relationships": 12,
+  "relationshipDensityPercent": 1.47,
+  "singlePointsOfFailure": [
+   "Syslog Server 1",
+   "Universal Forwarder 1",
+   "Indexer 1",
+   "Syslog Server 2",
+   "Heavy Forwarder 1",
+   "Deployment Server 1"
+  ],
+  "unmanagedAgents": [],
+  "crossRegionPaths": [
+   "Universal Forwarder 1 → Indexer 1",
+   "AWS Lambda 1 → Heavy Forwarder 1",
+   "Deployment Server 1 → Universal Forwarder 2",
+   "Administrator 1 → Authentication Provider · Cloud 1",
+   "Authentication Provider · Cloud 1 → Search Head 1"
+  ],
+  "boundaryCrossings": [
+   {
+    "path": "Firewalls and network devices → Syslog Server 1",
+    "boundaries": [
+     "Security zone",
+     "Responsibility"
+    ]
+   },
+   {
+    "path": "Universal Forwarder 1 → Indexer 1",
+    "boundaries": [
+     "Security zone",
+     "Responsibility"
+    ]
+   },
+   {
+    "path": "Syslog Source 2 → Syslog Server 2",
+    "boundaries": [
+     "Security zone",
+     "Responsibility"
+    ]
+   },
+   {
+    "path": "AWS Lambda 1 → Heavy Forwarder 1",
+    "boundaries": [
+     "Security zone",
+     "Responsibility"
+    ]
+   },
+   {
+    "path": "Deployment Server 1 → Universal Forwarder 1",
+    "boundaries": [
+     "Responsibility"
+    ]
+   },
+   {
+    "path": "Deployment Server 1 → Universal Forwarder 2",
+    "boundaries": [
+     "Responsibility"
+    ]
+   },
+   {
+    "path": "Authentication Provider · Cloud 1 → Search Head 1",
+    "boundaries": [
+     "Responsibility"
+    ]
+   }
+  ]
+ },
+ "exportPreferences": {
+  "scope": "complete",
+  "multiPageDimensions": {
+   "region": true,
+   "environment": false,
+   "group": true,
+   "plane": true,
+   "failure": false
+  },
+  "packSections": {
+   "cover": true,
+   "inventory": true,
+   "connections": true,
+   "findings": true,
+   "security": false,
+   "ownership": false,
+   "resilience": false,
+   "deployment": false,
+   "appendix": false,
+   "ov1": true,
+   "ov2": true
+  },
+  "packOwner": "",
+  "packPrintTheme": "light",
+  "packNotes": {},
+  "ov1": {
+   "mission": "Detect, investigate and contain security threats across both data centres and AWS within 15 minutes, 24×7.",
+   "people": []
+  },
+  "ov2": {
+   "nodeNames": {},
+   "activities": []
+  },
+  "handlingCaveat": ""
+ },
+ "architectureProfile": "enterprise",
+ "grouping": {
+  "mode": "none",
+  "collapsedTypes": []
+ }
+}
