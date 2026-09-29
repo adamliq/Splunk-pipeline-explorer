@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>
+<title>Threat Model DFD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: an architecture-pack page in the same family as the OV-1/2/3 mockups: banners, title block, purpose,
+   then the data flow diagram with trust boundaries, the boundary-crossing register, and the STRIDE threat register.
+   Colour carries meaning only: boundaries in the boundary red, flows by plane, threat status as chips. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --data:#0f7fa6; --mgmt:#11897a; --auth:#7a4fc4; --tb:#b93a2b; --review:#8a5a00; --hi:#fff4d6;
+  --ok:#1d7a4f; --open:#b93a2b; --acc:#6a7f8f; --xfer:#5b5bb8;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --data:#4fb7d6; --mgmt:#2dd4bf; --auth:#b39cff; --tb:#f28b7d; --review:#e0b567; --hi:#2a2412;
+  --ok:#66e0a3; --open:#f28b7d; --acc:#9fb2c1; --xfer:#a9a9ff;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --data:#4fb7d6; --mgmt:#2dd4bf; --auth:#b39cff; --tb:#f28b7d; --review:#e0b567; --hi:#2a2412;
+  --ok:#66e0a3; --open:#f28b7d; --acc:#9fb2c1; --xfer:#a9a9ff;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1280px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*,.gen>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);display:flex;justify-content:space-between;gap:12px;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+@media (max-width:640px){.inner{padding:14px}}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}}
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--tb);padding:4px 0 4px 12px}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+
+/* Summary strip */
+.summary{display:flex;flex-wrap:wrap;gap:8px 26px;align-items:baseline;font-size:.84rem;color:var(--ink-2)}
+.summary b{font:600 1.1rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .o b{color:var(--open)}
+.stride{display:flex;gap:4px;flex-wrap:wrap}
+.stride button{font:700 .72rem/1 var(--font-code);color:var(--ink-2);background:var(--sheet);border:1px solid var(--rule);border-radius:4px;padding:6px 8px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.stride button[aria-pressed="true"]{border-color:var(--ink-2);background:var(--zone);color:var(--ink)}
+.stride button span{font:500 .7rem var(--font-body);color:var(--muted)}
+.stride button i{font-style:normal;background:var(--open);color:var(--sheet);border-radius:8px;padding:1px 5px;font-size:.62rem}
+.stride button i.z{background:var(--rule);color:var(--ink-2)}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* Diagram */
+.figure{border:1px solid var(--rule);border-radius:3px;overflow-x:auto;background:var(--sheet);max-width:100%}
+.figure svg{display:block;min-width:980px;width:100%;height:auto}
+.bnd rect{fill:color-mix(in srgb,var(--tb) 3%,transparent);stroke:var(--tb);stroke-width:1.6;stroke-dasharray:10 6}
+.bnd.managed rect{stroke-dasharray:3 5;stroke-width:2}
+.bnd text{font:700 10.5px var(--font-code);letter-spacing:.1em;fill:var(--tb)}
+.bnd text.sub{font:500 10px var(--font-body);letter-spacing:0;fill:var(--muted)}
+.el{cursor:pointer}
+.el .shape{fill:var(--node);stroke:var(--ink-2);stroke-width:1.4}
+.el.proc .shape{stroke:var(--ink)}
+.el .id{font:700 10px var(--font-code);fill:var(--muted)}
+.el .nm{font:600 12.5px var(--font-title);fill:var(--ink)}
+.el .nm.pn{font-size:11.5px}
+.el .sm{font:400 10px var(--font-body);fill:var(--muted)}
+.el .store{stroke:var(--ink-2);stroke-width:1.6}
+.tcount{font:700 10px var(--font-code);fill:var(--sheet)}
+.tdot{fill:var(--open)} .tdot.ok{fill:var(--ok)}
+.fl{fill:none;stroke-width:1.9;cursor:pointer}
+.fl.data{stroke:var(--data)} .fl.mgmt{stroke:var(--mgmt);stroke-dasharray:7 5} .fl.auth{stroke:var(--auth);stroke-dasharray:2 4;stroke-linecap:round}
+.flhit{fill:none;stroke:transparent;stroke-width:14;cursor:pointer}
+.fll{cursor:pointer}
+.fll rect{fill:var(--sheet);stroke:var(--ink-2);stroke-width:1}
+.fll text{font:700 9.5px var(--font-code);fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+.fll.risk rect{stroke:var(--open);stroke-width:1.6}
+.fll.risk text{fill:var(--open)}
+.cross{fill:var(--sheet);stroke:var(--tb);stroke-width:1.8}
+.cross.open{fill:var(--tb)}
+svg .el,svg .fl,svg .fll,svg .cross{transition:opacity .2s}
+svg.focusing .el,svg.focusing .fl,svg.focusing .fll,svg.focusing .cross{opacity:.14}
+svg.focusing .on{opacity:1!important}
+svg.focusing .el.on .shape{stroke:var(--focus);stroke-width:2.6}
+svg.focusing .fl.on{stroke-width:3.2}
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:.8rem;color:var(--ink-2);align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.hint{margin:0;color:var(--muted);font-size:.8rem}
+
+/* Tables */
+h2{margin:0 0 8px;font:600 .72rem/1 var(--font-code);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:.8rem;min-width:900px}
+th,td{text-align:left;padding:6px 8px;border-top:1px solid var(--rule);vertical-align:top}
+thead th{border-top:0;background:var(--zone);font:600 .62rem/1.3 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap}
+td.code{font:600 .72rem/1.3 var(--font-code);white-space:nowrap}
+tbody tr{cursor:pointer}
+tbody tr:hover td{background:var(--zone)}
+tbody tr.on td{background:var(--hi)}
+tbody tr[hidden]{display:none}
+.st{font:700 .6rem/1 var(--font-code);letter-spacing:.06em;border-radius:4px;padding:4px 6px;white-space:nowrap;display:inline-block}
+.st.open{color:var(--open);background:color-mix(in srgb,var(--open) 14%,transparent)}
+.st.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.st.acc{color:var(--acc);background:color-mix(in srgb,var(--acc) 16%,transparent)}
+.st.xfer{color:var(--xfer);background:color-mix(in srgb,var(--xfer) 14%,transparent)}
+.sl{font:700 .72rem/1 var(--font-code);display:inline-grid;place-items:center;width:20px;height:20px;border-radius:4px;background:var(--zone);color:var(--ink)}
+.sev{font:600 .7rem var(--font-body)}
+.sev.h{color:var(--open)} .sev.m{color:var(--review)} .sev.l{color:var(--muted)}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;color:var(--muted);font-size:.76rem;border-top:1px solid var(--rule);padding-top:8px}
+
+.gen{border:1px dashed var(--rule);border-radius:6px;padding:14px 16px;display:grid;gap:10px;background:var(--sheet)}
+.gen h3{margin:0;font:600 1rem/1.3 var(--font-title)}
+.gen p{margin:0;color:var(--ink-2);font-size:.88rem;max-width:95ch}
+.gen table{min-width:640px;font-size:.84rem}
+.gen tbody tr{cursor:default}
+.gen tbody tr:hover td{background:transparent}
+.gen td:first-child{font-weight:600;white-space:nowrap}
+.tag{font:600 .66rem/1 var(--font-code);padding:3px 6px;border-radius:3px;white-space:nowrap}
+.tag.have{background:color-mix(in srgb,var(--mgmt) 16%,transparent);color:var(--mgmt)}
+.tag.der{background:color-mix(in srgb,var(--data) 14%,transparent);color:var(--data)}
+.tag.new{background:color-mix(in srgb,var(--review) 18%,transparent);color:var(--review)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="page">
+  <span class="example">Mockup · example architecture pack page · example data</span>
+
+  <article class="sheet" aria-label="Threat model page of the architecture pack">
+    <div class="banner top"><span>Security telemetry + PII</span><span>Threat model · TM-1</span></div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big">TM-1 · Data flow diagram and trust boundaries</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Method</span><span class="tb-v">DFD + STRIDE per element</span></div>
+        <div><span class="tb-k">Threat owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">146 · 29 Sep 2026</span></div>
+      </div>
+
+      <div class="purpose">
+        <span class="tb-k">Purpose</span>
+        <p>Shows where telemetry crosses a trust boundary and what could go wrong there. Every flow that crosses a boundary gets a marker; every element and flow lists its STRIDE threats, the control that answers each one, and whether the risk is mitigated, open, accepted or transferred to Splunk.</p>
+      </div>
+
+      <div class="summary" id="summary"></div>
+      <div class="stride" id="stride" role="group" aria-label="Filter threats by STRIDE category"></div>
+
+      <div class="figure">
+        <svg id="dfd" viewBox="0 0 1200 650" role="img" aria-labelledby="dfd-t dfd-d">
+          <title id="dfd-t">Data flow diagram with trust boundaries for the Splunk security telemetry architecture</title>
+          <desc id="dfd-d">Windows servers and firewalls in the Sydney data centre send events through a Universal Forwarder and a syslog server across the data-centre boundary into Splunk Cloud. AWS CloudTrail sends through a Lambda function across the AWS account boundary. SOC analysts sign in through the corporate identity provider and search Splunk Cloud.</desc>
+          <defs>
+            <marker id="mD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--data)"/></marker>
+            <marker id="mM" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--mgmt)"/></marker>
+            <marker id="mA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--auth)"/></marker>
+          </defs>
+          <g id="bnds"></g><g id="flows"></g><g id="els"></g><g id="labels"></g><g id="crosses"></g>
+        </svg>
+      </div>
+
+      <div class="legend" aria-label="Legend">
+        <span><svg width="36" height="16" aria-hidden="true"><rect x="2" y="2" width="32" height="12" style="fill:var(--node);stroke:var(--ink-2)"/></svg>External entity</span>
+        <span><svg width="22" height="22" aria-hidden="true"><circle cx="11" cy="11" r="9" style="fill:var(--node);stroke:var(--ink)"/></svg>Process</span>
+        <span><svg width="36" height="16" aria-hidden="true"><path d="M2 3H34M2 13H34" style="stroke:var(--ink-2);stroke-width:1.6"/></svg>Data store</span>
+        <span><svg width="36" height="10" aria-hidden="true"><path d="M2 5H34" style="stroke:var(--data);stroke-width:2"/></svg>Event data</span>
+        <span><svg width="36" height="10" aria-hidden="true"><path d="M2 5H34" style="stroke:var(--mgmt);stroke-width:2;stroke-dasharray:7 5"/></svg>Management</span>
+        <span><svg width="36" height="10" aria-hidden="true"><path d="M2 5H34" style="stroke:var(--auth);stroke-width:2;stroke-dasharray:2 4;stroke-linecap:round"/></svg>Authentication</span>
+        <span><svg width="36" height="16" aria-hidden="true"><rect x="2" y="2" width="32" height="12" rx="3" style="fill:none;stroke:var(--tb);stroke-width:1.6;stroke-dasharray:6 4"/></svg>Trust boundary (dotted: provider-managed)</span>
+        <span><svg width="16" height="16" aria-hidden="true"><path d="M8 1L15 8L8 15L1 8Z" style="fill:var(--sheet);stroke:var(--tb);stroke-width:1.8"/></svg>Boundary crossing (filled: an open threat on it)</span>
+      </div>
+      <p class="hint">Select an element, a flow or a table row to highlight it and its threats. Esc clears.</p>
+
+      <section>
+        <h2>Boundary crossings</h2>
+        <div class="tablewrap"><table id="xTable">
+          <thead><tr><th>Crossing</th><th>Flow</th><th>From → to</th><th>Zone → zone</th><th>Protocol</th><th>Authentication</th><th>Encryption</th><th>Threats</th></tr></thead>
+          <tbody></tbody></table></div>
+      </section>
+
+      <section>
+        <h2>Threat register · STRIDE per element</h2>
+        <div class="tablewrap"><table id="tTable">
+          <thead><tr><th>ID</th><th>STRIDE</th><th>Applies to</th><th>Threat</th><th>Control</th><th>Risk</th><th>Status</th><th>Owner</th></tr></thead>
+          <tbody></tbody></table></div>
+      </section>
+
+      <div class="foot">
+        <span>Splunk security telemetry architecture · Threat owner <span class="notset">Not set</span> · Generated from Builder topology</span>
+        <span>Page 9 of 24 · TM-1</span>
+      </div>
+    </div>
+    <div class="banner bottom"><span>Security telemetry + PII</span><span>Threat model · TM-1</span></div>
+  </article>
+
+  <aside class="gen" aria-labelledby="gen-h">
+    <h3 id="gen-h">How the Builder could generate this page</h3>
+    <p>The diagram is the same topology drawn in DFD notation. Components become processes, sources and people become external entities, and queues, indexes and app repositories become data stores. Trust boundaries come from the Trust zone group containers and each component's security zone. A crossing is any relationship whose two ends sit in different boundaries, and its STRIDE threats are seeded from the relationship details the Builder already records.</p>
+    <div class="tablewrap" style="border:0"><table>
+      <thead><tr><th>Page element</th><th>Source</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Processes, entities</td><td>Component types: sources, people and cloud services are external entities; forwarders, relays, Deployment Server, Lambda, indexing and search are processes</td><td><span class="tag der">Derived</span></td></tr>
+        <tr><td>Data stores</td><td>Persistent queues (UF/HF setting), indexes (indexer), deployment apps (Deployment Server), buffers (SC4S disk buffer)</td><td><span class="tag der">Derived</span></td></tr>
+        <tr><td>Trust boundaries</td><td>Group containers of type Trust zone, Network, Cloud tenant and Service boundary; component security zone (customer, Splunk, storage). Splunk-managed zones are drawn dotted</td><td><span class="tag have">Exists</span></td></tr>
+        <tr><td>Crossings</td><td>Every relationship whose ends are in different boundaries, with protocol, TLS and authentication from the relationship details</td><td><span class="tag der">Derived</span></td></tr>
+        <tr><td>Seeded threats</td><td>Rules per crossing and element: no TLS → Tampering and Information disclosure; no authentication → Spoofing; no acknowledgement or queue → Denial of service; Deployment Server → Elevation of privilege on its clients; token or certificate stored on a process → Information disclosure</td><td><span class="tag der">Derived</span></td></tr>
+        <tr><td>Status, owner, risk</td><td>A threat register saved with the topology: status (Open, Mitigated, Accepted, Transferred), owner (responsibility parties), risk (High, Medium, Low), notes. Splunk-managed elements default to Transferred</td><td><span class="tag new">New</span></td></tr>
+        <tr><td>Controls</td><td>Suggested per rule (for example "TLS syslog on 6514", "forwarder credentials certificate", "HEC token scoped to one index"); editable per threat</td><td><span class="tag new">New</span></td></tr>
+      </tbody></table></div>
+  </aside>
+</div>
+
+<script>
+(() => {
+  const BOUNDARIES = [
+    {id:'TB-1',name:'Sydney data centre',sub:'customer network · customer-managed',x:20,y:50,w:560,h:420},
+    {id:'TB-2',name:'Appliance segment',sub:'firewall and network management VLAN',x:36,y:330,w:218,h:126},
+    {id:'TB-3',name:'AWS account 1234',sub:'ap-southeast-2 · customer-managed',x:20,y:490,w:560,h:142},
+    {id:'TB-4',name:'Splunk Cloud Platform',sub:'acme stack · Splunk-managed',x:640,y:50,w:320,h:470,managed:true},
+    {id:'TB-5',name:'Corporate users',sub:'SOC workstations and identity',x:990,y:50,w:195,h:470}
+  ];
+  // kind: entity (rectangle), process (circle), store (two lines)
+  const ELEMENTS = [
+    {id:'E1',kind:'entity',name:'Windows servers',sm:'≈120 hosts',x:50,y:92,w:150,h:54},
+    {id:'P1',kind:'process',name:'Universal Forwarder',sm:'on host',cx:340,cy:119,r:44},
+    {id:'D1',kind:'store',name:'Persistent queue',sm:'UF local disk',x:280,y:196,w:124},
+    {id:'P4',kind:'process',name:'Deployment Server',sm:'server classes',cx:488,cy:262,r:44},
+    {id:'D3',kind:'store',name:'Deployment apps',sm:'etc/deployment-apps',x:430,y:334,w:124},
+    {id:'E2',kind:'entity',name:'Firewalls',sm:'30 devices',x:62,y:372,w:150,h:54},
+    {id:'P2',kind:'process',name:'Syslog server',sm:'SC4S',cx:340,cy:399,r:44},
+    {id:'E3',kind:'entity',name:'CloudTrail / GuardDuty',sm:'AWS services',x:44,y:548,w:168,h:54},
+    {id:'P5',kind:'process',name:'Lambda forwarder',sm:'HEC client',cx:340,cy:575,r:42},
+    {id:'P6',kind:'process',name:'Splunk Cloud indexing',sm:'managed',cx:728,cy:250,r:52},
+    {id:'D2',kind:'store',name:'Indexes',sm:'security, network, aws',x:668,y:390,w:150},
+    {id:'P7',kind:'process',name:'Search and ES',sm:'correlation',cx:880,cy:140,r:46},
+    {id:'E4',kind:'entity',name:'SOC analysts',sm:'24×7',x:1012,y:112,w:152,h:54},
+    {id:'E5',kind:'entity',name:'Identity provider',sm:'SAML · MFA',x:1012,y:330,w:152,h:54}
+  ];
+  const FLOWS = [
+    {id:'DF-1',from:'E1',to:'P1',plane:'data',proto:'local event logs'},
+    {id:'DF-2',from:'E2',to:'P2',plane:'data',proto:'syslog UDP 514',risk:true},
+    {id:'DF-3',from:'P1',to:'P6',plane:'data',proto:'S2S 9997 · TLS · cert'},
+    {id:'DF-4',from:'P2',to:'P6',plane:'data',proto:'HEC 443 · TLS · token'},
+    {id:'DF-5',from:'E3',to:'P5',plane:'data',proto:'CloudTrail events'},
+    {id:'DF-6',from:'P5',to:'P6',plane:'data',proto:'HEC 443 · TLS · token'},
+    {id:'DF-7',from:'P4',to:'P1',plane:'mgmt',proto:'phone-home 8089 · apps'},
+    {id:'DF-8',from:'P1',to:'D1',plane:'data',proto:'queue'},
+    {id:'DF-9',from:'D3',to:'P4',plane:'mgmt',proto:'read apps'},
+    {id:'DF-10',from:'P6',to:'D2',plane:'data',proto:'index write'},
+    {id:'DF-11',from:'D2',to:'P7',plane:'data',proto:'search'},
+    {id:'DF-12',from:'E4',to:'P7',plane:'data',proto:'HTTPS 443 · session'},
+    {id:'DF-13',from:'E4',to:'E5',plane:'auth',proto:'SAML sign-in · MFA'},
+    {id:'DF-14',from:'E5',to:'P7',plane:'auth',proto:'SAML assertion'}
+  ];
+  // id, STRIDE, applies to, threat, control, risk, status, owner
+  const THREATS = [
+    ['T-01','S','DF-3','A rogue host poses as a forwarder and sends events to Splunk Cloud.','Forwarder credentials certificate (mutual TLS) from the stack’s credentials app.','m','ok','Splunk platform team'],
+    ['T-02','T','DF-2','Syslog over UDP 514 can be altered or injected on the appliance VLAN.','Move devices to TLS syslog on 6514, or restrict 514 to the appliance VLAN with an ACL.','h','open','Network team'],
+    ['T-03','I','DF-2','PII in firewall logs is readable in transit.','TLS syslog on 6514.','h','open','Network team'],
+    ['T-04','R','DF-2','Unauthenticated syslog can’t be tied to the device that sent it.','Source-IP allow list on SC4S; tag host from the connection, not the message.','m','acc','Security operations'],
+    ['T-05','D','P2','A syslog burst fills the syslog server and events are dropped.','SC4S disk buffer; UDP receive buffer tuning; alert on drop counters.','m','ok','Splunk platform team'],
+    ['T-06','E','DF-7','A compromised Deployment Server pushes a malicious app to every forwarder.','Restrict Deployment Server admin to the platform team; change-controlled app repository; alert on new server classes.','h','open','Splunk platform team'],
+    ['T-07','T','D3','Someone edits a deployment app in the repository.','File integrity monitoring on etc/deployment-apps; Git-based change control.','m','open','Splunk platform team'],
+    ['T-08','S','DF-4','A stolen HEC token is used to inject fake events.','Token scoped to one index and source type; rotation every 90 days; IP allow list on the stack.','m','open','Splunk platform team'],
+    ['T-09','I','P5','The HEC token sits in Lambda environment variables.','Store the token in Secrets Manager; least-privilege execution role.','m','open','Cloud platform team'],
+    ['T-10','D','DF-3','Splunk Cloud is unreachable and forwarders stall.','Persistent queue on the UF (D1); indexer acknowledgement.','m','ok','Splunk platform team'],
+    ['T-11','I','D1','Queued events on the forwarder’s disk are readable by local admins.','Host hardening; disk encryption; queue sized to hours, not days.','l','acc','Server team'],
+    ['T-12','T','D2','Indexed evidence is modified or deleted.','Splunk-managed storage controls; index retention; audit index.','m','xfer','Splunk Cloud provider'],
+    ['T-13','S','DF-13','An analyst account is taken over.','SAML with MFA; conditional access; session timeout.','h','ok','Identity team'],
+    ['T-14','E','P7','An over-privileged role searches indexes outside its need.','Role-based index access; quarterly role review.','m','open','Security operations'],
+    ['T-15','R','DF-12','Analyst actions in Splunk can’t be attributed.','Splunk _audit index forwarded to a separate retention tier.','l','xfer','Splunk Cloud provider']
+  ];
+  const STRIDE = {S:'Spoofing',T:'Tampering',R:'Repudiation',I:'Information disclosure',D:'Denial of service',E:'Elevation of privilege'};
+  const STATUS = {open:'OPEN',ok:'MITIGATED',acc:'ACCEPTED',xfer:'TRANSFERRED'};
+  const RISK = {h:'High',m:'Medium',l:'Low'};
+  const NS='http://www.w3.org/2000/svg', svg=document.getElementById('dfd');
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const byId=Object.fromEntries(ELEMENTS.map(e=>[e.id,e]));
+  const st={focus:null,filter:new Set(Object.keys(STRIDE))};
+
+  // Boundaries
+  document.getElementById('bnds').innerHTML=BOUNDARIES.map(b=>`<g class="bnd${b.managed?' managed':''}"><rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="8"/><text x="${b.x+12}" y="${b.y+17}">${b.id} · ${esc(b.name.toUpperCase())}</text><text class="sub" x="${b.x+12}" y="${b.y+31}">${esc(b.sub)}</text></g>`).join('');
+
+  // Elements
+  const openCount=id=>THREATS.filter(t=>t[2]===id&&t[6]==='open').length, allCount=id=>THREATS.filter(t=>t[2]===id).length;
+  document.getElementById('els').innerHTML=ELEMENTS.map(e=>{
+    let s='',bx,by;
+    if(e.kind==='entity'){s=`<rect class="shape" x="${e.x}" y="${e.y}" width="${e.w}" height="${e.h}"/><text class="id" x="${e.x+8}" y="${e.y+15}">${e.id}</text><text class="nm" x="${e.x+8}" y="${e.y+31}">${esc(e.name)}</text><text class="sm" x="${e.x+8}" y="${e.y+45}">${esc(e.sm)}</text>`;bx=e.x+e.w;by=e.y}
+    else if(e.kind==='process'){const w=e.name.split(' ');let l1=e.name,l2='';if(w.length>1){let best=1,bd=1e9;for(let i=1;i<w.length;i++){const d=Math.abs(w.slice(0,i).join(' ').length-w.slice(i).join(' ').length);if(d<bd){bd=d;best=i}}l1=w.slice(0,best).join(' ');l2=w.slice(best).join(' ')}
+      s=`<circle class="shape" cx="${e.cx}" cy="${e.cy}" r="${e.r}"/><text class="id" x="${e.cx}" y="${e.cy-(l2?18:11)}" text-anchor="middle">${e.id}</text><text class="nm pn" x="${e.cx}" y="${e.cy+(l2?-3:4)}" text-anchor="middle">${esc(l1)}</text>${l2?`<text class="nm pn" x="${e.cx}" y="${e.cy+11}" text-anchor="middle">${esc(l2)}</text>`:''}<text class="sm" x="${e.cx}" y="${e.cy+(l2?25:18)}" text-anchor="middle">${esc(e.sm)}</text>`;bx=e.cx+e.r*.7;by=e.cy-e.r*.75}
+    else{s=`<rect x="${e.x}" y="${e.y}" width="${e.w}" height="40" style="fill:var(--node)"/><path class="store" d="M${e.x} ${e.y}H${e.x+e.w}M${e.x} ${e.y+40}H${e.x+e.w}"/><path class="store" d="M${e.x+30} ${e.y}V${e.y+40}"/><text class="id" x="${e.x+15}" y="${e.y+24}" text-anchor="middle">${e.id}</text><text class="nm" x="${e.x+38}" y="${e.y+18}">${esc(e.name)}</text><text class="sm" x="${e.x+38}" y="${e.y+32}">${esc(e.sm)}</text>`;bx=e.x+e.w;by=e.y}
+    const n=allCount(e.id),o=openCount(e.id);
+    const badge=n?`<g><circle class="tdot${o?'':' ok'}" cx="${bx}" cy="${by}" r="9"/><text class="tcount" x="${bx}" y="${by+3.5}" text-anchor="middle">${n}</text></g>`:'';
+    return `<g class="el ${e.kind==='process'?'proc':''}" data-id="${e.id}" tabindex="0" role="button" aria-label="${e.id} ${esc(e.name)}, ${n} threats, ${o} open">${s}${badge}</g>`}).join('');
+
+  // Geometry helpers
+  const center=e=>e.kind==='process'?[e.cx,e.cy]:[e.x+e.w/2,e.y+(e.kind==='store'?20:e.h/2)];
+  function edgePoint(e,toward){
+    const [cx,cy]=center(e),dx=toward[0]-cx,dy=toward[1]-cy,L=Math.hypot(dx,dy)||1;
+    if(e.kind==='process')return [cx+dx/L*(e.r+2),cy+dy/L*(e.r+2)];
+    const hw=e.w/2+2,hh=(e.kind==='store'?20:e.h/2)+2,t=Math.min(hw/Math.abs(dx||1e-6),hh/Math.abs(dy||1e-6));
+    return [cx+dx*t,cy+dy*t];
+  }
+  const labelsEl=document.getElementById('labels'), flowsEl=document.getElementById('flows'), crossEl=document.getElementById('crosses');
+  const OFF={'DF-1':[0,0],'DF-2':[-6,0],'DF-3':[0,0],'DF-4':[0,0],'DF-5':[0,0],'DF-6':[0,40],'DF-7':[0,0],'DF-8':[26,0],'DF-9':[26,0],'DF-10':[0,0],'DF-11':[0,0],'DF-12':[0,0],'DF-13':[0,0],'DF-14':[0,0]};
+  // Custom routes where a straight curve would cut through a boundary it doesn't cross.
+  const ROUTE={'DF-6':(p1,p2)=>`M${p1[0]} ${p1[1]}L598 ${p1[1]}Q610 ${p1[1]} 610 ${p1[1]-12}L610 ${p2[1]+14}Q610 ${p2[1]} 624 ${p2[1]}L${p2[0]} ${p2[1]}`};
+  let fl='',lb='';
+  const crossings=[];
+  for(const f of FLOWS){
+    const a=byId[f.from],b=byId[f.to],ca=center(a),cb=center(b);
+    const p1=edgePoint(a,cb),p2=edgePoint(b,ca);
+    const straight=Math.abs(p1[1]-p2[1])<30||Math.abs(p1[0]-p2[0])<30;
+    const mx=(p1[0]+p2[0])/2;
+    if(ROUTE[f.id]){const tgt=[byId[f.to].cx-byId[f.to].r*.92,byId[f.to].cy+byId[f.to].r*.38];const q1=edgePoint(a,[a.cx+100,a.cy]);var d=ROUTE[f.id](q1,tgt)}
+    else var d=straight?`M${p1[0]} ${p1[1]}L${p2[0]} ${p2[1]}`:`M${p1[0]} ${p1[1]}C${mx} ${p1[1]} ${mx} ${p2[1]} ${p2[0]} ${p2[1]}`;
+    const m=f.plane==='data'?'mD':f.plane==='mgmt'?'mM':'mA';
+    fl+=`<path class="flhit" data-id="${f.id}" d="${d}"/><path class="fl ${f.plane}" data-id="${f.id}" d="${d}" marker-end="url(#${m})"${f.id==='DF-11'?' marker-start="url(#mD)"':''}/>`;
+    f.d=d;
+  }
+  flowsEl.innerHTML=fl;
+  // Labels at the path midpoint; crossings where a path leaves or enters a boundary rectangle.
+  const inside=(b,p)=>p.x>b.x&&p.x<b.x+b.w&&p.y>b.y&&p.y<b.y+b.h;
+  for(const f of FLOWS){
+    const path=flowsEl.querySelector(`.fl[data-id="${f.id}"]`),L=path.getTotalLength(),mid=path.getPointAtLength(L/2),o=OFF[f.id]||[0,-8];
+    const pw=f.id.length*6+12;
+    lb+=`<g class="fll${f.risk?' risk':''}" data-id="${f.id}"><title>${f.id} · ${esc(f.proto)}</title><rect x="${mid.x+o[0]-pw/2}" y="${mid.y+o[1]-8}" width="${pw}" height="16" rx="8"/><text x="${mid.x+o[0]}" y="${mid.y+o[1]}">${f.id}</text></g>`;
+    let prev=BOUNDARIES.map(b=>inside(b,path.getPointAtLength(0)));
+    for(let s=4;s<=L;s+=4){const pt=path.getPointAtLength(s),now=BOUNDARIES.map(b=>inside(b,pt));
+      BOUNDARIES.forEach((b,i)=>{if(now[i]!==prev[i]){crossings.push({flow:f,b,pt,dir:now[i]?'enter':'leave'})}});prev=now}
+  }
+  labelsEl.innerHTML=lb;
+  // Group crossings per flow into one row: leaves X → enters Y
+  const perFlow=new Map();crossings.forEach(c=>{if(!perFlow.has(c.flow.id))perFlow.set(c.flow.id,{flow:c.flow,leave:[],enter:[],pts:[]});const r=perFlow.get(c.flow.id);r[c.dir].push(c.b.id);r.pts.push(c.pt)});
+  const hasOpen=id=>THREATS.some(t=>t[2]===id&&t[6]==='open');
+  let cx='',n=0;const xrows=[];
+  for(const r of perFlow.values()){n++;const cid='X-'+n;r.cid=cid;
+    for(const pt of r.pts)cx+=`<path class="cross${hasOpen(r.flow.id)?' open':''}" data-id="${r.flow.id}" d="M${pt.x} ${pt.y-7}L${pt.x+7} ${pt.y}L${pt.x} ${pt.y+7}L${pt.x-7} ${pt.y}Z"><title>${r.flow.id} crosses a trust boundary</title></path>`;
+    xrows.push(r)}
+  crossEl.innerHTML=cx;
+
+  // Tables
+  const DETAIL={'DF-2':['None','None'],'DF-3':['Forwarder certificate','TLS'],'DF-4':['HEC token','TLS'],'DF-6':['HEC token','TLS'],'DF-7':['Server certificate','TLS'],'DF-12':['SAML session','TLS'],'DF-14':['Signed assertion','TLS'],'DF-13':['Password + MFA','TLS']};
+  const innermost=p=>BOUNDARIES.filter(b=>inside(b,p)).sort((a,b)=>a.w*a.h-b.w*b.h)[0];
+  const zoneOf=id=>{const e=byId[id],c=center(e);const b=innermost({x:c[0],y:c[1]});return b?`${b.id} ${esc(b.name)}`:'Outside'};
+  document.querySelector('#xTable tbody').innerHTML=xrows.map(r=>{const f=r.flow,det=DETAIL[f.id]||['Not set','Not set'],th=THREATS.filter(t=>t[2]===f.id).map(t=>t[0]);
+    return `<tr data-id="${f.id}" tabindex="0"><td class="code">${r.cid}</td><td class="code">${f.id}</td><td>${f.from} ${esc(byId[f.from].name)} → ${f.to} ${esc(byId[f.to].name)}</td><td>${zoneOf(f.from)} → ${zoneOf(f.to)}</td><td>${esc(f.proto)}</td><td>${esc(det[0])}</td><td${det[1]==='None'?' style="color:var(--open);font-weight:600"':''}>${esc(det[1])}</td><td class="code">${th.join(', ')||'—'}</td></tr>`}).join('');
+  const nameOf=id=>byId[id]?`${id} ${byId[id].name}`:`${id} ${FLOWS.find(f=>f.id===id).proto}`;
+  document.querySelector('#tTable tbody').innerHTML=THREATS.map(t=>`<tr data-id="${t[2]}" data-s="${t[1]}" tabindex="0"><td class="code">${t[0]}</td><td><span class="sl" title="${STRIDE[t[1]]}">${t[1]}</span></td><td>${esc(nameOf(t[2]))}</td><td>${esc(t[3])}</td><td>${esc(t[4])}</td><td><span class="sev ${t[5]}">${RISK[t[5]]}</span></td><td><span class="st ${t[6]}">${STATUS[t[6]]}</span></td><td>${esc(t[7])}</td></tr>`).join('');
+
+  // Summary and STRIDE filter
+  const cnt=s=>THREATS.filter(t=>t[6]===s).length;
+  document.getElementById('summary').innerHTML=`<span><b>${BOUNDARIES.length}</b>trust boundaries</span><span><b>${xrows.length}</b>boundary crossings</span><span><b>${THREATS.length}</b>threats</span><span class="o"><b>${cnt('open')}</b>open</span><span><b>${cnt('ok')}</b>mitigated</span><span><b>${cnt('acc')}</b>accepted</span><span><b>${cnt('xfer')}</b>transferred to Splunk</span>`;
+  document.getElementById('stride').innerHTML=Object.entries(STRIDE).map(([k,v])=>{const o=THREATS.filter(t=>t[1]===k&&t[6]==='open').length;return `<button type="button" data-s="${k}" aria-pressed="true">${k}<span>${v}</span><i class="${o?'':'z'}" title="${o} open">${o}</i></button>`}).join('');
+  document.getElementById('stride').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const k=b.dataset.s;
+    if(st.filter.size===6){st.filter=new Set([k])}else if(st.filter.has(k)){st.filter.delete(k);if(!st.filter.size)st.filter=new Set(Object.keys(STRIDE))}else st.filter.add(k);
+    document.querySelectorAll('#stride button').forEach(x=>x.setAttribute('aria-pressed',st.filter.has(x.dataset.s)));
+    document.querySelectorAll('#tTable tbody tr').forEach(r=>r.hidden=!st.filter.has(r.dataset.s))});
+
+  // Focus: an element or flow lights up with its threats' rows
+  function focus(id){
+    st.focus=st.focus===id?null:id;const on=st.focus;
+    svg.classList.toggle('focusing',!!on);
+    svg.querySelectorAll('.on').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('tbody tr.on').forEach(x=>x.classList.remove('on'));
+    if(!on)return;
+    const flow=FLOWS.find(f=>f.id===on);
+    const ids=flow?[on,flow.from,flow.to]:[on,...FLOWS.filter(f=>f.from===on||f.to===on).map(f=>f.id)];
+    ids.forEach(i=>svg.querySelectorAll(`[data-id="${i}"]`).forEach(x=>x.classList.add('on')));
+    if(!flow)FLOWS.filter(f=>f.from===on||f.to===on).forEach(f=>[f.from,f.to].forEach(i=>svg.querySelectorAll(`.el[data-id="${i}"]`).forEach(x=>x.classList.add('on'))));
+    document.querySelectorAll(`tbody tr[data-id="${on}"]`).forEach(x=>x.classList.add('on'));
+  }
+  document.addEventListener('click',e=>{const t=e.target.closest('[data-id]');if(t&&(t.closest('#dfd')||t.closest('#xTable')||t.closest('#tTable')))focus(t.dataset.id)});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&st.focus)focus(st.focus);if((e.key==='Enter'||e.key===' ')&&e.target.matches('.el,tbody tr[data-id]')){e.preventDefault();focus(e.target.dataset.id)}});
+})();
+</script>
+
+</body></html>
