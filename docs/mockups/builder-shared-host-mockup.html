@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>
+<title>Shared Host Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: the Builder canvas as it looks today (dark, dotted grid), with two shared hosts drawn as solid host boxes;
+   a mode switch shows them expanded or collapsed, and an inspector column explains the host and its checks.
+   Single dark look on purpose: it matches the Builder it's a mockup for. */
+:root{
+  color-scheme:dark;
+  --page:#07111a; --panel:#0c1822; --canvas:#08131c; --dot:#1b2d3c; --card:#0f1d29; --card-2:#132433; --rule:#20364a;
+  --ink:#e6eff5; --ink-2:#aab9c8; --muted:#7f95a8;
+  --data:#57c7e8; --mgmt:#2dd4bf; --auth:#b39cff; --host:#8fb4d0; --host-fill:rgba(143,180,208,.07);
+  --ok:#66e0a3; --warn:#f3bd61; --bad:#f28b7d; --focus:#57c7e8;
+  --font:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.45 var(--font)}
+.page{max-width:1500px;margin:0 auto;padding-inline:16px;padding-block:18px 32px;display:grid;gap:14px}
+.page>*{min-width:0}
+.tag{justify-self:start;font:600 .66rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);border-radius:999px;padding:5px 9px}
+h1{margin:0;font:600 1.35rem/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;color:var(--ink-2);max-width:92ch}
+
+/* Toolbar */
+.bar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:8px 10px}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:7px;overflow:hidden}
+.seg button{font:600 .8rem var(--font);color:var(--ink-2);background:transparent;border:0;padding:7px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--card-2);color:var(--ink)}
+.btn{font:600 .8rem var(--font);color:var(--ink);background:var(--card);border:1px solid var(--rule);border-radius:7px;padding:7px 11px;cursor:pointer;display:inline-flex;gap:7px;align-items:center}
+.btn.primary{border-color:color-mix(in srgb,var(--mgmt) 60%,transparent);color:var(--mgmt)}
+.bar .hint{color:var(--muted);font-size:.8rem}
+.bar .spacer{flex:1}
+button:focus-visible,.hostHead:focus-visible,.card:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* Workspace: canvas + inspector */
+.work{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:12px;align-items:start}
+@media (max-width:1100px){.work{grid-template-columns:minmax(0,1fr)}}
+.canvasWrap{position:relative;border:1px solid var(--rule);border-radius:8px;background:var(--canvas) radial-gradient(var(--dot) 1px,transparent 1px) 0 0/22px 22px;overflow-x:auto;overflow-y:hidden}
+.world{position:relative;width:1180px;height:600px;transform-origin:0 0}
+svg.wires{position:absolute;inset:0;width:1180px;height:600px;overflow:visible;pointer-events:none}
+.wire{fill:none;stroke-width:2;transition:opacity .2s}
+.wire.data{stroke:var(--data)}
+.wire.mgmt{stroke:var(--mgmt);stroke-dasharray:7 5}
+.wire.local{stroke:var(--mgmt);stroke-dasharray:3 4;stroke-width:1.6}
+.wlabel{font:600 10.5px var(--mono);paint-order:stroke;stroke:var(--canvas);stroke-width:4px;stroke-linejoin:round}
+.wlabel.data{fill:var(--data)} .wlabel.mgmt,.wlabel.local{fill:var(--mgmt)}
+.badge circle{fill:var(--card-2);stroke:var(--ink-2)} .badge text{font:700 10px var(--mono);fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+.dim .wire,.dim .wlabel{opacity:.15}
+.dim .wire.hot,.dim .wlabel.hot{opacity:1}
+.canvasTitle{position:absolute;left:12px;top:8px;font-size:.75rem;color:var(--muted)}
+
+/* Cards */
+.card{position:absolute;background:var(--card);border:1px solid #2c4358;border-radius:8px;padding:9px 11px;display:grid;gap:5px;align-content:start;cursor:default;transition:border-color .2s,opacity .2s}
+.card .tier{font:500 .64rem/1 var(--font);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.card .name{font:600 .92rem/1.2 var(--font)}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font:500 .68rem/1 var(--font);color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:3px 7px;white-space:nowrap}
+.chip.m{color:var(--mgmt);border-color:color-mix(in srgb,var(--mgmt) 40%,transparent)}
+.chip.d{color:var(--data);border-color:color-mix(in srgb,var(--data) 40%,transparent)}
+.card.fwd{border-color:color-mix(in srgb,var(--data) 55%,transparent)}
+.card.mg{border-color:color-mix(in srgb,var(--mgmt) 55%,transparent)}
+.card.idx{border-color:color-mix(in srgb,var(--warn) 50%,transparent)}
+.card:hover,.card.on{border-color:var(--ink-2)}
+.dim .card:not(.on){opacity:.45}
+
+/* Host box: solid border, header chip. Reads as one machine, unlike dashed group boxes. */
+.host{position:absolute;border:1.5px solid var(--host);border-radius:11px;background:var(--host-fill);transition:opacity .2s}
+.hostHead{position:absolute;left:0;right:0;top:0;height:34px;display:flex;align-items:center;gap:8px;padding:0 10px;border-bottom:1px solid color-mix(in srgb,var(--host) 35%,transparent);cursor:pointer;border-radius:10px 10px 0 0}
+.hostHead:hover{background:rgba(143,180,208,.08)}
+.hostHead svg{flex:none}
+.hostHead .hn{font:600 .8rem/1 var(--mono);color:var(--ink)}
+.hostHead .hs{font-size:.7rem;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
+.hostHead .caret{font-size:.75rem;color:var(--ink-2)}
+.host.sel{box-shadow:0 0 0 2px color-mix(in srgb,var(--focus) 55%,transparent)}
+
+/* Collapsed host: one combined card */
+.combo{position:absolute;border:1.5px solid var(--host);border-radius:11px;background:var(--card);display:grid;align-content:start;overflow:hidden}
+.combo .hostHead{position:static}
+.combo .body{padding:9px 11px;display:grid;gap:7px}
+.combo .title{font:600 .95rem/1.25 var(--font);text-wrap:balance}
+.role{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;align-items:center;border-top:1px solid var(--rule);padding-top:7px}
+.role i{grid-row:span 2;width:8px;height:8px;border-radius:2px}
+.role b{font-size:.78rem}
+.role span{font-size:.7rem;color:var(--muted)}
+.role i.d{background:var(--data)} .role i.m{background:var(--mgmt)}
+.local{font-size:.7rem;color:var(--mgmt)}
+
+/* Inspector */
+.insp{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;display:grid;gap:12px}
+.insp h2{margin:0;font:600 .66rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.insp h3{margin:0;font:600 1.02rem/1.2 var(--font)}
+.field{display:grid;gap:4px}
+.field label{font-size:.72rem;color:var(--ink-2)}
+.field input,.field select{font:500 .82rem var(--font);color:var(--ink);background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:7px 9px;width:100%}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.roles{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.roles li{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:6px 8px;font-size:.82rem}
+.roles li i{width:8px;height:8px;border-radius:2px;flex:none}
+.roles li small{margin-left:auto;color:var(--muted);font-size:.7rem}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.checks li{display:grid;grid-template-columns:auto 1fr;gap:8px;font-size:.8rem;color:var(--ink-2)}
+.checks li b{color:var(--ink);font-weight:600}
+.st{font:700 .62rem/1 var(--mono);letter-spacing:.06em;border-radius:4px;padding:4px 5px;height:fit-content}
+.st.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.st.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 14%,transparent)}
+.st.bad{color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,transparent)}
+
+/* Rules + creation */
+.lower{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:12px}
+@media (max-width:900px){.lower{grid-template-columns:minmax(0,1fr)}}
+.box{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;display:grid;gap:10px;min-width:0;align-content:start}
+.box h2{margin:0;font:600 .66rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.8rem;min-width:520px}
+th,td{text-align:left;padding:6px 8px;border-top:1px solid var(--rule);vertical-align:top}
+thead th{border-top:0;font:600 .62rem/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+td:first-child{color:var(--ink);font-weight:500}
+td{color:var(--ink-2)}
+ol.how{margin:0;padding-left:18px;display:grid;gap:8px;color:var(--ink-2);font-size:.84rem}
+ol.how b{color:var(--ink)}
+kbd{font:600 .72rem var(--mono);border:1px solid var(--rule);border-bottom-width:2px;border-radius:4px;padding:1px 5px;color:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="page">
+  <span class="tag">Mockup · Builder canvas · example topology</span>
+  <h1>Components that share a host</h1>
+  <p class="lede">A host box groups the roles that run on one Splunk instance. Each role keeps its own card, inspector and connectors, so data lines leave the Heavy Forwarder and phone-home lines leave the Deployment Server. Collapse a host to fold it into one combined card.</p>
+
+  <div class="bar" role="toolbar" aria-label="Host view">
+    <div class="seg" role="group" aria-label="Show hosts">
+      <button type="button" id="mExpanded" aria-pressed="true">Expanded hosts</button>
+      <button type="button" id="mCollapsed" aria-pressed="false">Collapsed hosts</button>
+    </div>
+    <button type="button" class="btn primary" id="putOnHost" title="Select two or more cards, then put them on one host">⊞ Put on one host</button>
+    <span class="hint">Or <kbd>Alt</kbd>-drag a card onto another card · or set <b>Host</b> in the inspector</span>
+    <span class="spacer"></span>
+    <span class="hint">Select a host header to inspect it · hover a role to trace its lines</span>
+  </div>
+
+  <div class="work">
+    <div class="canvasWrap" id="wrap">
+      <div class="world" id="world">
+        <span class="canvasTitle">Unified topology · 8 components · 2 shared hosts · 9 relationships</span>
+        <svg class="wires" id="wires" aria-hidden="true">
+          <defs>
+            <marker id="aData" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--data)"/></marker>
+            <marker id="aMgmt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--mgmt)"/></marker>
+          </defs>
+          <g id="wireLayer"></g>
+        </svg>
+        <div id="nodes"></div>
+      </div>
+    </div>
+
+    <aside class="insp" id="insp" aria-live="polite"></aside>
+  </div>
+
+  <div class="lower">
+    <section class="box">
+      <h2>Which roles can share a host</h2>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Roles on one host</th><th>Result</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td>Heavy Forwarder + Deployment Server</td><td><span class="st ok">OK</span></td><td>Common in small estates. Warn above 50 deployment clients; move the DS to its own host.</td></tr>
+            <tr><td>License Manager + Monitoring Console</td><td><span class="st ok">OK</span></td><td>Both light, both management plane.</td></tr>
+            <tr><td>Deployment Server + License Manager</td><td><span class="st ok">OK</span></td><td>Warn above 50 deployment clients.</td></tr>
+            <tr><td>Syslog Server + Universal Forwarder</td><td><span class="st ok">OK</span></td><td>The usual pattern; the file handoff is drawn as a local link.</td></tr>
+            <tr><td>Deployment Server + Indexer or cluster peer</td><td><span class="st bad">Flag</span></td><td>Configuration pushes compete with indexing; peers are managed by the cluster manager.</td></tr>
+            <tr><td>Monitoring Console + search head cluster member</td><td><span class="st bad">Flag</span></td><td>Not supported on SHC members.</td></tr>
+            <tr><td>Cluster manager + one of its peers</td><td><span class="st bad">Flag</span></td><td>Losing the host loses both the manager and a copy.</td></tr>
+            <tr><td>Two roles listening on the same port</td><td><span class="st bad">Flag</span></td><td>For example two receivers on 9997 or two HEC inputs on 8088.</td></tr>
+            <tr><td>Any roles over the host's size</td><td><span class="st warn">Warn</span></td><td>Pipeline sets and ingest add up per host.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="box">
+      <h2>Where the host shows up</h2>
+      <ol class="how">
+        <li><b>Inventory:</b> a Host column; roles on the same host share a row group.</li>
+        <li><b>Architecture pack:</b> "2 roles on splunk-hf01" in the component table and the deployment section.</li>
+        <li><b>OV-1:</b> one card with both icons, "Heavy Forwarder + Deployment Server".</li>
+        <li><b>OV-2 / OV-3:</b> roles stay in their own operational nodes; Realised by says "on shared host splunk-hf01".</li>
+        <li><b>Topology file:</b> each component carries <code>hostId</code>; hosts carry name, region and size. Re-import keeps them.</li>
+      </ol>
+    </section>
+  </div>
+</div>
+
+<script>
+(() => {
+  // Example topology. Positions are world coordinates (1180 × 600).
+  const HOSTS = {
+    hf01:{name:'splunk-hf01',size:'8 vCPU · 16 GB',region:'Sydney',members:['hf','ds'],box:{x:292,y:36,w:238,h:300},combo:{x:292,y:60,w:238,h:236},
+      title:'Heavy Forwarder + Deployment Server',local:'Deployment Server also manages this host’s Heavy Forwarder'},
+    mgmt01:{name:'splunk-mgmt01',size:'4 vCPU · 8 GB',region:'Sydney',members:['lm','mc'],box:{x:894,y:100,w:238,h:282},combo:{x:894,y:130,w:238,h:210},
+      title:'License Manager + Monitoring Console',local:''}
+  };
+  const CARDS = {
+    hec:{x:36,y:80,w:196,h:98,cls:'',tier:'Source system',name:'HEC Client 1',chips:[['d','HTTPS 8088'],['','Sydney']]},
+    uf1:{x:36,y:360,w:196,h:92,cls:'fwd',tier:'Splunk forwarding tier',name:'Universal Forwarder 1',chips:[['','Windows hosts ≈120']]},
+    uf2:{x:36,y:476,w:196,h:92,cls:'fwd',tier:'Splunk forwarding tier',name:'Universal Forwarder 2',chips:[['','Linux hosts ≈45']]},
+    hf:{x:308,y:84,w:206,h:104,cls:'fwd',tier:'Splunk forwarding tier',name:'Heavy Forwarder 1',chips:[['d','HEC input'],['','2 pipeline sets']],host:'hf01'},
+    ds:{x:308,y:220,w:206,h:100,cls:'mg',tier:'Management',name:'Deployment Server 1',chips:[['m','3 clients'],['','server classes']],host:'hf01'},
+    idx:{x:630,y:150,w:206,h:112,cls:'idx',tier:'Splunk indexing tier',name:'Indexer 1',chips:[['','P1'],['','P2']]},
+    lm:{x:910,y:148,w:206,h:96,cls:'mg',tier:'Management',name:'License Manager 1',chips:[['m','500 GB/day licence']],host:'mgmt01'},
+    mc:{x:910,y:266,w:206,h:100,cls:'mg',tier:'Management',name:'Monitoring Console 1',chips:[['m','distributed mode']],host:'mgmt01'}
+  };
+  // from, to, plane, from side, to side, label, label position along the line (0–1), label y offset, text anchor, label x offset
+  const EDGES = [
+    ['hec','hf','data','r','l','HEC 8088',.5,-8],
+    ['hf','idx','data','r','l','S2S · TLS',.5,-10],
+    ['uf1','idx','data','r','b','S2S · TLS',.62,-8],
+    ['uf2','idx','data','r','b','',.5,0],
+    ['ds','uf1','mgmt','l','r','phone-home 8089',.78,-6,'end'],
+    ['ds','uf2','mgmt','l','r','',.5,0],
+    ['ds','hf','local','t','b','local',.5,4,'start',10],
+    ['lm','idx','mgmt','l','r','licence',.5,-8],
+    ['mc','idx','mgmt','l','r','REST 8089',.55,18]
+  ];
+  const ROLE = {hf:['d','Heavy Forwarder','HEC 8088 · 2 pipeline sets'],ds:['m','Deployment Server','3 clients · server classes'],lm:['m','License Manager','500 GB/day licence'],mc:['m','Monitoring Console','distributed mode']};
+  const state = {collapsed:{hf01:false,mgmt01:false}, selected:'hf01', hot:null};
+
+  const nodesEl = document.getElementById('nodes'), wireLayer = document.getElementById('wireLayer'), world = document.getElementById('world');
+  const NS = 'http://www.w3.org/2000/svg';
+  const serverIcon = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2" width="12" height="5" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="9" width="12" height="5" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="4.6" cy="4.5" r=".9" fill="currentColor"/><circle cx="4.6" cy="11.5" r=".9" fill="currentColor"/></svg>';
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  // Where a card is drawn now: its own rect, or its collapsed host's combined card.
+  function rectOf(id){
+    const c = CARDS[id];
+    if (c.host && state.collapsed[c.host]) return {...HOSTS[c.host].combo, id:'host:'+c.host};
+    return {...c, id};
+  }
+  function anchor(r, side, slot){
+    const off = slot * 12;
+    if (side==='r') return [r.x+r.w, r.y+r.h/2+off];
+    if (side==='l') return [r.x, r.y+r.h/2+off];
+    if (side==='t') return [r.x+r.w/2+off, r.y];
+    return [r.x+r.w/2+off, r.y+r.h];
+  }
+  function path(a, as, b, bs){
+    const d = 60, v = {r:[1,0],l:[-1,0],t:[0,-1],b:[0,1]};
+    const c1 = [a[0]+v[as][0]*d, a[1]+v[as][1]*d], c2 = [b[0]+v[bs][0]*d, b[1]+v[bs][1]*d];
+    return `M${a[0]} ${a[1]} C${c1[0]} ${c1[1]} ${c2[0]} ${c2[1]} ${b[0]} ${b[1]}`;
+  }
+
+  function bez(a,as,b,bs,t){
+    const d=60,v={r:[1,0],l:[-1,0],t:[0,-1],b:[0,1]},c1=[a[0]+v[as][0]*d,a[1]+v[as][1]*d],c2=[b[0]+v[bs][0]*d,b[1]+v[bs][1]*d],u=1-t;
+    return [0,1].map(i=>u*u*u*a[i]+3*u*u*t*c1[i]+3*u*t*t*c2[i]+t*t*t*b[i]);
+  }
+  function render(){
+    // Cards and host boxes
+    let h = '';
+    for (const [hid, host] of Object.entries(HOSTS)) {
+      const sel = state.selected===hid ? ' sel' : '';
+      if (state.collapsed[hid]) {
+        const b = host.combo;
+        h += `<div class="combo${sel}" style="left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px" data-host="${hid}">
+          <div class="hostHead" tabindex="0" role="button" aria-expanded="false" data-host="${hid}">${serverIcon}<span class="hn">${esc(host.name)}</span><span class="hs">${host.members.length} roles</span><span class="caret">▸</span></div>
+          <div class="body"><div class="title">${esc(host.title)}</div>
+          ${host.members.map(m=>`<div class="role" data-role="${m}"><i class="${ROLE[m][0]}"></i><b>${ROLE[m][1]}</b><span>${ROLE[m][2]}</span></div>`).join('')}
+          ${host.local?`<div class="local">⇣ local: ${esc(host.local)}</div>`:''}</div></div>`;
+      } else {
+        const b = host.box;
+        h += `<div class="host${sel}" style="left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px" data-host="${hid}">
+          <div class="hostHead" tabindex="0" role="button" aria-expanded="true" data-host="${hid}">${serverIcon}<span class="hn">${esc(host.name)}</span><span class="hs">${host.members.length} roles · ${esc(host.size.split(' · ')[0])}</span><span class="caret">▾</span></div></div>`;
+      }
+    }
+    for (const [id, c] of Object.entries(CARDS)) {
+      if (c.host && state.collapsed[c.host]) continue;
+      h += `<div class="card ${c.cls}${state.hot===id?' on':''}" tabindex="0" data-card="${id}" style="left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px">
+        <span class="tier">${esc(c.tier)}</span><span class="name">${esc(c.name)}</span>
+        <div class="chips">${c.chips.map(([k,t])=>`<span class="chip ${k}">${esc(t)}</span>`).join('')}</div></div>`;
+    }
+    nodesEl.innerHTML = h;
+
+    // Connectors: map endpoints to what is drawn, drop links inside a collapsed host, merge duplicates.
+    const groups = new Map();
+    for (const [f,t,plane,fs,ts,label,lt=.5,ly=-8,la='middle',lx=0] of EDGES) {
+      const a = rectOf(f), b = rectOf(t);
+      if (a.id === b.id) continue;
+      const key = a.id+'>'+b.id+'>'+plane;
+      if (!groups.has(key)) groups.set(key,{a,b,plane,fs,ts,label,lt,ly,la,lx,members:[]});
+      groups.get(key).members.push(f, t);
+    }
+    // Spread several lines leaving the same side of one card.
+    const slots = new Map(), slotOf = (id,side)=>{const k=id+side;const n=slots.get(k)||0;slots.set(k,n+1);return n};
+    const counts = new Map(); for (const g of groups.values()){for (const k of [g.a.id+g.fs, g.b.id+g.ts]) counts.set(k,(counts.get(k)||0)+1)}
+    let w = '';
+    for (const g of groups.values()) {
+      const nA = counts.get(g.a.id+g.fs), nB = counts.get(g.b.id+g.ts);
+      const sA = slotOf(g.a.id,g.fs) - (nA-1)/2, sB = slotOf(g.b.id,g.ts) - (nB-1)/2;
+      const p1 = anchor(g.a, g.fs, sA), p2 = anchor(g.b, g.ts, sB);
+      const hot = state.hot && g.members.includes(state.hot) ? ' hot' : '';
+      const marker = g.plane==='data' ? 'aData' : 'aMgmt';
+      w += `<path class="wire ${g.plane}${hot}" d="${path(p1,g.fs,p2,g.ts)}" marker-end="url(#${marker})"/>`;
+      const merged = g.members.length/2;
+      if (g.label) {
+        const pt = bez(p1,g.fs,p2,g.ts,g.lt);
+        w += `<text class="wlabel ${g.plane}${hot}" x="${pt[0]+g.lx}" y="${pt[1]+g.ly}" text-anchor="${g.la}">${esc(g.label)}</text>`;
+      }
+      if (merged>1) { const mx=(p1[0]+p2[0])/2, my=(p1[1]+p2[1])/2+12; w += `<g class="badge"><circle cx="${mx}" cy="${my}" r="9"/><text x="${mx}" y="${my}">×${merged}</text></g>`; }
+    }
+    wireLayer.innerHTML = w;
+    world.classList.toggle('dim', !!state.hot);
+    renderInspector();
+    document.getElementById('mExpanded').setAttribute('aria-pressed', String(!Object.values(state.collapsed).some(Boolean)));
+    document.getElementById('mCollapsed').setAttribute('aria-pressed', String(Object.values(state.collapsed).every(Boolean)));
+  }
+
+  const CHECKS = {
+    hf01:[['ok','Allowed combination','Heavy Forwarder and Deployment Server can share a host in small estates.'],
+          ['ok','Deployment clients: 3 of 50','Above 50, move the Deployment Server to its own host.'],
+          ['ok','Ports','HEC 8088 (Heavy Forwarder) and management 8089 (both roles, one splunkd) don’t clash.'],
+          ['warn','Capacity to confirm','2 pipeline sets plus phone-home on 8 vCPU · 16 GB. Add expected HEC volume to check headroom.']],
+    mgmt01:[['ok','Allowed combination','License Manager and Monitoring Console are both light management roles.'],
+            ['ok','Ports','Both use management 8089 on one splunkd.'],
+            ['ok','Capacity','Well within 4 vCPU · 8 GB.']]
+  };
+  function renderInspector(){
+    const hid = state.selected, host = HOSTS[hid];
+    document.getElementById('insp').innerHTML = `
+      <h2>Inspector · host</h2>
+      <h3>${esc(host.name)}</h3>
+      <div class="field"><label for="hName">Host name</label><input id="hName" value="${esc(host.name)}" readonly></div>
+      <div class="row2">
+        <div class="field"><label for="hRegion">Region</label><input id="hRegion" value="${esc(host.region)}" readonly></div>
+        <div class="field"><label for="hSize">Size</label><input id="hSize" value="${esc(host.size)}" readonly></div>
+      </div>
+      <div class="field"><label>Roles on this host</label>
+        <ul class="roles">${host.members.map(m=>`<li><i style="background:var(--${ROLE[m][0]==='d'?'data':'mgmt'})"></i>${ROLE[m][1]}<small>${esc(CARDS[m].name)}</small></li>`).join('')}</ul></div>
+      <div class="field"><label>Checks</label>
+        <ul class="checks">${CHECKS[hid].map(([s,t,d])=>`<li><span class="st ${s}">${s==='ok'?'OK':s==='warn'?'WARN':'FLAG'}</span><span><b>${esc(t)}.</b> ${esc(d)}</span></li>`).join('')}</ul></div>
+      <button type="button" class="btn" id="toggleSel">${state.collapsed[hid]?'Expand host':'Collapse to one card'}</button>`;
+    document.getElementById('toggleSel').onclick = () => { state.collapsed[hid] = !state.collapsed[hid]; render(); };
+  }
+
+  // Interactions
+  nodesEl.addEventListener('click', e => {
+    const head = e.target.closest('.hostHead');
+    if (head) { const hid = head.dataset.host; if (state.selected===hid) state.collapsed[hid] = !state.collapsed[hid]; state.selected = hid; render(); return; }
+    const box = e.target.closest('[data-host]'); if (box) { state.selected = box.dataset.host; render(); }
+  });
+  nodesEl.addEventListener('keydown', e => { if ((e.key==='Enter'||e.key===' ') && e.target.matches('.hostHead')) { e.preventDefault(); e.target.click(); } });
+  nodesEl.addEventListener('mouseover', e => { const c = e.target.closest('[data-card],[data-role]'); const id = c ? (c.dataset.card||c.dataset.role) : null; if (id!==state.hot) { state.hot = id; render(); } });
+  nodesEl.addEventListener('mouseleave', () => { if (state.hot) { state.hot = null; render(); } });
+  nodesEl.addEventListener('focusin', e => { const c = e.target.closest('[data-card]'); if (c) { state.hot = c.dataset.card; render(); document.querySelector(`[data-card="${c.dataset.card}"]`)?.focus(); } });
+  document.getElementById('mExpanded').onclick = () => { for (const k in state.collapsed) state.collapsed[k] = false; render(); };
+  document.getElementById('mCollapsed').onclick = () => { for (const k in state.collapsed) state.collapsed[k] = true; render(); };
+  document.getElementById('putOnHost').onclick = e => { e.currentTarget.textContent = '⊞ Select 2+ cards first'; setTimeout(()=>{e.currentTarget.textContent='⊞ Put on one host'},1600); };
+
+  // Fit the fixed world to the canvas width (never below 60%; below that the canvas scrolls sideways).
+  const wrap = document.getElementById('wrap');
+  function fit(){ const s = Math.max(.6, Math.min(1, (wrap.clientWidth-2)/1180)); world.style.transform = `scale(${s})`; world.style.marginBottom = `${600*s-600}px`; world.style.marginRight = `${1180*s-1180}px`; }
+  new ResizeObserver(fit).observe(wrap);
+  render(); fit();
+})();
+</script>
+
+</body></html>
