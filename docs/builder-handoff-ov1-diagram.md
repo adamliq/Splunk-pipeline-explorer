@@ -1,5 +1,7 @@
 # Builder handoff: make the OV-1 diagram match the mockup
 
+> **Largely implemented in Build 137.** What remains is in [`builder-handoff-build137.md`](builder-handoff-build137.md) items 1–6; this file stays as the full OV-1 spec.
+
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Baseline:** Build 135 (`builder-ov1-v132`, shown in the pack and the OV tab by `builder-ov-workspace-v135`). This is a companion to [`builder-handoff-build135.md`](builder-handoff-build135.md) and replaces its item 8 ("OV-1 graphic: layout") with a full spec. Do items 1–2 of that handoff first (they break the OV tab); this can follow.
 **Reference:** `docs/mockups/architecture-ov1-mockup.html` (open it in a browser; click a thread number to see the highlighting).

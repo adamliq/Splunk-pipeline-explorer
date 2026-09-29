@@ -1,5 +1,7 @@
 # Builder handoff: Build 135 review
 
+> **Superseded by [`builder-handoff-build137.md`](builder-handoff-build137.md)** (Build 137 review: items 1–12 are fixed or nearly so; the remaining work is listed there). Kept as the Build 135 review record.
+
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Reviewed:** `main` at `3e539ea` (Build 135, 29 Sep 2026: `builder-grouping-polish-v131`, `builder-ov1-v132`, `builder-ov2-v133`, `builder-ov3-v134`, `builder-ov-workspace-v135`), also merged into branch `claude/build-page-layout-bl6jk1`
 **History:** `builder-handoff-build131.md` (the task list this build implements: items 1–5 and the OV-1/OV-2/OV-3 specs in items 7–9) and earlier.
