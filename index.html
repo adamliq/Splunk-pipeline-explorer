@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 135 · 29 Sep 2026</title>
+  <title>Splunk Pipeline Explorer · Build 137 · 29 Sep 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,9 +202,9 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="135" data-build-date="2026-09-29">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="137" data-build-date="2026-09-29">
     <div class="builderHead">
-      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 135, dated 29 September 2026"><b>Build 135</b><time datetime="2026-09-29">29 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
+      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 137, dated 29 September 2026"><b>Build 137</b><time datetime="2026-09-29">29 Sep 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
         <div class="builderActions"><div class="builderHistoryControls"><button class="builderBtn" id="builderUndo" disabled>↶ Undo <kbd>Ctrl Z</kbd></button><button class="builderBtn" id="builderRedo" disabled>↷ Redo <kbd>Ctrl Y</kbd></button><button class="builderBtn" id="builderHistoryToggle" aria-expanded="false">History <span class="builderHistoryCount" id="builderHistoryCount">0</span></button></div><button class="builderBtn" id="builderLoadPath">Load selected path</button><button class="builderBtn" id="builderClear">Clear</button><button class="builderBtn" id="builderFailure">Open in Failure Lab</button><button class="builderBtn primary" id="builderUse">Use in explorer</button></div>
         <div class="builderPersistence"><select id="builderSaved" aria-label="Saved custom topologies"><option value="">Saved topologies</option></select><button class="builderBtn" id="builderSave">Save</button><button class="builderBtn" id="builderLoadSaved">Load</button><button class="builderBtn" id="builderImport">Import JSON</button><button class="builderBtn" id="builderExport">Export JSON</button><input id="builderImportFile" type="file" accept="application/json,.json" hidden></div>
@@ -5649,7 +5649,7 @@ const builderOvNav135=document.createElement('button');builderOvNav135.type='but
 const builderOvRoot135=document.createElement('section');builderOvRoot135.id='ovWorkspace135';builderOvRoot135.className='ovWorkspace135';builderOvRoot135.setAttribute('aria-label','Operational architecture views');$('#topologyBuilder').insertAdjacentElement('afterend',builderOvRoot135);
 let builderOvActive135='ov1',builderOvTheme135='light',builderOvModel135=null;
 function builderOvSections135(){return{ov1:[builderOvPage132()],ov2:builderOv2Pages133(),ov3:builderOv3Pages134()}}
-function builderOvRender135(){if(state.view!=='ov')return;try{const sections=builderOvSections135(),model=builderOv2Model133(),text=builderV125Text125;builderOvModel135=model;builderOvRoot135.classList.toggle('theme-dark',builderOvTheme135==='dark');builderOvRoot135.classList.toggle('theme-light',builderOvTheme135==='light');builderOvRoot135.innerHTML='<div class="ovHead135"><div><small>Operational architecture views · Build '+text($('#topologyBuilder').dataset.buildNumber)+'</small><h2>OV-1 · OV-2 · OV-3</h2><p>Concept, resource flows and assurance matrix derived from the current Builder topology.</p></div><div class="ovHeadActions135"><button type="button" id="ovRefresh135">Refresh</button><button type="button" id="ovTheme135" aria-pressed="'+(builderOvTheme135==='dark')+'">'+(builderOvTheme135==='dark'?'Light theme':'Dark theme')+'</button><button type="button" id="ovPrint135">Print / PDF</button><button type="button" id="ovPack135">Download architecture pack</button><button type="button" class="primary" id="ovEdit135">Edit in Builder</button></div></div><div class="ovSummary135"><span><b>'+state.builderNodes.length+'</b> components</span><span><b>'+model.nodes.length+'</b> operational nodes</span><span><b>'+model.needlines.length+'</b> needlines</span><span><b>'+model.flows.length+'</b> resource flows</span><span>Generated from the current topology</span></div><div class="ovTabs135" role="tablist" aria-label="Operational view"><button type="button" role="tab" id="ovTab1-135" aria-controls="ovPanel1-135" data-ov-tab="ov1">OV-1 · Concept</button><button type="button" role="tab" id="ovTab2-135" aria-controls="ovPanel2-135" data-ov-tab="ov2">OV-2 · Resource flows</button><button type="button" role="tab" id="ovTab3-135" aria-controls="ovPanel3-135" data-ov-tab="ov3">OV-3 · Matrix</button></div>'+Object.entries(sections).map(([key,pages],index)=>'<div class="ovPanel135" id="ovPanel'+(index+1)+'-135" role="tabpanel" aria-labelledby="ovTab'+(index+1)+'-135" data-ov-panel="'+key+'">'+pages.map((page,i)=>'<article class="ovSheet135" data-ov-page="'+text(page.id)+'"><div class="ovSectionTitle135"><strong>'+text(page.title)+'</strong><span>'+key.toUpperCase()+' · '+(i+1)+' / '+pages.length+'</span></div>'+page.content.replace('<svg class="ov1Diagram132"','<div class="ov1Figure135"><svg class="ov1Diagram132"').replace(/(<\/svg>)(?![\s\S]*<\/svg>)/,'$1</div>')+'</article>').join('')+'</div>').join('');builderOvShow135(builderOvActive135);builderOvRoot135.querySelector('#ovRefresh135').onclick=builderOvRender135;builderOvRoot135.querySelector('#ovTheme135').onclick=()=>{builderOvTheme135=builderOvTheme135==='dark'?'light':'dark';builderOvRender135()};builderOvRoot135.querySelector('#ovPrint135').onclick=()=>window.print();builderOvRoot135.querySelector('#ovPack135').onclick=downloadArchitecturePack;builderOvRoot135.querySelector('#ovEdit135').onclick=()=>switchView('builder');builderOvRoot135.querySelectorAll('[data-ov-tab]').forEach(button=>button.onclick=()=>builderOvShow135(button.dataset.ovTab));builderOvWire135()}catch(error){builderOvRoot135.innerHTML='<div class="ovError135" role="alert">Unable to render operational views: '+builderV125Text125(error.message)+'</div>'}}
+function builderOvRender135(){if(state.view!=='ov')return;try{const sections=builderOvSections135(),model=builderOv2Model133(),text=builderV125Text125;builderOvModel135=model;builderOvRoot135.classList.toggle('theme-dark',builderOvTheme135==='dark');builderOvRoot135.classList.toggle('theme-light',builderOvTheme135==='light');builderOvRoot135.innerHTML='<div class="ovHead135"><div><small>Operational architecture views · Build '+text($('#topologyBuilder').dataset.buildNumber)+'</small><h2>OV-1 · OV-2 · OV-3</h2><p>Concept, resource flows and assurance matrix derived from the current Builder topology.</p></div><div class="ovHeadActions135"><button type="button" id="ovRefresh135">Refresh</button><button type="button" id="ovTheme135" aria-pressed="'+(builderOvTheme135==='dark')+'">'+(builderOvTheme135==='dark'?'Light theme':'Dark theme')+'</button><button type="button" id="ovPrint135">Print / PDF</button><button type="button" id="ovPack135">Download architecture pack</button><button type="button" class="primary" id="ovEdit135">Edit in Builder</button></div></div><div class="ovSummary135"><span><b>'+state.builderNodes.length+'</b> components</span><span><b>'+model.nodes.length+'</b> operational nodes</span><span><b>'+model.needlines.length+'</b> needlines</span><span><b>'+model.flows.length+'</b> resource flows</span><span>Generated from the current topology</span></div><div class="ovTabs135" role="tablist" aria-label="Operational view"><button type="button" role="tab" id="ovTab1-135" aria-controls="ovPanel1-135" data-ov-tab="ov1">OV-1 · Concept</button><button type="button" role="tab" id="ovTab2-135" aria-controls="ovPanel2-135" data-ov-tab="ov2">OV-2 · Resource flows</button><button type="button" role="tab" id="ovTab3-135" aria-controls="ovPanel3-135" data-ov-tab="ov3">OV-3 · Matrix</button></div>'+Object.entries(sections).map(([key,pages],index)=>'<div class="ovPanel135" id="ovPanel'+(index+1)+'-135" role="tabpanel" aria-labelledby="ovTab'+(index+1)+'-135" data-ov-panel="'+key+'">'+pages.map((page,i)=>'<article class="ovSheet135" data-ov-page="'+text(page.id)+'"><div class="ovSectionTitle135"><strong>'+text(page.title)+'</strong><span>'+key.toUpperCase()+' · '+(i+1)+' / '+pages.length+'</span></div>'+(page.content.includes('<svg class="ov1Diagram132"')?page.content.replace('<svg class="ov1Diagram132"','<div class="ov1Figure135"><svg class="ov1Diagram132"').replace(/(<\/svg>)(?![\s\S]*<\/svg>)/,'$1</div>'):page.content)+'</article>').join('')+'</div>').join('');builderOvShow135(builderOvActive135);builderOvRoot135.querySelector('#ovRefresh135').onclick=builderOvRender135;builderOvRoot135.querySelector('#ovTheme135').onclick=()=>{builderOvTheme135=builderOvTheme135==='dark'?'light':'dark';builderOvRender135()};builderOvRoot135.querySelector('#ovPrint135').onclick=()=>window.print();builderOvRoot135.querySelector('#ovPack135').onclick=downloadArchitecturePack;builderOvRoot135.querySelector('#ovEdit135').onclick=()=>switchView('builder');builderOvRoot135.querySelectorAll('[data-ov-tab]').forEach(button=>button.onclick=()=>builderOvShow135(button.dataset.ovTab));builderOvWire135()}catch(error){builderOvRoot135.innerHTML='<div class="ovError135" role="alert">Unable to render operational views: '+builderV125Text125(error.message)+'</div>'}}
 function builderOvShow135(key){builderOvActive135=['ov1','ov2','ov3'].includes(key)?key:'ov1';builderOvRoot135.querySelectorAll('[data-ov-tab]').forEach(tab=>{const active=tab.dataset.ovTab===builderOvActive135;tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1});builderOvRoot135.querySelectorAll('[data-ov-panel]').forEach(panel=>panel.hidden=panel.dataset.ovPanel!==builderOvActive135)}
 function builderOvHighlight135(key,value){const panel=builderOvRoot135.querySelector('[data-ov-panel="'+key+'"]');if(!panel)return;panel.dataset.focus=value;panel.querySelectorAll('.ov1Page132').forEach(page=>page.dataset.activeThread=value);panel.querySelectorAll('.ov2Page133').forEach(page=>page.dataset.focus=value);panel.querySelectorAll('[data-thread],[data-needline],[data-node]').forEach(el=>{const attr=key==='ov1'?'thread':el.hasAttribute('data-needline')?'needline':'node',id=el.dataset[attr],line=builderOvModel135?.needlines.find(n=>n.id===value),active=key==='ov1'?id===value:attr==='needline'?id.split(', ').includes(value)||!!builderOvModel135?.needlines.find(n=>n.id===id&&[n.from.id,n.to.id].includes(value)):id===value||!!line&&[line.from.id,line.to.id].includes(id);el.classList.toggle('active',active)})}
 function builderOvFilter135(sourceBar){const panel=builderOvRoot135.querySelector('[data-ov-panel="ov3"]');if(!panel||!builderOvModel135)return;const controls=[...panel.querySelectorAll('[data-ov3-controls]')],primary=sourceBar||controls[0],planes=new Set([...primary.querySelectorAll('[data-ov3-plane]:checked')].map(el=>el.dataset.ov3Plane)),groups=new Set([...primary.querySelectorAll('[data-ov3-group]:checked')].map(el=>el.dataset.ov3Group)),review=primary.querySelector('[data-ov3-review]').checked,gaps=primary.querySelector('[data-ov3-gaps]').checked,query=primary.querySelector('[data-ov3-search]').value.trim().toLowerCase(),pair=panel.dataset.pair||'';let shown=0;for(const flow of builderOvModel135.flows){const hay=[flow.id,flow.needlineId,flow.details.resourceExchanged,flow.details.activitySupported,flow.needline.from.id,flow.needline.from.name,...(flow.consumers||[flow.needline.to]).flatMap(n=>[n.id,n.name]),builderOv2Transport133(flow),builderOv3Auth134(flow)].join(' ').toLowerCase(),match=planes.has(flow.edge.plane)&&(!review||flow.findings.length)&&(!gaps||builderOv3Gap134(flow))&&(!query||hay.includes(query))&&(!pair||pair.split('|')[0]===flow.needline.from.id&&(flow.consumers||[flow.needline.to]).some(n=>n.id===pair.split('|')[1]));if(match)shown++;panel.querySelectorAll('[data-ov3-flow="'+flow.id+'"]').forEach(row=>{row.hidden=!match;row.nextElementSibling.hidden=true})}panel.querySelectorAll('[data-ov3-showing]').forEach(el=>el.textContent=shown);panel.querySelectorAll('[data-ov3-pair-label]').forEach(el=>el.textContent=pair?' · '+pair:'');panel.querySelectorAll('.ov3Matrix134 [data-ov3-group]').forEach(el=>el.hidden=el.dataset.ov3Group!=='fixed'&&!groups.has(el.dataset.ov3Group));for(const bar of controls.filter(bar=>bar!==primary)){bar.querySelectorAll('[data-ov3-plane]').forEach(el=>el.checked=planes.has(el.dataset.ov3Plane));bar.querySelectorAll('[data-ov3-group]').forEach(el=>el.checked=groups.has(el.dataset.ov3Group));bar.querySelector('[data-ov3-review]').checked=review;bar.querySelector('[data-ov3-gaps]').checked=gaps;bar.querySelector('[data-ov3-search]').value=query}}
@@ -5658,6 +5658,508 @@ const builderOvSwitchBefore135=switchView;
 switchView=function(view,...args){const result=builderOvSwitchBefore135(view,...args);const active=view==='ov';document.body.classList.toggle('ovView',active);builderOvRoot135.classList.toggle('active',active);if(active){$('#empty').style.display='none';builderOvRender135()}return result};
 document.title='Splunk Pipeline Explorer · Build 135 · 29 Sep 2026';$('#topologyBuilder').dataset.buildNumber='135';$('#topologyBuilder').dataset.buildDate='2026-09-29';const builderOvStamp135=$('.builderBuildStamp');if(builderOvStamp135){builderOvStamp135.setAttribute('aria-label','Build 135, dated 29 September 2026');builderOvStamp135.querySelector('b').textContent='Build 135';const time=builderOvStamp135.querySelector('time');if(time){time.dateTime='2026-09-29';time.textContent='29 Sep 2026'}}
 changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Dedicated operational views','Open OV-1 concept, OV-2 resource flows and OV-3 matrix together in a read-only page derived from the Builder topology.',true]);if(state.view==='changes')renderChanges();
+</script>
+<style id="builder-ov-review-v136-styles">
+/* The Matrix view's global sticky table headers must not move OV headers down. */
+#ovWorkspace135 th,#builderPresentationOverlay .ov2Page133 th,#builderPresentationOverlay .ov3Page134 th{position:static;top:auto}
+#ovWorkspace135 .ov3Matrix134 th:nth-child(-n+2),#ovWorkspace135 .ov3Matrix134 td:nth-child(-n+2){position:sticky;top:auto}
+#ovWorkspace135 .ovSheet135 th{background:#e5eef2;color:#183e52}
+#ovWorkspace135.theme-dark .ovSheet135 th{background:#183546;color:#edf7fa}
+#ovWorkspace135 .ov3Matrix134{width:1120px;min-width:1120px;table-layout:fixed}
+#ovWorkspace135 .ov3Matrix134[data-ov3-part="controls"]{width:1240px;min-width:1240px}
+#ovWorkspace135 .ov3Matrix134 thead tr:first-child th{position:static!important;left:auto!important;width:auto!important;min-width:0!important}
+#ovWorkspace135 .ov3Matrix134 th:first-child,#ovWorkspace135 .ov3Matrix134 td:first-child{width:90px;min-width:90px;left:0;white-space:normal;overflow-wrap:normal}
+#ovWorkspace135 .ov3Matrix134 th:nth-child(2),#ovWorkspace135 .ov3Matrix134 td:nth-child(2){width:185px;min-width:185px;left:90px;overflow-wrap:normal}
+#ovWorkspace135 .ov3Matrix134 th:nth-child(n+3),#ovWorkspace135 .ov3Matrix134 td:nth-child(n+3){min-width:105px}
+#ovWorkspace135 .ov3Matrix134 th:nth-child(-n+2),#ovWorkspace135 .ov3Matrix134 td:nth-child(-n+2){background:#e5eef2;z-index:3}
+#ovWorkspace135.theme-dark .ov3Matrix134 th:nth-child(-n+2),#ovWorkspace135.theme-dark .ov3Matrix134 td:nth-child(-n+2){background:#183546}
+#ovWorkspace135 .ov2Legend133{display:flex;flex-wrap:wrap;gap:7px 16px;font-size:11px;margin:10px 0;color:#405c6c}
+#ovWorkspace135 .ov2Class133{display:flex;justify-content:space-between;gap:12px;border-block:2px solid #9db4c1;padding:5px;font-size:11px;font-weight:700}
+#ovWorkspace135 .ov1Measures132 small{font-size:11px}
+#ovWorkspace135 .ov3Filters134 input[type="search"]{border:1px solid #8fa9b8;border-radius:5px;padding:5px 7px;background:#fff;color:#173247}
+#ovWorkspace135.theme-dark .ov3Filters134 input[type="search"]{background:#102b3a;color:#eaf8fa;border-color:#6e92a4}
+#ovWorkspace135 .ov3Filters134 [data-ov3-plane]{accent-color:#147994}
+.topologyBuilder .builderTypeHeader130{padding-inline:10px;box-shadow:0 0 0 6px #102735}
+@media print{
+  #ovWorkspace135 .ov3Matrix134{width:100%;min-width:0;table-layout:fixed}
+  #ovWorkspace135 .ov3Matrix134 th:nth-child(-n+2),#ovWorkspace135 .ov3Matrix134 td:nth-child(-n+2){position:static;left:auto}
+  .ov3Page134 .ov3Matrix134 th:first-child,.ov3Page134 .ov3Matrix134 td:first-child{width:9%;min-width:0!important}
+  .ov3Page134 .ov3Matrix134 th:nth-child(2),.ov3Page134 .ov3Matrix134 td:nth-child(2){width:16%;min-width:0!important}
+}
+@media(max-width:760px){
+  body.ovView main.shell>header{display:none!important}
+  #ovWorkspace135 .ovHead135{padding:9px 12px}
+  #ovWorkspace135 .ovHead135 p{font-size:11px;max-width:34ch}
+  #ovWorkspace135 .ovHeadActions135{width:auto;flex:1;align-items:flex-start}
+  #ovWorkspace135 .ovHeadActions135 .primary{flex:0 0 auto}
+  #ovWorkspace135 .ovActionsMenu136{position:relative}
+  #ovWorkspace135 .ovActionsMenu136 summary{list-style:none;border:1px solid #60849a;border-radius:7px;padding:7px 10px;color:#eaf7fb;font-size:12px;font-weight:700;cursor:pointer}
+  #ovWorkspace135 .ovActionsMenu136 summary::-webkit-details-marker{display:none}
+  #ovWorkspace135 .ovActionsMenu136[open] .ovActionsContents136{position:absolute;right:0;top:100%;z-index:10;display:grid;gap:4px;width:210px;padding:7px;border:1px solid #60849a;border-radius:8px;background:#102637;box-shadow:0 12px 25px #0006}
+  #ovWorkspace135 .ovActionsContents136 button{width:100%;text-align:left}
+  #ovWorkspace135 .ovTabs135{position:sticky;top:0;z-index:6;padding:6px 9px}
+  #ovWorkspace135 .ovTabs135 button{padding:6px 8px}
+}
+</style>
+<script id="builder-ov-review-v136">
+/* Keep saved false, but include OV-3 for new architecture packs. */
+if(state.builderExport.sections.ov3===undefined)state.builderExport.sections.ov3=true;
+
+/* The existing node and flow IDs remain the common source for OV-2 and OV-3. */
+const builderOv2ModelBefore136=builderOv2Model133;
+builderOv2Model133=function(...args){
+  const model=builderOv2ModelBefore136(...args);
+  for(const flow of model.flows){
+    const security=[],questions=[];
+    for(const finding of flow.findings||[]){
+      (/\bPII\b|unencrypted|without TLS|cross.region|authentication required|credential/i.test(finding)?security:questions).push(finding);
+    }
+    for(const edge of flow.edges||[flow.edge]){
+      const details=ensureRelationshipDetails(edge.edge);
+      if(details.authenticationRequired==='Yes'&&(!details.authenticationType||details.authenticationType==='Not specified'||details.authenticationType==='Not applicable'))
+        security.push('Authentication is required but its type is not specified.');
+    }
+    flow.openQuestions=[...new Set(questions)];
+    flow.findings=[...new Set(security)];
+  }
+  for(const line of model.needlines)line.review=line.flows.some(flow=>flow.findings.length>0);
+  return model;
+};
+
+/* Split modelled source ingest across each outgoing branch. Unknown capacity stays unknown. */
+function builderOvVolume136(flow){
+  if(flow.edge.plane!=='data')return null;
+  const capacity=state.capacity||{},eps=Number(capacity.arrivalEps),kb=Number(capacity.eventKb);
+  if(!(eps>0&&kb>0))return null;
+  const edges=builderTraceEdges('all').filter(edge=>edge.plane==='data');
+  const sources=state.builderNodes.filter(node=>builderTierOf130(node)==='sources');
+  const instances=sources.reduce((sum,node)=>sum+builderOvInstances132(node),0);
+  if(!instances)return null;
+  const byTarget=new Map(),bySource=new Map();
+  for(const edge of edges){
+    const incoming=byTarget.get(edge.to)||[],outgoing=bySource.get(edge.from)||[];
+    incoming.push(edge);outgoing.push(edge);byTarget.set(edge.to,incoming);bySource.set(edge.from,outgoing);
+  }
+  const memo=new Map(),visiting=new Set(),total=eps*kb*86400/1000000;
+  function inbound(id){
+    if(memo.has(id))return memo.get(id);
+    if(visiting.has(id))return 0;
+    visiting.add(id);
+    const node=state.builderNodes.find(item=>item.id===id);
+    const own=node&&builderTierOf130(node)==='sources'?total*builderOvInstances132(node)/instances:0;
+    const amount=own+(byTarget.get(id)||[]).reduce((sum,edge)=>sum+outbound(edge),0);
+    visiting.delete(id);memo.set(id,amount);return amount;
+  }
+  function outbound(edge){const outgoing=bySource.get(edge.from)||[edge],index=outgoing.indexOf(edge),amount=Math.round(inbound(edge.from));return Math.round(amount*(index+1)/outgoing.length)-Math.round(amount*index/outgoing.length)}
+  const selected=flow.edges||[flow.edge];
+  return Math.round(selected.filter(edge=>edge.plane==='data').reduce((sum,edge)=>sum+outbound(edge),0));
+}
+builderOv3Volume134=builderOvVolume136;
+const builderOvTimelinessBefore136=builderOv2Timeliness133;
+builderOv2Timeliness133=function(flow){if(flow.edge.plane==='management'){const relation=flow.edge.edge.relation,seconds=Number(relation?.phoneHomeSeconds||relation?.phoneHome||0);return seconds>0?seconds+' s poll':relation?.type==='deployment_client'?'60 s poll':'Not set'}return builderOvTimelinessBefore136(flow)};
+
+/* Preserve older saved values while exposing the current Criticality vocabulary. */
+const builderOvSanitizeBefore136=sanitizeRelationshipDetails;
+sanitizeRelationshipDetails=function(value,defaults){
+  const mapped={...value};
+  if(mapped.flowCriticality) mapped.flowCriticality=({'Critical':'Mission critical','High':'Mission critical','Medium':'Essential','Low':'Routine'})[mapped.flowCriticality]||mapped.flowCriticality;
+  return builderOvSanitizeBefore136(mapped,defaults);
+};
+const builderOvMarkupBefore136=relationshipInspectorMarkup;
+relationshipInspectorMarkup=function(){
+  const html=builderOvMarkupBefore136();
+  if(html.includes('data-relationship-field="flowClassification"'))return html;
+  const classification=state.builderPresentation.classification||state.securityClassification||'Security telemetry';
+  const values=[...new Set([classification,'Internal','Official','Official: Sensitive','Protected','Secret','Top Secret'])];
+  const field='<label>Flow classification<select data-relationship-field="flowClassification"><option value="">Same as pack ('+builderV125Text125(classification)+')</option>'+values.map(value=>'<option value="'+builderV125Text125(value)+'">'+builderV125Text125(value)+'</option>').join('')+'</select></label>';
+  return html.replace('<label>Acknowledgement',field+'<label>Acknowledgement');
+};
+
+/* A needline diagram uses explicit gutters and two-line node names. */
+builderOv2Svg133=function(model){
+  const esc=builderV125Text125,tiers={sources:0,collection:1,forwarding:2,processing:2,indexing:3,search:3,management:3,people:4,response:4};
+  const pitch=365,boxW=205,boxH=65,counts=[0,0,0,0,0],positions=new Map(),frames=new Map();
+  for(const node of model.nodes){
+    const column=tiers[node.tier]??4,row=counts[column]++;
+    positions.set(node.key,{x:18+column*pitch,y:48+row*88});
+    const members=frames.get(node.location)||[];members.push(node);frames.set(node.location,members);
+  }
+  const bottom=Math.max(0,...[...positions.values()].map(point=>point.y+boxH)),height=bottom+32,width=Math.max(1,counts.findLastIndex(count=>count>0)+1)*pitch;
+  const frameMarkup=[...frames].map(([name,nodes])=>{
+    const points=nodes.map(node=>positions.get(node.key)),left=Math.min(...points.map(p=>p.x))-8,right=Math.max(...points.map(p=>p.x))+boxW+8,top=Math.min(...points.map(p=>p.y))-25,low=Math.max(...points.map(p=>p.y))+boxH+8;
+    return '<g><rect class="frame" x="'+left+'" y="'+top+'" width="'+(right-left)+'" height="'+(low-top)+'" rx="8" stroke-dasharray="5 5"/><text class="small" x="'+(left+7)+'" y="'+(top+16)+'">'+esc(name)+'</text></g>';
+  }).join('');
+  const paths=model.needlines.map((line,index)=>{
+    const a=positions.get(line.from.key),b=positions.get(line.to.key);if(!a||!b)return'';
+    const right=b.x>=a.x,x1=a.x+(right?boxW:0),x2=b.x+(right?0:boxW),y1=a.y+boxH/2,y2=b.y+boxH/2,middle=(x1+x2)/2,caption=line.id+' · '+line.flows.map(flow=>flow.id).join(', '),pillW=Math.min(138,Math.max(80,caption.length*6+14)),px=middle-pillW/2,py=Math.max(23,(y1+y2)/2-11+(index%2)*24);
+    return '<g data-needline="'+line.id+'" tabindex="0" role="button" aria-label="'+esc(caption)+'"><path class="line '+line.plane+'" d="M'+x1+' '+y1+' L'+middle+' '+y1+' L'+middle+' '+y2+' L'+x2+' '+y2+'"/><rect class="pill '+(line.review?'review':'')+'" x="'+px+'" y="'+py+'" width="'+pillW+'" height="21" rx="10"/><text class="small" x="'+(px+7)+'" y="'+(py+15)+'">'+esc(caption.slice(0,21))+(line.review?' ⚠':'')+'</text><title>'+esc(caption)+'</title></g>';
+  }).join('');
+  const cards=model.nodes.map(node=>{
+    const p=positions.get(node.key),name=node.id+' '+node.name,cut=name.length>27?name.lastIndexOf(' ',27):name.length,first=name.slice(0,cut),second=name.slice(cut).trim();
+    return '<g data-node="'+node.id+'" tabindex="0" role="button" aria-label="'+esc(name)+'"><rect class="node" x="'+p.x+'" y="'+p.y+'" width="'+boxW+'" height="'+boxH+'" rx="6"/><text x="'+(p.x+7)+'" y="'+(p.y+17)+'" font-weight="700">'+esc(first)+'</text>'+(second?'<text class="small" x="'+(p.x+7)+'" y="'+(p.y+31)+'">'+esc(second.slice(0,30))+'</text>':'')+'<text class="small" x="'+(p.x+7)+'" y="'+(p.y+46)+'">'+esc(node.activity.slice(0,31))+'</text><text class="small" x="'+(p.x+7)+'" y="'+(p.y+60)+'">'+esc(node.realised.slice(0,31))+'</text><title>'+esc(name+' · '+node.realised)+'</title></g>';
+  }).join('');
+  return '<svg class="ov2Diagram133" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="Operational resource flow: '+model.nodes.length+' nodes, '+model.needlines.length+' needlines">'+frameMarkup+paths+cards+'</svg>';
+};
+
+/* Size concept zones to their contents and reserve the gutters for flow tags. */
+builderOvSvg132=function(model){
+  const esc=builderV125Text125,pitch=345,cardW=230,areaCount=model.shapes.some(s=>s.area===3)||state.builderExport.ov1.people.length?4:3;
+  const rows=Array.from({length:areaCount},()=>[]),positions=new Map();
+  for(const shape of model.shapes)if(shape.area<areaCount)rows[shape.area].push(shape);
+  const platform=rows[2],regular=platform.filter(shape=>builderTierOf130(shape.nodes[0])!=='management'),managed=platform.filter(shape=>builderTierOf130(shape.nodes[0])==='management');
+  rows[2]=regular.concat(managed);
+  rows.forEach((shapes,area)=>shapes.forEach((shape,index)=>positions.set(shape.key,{x:17+area*pitch,y:55+index*44+(area===2&&index>=regular.length&&managed.length?17:0)})));
+  const roleStart=55+(rows[3]?.length||0)*44,roleCount=state.builderExport.ov1.people.length;
+  const bottom=Math.max(155,...[...positions.values()].map(p=>p.y+34),roleStart+roleCount*30);
+  const height=bottom+32,width=areaCount*pitch;
+  const zoneNames=['Sites and cloud','Collection and forwarding','Platform','People and response'];
+  const zones=rows.map((shapes,i)=>'<g><rect class="ov1Zone132" x="'+i*pitch+'" y="10" width="'+(pitch-10)+'" height="'+(height-20)+'" rx="8"/><text x="'+(i*pitch+10)+'" y="32" font-weight="700">'+zoneNames[i]+'</text>'+(shapes.length||i===3&&roleCount?'':'<text class="ov1Small132" x="'+(i*pitch+12)+'" y="64">None in this topology</text>')+'</g>').join('');
+  const sites=model.sites.map(site=>{const shapes=rows[0].filter(shape=>shape.site===site);if(!shapes.length)return'';const points=shapes.map(shape=>positions.get(shape.key)),top=Math.min(...points.map(p=>p.y))-18,low=Math.max(...points.map(p=>p.y))+35;return'<g><rect class="ov1Zone132" x="7" y="'+top+'" width="'+(pitch-24)+'" height="'+(low-top)+'" rx="5"/><text class="ov1Small132" x="14" y="'+(top+14)+'">'+esc(site)+'</text></g>'}).join('');
+  const managementBox=managed.length?'<g><rect class="ov1Zone132" x="'+(2*pitch+8)+'" y="'+(positions.get(managed[0].key).y-12)+'" width="'+(pitch-27)+'" height="'+(managed.length*44+15)+'" rx="6" stroke-dasharray="5 4"/><text class="ov1Small132" x="'+(2*pitch+17)+'" y="'+(positions.get(managed[0].key).y+2)+'">Management</text></g>':'';
+  const links=model.links.map((link,index)=>{
+    const a=positions.get(link.from),b=positions.get(link.to);if(!a||!b)return'';
+    const forward=b.x>a.x,x1=a.x+(forward?cardW:0),x2=b.x+(forward?0:cardW),y1=a.y+16,y2=b.y+16,gutter=Math.min(x1,x2),mx=(x1+x2)/2,thread=link.plane==='management'?5:link.plane==='authentication'?6:builderTierOf130(link.edges[0].edge.source)==='sources'?1:2,tag=builderOvTag132(link),label=(tag+(link.edges.length>1?' ×'+link.edges.length:'')).trim();
+    const labelY=45+index*19,tagW=Math.min(105,Math.max(30,label.length*6+9));
+    return'<g data-thread="'+thread+'"><path class="ov1Path132 '+link.plane+'" d="M'+x1+' '+y1+' L'+mx+' '+y1+' L'+mx+' '+y2+' L'+x2+' '+y2+'"/><circle cx="'+mx+'" cy="'+y1+'" r="9" fill="var(--data)"/><text x="'+mx+'" y="'+(y1+3)+'" fill="white" text-anchor="middle">'+thread+'</text>'+(label?'<rect x="'+(gutter+5)+'" y="'+labelY+'" width="'+tagW+'" height="16" fill="var(--panel)" rx="3"/><text class="ov1Small132" x="'+(gutter+9)+'" y="'+(labelY+12)+'">'+esc(label.slice(0,16))+'</text>':'')+'<title>'+esc(link.edges.length+' '+(link.edges.length===1?'relationship':'relationships')+' · '+label)+'</title></g>';
+  }).join('');
+  const cards=model.shapes.map(shape=>{const p=positions.get(shape.key);if(!p)return'';return'<g><rect class="ov1Card132" x="'+p.x+'" y="'+p.y+'" width="'+cardW+'" height="30" rx="5"/><text x="'+(p.x+7)+'" y="'+(p.y+20)+'">'+esc((shape.name+' · '+shape.count).slice(0,29))+'</text><title>'+esc(shape.name+' · '+shape.count+' '+(shape.count===1?'instance':'instances')+' represented')+'</title></g>'}).join('');
+  const roles=areaCount===4?state.builderExport.ov1.people.map((role,index)=>'<g><rect class="ov1Card132" x="'+(3*pitch+17)+'" y="'+(roleStart+index*30)+'" width="'+cardW+'" height="25" rx="5"/><text x="'+(3*pitch+24)+'" y="'+(roleStart+index*30+17)+'">'+esc((role.name+(role.coverage?' · '+role.coverage:'')).slice(0,29))+'</text></g>').join(''):'';
+  return'<svg class="ov1Diagram132" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="Operational concept with '+model.shapes.length+' grouped component types and '+model.links.length+' relationship paths">'+zones+sites+managementBox+links+cards+roles+'</svg>';
+};
+
+/* Display names are separate from stored plane and column-group keys. */
+const builderOvFiltersBefore136=builderOv3Filters134;
+builderOv3Filters134=function(){
+  return builderOvFiltersBefore136()
+    .replace(/> data<\/label>/g,'> Event data</label>')
+    .replace(/> management<\/label>/g,'> Fleet management</label>')
+    .replace(/> authentication<\/label>/g,'> Authentication</label>')
+    .replace(/> response<\/label>/g,'> Alerts and response</label>')
+    .replace(/> (exchange|performance|assurance|security)<\/label>/g,(match,key)=>'> '+key[0].toUpperCase()+key.slice(1)+'</label>');
+};
+function builderOvShortDate136(){const value=state.builderPresentation.date||localIsoDate(),parts=String(value).split('-').map(Number);return parts.length===3&&parts.every(Number.isFinite)?new Intl.DateTimeFormat('en-AU',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(Date.UTC(parts[0],parts[1]-1,parts[2]))):value}
+function builderOvPageDate136(page){return{...page,content:page.content.replaceAll(formatPresentationDate(state.builderPresentation.date||localIsoDate()),builderOvShortDate136())}}
+const builderOv1PageBefore136=builderOvPage132;builderOvPage132=function(){return builderOvPageDate136(builderOv1PageBefore136())};
+const builderOv2PagesBefore136=builderOv2Pages133;builderOv2Pages133=function(){return builderOv2PagesBefore136().map(builderOvPageDate136)};
+const builderOv3PagesBefore136=builderOv3Pages134;builderOv3Pages134=function(){return builderOv3PagesBefore136().map(builderOvPageDate136)};
+const builderOvPackBefore136=architecturePackHtml;
+architecturePackHtml=function(...args){return builderOvPackBefore136(...args).replace('</style></head>','@media print{.ov3Page134 .ov3Matrix134{width:100%;min-width:0;table-layout:fixed}.ov3Page134 .ov3Matrix134 th:first-child,.ov3Page134 .ov3Matrix134 td:first-child{width:9%;left:auto;white-space:normal}.ov3Page134 .ov3Matrix134 th:nth-child(2),.ov3Page134 .ov3Matrix134 td:nth-child(2){width:16%;left:auto}.ov3Page134 .ov3Matrix134 th:nth-child(-n+2),.ov3Page134 .ov3Matrix134 td:nth-child(-n+2){position:static}}\n</style></head>')};
+const builderOvCellsBefore136=builderOv3Cells134;
+builderOv3Cells134=function(flow,part){
+  const cells=builderOvCellsBefore136(flow,part);
+  if(part==='exchange')cells[6]=cells[6].replace('>'+builderV125Text125(flow.edge.plane)+'</td>','>'+builderV125Text125({data:'Event data',management:'Fleet management',authentication:'Authentication',response:'Alerts and response'}[flow.edge.plane]||flow.edge.plane)+'</td>');
+  return cells;
+};
+const builderOvTableBefore136=builderOv3Table134;
+builderOv3Table134=function(flows,part){
+  const holder=document.createElement('div');holder.innerHTML=builderOvTableBefore136(flows,part);
+  for(const flow of flows){
+    const row=holder.querySelector('[data-ov3-detail="'+flow.id+'"] td');
+    if(row&&flow.openQuestions?.length)row.insertAdjacentHTML('beforeend','<br><strong>Open questions:</strong> '+flow.openQuestions.map(builderV125Text125).join('; '));
+  }
+  return holder.innerHTML;
+};
+
+/* Search the whole routed path for a clear fan-out label position, including
+   the short branch immediately after the source stub. The badge is part of
+   the same label group, so its width participates in collision tests. */
+function builderFanoutRepair136(){
+  const svg=$('#builderTree .unifiedConnectorLayer');if(!svg)return;
+  const layout=unifiedBuilderPositions(),edges=builderTraceEdges('all'),paths=[...svg.querySelectorAll('path.unifiedConnector')],cards=state.builderNodes.filter(node=>layout.positions.has(node.id)).map(node=>builderV123Pad(builderCardBox(node.id,layout.positions),3)),placed=[];
+  for(const label of svg.querySelectorAll('.edgeRouteLabel')){
+    const edge=edges.find(item=>item.plane===label.dataset.routePlane&&String(item.id)===label.dataset.routeEdge);
+    if(!edge||edges.filter(item=>item.plane===edge.plane&&(item.from===edge.from||item.to===edge.to)).length<2)continue;
+    const path=paths.find(item=>item.dataset.edgePlane===label.dataset.routePlane&&item.dataset.edgeId===label.dataset.routeEdge),length=path?.getTotalLength?.();if(!length)continue;
+    const labelWidth=Number(label.querySelector('rect')?.getAttribute('width'))||100,width=labelWidth+27,offset=ensureRelationshipRouting(edge.edge).labelOffset;
+    let best=null;
+    for(const fraction of [.04,.08,.12,.17,.23,.29,.36,.43,.5,.57,.64,.71,.78,.85,.91,.96]){
+      const point=path.getPointAtLength(length*fraction),box={x:point.x+offset.x-labelWidth/2,y:point.y+offset.y-11,w:width,h:22};
+      const overlap=card=>box.x<card.x+card.w&&box.x+box.w>card.x&&box.y<card.y+card.h&&box.y+box.h>card.y;
+      const hits=cards.filter(overlap).length,otherLabels=placed.filter(overlap).length;
+      let crossing=0;
+      for(const other of paths){if(other===path||other.classList.contains('builderTypeHidden130'))continue;const total=other.getTotalLength?.();if(!total)continue;for(let at=4;at<total;at+=9){const p=other.getPointAtLength(at);if(p.x>box.x&&p.x<box.x+box.w&&p.y>box.y&&p.y<box.y+box.h){crossing++;break}}}
+      const score=hits*100000+otherLabels*10000+crossing*100+Math.abs(fraction-.5);
+      if(!best||score<best.score)best={box,score};
+      if(!hits&&!otherLabels&&!crossing)break;
+    }
+    if(best){label.setAttribute('transform','translate('+best.box.x+' '+best.box.y+')');placed.push(best.box)}
+  }
+}
+const builderOvPlaceLabelsBefore136=builderV123PlaceLabels;
+builderV123PlaceLabels=function(...args){const result=builderOvPlaceLabelsBefore136(...args);builderFanoutRepair136();return result};
+
+/* Reuse the existing workspace controls, with a compact mobile action menu. */
+try{builderOvTheme135=localStorage.getItem('splunkPipelineExplorer.ovTheme.v1')||((matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light')}catch{builderOvTheme135=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
+const builderOvRenderBefore136=builderOvRender135;
+builderOvRender135=function(...args){
+  const result=builderOvRenderBefore136(...args),root=builderOvRoot135;
+  const themeButton=root.querySelector('#ovTheme135');
+  if(themeButton)themeButton.onclick=()=>{builderOvTheme135=builderOvTheme135==='dark'?'light':'dark';try{localStorage.setItem('splunkPipelineExplorer.ovTheme.v1',builderOvTheme135)}catch{}builderOvRender135()};
+  root.querySelectorAll('.ovSectionTitle135 span').forEach(counter=>{const match=counter.textContent.match(/OV(\d) · (\d+) \/ (\d+)/);if(match)counter.textContent='OV-'+match[1]+' · '+match[2]+' of '+match[3]});
+  const actions=root.querySelector('.ovHeadActions135'),edit=root.querySelector('#ovEdit135');
+  if(actions&&edit&&matchMedia('(max-width:760px)').matches){
+    const details=document.createElement('details'),summary=document.createElement('summary'),content=document.createElement('div');
+    details.className='ovActionsMenu136';summary.textContent='Actions ▾';content.className='ovActionsContents136';
+    [...actions.children].filter(child=>child!==edit).forEach(child=>content.appendChild(child));
+    details.append(summary,content);actions.insertBefore(details,edit);
+  }
+  return result;
+};
+if(typeof matchMedia==='function')matchMedia('(max-width:760px)').addEventListener('change',()=>{if(state.view==='ov')builderOvRender135()});
+
+document.title='Splunk Pipeline Explorer · Build 136 · 29 Sep 2026';
+$('#topologyBuilder').dataset.buildNumber='136';$('#topologyBuilder').dataset.buildDate='2026-09-29';
+const builderOvStamp136=$('.builderBuildStamp');
+if(builderOvStamp136){builderOvStamp136.setAttribute('aria-label','Build 136, dated 29 September 2026');builderOvStamp136.querySelector('b').textContent='Build 136'}
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Operational views review fixes','Keep OV sheets inside their tabs, restore table geometry, include OV-3 by default and derive flow volumes from upstream sources.',true]);
+if(state.view==='changes')renderChanges();
+</script>
+<style id="builder-ov1-visual-v137-styles">
+.ov1Visual137{--ovInk:#132433;--ovInk2:#3f5566;--ovMuted:#526d7e;--ovRule:#c5d5df;--ovZone:#eef3f7;--ovSheet:#fff;--ovNode:#fff;--ovData:#006e93;--ovMgmt:#087866;--ovAuth:#6742a5;--ovResp:#a84f10;--ovReview:#805100;--ovClass:#835500;--ovClassFg:#fff;--ovIcon:#26435a;--ovIconFill:#dde8ef;color:var(--ovInk);background:var(--ovSheet);font-family:Inter,Segoe UI,Arial,sans-serif}
+.theme-dark .ov1Visual137{--ovInk:#e4eef4;--ovInk2:#b4c6d2;--ovMuted:#a9c0ce;--ovRule:#3b5667;--ovZone:#142b3a;--ovSheet:#0c1e2b;--ovNode:#10293a;--ovData:#66c9e6;--ovMgmt:#55d9c5;--ovAuth:#c0abfa;--ovResp:#f0a06d;--ovReview:#efc87d;--ovClass:#e0b567;--ovClassFg:#1b1204;--ovIcon:#b9d2e0;--ovIconFill:#183044}
+.ov1Visual137 .ovClass137{display:flex;justify-content:space-between;align-items:center;background:var(--ovClass);color:var(--ovClassFg);min-height:24px;padding:4px 10px;font:700 11px/1.3 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase}
+.ov1Visual137 .ovTitle137{display:grid;grid-template-columns:2.1fr repeat(4,1fr);border:1px solid var(--ovRule);margin:12px 0}
+.ov1Visual137 .ovTitle137>div{min-width:0;padding:8px 10px;border-left:1px solid var(--ovRule)}.ov1Visual137 .ovTitle137>div:first-child{border-left:0}
+.ov1Visual137 .ovTitle137 small,.ov1Visual137 .ovMission137 small,.ov1Visual137 h3{display:block;color:var(--ovMuted);font:700 10.5px/1.3 ui-monospace,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase}
+.ov1Visual137 .ovTitle137 strong{display:block;margin-top:3px;font-size:13px;line-height:1.3}.ov1Visual137 .ovTitle137>div:first-child strong{font-size:20px}
+.ov1Visual137 .ovNotSet137{display:inline-block;background:color-mix(in srgb,var(--ovReview) 16%,transparent);color:var(--ovReview);border-radius:3px;padding:1px 5px}
+.ov1Visual137 .ovMission137{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start;border-left:3px solid var(--ovData);padding:5px 12px;margin:14px 0}.ov1Visual137 .ovMission137 p{margin:0;font-size:15px;line-height:1.45}
+.ov1Visual137 .ovFigure137{border:1px solid var(--ovRule);border-radius:4px;overflow-x:auto;background:var(--ovSheet)}
+.ov1Visual137 .ovFigure137 svg{display:block;min-width:1000px;width:100%;height:auto;max-height:none;border:0;background:var(--ovSheet)}
+.ov1Visual137 svg .ovZone137{fill:var(--ovZone);stroke:var(--ovRule);stroke-width:1}.ov1Visual137 svg .ovSite137{fill:var(--ovNode);stroke:var(--ovRule);stroke-width:1;stroke-dasharray:5 4}
+.ov1Visual137 svg .ovZoneTitle137{font:700 10.5px ui-monospace,Menlo,monospace;letter-spacing:.12em;fill:var(--ovMuted)}.ov1Visual137 svg .ovSiteTitle137{font:700 11.5px Inter,Segoe UI,Arial,sans-serif;fill:var(--ovInk2)}
+.ov1Visual137 svg .ovCard137{fill:var(--ovNode)}.ov1Visual137 svg .ovIconBase137{fill:var(--ovIconFill);stroke:var(--ovIcon);stroke-width:1.4}.ov1Visual137 svg .ovIconLine137{stroke:var(--ovIcon);stroke-width:1.4;fill:none}.ov1Visual137 svg .ovIconDot137{fill:var(--ovIcon)}
+.ov1Visual137 svg .ovName137{font:600 13px Inter,Segoe UI,Arial,sans-serif;fill:var(--ovInk)}.ov1Visual137 svg .ovDetail137{font:400 11px Inter,Segoe UI,Arial,sans-serif;fill:var(--ovMuted)}.ov1Visual137 svg .ovDetail137.review{fill:var(--ovReview)}
+.ov1Visual137 svg .ovPath137{fill:none;stroke:var(--ovData);stroke-width:2}.ov1Visual137 svg .ovPath137.management{stroke:var(--ovMgmt);stroke-width:1.8;stroke-dasharray:7 5}.ov1Visual137 svg .ovPath137.authentication{stroke:var(--ovAuth);stroke-width:1.8;stroke-dasharray:2 4;stroke-linecap:round}.ov1Visual137 svg .ovPath137.response{stroke:var(--ovResp)}
+.ov1Visual137 svg .ovTag137{font:500 9.5px ui-monospace,Menlo,monospace;fill:var(--ovInk2);stroke:var(--ovSheet);stroke-width:3;paint-order:stroke}.ov1Visual137 svg .ovThreadMarker137{cursor:pointer}.ov1Visual137 svg .ovThreadMarker137 circle{fill:var(--ovSheet);stroke:var(--ovInk);stroke-width:1.4}.ov1Visual137 svg .ovThreadMarker137 text{font:700 11px ui-monospace,Menlo,monospace;fill:var(--ovInk);text-anchor:middle;dominant-baseline:central}
+.ov1Visual137[data-active-thread] [data-thread]:not(.active){opacity:.15}.ov1Visual137 .ovThreadMarker137:focus-visible{outline:2px solid var(--ovData)}
+.ov1Visual137 .ovBelow137{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:18px;margin:14px 0}.ov1Visual137 h3{margin:0 0 8px}.ov1Visual137 .ovThreads137{list-style:none;display:grid;gap:3px;margin:0;padding:0}.ov1Visual137 .ovThreads137 li{display:grid;grid-template-columns:26px minmax(0,1fr);gap:10px;padding:6px 7px;cursor:pointer;border-radius:5px}.ov1Visual137 .ovThreads137 li:hover,.ov1Visual137 .ovThreads137 li.active{background:var(--ovZone)}.ov1Visual137 .ovThreads137 li b:first-child{display:grid;place-items:center;width:23px;height:23px;border:1.4px solid var(--ovInk);border-radius:50%;font:700 11px ui-monospace,Menlo,monospace}.ov1Visual137 .ovThreads137 strong{display:block;font-size:14px}.ov1Visual137 .ovThreads137 span{display:block;color:var(--ovInk2);font-size:12px;line-height:1.4}
+.ov1Visual137 .ovLegend137{display:grid;gap:6px;font-size:12px;color:var(--ovInk2)}.ov1Visual137 .ovLegend137 div{display:flex;align-items:center;gap:9px}.ov1Visual137 .ovLegend137 svg{width:38px;height:13px;flex:none}.ov1Visual137 .ovMeasures137{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--ovRule)}.ov1Visual137 .ovMeasures137 div{padding:7px 9px;border-top:1px solid var(--ovRule);border-left:1px solid var(--ovRule)}.ov1Visual137 .ovMeasures137 div:nth-child(-n+2){border-top:0}.ov1Visual137 .ovMeasures137 div:nth-child(odd){border-left:0}.ov1Visual137 .ovMeasures137 b{display:block;font-size:18px}.ov1Visual137 .ovMeasures137 small{display:block;color:var(--ovMuted);font-size:12px}.ov1Visual137 .ovMeasures137 .review b{color:var(--ovReview)}
+.ov1Visual137 .ovFooter137{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--ovRule);padding:8px 0;margin:10px 0;color:var(--ovMuted);font-size:11px}
+@media(max-width:760px){.ov1Visual137 .ovTitle137{grid-template-columns:1fr 1fr}.ov1Visual137 .ovTitle137>div:first-child{grid-column:1/-1}.ov1Visual137 .ovBelow137{grid-template-columns:1fr}.ov1Visual137 .ovMission137{grid-template-columns:1fr;gap:4px}}
+@media print{.ov1Visual137 .ovFigure137{overflow:visible}.ov1Visual137 .ovFigure137 svg{min-width:0;max-height:125mm}.ov1Visual137 .ovTitle137 strong{font-size:11pt}.ov1Visual137 .ovThreads137{break-inside:auto}.ov1Visual137 .ovThreads137 li{break-inside:avoid}.ov1Visual137 svg .ovTag137{font-size:10px}}
+</style>
+<script id="builder-ov1-visual-v137">
+/* A drawing page derived from the same nodes and relationships as the pack. */
+const builderOvAreaBefore137=builderOvArea132;
+builderOvArea132=function(node){
+  if(['awsLambda','azureFunction'].includes(node.type)||node.type==='apiCollector'&&/aws|azure|gcp|cloud/i.test(node.region||''))return 0;
+  return builderOvAreaBefore137(node);
+};
+const builderOvModelBefore137=builderOvModel132;
+builderOvModel132=function(){
+  const prior=builderOvModelBefore137(),shapes=[],byKey=new Map(),byNode=new Map(),links=new Map();
+  for(const node of state.builderNodes){
+    const area=builderOvArea132(node),cloud=area===0&&['awsLambda','azureFunction','apiCollector'].includes(node.type),region=node.region||'Unspecified';
+    const provider=node.type==='azureFunction'||/azure/i.test(region)?'Azure':node.type==='awsLambda'||/aws|ap-southeast/i.test(region)?'AWS':'Cloud';
+    const site=area===0?(cloud?provider+' · '+region:region):'',key=[area,site,node.type].join('|');
+    let shape=byKey.get(key);
+    if(!shape){shape={key,area,site,type:node.type,name:builderComponents[node.type]?.name||node.type,count:0,nodes:[]};byKey.set(key,shape);shapes.push(shape)}
+    shape.nodes.push(node);shape.count+=builderOvInstances132(node);byNode.set(node.id,key);
+  }
+  for(const edge of builderTraceEdges('all')){
+    const from=byNode.get(edge.from),to=byNode.get(edge.to);if(!from||!to||from===to)continue;
+    const key=[from,to,edge.plane].join('|'),link=links.get(key)||{from,to,plane:edge.plane,edges:[]};
+    link.edges.push(edge);links.set(key,link);
+  }
+  return {...prior,shapes,links:[...links.values()],sites:[...new Set(shapes.filter(shape=>shape.area===0).map(shape=>shape.site))]};
+};
+const builderOvTagBefore137=builderOvTag132;
+builderOvTag132=function(link){
+  const details=ensureRelationshipDetails(link.edges[0].edge),raw=String(details.protocol||link.edges[0].edge.label||''),parts=[];
+  if(link.plane==='management')parts.push('phone-home');
+  else if(link.plane==='authentication'||/SAML/i.test(raw))parts.push(/SAML/i.test(raw)?'SAML':/OIDC|OpenID/i.test(raw)?'OIDC':'authentication');
+  else if(/Splunk-to-Splunk|S2S/i.test(raw))parts.push('S2S');
+  else if(/HEC|8088/i.test(raw))parts.push('HEC HTTPS');
+  else if(/syslog|TCP\/TLS or UDP/i.test(raw))parts.push('syslog');
+  else if(raw&&raw!=='Unknown')parts.push(raw.split(/[·,;]/)[0].trim().split(/\s+/).slice(0,3).join(' '));
+  if(link.plane==='authentication'){
+    const method=String(details.authenticationType||'');
+    if(method&&!/not specified|not applicable|SAML SSO/i.test(method))parts.push(method.replace('Mutual TLS certificate','mTLS').replace('OpenID Connect','OIDC'));
+    if(/MFA/i.test(raw+' '+method+' '+link.edges[0].edge.relation?.method))parts.push('MFA');
+  }
+  else{
+    if(['Enabled','Required'].includes(details.tls)||/HTTPS/i.test(raw))parts.push('TLS');
+    const port=Number(details.port||link.edges[0].edge.relation?.port);
+    if(port>0)parts.push(String(port));
+    if(/enabled|yes|required/i.test(String(details.acknowledgement)))parts.push('ACK');
+    const method=String(details.authenticationType||'');
+    if(method&&!/not specified|not applicable/i.test(method))parts.push(method.replace('Mutual TLS certificate','mTLS').replace('OpenID Connect','OIDC'));
+  }
+  return [...new Set(parts.filter(Boolean))].join(' · ');
+};
+function builderOvIcon137(type){
+  const frame='<rect class="ovIconBase137" width="34" height="34" rx="4"/>';
+  let lines='<path class="ovIconLine137" d="M7 10H27M7 17H27M7 24H24"/>';
+  if(/syslog|network/i.test(type))lines='<path class="ovIconLine137" d="M4 11H30M4 23H30M14 4V11M23 11V23M10 23V30M23 23V30"/>';
+  else if(/uf|forward/i.test(type))lines='<path class="ovIconLine137" d="M5 17H27M21 10L28 17L21 24"/>';
+  else if(/hf|processor|hecEndpoint/i.test(type))lines='<path class="ovIconLine137" d="M5 8H29L21 18V27L13 30V18Z"/>';
+  else if(/idx|indexer|cluster/i.test(type))lines='<ellipse class="ovIconLine137" cx="17" cy="9" rx="11" ry="4"/><path class="ovIconLine137" d="M6 9V25C6 29 28 29 28 25V9M6 18C6 22 28 22 28 18"/>';
+  else if(/search/i.test(type))lines='<circle class="ovIconLine137" cx="15" cy="15" r="8"/><path class="ovIconLine137" d="M21 21L29 29"/>';
+  else if(/authProvider/i.test(type))lines='<path class="ovIconLine137" d="M17 3L29 8V17C29 25 23 30 17 33C11 30 5 25 5 17V8Z M11 17L15 21L23 12"/>';
+  else if(/authUser/i.test(type))lines='<circle class="ovIconLine137" cx="17" cy="11" r="5"/><path class="ovIconLine137" d="M5 29C5 19 29 19 29 29"/>';
+  else if(/soar/i.test(type))lines='<path class="ovIconLine137" d="M8 9H26M8 17H26M8 25H21"/><circle class="ovIconBase137" cx="26" cy="26" r="2"/>';
+  else if(/ds|deployment/i.test(type))lines='<path class="ovIconLine137" d="M6 26H28M10 26V10H24V26M13 15H21"/>';
+  else if(/license|monitor/i.test(type))lines='<path class="ovIconLine137" d="M5 28L12 19L18 23L29 8"/>';
+  else if(/aws|azure|cloud/i.test(type))lines='<path class="ovIconLine137" d="M7 25C2 25 3 17 9 16C10 8 19 7 22 13C30 11 34 24 27 25Z"/>';
+  return'<g class="ovIcon137">'+frame+lines+'</g>';
+}
+function builderOvWrap137(text,limit){const words=String(text).split(/\s+/),lines=[''];for(const word of words){const last=lines.length-1;if(lines[last]&&(lines[last]+' '+word).length>limit)lines.push(word);else lines[last]+=(lines[last]?' ':'')+word}return lines}
+function builderOvCardName137(shape){
+  const count=shape.count,type=shape.type,base=shape.name;
+  if(count>1)return {uf:'Universal Forwarders',idx:'Indexers',syslog:'Syslog relays',windowsEvent:'Windows servers',syslogSource:'Syslog sources',authUser:'People',hf:'Heavy Forwarders'}[type]||(/s$/.test(base)?base:base+'s');
+  const named=shape.nodes[0]?.instanceName;
+  return named&&!/^.+\s[0-9]+$/.test(named)?named:base;
+}
+function builderOvCardDetail137(shape,connected){
+  const node=shape.nodes[0],explicit=shape.nodes.some(item=>Number(item.instancesRepresented)>0),count=shape.count,regions=[...new Set(shape.nodes.map(item=>item.region).filter(Boolean))];
+  if(!connected)return'not connected';
+  const facts={uf:'on Windows hosts',syslog:'syslog · UF · file handoff',hf:'parsing · routing',hecEndpoint:'HTTPS ingestion',idx:'indexed events',search:'search · dashboards',ds:'server classes · apps',authUser:'dashboards · triage',authProviderCloud:'SSO · MFA',authProviderOnPrem:'SSO · MFA',soar:'playbooks · cases',awsLambda:'Lambda · HEC',azureFunction:'Function · HEC'};
+  if(shape.type==='syslog'&&regions.length>1)return shape.nodes.length+' sites · '+regions.join(', ');
+  const quantity=explicit?'≈'+count+(shape.area===0?' hosts':' instances'):count>1?count+' components':'';
+  return[quantity,facts[shape.type]||builderComponents[shape.type]?.type||''].filter(Boolean).join(' · ');
+}
+function builderOvLayout137(model){
+  const people=state.builderExport.ov1.people||[],presentPeople=model.shapes.some(s=>s.area===3)||people.length>0,count=presentPeople?4:3,widths=count===4?[260,230,285,205]:[350,320,370],gap=60,zones=[],boxes=new Map(),cards=[],siteFrames=[],innerFrames=[],connected=new Set(model.links.flatMap(l=>[l.from,l.to]));
+  let x=0;for(let i=0;i<count;i++){zones.push({x,w:widths[i],name:['ENTERPRISE SITES & CLOUD','COLLECTION & FORWARDING','SPLUNK ENTERPRISE PLATFORM','PEOPLE & RESPONSE'][i]});x+=widths[i]+(i<count-1?gap:0)}
+  const width=x,cardGap=14;
+  function add(shape,px,py,w){
+    const name=shape.roleName||builderOvCardName137(shape),detail=shape.roleDetail||builderOvCardDetail137(shape,connected.has(shape.key)),nameLines=builderOvWrap137(name,Math.max(14,Math.floor((w-53)/6.8))),detailLines=builderOvWrap137(detail,Math.max(19,Math.floor((w-53)/5.8))),height=Math.max(52,27+nameLines.length*13+detailLines.length*12);
+    const box={x:px,y:py,w,h:height,shape,nameLines,detailLines,detail,role:!!shape.roleName};cards.push(box);boxes.set(shape.key,box);return py+height+cardGap;
+  }
+  let y=45,siteNumber=0;for(const site of model.sites){const members=model.shapes.filter(s=>s.area===0&&s.site===site),top=y;for(const shape of members)y=add(shape,zones[0].x+15,y,zones[0].w-30);
+    const title=/^(AWS|Azure|Cloud) · /.test(site)||site==='Unspecified'?site:site+' · site '+(++siteNumber);
+    siteFrames.push({x:zones[0].x+7,y:top-19,w:zones[0].w-14,h:y-top+11,title});y+=15}
+  const rank={uf:0,syslog:1,hecEndpoint:2,hf:3,dbConnect:4,ip:5,edgeProcessor:6,ingestProcessor:7};
+  const collection=model.shapes.filter(s=>s.area===1).sort((a,b)=>(rank[a.type]??8)-(rank[b.type]??8)||a.name.localeCompare(b.name));
+  y=48;for(const shape of collection)y=add(shape,zones[1].x+12,y,zones[1].w-24);
+  const platform=model.shapes.filter(s=>s.area===2),indexers=platform.filter(s=>builderTierOf130(s.nodes[0])==='indexing'),search=platform.filter(s=>builderTierOf130(s.nodes[0])==='search'),management=platform.filter(s=>!indexers.includes(s)&&!search.includes(s));
+  y=55;if(indexers.length){const top=y;for(const shape of indexers)y=add(shape,zones[2].x+17,y,zones[2].w-34);
+    const cluster=state.builderNodes.find(n=>n.type==='indexerCluster'),factors=cluster?[cluster.indexClusterRf&&'RF '+cluster.indexClusterRf,cluster.indexClusterSf&&'SF '+cluster.indexClusterSf].filter(Boolean).join(' / '):'';
+    innerFrames.push({x:zones[2].x+7,y:top-18,w:zones[2].w-14,h:y-top+10,title:cluster?'Indexer cluster · multisite'+(factors?' · '+factors:''):'Indexing'});y+=14}
+  for(const shape of search)y=add(shape,zones[2].x+17,y,zones[2].w-34);
+  if(management.length){y+=16;const top=y;for(const shape of management)y=add(shape,zones[2].x+17,y,zones[2].w-34);innerFrames.push({x:zones[2].x+7,y:top-18,w:zones[2].w-14,h:y-top+10,title:'Management'})}
+  if(count===4){y=48;const users=model.shapes.filter(s=>s.area===3&&s.type==='authUser'),other=model.shapes.filter(s=>s.area===3&&s.type!=='authUser'),sorted=other.sort((a,b)=>(/authProvider/.test(a.type)?0:/soar/i.test(a.type)?2:1)-(/authProvider/.test(b.type)?0:/soar/i.test(b.type)?2:1));
+    if(people.length){for(const [i,person] of people.entries()){const pseudo={key:'role:'+i,type:'authUser',area:3,nodes:[],count:1,name:person.name,roleName:person.name,roleDetail:[person.coverage,person.notes].filter(Boolean).join(' · ')||'People and response'};const pos=y;y=add(pseudo,zones[3].x+10,y,zones[3].w-20);if(i===0)users.forEach(u=>boxes.set(u.key,{...boxes.get(pseudo.key),shape:u}));if(y-pos<64)y+=4}}
+    else for(const shape of users)y=add(shape,zones[3].x+10,y,zones[3].w-20);
+    for(const shape of sorted){if(/soar/i.test(shape.type))y+=12;y=add(shape,zones[3].x+10,y,zones[3].w-20)}
+  }
+  const bottom=Math.max(145,...cards.map(c=>c.y+c.h),...siteFrames.map(f=>f.y+f.h),...innerFrames.map(f=>f.y+f.h)),height=bottom+25;
+  return{width,height,zones,boxes,cards,siteFrames,innerFrames};
+}
+function builderOvCardSvg137(card,threads){
+  const esc=builderV125Text125,{x,y,w,h,shape,nameLines,detailLines,detail}=card,iconX=x+6,iconY=y+8,textX=x+47,
+    ids=shape.roleName?[...new Set([...threads.entries()].filter(([key])=>key.endsWith('|authUser')).flatMap(([,numbers])=>[...numbers]))].join(' '):[...(threads.get(shape.key)||[])].join(' ');
+  const name=nameLines.map((line,i)=>'<text class="ovName137" x="'+textX+'" y="'+(y+18+i*13)+'">'+esc(line)+'</text>').join('');
+  const details=detailLines.map((line,i)=>'<text class="ovDetail137 '+(detail==='not connected'?'review':'')+'" x="'+textX+'" y="'+(y+19+nameLines.length*13+i*12)+'">'+esc(line)+'</text>').join('');
+  return'<g class="ovCardGroup137" data-thread="'+ids+'" data-ov-card="'+esc(shape.key)+'"><rect class="ovCard137" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="4"/><g transform="translate('+iconX+' '+iconY+')">'+builderOvIcon137(shape.type)+'</g>'+name+details+'<title>'+esc(builderOvCardName137(shape)+' · '+detail)+'</title></g>';
+}
+function builderOvDiagram137(model){
+  const esc=builderV125Text125,L=builderOvLayout137(model),zoneMarkup=L.zones.map(z=>'<g><rect class="ovZone137" x="'+z.x+'" y="10" width="'+z.w+'" height="'+(L.height-20)+'" rx="6"/><text class="ovZoneTitle137" x="'+(z.x+10)+'" y="30">'+esc(z.name)+'</text></g>').join('');
+  const frames=[...L.siteFrames,...L.innerFrames].map(f=>'<g><rect class="ovSite137" x="'+f.x+'" y="'+f.y+'" width="'+f.w+'" height="'+f.h+'" rx="5"/><text class="ovSiteTitle137" x="'+(f.x+9)+'" y="'+(f.y+14)+'">'+esc(f.title)+'</text></g>').join('');
+  const lanes=[],byFrom=new Map(),byTo=new Map(),threads=new Map(),occupied=[],markers=[];
+  function remember(key,n){const ids=threads.get(key)||new Set();ids.add(n);threads.set(key,ids)}
+  const order={data:0,authentication:1,response:2,management:3},links=[...model.links].sort((a,b)=>(order[a.plane]??4)-(order[b.plane]??4));
+  for(const link of links){
+    const a=L.boxes.get(link.from),b=L.boxes.get(link.to);if(!a||!b)continue;
+    const sourceTier=builderTierOf130(link.edges[0].edge.source),targetTier=builderTierOf130(link.edges[0].edge.target);
+    const thread=link.plane==='management'?5:link.plane==='authentication'?6:link.plane==='response'?7:targetTier==='search'?4:sourceTier==='sources'?1:2;
+    remember(link.from,thread);remember(link.to,thread);
+    const outgoing=byFrom.get(link.from)||0,incoming=byTo.get(link.to)||0;byFrom.set(link.from,outgoing+1);byTo.set(link.to,incoming+1);
+    let x1,y1,x2,y2,c1x,c1y,c2x,c2y;
+    if(b.x>=a.x+a.w){x1=a.x+a.w;y1=a.y+a.h/2+(outgoing%3-1)*8;x2=b.x;y2=b.y+b.h/2+(incoming%3-1)*8;const dx=Math.min(60,(x2-x1)/2);c1x=x1+dx;c1y=y1;c2x=x2-dx;c2y=y2}
+    else if(a.x>=b.x+b.w){x1=a.x;y1=a.y+a.h/2+(outgoing%3-1)*8;x2=b.x+b.w;y2=b.y+b.h/2+(incoming%3-1)*8;const dx=Math.min(60,(x1-x2)/2);c1x=x1-dx;c1y=y1;c2x=x2+dx;c2y=y2}
+    else if(b.y>=a.y+a.h){x1=a.x+a.w/2;y1=a.y+a.h;x2=b.x+b.w/2;y2=b.y;c1x=x1;c1y=y1+Math.min(42,(y2-y1)/2);c2x=x2;c2y=y2-Math.min(42,(y2-y1)/2)}
+    else{x1=a.x+a.w/2;y1=a.y;x2=b.x+b.w/2;y2=b.y+b.h;c1x=x1;c1y=y1-25;c2x=x2;c2y=y2+25}
+    let d='M'+x1+' '+y1+' C'+c1x+' '+c1y+' '+c2x+' '+c2y+' '+x2+' '+y2;
+    let point={x:(x1+3*c1x+3*c2x+x2)/8,y:(y1+3*c1y+3*c2y+y2)/8};
+    if(link.plane==='management'&&a.x>b.x+b.w){
+      const gutter=(x1+x2)/2,branch=12+outgoing*8;
+      d='M'+x1+' '+y1+' C'+(x1-25)+' '+y1+' '+gutter+' '+(y1+branch)+' '+gutter+' '+(y1+branch)+
+        ' L'+gutter+' '+(y2+branch)+' C'+gutter+' '+y2+' '+(x2+24)+' '+y2+' '+x2+' '+y2;
+      point={x:gutter,y:(y1+y2)/2};
+    }
+    lanes.push({link,thread,d,point});
+  }
+  const additional=[];
+  const byType=type=>L.cards.find(c=>c.shape.type===type);
+  const idx=byType('idx'),search=byType('search'),soar=L.cards.find(c=>/soar/i.test(c.shape.type)),idp=L.cards.find(c=>/authProvider/.test(c.shape.type)),person=L.cards.find(c=>c.shape.type==='authUser');
+  if(model.threads.some(t=>t[0]===3)&&idx){const x=idx.x+idx.w+10,y=idx.y+8;additional.push({thread:3,plane:'data',d:'M'+x+' '+y+' L'+x+' '+(y+Math.max(30,idx.h)),point:{x,y:y+16},replication:true})}
+  if(model.threads.some(t=>t[0]===4)&&idx&&search&&!lanes.some(l=>l.thread===4)){const x=search.x+search.w/2,y1=search.y-2,y2=idx.y+idx.h+2;additional.push({thread:4,plane:'data',d:'M'+x+' '+y1+' L'+x+' '+y2,point:{x:x-17,y:(y1+y2)/2}})}
+  if(model.threads.some(t=>t[0]===7)&&search&&soar&&!lanes.some(l=>l.thread===7)){const x1=search.x+search.w,x2=soar.x,y1=search.y+search.h/2,y2=soar.y+soar.h/2;additional.push({thread:7,plane:'response',d:'M'+x1+' '+y1+' C'+(x1+35)+' '+y1+' '+(x2-35)+' '+y2+' '+x2+' '+y2,point:{x:(x1+x2)/2,y:(y1+y2)/2}})}
+  if(model.threads.some(t=>t[0]===6)&&person&&idp&&!lanes.some(l=>l.thread===6)){const x=person.x+person.w/2;additional.push({thread:6,plane:'authentication',d:'M'+x+' '+(person.y+person.h)+' L'+x+' '+idp.y,point:{x:x+15,y:(person.y+person.h+idp.y)/2}})}
+  const all=[...lanes,...additional],defs='<defs>'+[['data','var(--ovData)'],['management','var(--ovMgmt)'],['authentication','var(--ovAuth)'],['response','var(--ovResp)']].map(([name,color])=>'<marker id="ov137-'+name+'" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="'+color+'"/></marker>').join('')+'</defs>';
+  const paths=all.map(l=>'<path class="ovPath137 '+(l.plane||l.link.plane)+'" data-thread="'+l.thread+'" d="'+l.d+'" marker-end="url(#ov137-'+(l.plane||l.link.plane)+')"'+(l.replication?' marker-start="url(#ov137-data)"':'')+'/>').join('');
+  const overlap=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y,cardBoxes=L.cards.map(c=>({x:c.x,y:c.y,w:c.w,h:c.h}));
+  const tags=lanes.map(l=>{const value=builderOvTag132(l.link)+(l.link.edges.length>1?' ×'+l.link.edges.length:''),w=value.length*5.8;if(!value||w>175)return'';let spot=null;
+    for(const shift of [-22,22,-36,36,-50,50,-64,64,0]){const box={x:l.point.x-w/2,y:l.point.y+shift-9,w,h:12};if(box.x>=5&&box.x+box.w<L.width-5&&box.y>32&&box.y+box.h<L.height-8&&![...cardBoxes,...occupied].some(other=>overlap(box,other))){spot=box;break}}
+    if(!spot)return'';occupied.push(spot);return'<text class="ovTag137" data-thread="'+l.thread+'" x="'+spot.x+'" y="'+(spot.y+10)+'">'+esc(value)+'</text>'}).join('');
+  for(const thread of model.threads){const n=thread[0],line=all.find(item=>item.thread===n),fallback=n===3?idx:n===4?search:n===6?idp:n===7?soar:null;if(!line&&!fallback)continue;const origin=line?.point||{x:fallback.x+fallback.w+16,y:fallback.y+fallback.h/2};
+    let box=null;for(const delta of [[0,-22],[0,22],[-20,-20],[20,20],[-28,0],[28,0]]){const test={x:origin.x+delta[0]-11,y:origin.y+delta[1]-11,w:22,h:22};if(test.x>3&&test.x+22<L.width-3&&test.y>34&&test.y+22<L.height-5&&![...cardBoxes,...occupied,...markers].some(other=>overlap(test,other))){box=test;break}}
+    if(!box){for(const zone of L.zones.slice(0,-1)){if(box)break;const gx=zone.x+zone.w+19;for(let gy=42;gy<L.height-25;gy+=25){const test={x:gx,y:gy,w:22,h:22};if(![...cardBoxes,...occupied,...markers].some(other=>overlap(test,other))){box=test;break}}}}
+    if(!box)box={x:Math.max(4,Math.min(L.width-26,origin.x+20)),y:Math.max(38,Math.min(L.height-27,origin.y+22)),w:22,h:22};
+    markers.push({...box,n});
+  }
+  const markerSvg=markers.map(m=>'<g class="ovThreadMarker137" data-thread="'+m.n+'" tabindex="0" role="button" aria-label="Thread '+m.n+'"><circle cx="'+(m.x+11)+'" cy="'+(m.y+11)+'" r="11"/><text x="'+(m.x+11)+'" y="'+(m.y+11)+'">'+m.n+'</text></g>').join('');
+  const cards=L.cards.map(c=>builderOvCardSvg137(c,threads)).join('');
+  /* Keep the legacy class for tab actions, but not first: v135 string surgery
+     otherwise inserts a closing div after the legend's last SVG. */
+  return'<svg class="ovDiagram137 ov1Diagram132" viewBox="0 0 '+L.width+' '+L.height+'" role="img" aria-label="Operational concept with '+model.shapes.length+' grouped component types and '+model.links.length+' relationships">'+defs+zoneMarkup+frames+paths+tags+cards+markerSvg+'</svg>';
+}
+
+function builderOvThreadText137(model,n){
+  const shapes=model.shapes,types=items=>[...new Set(items.map(s=>builderOvCardName137(s)))].join(', '),source=shapes.filter(s=>s.area===0),cloud=source.filter(s=>/AWS|Azure|Cloud/i.test(s.site)),collection=shapes.filter(s=>s.area===1),indexers=shapes.filter(s=>builderTierOf130(s.nodes[0])==='indexing'),search=shapes.filter(s=>builderTierOf130(s.nodes[0])==='search'),users=state.builderExport.ov1.people,management=shapes.filter(s=>s.area===2&&builderTierOf130(s.nodes[0])==='management'),idp=shapes.filter(s=>/authProvider/.test(s.type)),soar=shapes.filter(s=>/soar/i.test(s.type));
+  const event=model.links.find(l=>l.plane==='data'&&/S2S|Splunk-to-Splunk/i.test(builderOvTag132(l)+' '+l.edges[0].edge.label))||model.links.find(l=>l.plane==='data'&&builderTierOf130(l.edges[0].edge.target)==='indexing'),d=event?ensureRelationshipDetails(event.edges[0].edge):{},relation=state.builderRelations.find(r=>r.type==='deployment_client'),cluster=state.builderNodes.find(node=>node.type==='indexerCluster'),ports=event?.edges[0]?.edge?.relation?.port||d.port;
+  if(n===1)return (source.length?types(source.filter(s=>!cloud.includes(s)))+' send telemetry to '+(types(collection)||'collection')+' across the modelled sites. ':'')+(cloud.length?types(cloud)+' deliver cloud events through '+(types(collection.filter(s=>/hec|hf/i.test(s.type)))||'the collection tier')+'.':'');
+  if(n===2)return 'Forwarders deliver '+(event?builderOvTag132(event).split(' · ')[0]:'event data')+(d.tls==='Enabled'||d.tls==='Required'?' over TLS':'')+(ports?' on TCP '+ports:'')+(/enabled|yes|required/i.test(String(d.acknowledgement))?' with indexer acknowledgement':'')+' to '+(types(indexers)||'the indexing tier')+'. '+(model.sites.length>1?'Regional paths preserve the modelled site boundaries.':'');
+  if(n===3)return 'The '+(types(indexers)||'indexer')+' cluster replicates indexed events'+(cluster?.indexClusterSf?' with '+cluster.indexClusterSf+' searchable copies':'')+(model.sites.length>1?' across '+model.sites.filter(s=>!/AWS|Azure/.test(s)).join(' and '):'')+'. '+(cluster?.indexClusterRf?'Replication factor '+cluster.indexClusterRf+(cluster.indexClusterSf?' and search factor '+cluster.indexClusterSf:'')+' are recorded.':'');
+  if(n===4)return (types(search)||'Search services')+' run searches and detection content for '+(users.length?users.map(p=>p.name).join(' and '):'the people using the platform')+'. Results support investigation and dashboards.';
+  if(n===5)return (management.some(s=>s.type==='ds')?'The Deployment Server distributes apps and configuration to '+(state.builderRelations.length||'managed')+' components'+(relation?.port?' over phone-home on TCP '+relation.port:'')+'. ':'')+(management.some(s=>/license/i.test(s.type))?'The License Manager tracks daily ingest.':'');
+  if(n===6){const auth=state.builderAuthRelations[0],method=auth?.method||auth?.identityProvider||'';return (users.length?users.map(p=>p.name).join(' and '):'Users')+' sign in through '+(types(idp)||'the identity provider')+(method?' with '+method:'')+'. The model records mechanisms, never credentials.'}
+  if(n===7)return 'Notable events can initiate '+(types(soar)||'SOAR')+' playbooks and response workflows. Analysts can trace those actions back to the detection path.';
+  return'';
+}
+function builderOvLegend137(){
+  const items=[['Event data','var(--ovData)',''],['Fleet management','var(--ovMgmt)','7 5'],['Interactive authentication','var(--ovAuth)','2 4'],['Alerts and response','var(--ovResp)','']];
+  return'<div class="ovLegend137">'+items.map(([name,color,dash])=>'<div><svg viewBox="0 0 38 13" aria-hidden="true"><path d="M0 6.5H38" stroke="'+color+'" stroke-width="2" '+(dash?'stroke-dasharray="'+dash+'"':'')+'/></svg>'+name+'</div>').join('')+'<div><svg viewBox="0 0 38 13" aria-hidden="true"><circle cx="19" cy="6.5" r="6" fill="var(--ovSheet)" stroke="var(--ovInk)"/><text x="19" y="9.5" text-anchor="middle" font-size="8" fill="var(--ovInk)">n</text></svg>Operational thread (select to highlight)</div></div>';
+}
+const builderOvPageBefore137=builderOvPage132;
+builderOvSvg132=builderOvDiagram137;
+builderOvPage132=function(){
+  const model=builderOvModel132(),esc=builderV125Text125,title=state.builderPresentation.title||defaultPresentationTitle(),owner=state.builderExport.owner||'Not set',classification=state.builderPresentation.classification||state.securityClassification||'Security telemetry',date=builderOvShortDate136(),mission=state.builderExport.ov1.mission||'';
+  const banner='<div class="ovClass137"><span>'+esc(classification)+'</span><span>Operational architecture · OV-1</span></div>';
+  const cells=[['Architecture view','OV-1 · High-Level Operational Concept Graphic'],['Architecture',title],['Scope','Complete topology · Splunk Enterprise'],['Owner / author',owner],['Build · prepared',$('#topologyBuilder').dataset.buildNumber+' · '+date]];
+  const heading='<div class="ovTitle137">'+cells.map(([label,value])=>'<div><small>'+esc(label)+'</small><strong>'+(value==='Not set'?'<span class="ovNotSet137">Not set</span>':esc(value))+'</strong></div>').join('')+'</div>';
+  const threads='<section><h3>Operational threads</h3><ol class="ovThreads137">'+model.threads.map(([number,name])=>'<li class="ov1Thread132" data-thread="'+number+'" tabindex="0"><b>'+number+'</b><div><strong>'+esc(name)+'</strong><span>'+esc(builderOvThreadText137(model,number))+'</span></div></li>').join('')+'</ol></section>';
+  const measures=model.measures.map(([label,value],index)=>{const figure=index===2&&value!=='Not set'?'≈ '+value:index===1&&value!=='Not set'?'≤ '+value:value;return'<div class="'+(index===5?'review':'')+'"><b>'+esc(figure)+'</b><small>'+esc(label)+'</small></div>'}).join('');
+  const lower='<div class="ovBelow137">'+threads+'<aside><h3>Legend</h3>'+builderOvLegend137()+'<h3 style="margin-top:14px">Key measures</h3><div class="ovMeasures137">'+measures+'</div></aside></div>';
+  const content='<div class="ov1Page132 ov1Visual137">'+banner+heading+(mission?'<div class="ovMission137"><small>Mission</small><p>'+esc(mission)+'</p></div>':'')+'<div class="ovFigure137">'+builderOvDiagram137(model)+'</div>'+lower+'<div class="ovFooter137"><span>'+esc(title)+' · Owner '+esc(owner)+' · Generated from Builder topology</span><span data-ov-footer-page137>OV-1</span></div>'+banner+'</div>';
+  return builderV125Page125('ov1-132','OV-1 · High-Level Operational Concept Graphic',content);
+};
+const builderOvPackPagesBefore137=builderV125PackPages125;
+builderV125PackPages125=function(...args){const pages=builderOvPackPagesBefore137(...args),index=pages.findIndex(page=>page.id==='ov1-132');if(index>=0)pages[index].content=pages[index].content.replace('data-ov-footer-page137>OV-1','data-ov-footer-page137>Page '+(index+1)+' of '+pages.length+' · OV-1');return pages};
+const builderOvPackHtmlBefore137=architecturePackHtml;
+architecturePackHtml=function(...args){return builderOvPackHtmlBefore137(...args).replace('</style></head>',$('#builder-ov1-visual-v137-styles').textContent+'</style></head>')};
+const builderOvHighlightBefore137=builderOvHighlight135;
+builderOvHighlight135=function(key,value){
+  if(key!=='ov1')return builderOvHighlightBefore137(key,value);
+  const panel=builderOvRoot135.querySelector('[data-ov-panel="ov1"]');if(!panel)return;
+  for(const page of panel.querySelectorAll('.ov1Visual137')){page.dataset.activeThread=value;page.querySelectorAll('[data-thread]').forEach(el=>el.classList.toggle('active',el.dataset.thread.split(' ').includes(value)))}
+};
+const builderOvPreviewBefore137=updatePresentationDiagram;
+updatePresentationDiagram=function(...args){
+  const result=builderOvPreviewBefore137(...args),overlay=$('#builderPresentationOverlay');if(!overlay)return result;
+  for(const page of overlay.querySelectorAll('.ov1Visual137')){
+    const activate=value=>{page.dataset.activeThread=value;page.querySelectorAll('[data-thread]').forEach(el=>el.classList.toggle('active',el.dataset.thread.split(' ').includes(value)))};
+    page.querySelectorAll('.ovThreadMarker137,.ovThreads137 li').forEach(el=>{el.onmouseenter=()=>activate(el.dataset.thread);el.onfocus=()=>activate(el.dataset.thread);el.onclick=()=>activate(el.dataset.thread);el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();activate(el.dataset.thread)}}});
+  }
+  return result;
+};
+document.title='Splunk Pipeline Explorer · Build 137 · 29 Sep 2026';
+$('#topologyBuilder').dataset.buildNumber='137';$('#topologyBuilder').dataset.buildDate='2026-09-29';
+const builderOvStamp137=$('.builderBuildStamp');if(builderOvStamp137){builderOvStamp137.setAttribute('aria-label','Build 137, dated 29 September 2026');builderOvStamp137.querySelector('b').textContent='Build 137'}
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['OV-1 visual drawing','Render grouped pictogram cards, routed operational threads, site and platform boxes, a title block and topology-derived narrative.',true]);if(state.view==='changes')renderChanges();
+
 </script>
 </body>
 </html>
