@@ -5,6 +5,7 @@
 **History:** `builder-handoff-build135.md` and `builder-handoff-ov1-diagram.md` (the task lists this build implements). This file replaces both as the task list.
 **Tool:** `node tools/builder-connector-check.js index.html [screenshot-dir]`.
 **References:** `docs/mockups/architecture-ov1-mockup.html`, `docs/mockups/ov1-reference-topology.json` (load with `loadTopologyDocument`), and side-by-side images `docs/mockups/compare/ov1-mockup.png`, `ov1-build135.png` and **`ov1-build137.png`** (now).
+**OV-2 rework:** [`builder-handoff-ov2-diagram.md`](builder-handoff-ov2-diagram.md): a comparison with the OV-2 mockup and a full spec for the page (layout by site, needlines, pills, response needlines, naming, one transport formatter, derived defaults). Do it after items 1–6 below.
 
 ## TL;DR
 
