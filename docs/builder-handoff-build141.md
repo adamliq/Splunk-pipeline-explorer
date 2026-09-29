@@ -10,6 +10,7 @@
 Both are on branch `claude/build-page-layout-bl6jk1`; copy `tools/` to `main`.
 
 **New feature spec:** [`builder-handoff-shared-hosts.md`](builder-handoff-shared-hosts.md): components that share a host (e.g. Heavy Forwarder + Deployment Server), with mockup `docs/mockups/builder-shared-host-mockup.html`.
+**New feature spec:** [`builder-handoff-splunk-cloud-indexing.md`](builder-handoff-splunk-cloud-indexing.md): a Splunk Cloud indexing palette component (Indexer with `hosting:'splunkCloud'`), with mockup `docs/mockups/builder-splunk-cloud-indexing-mockup.html`.
 **Screenshots (now):** `docs/mockups/compare/builder-build141-1440.png`, `ov1-build141.png`, `ov2-build141.png` and `ov3-build141.png` (made with `docs/mockups/ov1-reference-topology.json`). Compare with `ov1-mockup.png`, `ov2-mockup.png` and `ov3-mockup.png`.
 
 ## TL;DR

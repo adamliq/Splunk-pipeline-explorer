@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>
+<title>Splunk Cloud Indexing Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: the Builder as it looks today (dark, dotted canvas): palette column, canvas, inspector column;
+   review findings and the rules below. Single dark look on purpose: it mirrors the Builder it mocks up. */
+:root{
+  color-scheme:dark;
+  --page:#07111a; --panel:#0c1822; --canvas:#08131c; --dot:#1b2d3c; --card:#0f1d29; --card-2:#132433; --rule:#20364a;
+  --ink:#e6eff5; --ink-2:#aab9c8; --muted:#7f95a8;
+  --data:#57c7e8; --mgmt:#2dd4bf; --idx:#f3bd61; --cloud:#89b7ec; --cloud-fill:rgba(137,183,236,.08);
+  --ok:#66e0a3; --warn:#f3bd61; --bad:#f28b7d; --focus:#57c7e8;
+  --font:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.45 var(--font)}
+.page{max-width:1560px;margin:0 auto;padding-inline:16px;padding-block:18px 32px;display:grid;gap:14px}
+.page>*{min-width:0}
+.tag{justify-self:start;font:600 .66rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);border-radius:999px;padding:5px 9px}
+h1{margin:0;font:600 1.35rem/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;color:var(--ink-2);max-width:95ch}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+.work{display:grid;grid-template-columns:230px minmax(0,1fr) 330px;gap:12px;align-items:start}
+@media (max-width:1250px){.work{grid-template-columns:minmax(0,1fr) 330px}.palette{grid-column:1/-1}}
+@media (max-width:900px){.work{grid-template-columns:minmax(0,1fr)}}
+.work>*{min-width:0}
+
+/* Palette */
+.palette{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:10px;display:grid;gap:10px;align-content:start}
+.palette input{font:500 .82rem var(--font);color:var(--ink);background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:7px 9px;width:100%}
+.pgroup{display:grid;gap:5px}
+.pgroup h2{margin:0;font:600 .62rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.pitems{display:grid;gap:5px}
+@media (max-width:1250px){.pitems{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}}
+.pitem{display:flex;align-items:center;gap:8px;font:500 .82rem var(--font);color:var(--ink);background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--c);border-radius:6px;padding:6px 8px;text-align:left;cursor:grab}
+.pitem .ic{font:700 .64rem/1 var(--mono);color:var(--c);border:1px solid color-mix(in srgb,var(--c) 50%,transparent);border-radius:4px;padding:3px 4px;min-width:26px;text-align:center}
+.pitem.new{box-shadow:0 0 0 1px color-mix(in srgb,var(--cloud) 60%,transparent)}
+.pitem .newb{margin-left:auto;font:700 .58rem/1 var(--mono);color:var(--page);background:var(--cloud);border-radius:3px;padding:3px 4px}
+.pnote{margin:0;font-size:.74rem;color:var(--muted)}
+
+/* Canvas */
+.canvasWrap{position:relative;border:1px solid var(--rule);border-radius:8px;background:var(--canvas) radial-gradient(var(--dot) 1px,transparent 1px) 0 0/22px 22px;overflow-x:auto;overflow-y:hidden}
+.world{position:relative;width:880px;height:660px;transform-origin:0 0}
+svg.wires{position:absolute;inset:0;width:880px;height:660px;overflow:visible}
+.wire{fill:none;stroke-width:2;pointer-events:stroke;cursor:pointer}
+.wire.data{stroke:var(--data)} .wire.mgmt{stroke:var(--mgmt);stroke-dasharray:7 5}
+.wire.blocked{stroke:var(--bad);stroke-dasharray:4 5}
+.wire.sel{stroke-width:3.5}
+.hit{fill:none;stroke:transparent;stroke-width:14;pointer-events:stroke;cursor:pointer}
+.wl{font:600 10.5px var(--mono);paint-order:stroke;stroke:var(--canvas);stroke-width:4px;stroke-linejoin:round}
+.wl.data{fill:var(--data)} .wl.mgmt{fill:var(--mgmt)} .wl.blocked{fill:var(--bad)}
+.canvasTitle{position:absolute;left:12px;top:8px;font-size:.75rem;color:var(--muted)}
+.card{position:absolute;background:var(--card);border:1px solid #2c4358;border-radius:8px;padding:9px 11px;display:grid;gap:5px;align-content:start}
+.card .tier{font:500 .64rem/1 var(--font);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.card .name{font:600 .92rem/1.2 var(--font)}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font:500 .68rem/1 var(--font);color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:3px 7px;white-space:nowrap}
+.chip.d{color:var(--data);border-color:color-mix(in srgb,var(--data) 40%,transparent)}
+.chip.c{color:var(--cloud);border-color:color-mix(in srgb,var(--cloud) 45%,transparent)}
+.card.fwd{border-color:color-mix(in srgb,var(--data) 55%,transparent)}
+.card.mg{border-color:color-mix(in srgb,var(--mgmt) 55%,transparent)}
+.card.bad{border-color:color-mix(in srgb,var(--bad) 60%,transparent)}
+.issue{position:absolute;right:-8px;top:-8px;width:20px;height:20px;border-radius:50%;background:var(--bad);color:var(--page);font:700 .72rem/20px var(--mono);text-align:center}
+.issue.w{background:var(--warn)}
+
+/* The new card */
+.cloudCard{position:absolute;border:1.5px solid var(--cloud);border-radius:12px;background:linear-gradient(180deg,var(--cloud-fill),transparent 60%),var(--card);padding:0;display:grid;cursor:pointer;overflow:hidden}
+.cloudCard.sel{box-shadow:0 0 0 2px color-mix(in srgb,var(--cloud) 60%,transparent)}
+.cloudHead{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid color-mix(in srgb,var(--cloud) 30%,transparent)}
+.cloudHead .tier{font:600 .64rem/1.2 var(--font);letter-spacing:.1em;text-transform:uppercase;color:var(--cloud)}
+.managed{margin-left:auto;font:700 .6rem/1 var(--mono);letter-spacing:.06em;color:var(--page);background:var(--cloud);border-radius:3px;padding:4px 5px;white-space:nowrap}
+.cloudBody{padding:10px 12px;display:grid;gap:7px}
+.cloudBody .name{font:600 1rem/1.2 var(--font)}
+.stack{font:600 .76rem/1.2 var(--mono);color:var(--ink-2)}
+.inputs{display:grid;gap:4px;border-top:1px solid var(--rule);padding-top:7px}
+.inputs div{display:flex;justify-content:space-between;gap:8px;font-size:.72rem;color:var(--ink-2)}
+.inputs b{font:600 .7rem var(--mono);color:var(--data)}
+.cloudFoot{font-size:.68rem;color:var(--muted);border-top:1px solid var(--rule);padding:7px 12px}
+
+/* Inspector */
+.insp{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;display:grid;gap:12px}
+.itabs{display:flex;gap:6px;flex-wrap:wrap}
+.itabs button{font:600 .76rem var(--font);color:var(--ink-2);background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:6px 9px;cursor:pointer}
+.itabs button[aria-pressed="true"]{color:var(--ink);border-color:var(--cloud)}
+.insp h2{margin:0;font:600 .64rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.insp h3{margin:0;font:600 1.02rem/1.25 var(--font)}
+.field{display:grid;gap:4px}
+.field label{font-size:.72rem;color:var(--ink-2)}
+.field input,.field select{font:500 .82rem var(--font);color:var(--ink);background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:7px 9px;width:100%}
+.field .lock{font-size:.68rem;color:var(--muted)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ep{font:600 .74rem/1.5 var(--mono);color:var(--ink);background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:7px 9px;overflow-wrap:anywhere}
+.ep small{display:block;font:400 .68rem var(--font);color:var(--muted)}
+.notice{font-size:.76rem;color:var(--ink-2);border-left:3px solid var(--cloud);padding:4px 0 4px 10px}
+
+/* Findings + rules */
+.lower{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:12px}
+@media (max-width:1000px){.lower{grid-template-columns:minmax(0,1fr)}}
+.box{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;display:grid;gap:10px;align-content:start;min-width:0}
+.box h2{margin:0;font:600 .64rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.finds{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.finds li{display:grid;grid-template-columns:auto 1fr;gap:9px;font-size:.82rem;color:var(--ink-2)}
+.finds b{color:var(--ink);font-weight:600}
+.st{font:700 .6rem/1 var(--mono);letter-spacing:.06em;border-radius:4px;padding:4px 5px;height:fit-content;white-space:nowrap}
+.st.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.st.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 14%,transparent)}
+.st.bad{color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,transparent)}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.8rem;min-width:560px}
+th,td{text-align:left;padding:6px 8px;border-top:1px solid var(--rule);vertical-align:top}
+thead th{border-top:0;font:600 .6rem/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+td{color:var(--ink-2)} td:first-child{color:var(--ink);font-weight:500}
+.convert{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.mini{background:var(--card);border:1px solid #2c4358;border-radius:8px;padding:8px 10px;display:grid;gap:4px;min-width:200px}
+.mini.idx{border-color:color-mix(in srgb,var(--idx) 55%,transparent)}
+.mini.cl{border:1.5px solid var(--cloud)}
+.mini .tier{font:500 .6rem/1 var(--font);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.mini .name{font:600 .86rem var(--font)}
+.arrow{font:600 .8rem var(--mono);color:var(--cloud)}
+.btn{font:600 .78rem var(--font);color:var(--cloud);background:var(--card);border:1px solid color-mix(in srgb,var(--cloud) 55%,transparent);border-radius:6px;padding:6px 10px;cursor:pointer}
+</style>
+
+<div class="page">
+  <span class="tag">Mockup · Builder · example topology</span>
+  <h1>Splunk Cloud indexing on the canvas</h1>
+  <p class="lede">A palette item adds Splunk Cloud Platform as the indexing destination. It's an Indexer underneath, so every existing connection, page and view keeps working, but the card, inspector, connection defaults and review rules know it's a managed service. Select the card, or a connection into it, to see the inspector.</p>
+
+  <div class="work">
+    <aside class="palette" aria-label="Add component">
+      <input id="pSearch" value="cloud" aria-label="Search components" readonly>
+      <div class="pgroup"><h2>Indexing</h2>
+        <div class="pitems">
+          <button type="button" class="pitem" style="--c:var(--idx)"><span class="ic">IX</span>Indexer</button>
+          <button type="button" class="pitem" style="--c:var(--idx)"><span class="ic">IC</span>Indexer Cluster</button>
+          <button type="button" class="pitem new" style="--c:var(--cloud)"><span class="ic">SC</span>Splunk Cloud indexing<span class="newb">NEW</span></button>
+          <button type="button" class="pitem" style="--c:#f49b66"><span class="ic">S3</span>Amazon S3</button>
+        </div>
+      </div>
+      <div class="pgroup"><h2>Search</h2>
+        <div class="pitems">
+          <button type="button" class="pitem" style="--c:#6fa8ff"><span class="ic">SH</span>Search Head</button>
+          <button type="button" class="pitem" style="--c:var(--cloud)"><span class="ic">SH</span>Splunk Cloud Search</button>
+        </div>
+      </div>
+      <p class="pnote">Tooltip: "Splunk-managed indexing in your Splunk Cloud Platform stack. Receives S2S over TLS on 9997 and HEC on 443."</p>
+    </aside>
+
+    <div class="canvasWrap" id="wrap">
+      <div class="world" id="world">
+        <span class="canvasTitle">Unified topology · 9 components · Validate for: Splunk Cloud</span>
+        <svg class="wires" id="wires" aria-hidden="true">
+          <defs>
+            <marker id="aD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--data)"/></marker>
+            <marker id="aM" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--mgmt)"/></marker>
+            <marker id="aX" viewBox="0 0 12 12" refX="6" refY="6" markerWidth="12" markerHeight="12" orient="auto"><path d="M2 2L10 10M10 2L2 10" style="stroke:var(--bad);stroke-width:2.2;fill:none"/></marker>
+          </defs>
+          <g id="wl"></g>
+        </svg>
+        <div id="nodes"></div>
+      </div>
+    </div>
+
+    <aside class="insp" id="insp" aria-live="polite"></aside>
+  </div>
+
+  <div class="lower">
+    <section class="box">
+      <h2>Review findings · Splunk Cloud profile</h2>
+      <ul class="finds">
+        <li><span class="st bad">ERROR</span><span><b>Syslog can't go directly to Splunk Cloud.</b> Firewalls 1 → Splunk Cloud. Send it through the syslog server (SC4S) and HEC, or through a forwarder.</span></li>
+        <li><span class="st warn">WARN</span><span><b>Forwarder credentials app not recorded</b> on Universal Forwarder 1. Splunk Cloud only accepts forwarders that have the stack's credentials package.</span></li>
+        <li><span class="st warn">WARN</span><span><b>Outbound access not recorded.</b> The Sydney network zone needs 9997 and 443 to acme.splunkcloud.com, and the stack's IP allow list needs the zone's egress addresses.</span></li>
+        <li><span class="st ok">OK</span><span><b>TLS on every handoff into Splunk Cloud</b> (S2S 9997 and HEC 443).</span></li>
+        <li><span class="st ok">OK</span><span><b>Deployment Server manages forwarders only.</b> No management links to Splunk Cloud.</span></li>
+      </ul>
+    </section>
+    <section class="box">
+      <h2>Rules for Splunk Cloud indexing</h2>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Into Splunk Cloud</th><th>Result</th><th>Default or reason</th></tr></thead>
+          <tbody>
+            <tr><td>UF / HF over S2S</td><td><span class="st ok">OK</span></td><td>TLS required, port 9997, authentication "Forwarder credentials (certificate)", indexer ACK recommended.</td></tr>
+            <tr><td>HEC client, Lambda, Azure Function, HEC endpoint</td><td><span class="st ok">OK</span></td><td>HTTPS 443 to http-inputs-&lt;stack&gt;, authentication "HEC token", ACK optional.</td></tr>
+            <tr><td>Ingest Processor, Edge Processor</td><td><span class="st ok">OK</span></td><td>Splunk index destination in the same stack.</td></tr>
+            <tr><td>Syslog source directly</td><td><span class="st bad">ERROR</span></td><td>Splunk Cloud has no syslog listener; use a syslog server with a forwarder or HEC.</td></tr>
+            <tr><td>Any handoff without TLS</td><td><span class="st bad">ERROR</span></td><td>Splunk Cloud only accepts encrypted inputs.</td></tr>
+            <tr><td>Deployment Server, License Manager, Monitoring Console, cluster manager</td><td><span class="st bad">ERROR</span></td><td>Splunk manages the stack; customer management roles can't manage it.</td></tr>
+            <tr><td>Same source to on-premises and cloud indexers</td><td><span class="st warn">WARN</span></td><td>Hybrid profile: confirm routing, so data isn't indexed twice or licensed twice.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="convert">
+        <div class="mini idx"><span class="tier">Splunk indexing tier</span><span class="name">Indexer 1</span></div>
+        <span class="arrow">→ Convert to Splunk Cloud indexing →</span>
+        <div class="mini cl"><span class="tier">Splunk Cloud · managed</span><span class="name">Splunk Cloud · acme</span></div>
+        <button type="button" class="btn">Convert</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(() => {
+  const CARDS = {
+    ds:{x:250,y:30,w:200,h:86,cls:'mg',tier:'Management',name:'Deployment Server 1',chips:[['','manages 1 forwarder']]},
+    win:{x:20,y:160,w:190,h:86,cls:'',tier:'Source system',name:'Windows servers',chips:[['','≈120 hosts']]},
+    uf:{x:250,y:160,w:200,h:92,cls:'fwd',tier:'Splunk forwarding tier',name:'Universal Forwarder 1',chips:[['','Sydney']],issue:'w'},
+    sys:{x:20,y:290,w:190,h:86,cls:'',tier:'Source system',name:'Appliance syslog',chips:[['','TCP 514']]},
+    sc4s:{x:250,y:290,w:200,h:92,cls:'',tier:'Collection relay',name:'Syslog Server (SC4S)',chips:[['d','HEC out']]},
+    lam:{x:20,y:420,w:190,h:86,cls:'',tier:'Cloud collection',name:'AWS Lambda',chips:[['','CloudTrail']]},
+    fw:{x:20,y:550,w:190,h:86,cls:'bad',tier:'Source system',name:'Firewalls 1',chips:[['','UDP 514']],issue:'x'},
+    search:{x:570,y:545,w:270,h:86,cls:'',tier:'Splunk Cloud · search',name:'Splunk Cloud Search',chips:[['c','same stack']]}
+  };
+  const CLOUD = {x:570,y:190,w:270,h:292};
+  const EDGES = [
+    {id:'e1',from:'win',to:'uf',plane:'data',label:''},
+    {id:'e2',from:'uf',to:'cloud',plane:'data',label:'S2S 9997 · TLS'},
+    {id:'e3',from:'sys',to:'sc4s',plane:'data',label:''},
+    {id:'e4',from:'sc4s',to:'cloud',plane:'data',label:'HEC 443 · TLS'},
+    {id:'e5',from:'lam',to:'cloud',plane:'data',label:'HEC 443 · TLS'},
+    {id:'e6',from:'fw',to:'cloud',plane:'blocked',label:'syslog → Splunk Cloud: not allowed'},
+    {id:'e7',from:'ds',to:'uf',plane:'mgmt',label:'phone-home 8089',side:'v'},
+    {id:'e8',from:'cloud',to:'search',plane:'data',label:'search',side:'v'}
+  ];
+  const state = {sel:'cloud'};
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const rect = id => id==='cloud' ? CLOUD : CARDS[id];
+  const nodes = document.getElementById('nodes'), wl = document.getElementById('wl');
+
+  function draw(){
+    let h = '';
+    for (const [id,c] of Object.entries(CARDS)) h += `<div class="card ${c.cls}" style="left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px"><span class="tier">${esc(c.tier)}</span><span class="name">${esc(c.name)}</span><div class="chips">${c.chips.map(([k,t])=>`<span class="chip ${k}">${esc(t)}</span>`).join('')}</div>${c.issue?`<span class="issue ${c.issue==='w'?'w':''}" title="${c.issue==='w'?'1 to review':'1 error'}">${c.issue==='w'?'1':'!'}</span>`:''}</div>`;
+    const b = CLOUD;
+    h += `<div class="cloudCard${state.sel==='cloud'?' sel':''}" tabindex="0" role="button" aria-label="Splunk Cloud indexing, acme.splunkcloud.com" data-sel="cloud" style="left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px">
+      <div class="cloudHead"><svg width="18" height="14" viewBox="0 0 18 14" aria-hidden="true"><path d="M5 12h9a3.5 3.5 0 0 0 .4-7A5 5 0 0 0 4.6 6 3 3 0 0 0 5 12z" fill="none" stroke="var(--cloud)" stroke-width="1.4"/></svg><span class="tier">Splunk Cloud · indexing</span><span class="managed" title="Managed by Splunk">MANAGED</span></div>
+      <div class="cloudBody"><span class="name">Splunk Cloud · acme</span><span class="stack">acme.splunkcloud.com</span>
+        <div class="chips"><span class="chip c">AWS ap-southeast-2</span><span class="chip c">Victoria</span><span class="chip">500 GB/day</span></div>
+        <div class="inputs"><div><span>Forwarders</span><b>S2S 9997 · TLS</b></div><div><span>HEC</span><b>443 · token</b></div><div><span>Receiving from</span><span>3 connections</span></div></div></div>
+      <div class="cloudFoot">Pipeline sets, storage and clustering are managed by Splunk.</div></div>`;
+    nodes.innerHTML = h;
+
+    // Connectors into the cloud card spread down its left edge.
+    const into = EDGES.filter(e=>e.to==='cloud'&&!e.side); let k = 0;
+    let w = '';
+    for (const e of EDGES) {
+      const a = rect(e.from), t = rect(e.to);
+      let p1, p2, d;
+      if (e.side==='v') { p1=[a.x+a.w/2,a.y+a.h]; p2=[t.x+t.w/2,t.y]; d=`M${p1[0]} ${p1[1]} L${p2[0]} ${p2[1]}`; }
+      else {
+        p1=[a.x+a.w,a.y+a.h/2];
+        const slot = e.to==='cloud' ? into.indexOf(e) : -1;
+        p2 = e.to==='cloud' ? [t.x, t.y+46+slot*58] : [t.x, t.y+t.h/2];
+        if (e.plane==='blocked') p2 = [t.x-44, t.y+t.h-20];
+        d=`M${p1[0]} ${p1[1]} C${p1[0]+80} ${p1[1]} ${p2[0]-80} ${p2[1]} ${p2[0]} ${p2[1]}`;
+      }
+      const sel = state.sel===e.id ? ' sel' : '';
+      const m = e.plane==='data'?'aD':e.plane==='mgmt'?'aM':'aX';
+      w += `<path class="hit" data-sel="${e.id}" d="${d}"/><path class="wire ${e.plane}${sel}" data-sel="${e.id}" d="${d}" marker-end="url(#${m})"/>`;
+      if (e.label) {
+        let lx=(p1[0]+p2[0])/2, ly=(p1[1]+p2[1])/2-8, anchor='middle';
+        if (e.side==='v') { lx=p1[0]+8; ly=(p1[1]+p2[1])/2+4; anchor='start'; }
+        if (e.to==='cloud' && e.plane==='data') { lx=p2[0]-12; ly=p2[1]-9; anchor='end'; }
+        if (e.plane==='blocked') { lx=p1[0]+20; ly=p1[1]+22; anchor='start'; }
+        w += `<text class="wl ${e.plane}" x="${lx}" y="${ly}" text-anchor="${anchor}">${esc(e.label)}</text>`;
+      }
+    }
+    wl.innerHTML = w;
+    inspector();
+  }
+
+  function inspector(){
+    const el = document.getElementById('insp'), s = state.sel;
+    const tabs = `<div class="itabs" role="group" aria-label="Inspect">
+      <button type="button" data-sel="cloud" aria-pressed="${s==='cloud'}">Splunk Cloud card</button>
+      <button type="button" data-sel="e2" aria-pressed="${s==='e2'}">UF → Splunk Cloud</button>
+      <button type="button" data-sel="e5" aria-pressed="${s==='e5'}">Lambda → Splunk Cloud</button>
+      <button type="button" data-sel="e6" aria-pressed="${s==='e6'}">Firewalls → Splunk Cloud</button></div>`;
+    let body = '';
+    if (s==='cloud' || !['e2','e5','e6'].includes(s)) {
+      body = `<h2>Inspector · component</h2><h3>Splunk Cloud · acme</h3>
+        <div class="field"><label for="fStack">Stack name</label><input id="fStack" value="acme" readonly><span class="lock">acme.splunkcloud.com</span></div>
+        <div class="field"><label for="fRegion">Cloud region</label><select id="fRegion" disabled><option>AWS ap-southeast-2 (Sydney)</option></select></div>
+        <div class="row2"><div class="field"><label for="fExp">Experience</label><select id="fExp" disabled><option>Victoria</option></select></div>
+        <div class="field"><label for="fLic">Ingest licence</label><input id="fLic" value="500 GB/day" readonly></div></div>
+        <div class="field"><label for="fOwner">Owner</label><input id="fOwner" value="Splunk Cloud provider" readonly><span class="lock">Set automatically for Splunk-managed components</span></div>
+        <div class="field"><label>Receiving endpoints (from the stack name)</label>
+          <div class="ep">inputs1.acme.splunkcloud.com:9997<small>S2S from forwarders · TLS · forwarder credentials app</small></div>
+          <div class="ep">http-inputs-acme.splunkcloud.com:443<small>HEC · TLS · HEC token</small></div></div>
+        <div class="field"><label for="fAllow">IP allow list (customer egress)</label><input id="fAllow" value="" placeholder="Not set · e.g. 203.0.113.0/28" readonly></div>
+        <p class="notice">Pipeline sets, storage, replication and cluster settings aren't shown: Splunk manages them. Capacity is checked against the ingest licence.</p>`;
+    } else if (s==='e2') {
+      body = `<h2>Inspector · connection</h2><h3>Universal Forwarder 1 → Splunk Cloud</h3>
+        <div class="row2"><div class="field"><label>Protocol</label><input value="Splunk-to-Splunk" readonly></div><div class="field"><label>Port</label><input value="9997" readonly></div></div>
+        <div class="row2"><div class="field"><label>TLS</label><input value="Required" readonly><span class="lock">Locked for Splunk Cloud</span></div><div class="field"><label>Acknowledgement</label><input value="Indexer ACK (recommended)" readonly></div></div>
+        <div class="field"><label>Authentication</label><input value="Forwarder credentials (certificate)" readonly></div>
+        <div class="field"><label>Forwarder credentials app installed</label><select disabled><option>Not recorded</option></select><span class="lock">Needed on the sending forwarder</span></div>
+        <p class="notice">Defaults applied when a connection targets Splunk Cloud indexing. Changing TLS to anything but Required isn't offered.</p>`;
+    } else if (s==='e5') {
+      body = `<h2>Inspector · connection</h2><h3>AWS Lambda → Splunk Cloud</h3>
+        <div class="row2"><div class="field"><label>Protocol</label><input value="HEC (HTTPS)" readonly></div><div class="field"><label>Port</label><input value="443" readonly></div></div>
+        <div class="row2"><div class="field"><label>TLS</label><input value="Required" readonly><span class="lock">Locked for Splunk Cloud</span></div><div class="field"><label>Acknowledgement</label><input value="HEC ACK (optional)" readonly></div></div>
+        <div class="field"><label>Authentication</label><input value="HEC token" readonly></div>
+        <div class="field"><label>Endpoint</label><div class="ep">http-inputs-acme.splunkcloud.com:443</div></div>`;
+    } else {
+      body = `<h2>Inspector · connection</h2><h3>Firewalls 1 → Splunk Cloud</h3>
+        <p class="notice" style="border-color:var(--bad)"><b>Not allowed.</b> Splunk Cloud has no syslog listener. The connection is drawn in red so the design stays visible, and counts as an error.</p>
+        <div class="field"><label>Fix</label><div class="ep">Route through Syslog Server (SC4S) → HEC 443<small>or a syslog server with a Universal Forwarder → S2S 9997</small></div></div>
+        <button type="button" class="btn">Insert Syslog Server between them</button>`;
+    }
+    el.innerHTML = tabs + body;
+  }
+
+  document.addEventListener('click', e => { const t = e.target.closest('[data-sel]'); if (t) { state.sel = t.dataset.sel; draw(); } });
+  document.addEventListener('keydown', e => { if ((e.key==='Enter'||e.key===' ') && e.target.matches('.cloudCard')) { e.preventDefault(); state.sel='cloud'; draw(); } });
+
+  const wrap = document.getElementById('wrap'), world = document.getElementById('world');
+  function fit(){ const s = Math.max(.62, Math.min(1, (wrap.clientWidth-2)/880)); world.style.transform=`scale(${s})`; world.style.marginBottom=`${660*s-660}px`; world.style.marginRight=`${880*s-880}px`; }
+  new ResizeObserver(fit).observe(wrap);
+  draw(); fit();
+})();
+</script>
+
+</body></html>
