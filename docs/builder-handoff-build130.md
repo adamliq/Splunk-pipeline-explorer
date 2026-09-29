@@ -1,6 +1,6 @@
 # Builder handoff: Build 130 review
 
-> **Superseded by [`builder-handoff-build131.md`](builder-handoff-build131.md)**, the current task list (the same open items plus the new OV-1 page). Kept as the Build 130 review record.
+> **Superseded by [`builder-handoff-build135.md`](builder-handoff-build135.md)**, the current task list (the same open items plus the new OV-1 page). Kept as the Build 130 review record.
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Reviewed:** `main` at `44f1086` (Build 130, 29 Sep 2026: `builder-auth-summary-v129`, `builder-grouping-v130`), also merged into branch `claude/build-page-layout-bl6jk1`

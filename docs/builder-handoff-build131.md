@@ -1,5 +1,7 @@
 # Builder handoff: tasks for Build 131
 
+> **Superseded by [`builder-handoff-build135.md`](builder-handoff-build135.md)** (Build 135 review: items 1, 2 and 4 are done; OV-1, OV-2 and OV-3 are implemented, with fixes listed there). Kept as the spec for items 7–9.
+
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Baseline:** `main` at `44f1086` (Build 130, 29 Sep 2026), also merged into branch `claude/build-page-layout-bl6jk1`. There is no newer build; this is a new version of the task list, not a new review.
 **History:** `builder-handoff-build130.md` (the Build 130 review these items come from) and earlier.
