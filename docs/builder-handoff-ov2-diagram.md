@@ -1,5 +1,7 @@
 # Builder handoff: make the OV-2 page match the mockup
 
+> **Largely implemented in Build 141.** What remains is in [`builder-handoff-build141.md`](builder-handoff-build141.md); this file stays as the full spec.
+
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Baseline:** Build 137 (`builder-ov2-v133`, adjusted by `builder-ov-review-v136`; shown in the pack and the OV tab). Companion to [`builder-handoff-build137.md`](builder-handoff-build137.md); do that file's OV-1 items 1–6 first or alongside, since several fixes here share code with OV-1 (the flow-tag formatter, title block, banners and legend).
 **Reference:** `docs/mockups/architecture-ov2-mockup.html` (open it in a browser; click a needline pill or a table row to see the highlighting).

@@ -1,5 +1,7 @@
 # Builder handoff: text and shapes go soft when the canvas is zoomed
 
+> **Largely implemented in Build 141.** What remains is in [`builder-handoff-build141.md`](builder-handoff-build141.md); this file stays as the full spec.
+
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Baseline:** Build 138 (`main` at `2111f20`), merged into branch `claude/build-page-layout-bl6jk1`.
 **Reported:** after zooming the Builder canvas, card text, borders and connectors aren't crisp.

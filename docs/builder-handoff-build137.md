@@ -1,5 +1,7 @@
 # Builder handoff: Build 137 review
 
+> **Superseded by [`builder-handoff-build141.md`](builder-handoff-build141.md)** (Build 141 review). Kept for reference.
+
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Reviewed:** `main` at `fffb43f` (Build 137, 29 Sep 2026: `builder-ov-review-v136`, `builder-ov1-visual-v137`), also merged into branch `claude/build-page-layout-bl6jk1`
 **History:** `builder-handoff-build135.md` and `builder-handoff-ov1-diagram.md` (the task lists this build implements). This file replaces both as the task list.

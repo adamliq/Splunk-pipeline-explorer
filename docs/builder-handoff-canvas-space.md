@@ -1,5 +1,7 @@
 # Builder handoff: give the canvas the screen (desktop)
 
+> **Largely implemented in Build 141.** What remains is in [`builder-handoff-build141.md`](builder-handoff-build141.md); this file stays as the full spec.
+
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Screenshots:** `docs/mockups/compare/builder-space-build138-1440.png` and `builder-space-build138-2560.png`.
 **Baseline:** `main` at `2111f20` (Build 138, `builder-ov2-visual-v138`), merged into branch `claude/build-page-layout-bl6jk1`. Build 138 has 0 errors on load at every desktop size.

@@ -1,5 +1,7 @@
 # Builder handoff: make the OV-3 page match the mockup
 
+> **Largely implemented in Build 141.** What remains is in [`builder-handoff-build141.md`](builder-handoff-build141.md); this file stays as the full spec.
+
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Baseline:** Build 137 (`builder-ov3-v134`, adjusted by `builder-ov-review-v136`; shown in the pack and the OV tab). Companion to [`builder-handoff-build137.md`](builder-handoff-build137.md) and [`builder-handoff-ov2-diagram.md`](builder-handoff-ov2-diagram.md). **Do the OV-2 handoff first**: OV-3 reuses its node renumbering and naming (items 1 and 6), its transport formatter (item 8) and its resource and activity defaults (item 9). Those fixes change OV-3 automatically and aren't repeated here.
 **Reference:** `docs/mockups/architecture-ov3-mockup.html` (filters, row detail and grid-cell filtering all work in it).

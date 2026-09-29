@@ -1,6 +1,6 @@
 # Builder handoff: Build 128 review
 
-> **Superseded by [`builder-handoff-build137.md`](builder-handoff-build137.md).** Builds 129–130 implement the items below; see that file for what remains (including a P0 crash in Group by). Kept as history.
+> **Superseded by [`builder-handoff-build141.md`](builder-handoff-build141.md).** Builds 129–130 implement the items below; see that file for what remains (including a P0 crash in Group by). Kept as history.
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Reviewed:** `main` at `8da7456` (Build 128, 29 Sep 2026: `builder-review-polish-v128`), also merged into branch `claude/build-page-layout-bl6jk1`
