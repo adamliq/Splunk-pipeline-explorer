@@ -8,6 +8,7 @@
 **OV-2 rework:** [`builder-handoff-ov2-diagram.md`](builder-handoff-ov2-diagram.md): a comparison with the OV-2 mockup and a full spec for the page (layout by site, needlines, pills, response needlines, naming, one transport formatter, derived defaults). Do it after items 1–6 below.
 **OV-3 rework:** [`builder-handoff-ov3-matrix.md`](builder-handoff-ov3-matrix.md): a comparison with the OV-3 mockup (including a P1 row-hover bug that makes text unreadable) and a spec for one on-screen matrix, filter chips, correct per-plane values and a compact grid. Do it after the OV-2 rework.
 **Canvas space (Build 138 check):** [`builder-handoff-canvas-space.md`](builder-handoff-canvas-space.md): give the Builder canvas the whole desktop screen (full width, window height, chrome above ≤ 150px, docked panels on wide screens); measured by `tools/builder-space-check.js`.
+**Zoom sharpness (Build 138 check):** [`builder-handoff-zoom-sharpness.md`](builder-handoff-zoom-sharpness.md): canvas text and shapes blur when zoomed because `#builderTree` has a permanent `will-change: transform`; fix plus pixel snapping and minimum text size.
 
 ## TL;DR
 
