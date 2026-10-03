@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 150 · 4 Oct 2026</title>
+  <title>Splunk Pipeline Explorer · Build 152 · 4 Oct 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,9 +202,9 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="150" data-build-date="2026-10-04">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="152" data-build-date="2026-10-04">
     <div class="builderHead">
-      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 150, dated 4 October 2026"><b>Build 150</b><time datetime="2026-10-04">4 Oct 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
+      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 152, dated 4 October 2026"><b>Build 152</b><time datetime="2026-10-04">4 Oct 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
         <div class="builderActions"><div class="builderHistoryControls"><button class="builderBtn" id="builderUndo" disabled>↶ Undo <kbd>Ctrl Z</kbd></button><button class="builderBtn" id="builderRedo" disabled>↷ Redo <kbd>Ctrl Y</kbd></button><button class="builderBtn" id="builderHistoryToggle" aria-expanded="false">History <span class="builderHistoryCount" id="builderHistoryCount">0</span></button></div><button class="builderBtn" id="builderLoadPath">Load selected path</button><button class="builderBtn" id="builderClear">Clear</button><button class="builderBtn" id="builderFailure">Open in Failure Lab</button><button class="builderBtn primary" id="builderUse">Use in explorer</button></div>
         <div class="builderPersistence"><select id="builderSaved" aria-label="Saved custom topologies"><option value="">Saved topologies</option></select><button class="builderBtn" id="builderSave">Save</button><button class="builderBtn" id="builderLoadSaved">Load</button><button class="builderBtn" id="builderImport">Import JSON</button><button class="builderBtn" id="builderExport">Export JSON</button><input id="builderImportFile" type="file" accept="application/json,.json" hidden></div>
@@ -4008,7 +4008,7 @@ const addBuilderNodeBeforePaletteRecent=addBuilderNode;
 addBuilderNode=function(type,parent=null){const before=state.builderNodes.length,result=addBuilderNodeBeforePaletteRecent(type,parent);if(state.builderNodes.length>before&&builderPaletteRecentAvailable){builderPaletteRecentTypes=[type,...builderPaletteRecentTypes.filter(item=>item!==type)].slice(0,5);try{localStorage.setItem(builderPaletteRecentKey,JSON.stringify(builderPaletteRecentTypes))}catch{builderPaletteRecentAvailable=false}renderBuilderPaletteRecent()}return result};
 const builderPaletteIndependentTypes=new Set(['authUser','authProviderCloud','authProviderOnPrem','ds','licenseManager','monitoringConsole','serverClass','deploymentApp','indexerCluster','indexerClusterManager','shcCluster','shcMember','shcDeployer','s3FederatedConnection','s3DataCatalog','cloudSearchTier','streamServer','streamDefinition','soarCloud','soarOnPrem','soarPlaybook']);
 function builderPaletteRank(button,query){const name=button.dataset.paletteName.toLowerCase(),type=button.dataset.builderAdd.toLowerCase(),meta=builderComponents[button.dataset.builderAdd],named=(meta?.name||'').toLowerCase(),secondary=`${button.dataset.paletteDescription} ${(meta?.stages||[]).join(' ')} ${meta?.type||''}`.toLowerCase();let total=0;for(const term of query.split(/\s+/).filter(Boolean)){let rank=Infinity;if([name,type,named].some(value=>value===term))rank=0;else if([name,type,named].some(value=>value.startsWith(term)))rank=1;else if(name.split(/[^a-z0-9]+/).some(word=>word.startsWith(term)))rank=2;else if(secondary.split(/[^a-z0-9]+/).some(word=>word.startsWith(term)))rank=3;if(!Number.isFinite(rank))return Infinity;total+=rank}return total}
-function syncBuilderPaletteTarget(){const node=state.builderNodes.find(item=>item.id===state.builderSelected),text=$('#builderPaletteTargetText');text.textContent=node?`Adding after: ${componentInstanceLabel(node)}`:'Adding as a new unconnected component';$('#builderPaletteChangeTarget').hidden=!node;for(const button of builderPaletteButtons){const type=button.dataset.builderAdd,tag=button.querySelector('.builderUnconnectedTag'),independent=builderPaletteIndependentTypes.has(type),check=node&&!independent?dataCapability(node,{id:-1,type}):null;tag.hidden=!node||independent||check.valid;button.title=tag.hidden?button.dataset.paletteOriginalTitle:[button.dataset.paletteOriginalTitle,`Adds unconnected: ${check.reason}`].filter(Boolean).join(' · ')}if($('#builderPaletteNewUnconnected').checked)$('#builderSuggestions').hidden=true}
+function syncBuilderPaletteTarget(){const node=state.builderNodes.find(item=>item.id===state.builderSelected),text=$('#builderPaletteTargetText');text.textContent=node?`Adding after: ${componentInstanceLabel(node)}`:'Adding as a new unconnected component';$('#builderPaletteChangeTarget').hidden=!node;for(const button of builderPaletteButtons){const type=button.dataset.builderAdd,tag=button.querySelector('.builderUnconnectedTag');if(!tag)continue;const independent=builderPaletteIndependentTypes.has(type),check=node&&!independent?dataCapability(node,{id:-1,type}):null;tag.hidden=!node||independent||check.valid;button.title=tag.hidden?button.dataset.paletteOriginalTitle:[button.dataset.paletteOriginalTitle,`Adds unconnected: ${check.reason}`].filter(Boolean).join(' · ')}if($('#builderPaletteNewUnconnected').checked)$('#builderSuggestions').hidden=true}
 let builderPaletteWasSearching=false,builderPaletteOrderedMatches=[];
 const syncPaletteAccordionBeforeRanked=syncPaletteAccordion;
 syncPaletteAccordion=function(){if(!paletteText&&!builderPaletteWasSearching&&accordionActive===undefined)accordionActive=builderPaletteBaseGroups[0];for(const group of accordionGroups){const body=group.querySelector('.builderPaletteItems'),toggle=group.querySelector('.builderPaletteToggle'),count=[...body.querySelectorAll('[data-builder-add]')].filter(button=>!button.hidden).length,open=!group.hidden&&(paletteText?count>0:group===accordionActive);body.hidden=!open;toggle.setAttribute('aria-expanded',String(open));toggle.querySelector('.builderPaletteGroupCount').textContent=String(count)}};
@@ -6772,7 +6772,7 @@ const builderCloudSanitizeBefore148=sanitizeRelationshipDetails;sanitizeRelation
 const builderCloudNameBefore148=componentInstanceLabel;componentInstanceLabel=function(node){if(builderIsCloudIndexer148(node))return node.instanceName&&node.instanceName!=='Indexer '+node.id?node.instanceName:'Splunk Cloud'+(builderCloudStack148(node)?' · '+builderCloudStack148(node):'');return builderCloudNameBefore148(node)};
 function builderCloudCreate148(parent){const prior=new Set(state.builderNodes.map(n=>n.id));builderCloudAddBefore148('idx',parent);const node=state.builderNodes.find(n=>!prior.has(n.id)&&n.type==='idx');if(!node)return null;node.hosting='splunkCloud';node.cloudStack='';node.cloudRegion='';node.cloudExperience='Victoria';node.cloudLicence={unit:'GB/day',value:null};node.cloudAllowList='';node.networkZone='splunk';node.sets=1;state.responsibilityOwners[node.id]='Splunk Cloud provider';builderCloudApply148(node);renderBuilder();if(state.builderRuleProfile==='enterprise')builderStatus("Splunk Cloud indexing added. Switch 'Validate for' to Splunk Cloud or Hybrid to check cloud rules.");return node}
 const builderCloudPaletteGroup148=$('.builderPalette [data-builder-add="indexerCluster"]')?.closest('.builderGroup')||$('.builderPalette [data-builder-add="idx"]')?.closest('.builderGroup');
-const builderCloudPaletteButton148=document.createElement('button');builderCloudPaletteButton148.type='button';builderCloudPaletteButton148.className='builderPaletteItem builderCloudPalette148';builderCloudPaletteButton148.dataset.builderAdd='cloudIndexer148';builderCloudPaletteButton148.dataset.paletteName='Splunk Cloud indexing';builderCloudPaletteButton148.dataset.paletteDescription='Splunk-managed indexing in your Splunk Cloud Platform stack';builderCloudPaletteButton148.dataset.paletteOriginalTitle='Splunk-managed indexing in your Splunk Cloud Platform stack. Receives S2S over TLS on 9997 and HEC on 443. cloud stack Victoria Classic SCP';builderCloudPaletteButton148.title=builderCloudPaletteButton148.dataset.paletteOriginalTitle;builderCloudPaletteButton148.style.setProperty('--item','#89b7ec');builderCloudPaletteButton148.innerHTML='<span class="builderIcon">SC</span><span class="builderPaletteCopy"><span class="builderPaletteName">Splunk Cloud indexing</span><span class="builderPaletteSubtitle">Managed stack · S2S and HEC receiving</span></span><span class="cloudNew148">NEW</span>';builderComponents.cloudIndexer148={...builderComponents.idx,name:'Splunk Cloud indexing',color:'#89b7ec'};
+const builderCloudPaletteButton148=document.createElement('button');builderCloudPaletteButton148.type='button';builderCloudPaletteButton148.className='builderPaletteItem builderCloudPalette148';builderCloudPaletteButton148.dataset.builderAdd='cloudIndexer148';builderCloudPaletteButton148.dataset.paletteName='Splunk Cloud indexing';builderCloudPaletteButton148.dataset.paletteDescription='Splunk-managed indexing in your Splunk Cloud Platform stack';builderCloudPaletteButton148.dataset.paletteOriginalTitle='Splunk-managed indexing in your Splunk Cloud Platform stack. Receives S2S over TLS on 9997 and HEC on 443. cloud stack Victoria Classic SCP';builderCloudPaletteButton148.title=builderCloudPaletteButton148.dataset.paletteOriginalTitle;builderCloudPaletteButton148.style.setProperty('--item','#89b7ec');builderCloudPaletteButton148.innerHTML='<span class="builderIcon">SC</span><span class="builderPaletteCopy"><span class="builderPaletteName">Splunk Cloud indexing</span><span class="builderPaletteSubtitle">Managed stack · S2S and HEC receiving</span><span class="builderUnconnectedTag" hidden>adds unconnected</span></span><span class="cloudNew148">NEW</span>';builderComponents.cloudIndexer148={...builderComponents.idx,name:'Splunk Cloud indexing',color:'#89b7ec'};
 const builderCloudPaletteBody148=builderCloudPaletteGroup148?.querySelector('.builderPaletteItems');builderCloudPaletteBody148?.querySelector('[data-builder-add="indexerCluster"]')?.after(builderCloudPaletteButton148);if(!builderCloudPaletteButton148.isConnected)builderCloudPaletteBody148?.append(builderCloudPaletteButton148);
 if(builderCloudPaletteBody148){builderPaletteButtons.push(builderCloudPaletteButton148);builderPaletteBaseItems.get(builderCloudPaletteGroup148)?.push(builderCloudPaletteButton148);builderPaletteOriginalIndex.set(builderCloudPaletteButton148,builderPaletteButtons.length);builderCloudPaletteButton148.onclick=()=>addBuilderNode('cloudIndexer148',$('#builderPaletteNewUnconnected')?.checked?null:(state.builderSelected??null));builderCloudPaletteButton148.draggable=true;builderCloudPaletteButton148.ondragstart=e=>{builderDrag={kind:'palette',type:'cloudIndexer148'};e.dataTransfer.effectAllowed='copy';e.dataTransfer.setData('text/plain','palette:cloudIndexer148')};builderCloudPaletteButton148.ondragend=()=>{builderDrag=null;clearBuilderDragStyles()}}
 const builderCloudAddBefore148=addBuilderNode;addBuilderNode=function(type,parent){return type==='cloudIndexer148'?builderCloudCreate148(parent):builderCloudAddBefore148(type,parent)};
@@ -6907,6 +6907,433 @@ builderThreatWire150=function(){
 const builderThreatOvRenderBefore150=builderOvRender135;builderOvRender135=function(...args){const result=builderThreatOvRenderBefore150(...args);if(state.view==='ov'&&builderOvRoot135.querySelector('[data-ov-panel="tm1"]'))builderThreatWire150();return result};
 changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['TM-1 threat model','Generate DFD trust boundaries, boundary crossings and an editable STRIDE register from the Builder topology.',true]);
 document.title='Splunk Pipeline Explorer · Build 150 · 4 Oct 2026';$('#topologyBuilder').dataset.buildNumber='150';$('#topologyBuilder').dataset.buildDate='2026-10-04';const builderThreatStamp150=$('.builderBuildStamp');if(builderThreatStamp150){builderThreatStamp150.setAttribute('aria-label','Build 150, dated 4 October 2026');builderThreatStamp150.querySelector('b').textContent='Build 150';const date=builderThreatStamp150.querySelector('time');if(date){date.dateTime='2026-10-04';date.textContent='4 Oct 2026'}}
+</script>
+<style id="builder-review-fixes-v151-styles">
+/* A blocked cloud handoff is a relationship, not a wide hit target. */
+#builderTree path.unifiedConnector.builderCloudBlocked148{stroke:#d84a58!important;stroke-width:2!important;stroke-dasharray:6 5!important;marker-end:none!important}
+#builderTree .builderCloudBlocked148:not(path.unifiedConnector){stroke:transparent!important}
+#builderTree .edgeRouteLabel.builderRouteDeferred146{display:inline}
+#builderTree .edgeRouteLabel.builderRouteLabelHidden125{opacity:1}
+.builderSharedHost147.collapsed .builderHostCard147{overflow:auto}
+.builderSharedHost147.collapsed .builderHostCard147 span{line-height:1.35}
+.builderSharedHost147:not(.collapsed) .builderHostLocal147{bottom:auto;top:38px;left:auto;right:12px;background:#142b39;padding:2px 5px}
+.builderCloudCard148 .builderNodeChips,.builderCloudCard148 .builderStageRow,.builderCloudCard148 .builderStageRows{display:none!important}
+</style>
+<script id="builder-review-fixes-v151">
+/* A best-effort route label is more useful than an invisible relationship. */
+const builderPlaceLabelsBefore151=builderPlaceLabels149;
+builderPlaceLabels149=function(...args){
+  const result=builderPlaceLabelsBefore151(...args),svg=$('#builderTree .unifiedConnectorLayer');
+  for(const label of svg?.querySelectorAll('.edgeRouteLabel')||[]){
+    label.classList.remove('builderRouteDeferred146','builderRouteLabelHidden125');
+    label.querySelector('.builderEdgeIssueMarker')?.setAttribute('tabindex','0');
+  }
+  return result;
+};
+
+/* Avoid a full Builder DOM traversal on redraws with no new text elements. */
+const builderTextBefore151=polishBuilderText,builderTextPending151=new Set();
+const builderTextRoot151=$('#topologyBuilder');
+if(builderTextRoot151&&typeof MutationObserver==='function'){
+  new MutationObserver(records=>{
+    for(const record of records)for(const node of record.addedNodes)
+      if(node.nodeType===Node.ELEMENT_NODE)builderTextPending151.add(node);
+  }).observe(builderTextRoot151,{childList:true,subtree:true});
+}
+polishBuilderText=function(){
+  if(!builderTextPending151.size)return;
+  for(const root of builderTextPending151){
+    if(!root.isConnected)continue;
+    for(const element of [root,...root.querySelectorAll('*')]){
+      if(builderPerfPolished149.has(element)||![...element.childNodes].some(node=>node.nodeType===Node.TEXT_NODE&&node.textContent.trim()))continue;
+      builderPerfPolished149.add(element);
+      const font=parseFloat(getComputedStyle(element).fontSize),floor=element.closest('#builderTree')?10.5:10;
+      if(font&&font<floor)element.style.fontSize=floor+'px';
+    }
+  }
+  builderTextPending151.clear();
+};
+const builderGroupBarBefore151=renderBuilderGroupBar;
+let builderGroupBarSignature151='';
+renderBuilderGroupBar=function(){
+  const signature=JSON.stringify([state.builderSelectedGroup,state.builderGroups.map(g=>[g.id,g.name,g.color]),state.builderNodes.map(n=>[n.id,n.groupId])]);
+  if(signature===builderGroupBarSignature151&&$('#builderGroupBar #builderAddGroup'))return;
+  builderGroupBarSignature151=signature;
+  return builderGroupBarBefore151();
+};
+const builderGroupInspectorBefore151=renderBuilderGroupInspector;
+let builderGroupInspectorSignature151='';
+renderBuilderGroupInspector=function(){
+  const group=builderGroupById(state.builderSelectedGroup);
+  const signature=JSON.stringify([group,state.builderNodes.filter(n=>n.groupId===group?.id).map(n=>[n.id,n.instanceName,n.type])]);
+  if(signature===builderGroupInspectorSignature151&&
+     (group?$('#builderGroupInspector #builderCloseGroup'):$('#builderGroupInspector')?.style.display==='none'))return;
+  builderGroupInspectorSignature151=signature;
+  return builderGroupInspectorBefore151();
+};
+
+/* Preserve custom names; replace only the generated Indexer name on cloud cards. */
+const builderCloudNameBefore151=componentInstanceLabel;
+componentInstanceLabel=function(node){
+  if(builderIsCloudIndexer148(node)&&(!node.instanceName||node.instanceName==='Splunk Cloud'||/^Indexer\s+\d+$/.test(node.instanceName)))
+    return 'Splunk Cloud'+(builderCloudStack148(node)?' · '+builderCloudStack148(node):'');
+  return builderCloudNameBefore151(node);
+};
+const builderCloudCreateBefore151=builderCloudCreate148;
+builderCloudCreate148=function(...args){
+  const node=builderCloudCreateBefore151(...args);
+  if(node){node.instanceName='Splunk Cloud';renderBuilder();builderStatus('Splunk Cloud indexing added · set the stack name in Inspector.')}
+  return node;
+};
+/* The stack name is edited in the Inspector; conversion no longer prompts. */
+builderCloudConvert148=function(node){
+  if(!node||node.type!=='idx')return;
+  const toCloud=!builderIsCloudIndexer148(node),before=builderHistorySnapshot();
+  if(toCloud){
+    node.hosting='splunkCloud';node.cloudStack=node.cloudStack||'';
+    node.cloudRegion=node.cloudRegion||'';node.cloudExperience=node.cloudExperience||'Victoria';
+    node.cloudLicence=node.cloudLicence||{unit:'GB/day',value:null};
+    node.cloudAllowList=node.cloudAllowList||'';node.networkZone='splunk';node.sets=1;
+    if(!node.instanceName||/^Indexer\s+\d+$/.test(node.instanceName))node.instanceName='Splunk Cloud';
+    state.responsibilityOwners[node.id]='Splunk Cloud provider';builderCloudApply148(node,true);
+  }else{node.hosting='selfManaged';if(node.instanceName==='Splunk Cloud')node.instanceName='Indexer '+node.id}
+  commitBuilderHistory(before,toCloud?'Convert to Splunk Cloud indexing':'Convert to self-managed Indexer');
+  renderBuilder();requestAnimationFrame(()=>fitBuilderView(false));
+  if(toCloud){openBuilderCanvasInspector();requestAnimationFrame(()=>$('#builderInstanceInspector [data-cloud-field148="cloudStack"]')?.focus())}
+};
+
+/* Collapsed hosts are actual connector endpoints, including merged links. */
+function builderHostEndpoint151(nodeId,otherId,positions){
+  const node=state.builderNodes.find(n=>n.id===nodeId),host=builderHostById147(node?.hostId);
+  if(host?.collapsed&&builderHostMembers147(host).length>1){
+    const box=builderHostBox147(host);
+    return box?{x:box.x,y:box.y,w:Math.max(218,box.w),h:Math.max(148,98+builderHostMembers147(host).length*34)}:null;
+  }
+  return positions.has(nodeId)?builderCardBox(nodeId,positions):null;
+}
+function builderHostRefine151(){
+  const svg=$('#builderTree .unifiedConnectorLayer'),world=$('#builderTree .unifiedBuilderWorld');
+  if(!svg||!world||!state.builderHosts.some(h=>h.collapsed))return;
+  const positions=unifiedBuilderPositions().positions,groups=new Map();
+  svg.querySelectorAll('.builderHostBadge147,.builderHostBadgeText147').forEach(el=>el.parentElement?.remove());
+  for(const edge of builderTraceEdges('all')){
+    const a=builderHostById147(state.builderNodes.find(n=>n.id===edge.from)?.hostId);
+    const b=builderHostById147(state.builderNodes.find(n=>n.id===edge.to)?.hostId);
+    if(!(a?.collapsed||b?.collapsed)||a&&a===b)continue;
+    const key=edge.plane+'|'+(a?.collapsed?'h:'+a.id:'n:'+edge.from)+'|'+(b?.collapsed?'h:'+b.id:'n:'+edge.to);
+    if(!groups.has(key))groups.set(key,[]);
+    groups.get(key).push(edge);
+  }
+  for(const edges of groups.values()){
+    const first=edges[0],a=builderHostEndpoint151(first.from,first.to,positions),b=builderHostEndpoint151(first.to,first.from,positions);
+    if(!a||!b)continue;
+    const horizontal=Math.abs((b.x+b.w/2)-(a.x+a.w/2))>=Math.abs((b.y+b.h/2)-(a.y+a.h/2));
+    const right=b.x+b.w/2>=a.x+a.w/2,down=b.y+b.h/2>=a.y+a.h/2;
+    const start=horizontal?{x:right?a.x+a.w:a.x,y:a.y+a.h/2}:{x:a.x+a.w/2,y:down?a.y+a.h:a.y};
+    const end=horizontal?{x:right?b.x:b.x+b.w,y:b.y+b.h/2}:{x:b.x+b.w/2,y:down?b.y:b.y+b.h};
+    const mid=horizontal?(start.x+end.x)/2:(start.y+end.y)/2;
+    const d=horizontal?`M${start.x} ${start.y} L${mid} ${start.y} L${mid} ${end.y} L${end.x} ${end.y}`:
+      `M${start.x} ${start.y} L${start.x} ${mid} L${end.x} ${mid} L${end.x} ${end.y}`;
+    const label=svg.querySelector(`[data-route-plane="${first.plane}"][data-route-edge="${CSS.escape(String(first.id))}"]`);
+    for(const edge of edges){
+      for(const path of svg.querySelectorAll(`[data-edge-plane="${edge.plane}"][data-edge-id="${CSS.escape(String(edge.id))}"]`))
+        if(path.tagName.toLowerCase()==='path')path.setAttribute('d',d);
+    }
+    if(label){
+      const width=Number(label.querySelector('rect')?.getAttribute('width'))||110;
+      const x=horizontal?mid-width/2:(start.x+end.x)/2-width/2,y=horizontal?(start.y+end.y)/2-11:mid-11;
+      label.setAttribute('transform',`translate(${x} ${y})`);
+      label.style.display='';
+      label.classList.remove('builderRouteDeferred146','builderRouteLabelHidden125');
+      if(edges.length>1&&!label.querySelector('.builderHostCount151')){
+        const text=document.createElementNS('http://www.w3.org/2000/svg','text');
+        text.classList.add('builderHostCount151');text.setAttribute('x',width+8);text.setAttribute('y','13');
+        text.setAttribute('fill','#dff7f3');text.setAttribute('font-size','11');text.textContent='×'+edges.length;label.append(text);
+      }
+    }
+  }
+}
+const builderRenderBefore151=renderBuilder;
+renderBuilder=function(...args){
+  const result=builderRenderBefore151(...args);
+  for(const host of state.builderHosts.filter(h=>h.collapsed)){
+    const box=$(`#builderTree .builderSharedHost147[data-host-id="${CSS.escape(String(host.id))}"]`);
+    if(!box)continue;
+    const members=builderHostMembers147(host);
+    box.style.height=Math.max(148,98+members.length*34)+'px';
+    for(const row of box.querySelectorAll('[data-host-role]')){
+      const node=members.find(n=>String(n.id)===row.dataset.hostRole);
+      if(node)row.textContent='◼ '+componentInstanceLabel(node);
+    }
+  }
+  builderHostRefine151();
+  for(const edge of builderTraceEdges('data').filter(e=>builderIsCloudIndexer148(e.edge.target)&&e.edge.source?.type==='syslogSource')){
+    const selector=`#builderTree [data-edge-plane="data"][data-edge-id="${CSS.escape(String(edge.id))}"]`;
+    for(const path of $$(selector))if(!path.matches('path.unifiedConnector'))path.classList.remove('builderCloudBlocked148');
+    const label=$(`#builderTree [data-route-plane="data"][data-route-edge="${CSS.escape(String(edge.id))}"]`);
+    if(label){
+      const text=label.querySelector('text'),rect=label.querySelector('rect');
+      if(text)text.textContent='Syslog → Cloud blocked';
+      if(rect)rect.setAttribute('width','155');
+      label.classList.remove('builderRouteDeferred146','builderRouteLabelHidden125');
+      label.querySelector('.builderEdgeIssueMarker')?.setAttribute('transform','translate(170 11)');
+      const current=label.getAttribute('transform')?.match(/translate\(([-\d.]+)[ ,]([-\d.]+)\)/);
+      if(current)label.setAttribute('transform',`translate(${Number(current[1])+30} ${current[2]})`);
+      const path=$$(selector).find(el=>el.matches('path.unifiedConnector'));
+      if(path){const title=path.querySelector('title')||path.appendChild(document.createElementNS('http://www.w3.org/2000/svg','title'));title.textContent='Syslog → Splunk Cloud: not allowed';}
+    }
+  }
+  return result;
+};
+const builderPolishStatusBefore151=polishBuilderStatus;
+polishBuilderStatus=function(...args){
+  const result=builderPolishStatusBefore151(...args),bar=$('#builderValidation'),errors=builderFindingSummary().errors;
+  if(bar&&errors===1){
+    bar.querySelector('strong').textContent=bar.querySelector('strong').textContent.replace('1 errors','1 error');
+    bar.querySelector('b').textContent=bar.querySelector('b').textContent.replace('1 errors','1 error');
+  }
+  return result;
+};
+const builderUseButton151=$('#builderUse');
+if(builderUseButton151)builderUseButton151.title='Use this topology in the explorer';
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Builder review fixes','Keep relationship labels visible, route collapsed-host links to the host card, and simplify Splunk Cloud conversion.',true]);
+document.title='Splunk Pipeline Explorer · Build 151 · 4 Oct 2026';
+$('#topologyBuilder').dataset.buildNumber='151';$('#topologyBuilder').dataset.buildDate='2026-10-04';
+const builderStamp151=$('.builderBuildStamp');
+if(builderStamp151){builderStamp151.setAttribute('aria-label','Build 151, dated 4 October 2026');builderStamp151.querySelector('b').textContent='Build 151';const date=builderStamp151.querySelector('time');if(date){date.dateTime='2026-10-04';date.textContent='4 Oct 2026'}}
+</script>
+<style id="builder-threat-review-v152-styles">
+.tmMeta150{grid-template-columns:2fr repeat(4,minmax(0,1fr))}
+.tmFigure150 svg{width:max-content;max-width:none;min-width:100%;height:auto}
+.tmFigure150 .tmProcess152{fill:var(--tm-paper);stroke:var(--tm-blue);stroke-width:1.6}
+.tmFigure150 .tmFlowPill152 rect{fill:var(--tm-paper);stroke:var(--tm-blue);stroke-width:1.4}
+.tmFigure150 .tmFlowPill152.open rect{stroke:var(--tm-red);stroke-width:2}
+.tmFigure150 .tmFlowPill152 text{font:700 11px Inter,Segoe UI,Arial,sans-serif;fill:var(--tm-ink);text-anchor:middle}
+.tmFigure150 .tmNodeId152{font-weight:800;fill:var(--tm-blue)}
+.tmFigure150 .tmCross150{fill:var(--tm-paper);stroke:var(--tm-blue)}
+.tmFigure150 .tmCross150.open{fill:var(--tm-red);stroke:var(--tm-red)}
+.tmFilters150 .tmCount152{display:inline-block;min-width:18px;margin-left:5px;padding:1px 4px;border-radius:8px;background:#a83227;color:white;font-size:10px}
+.tmFilters150 .tmCount152.zero{background:#526b79}
+.tmEncryptionOpen152{color:var(--tm-red);font-weight:700}
+.tmRetired152{margin:14px 0;border:1px solid var(--tm-rule);border-radius:5px;padding:8px}
+.tmRetired152 summary{cursor:pointer;font-weight:700}
+@media(max-width:760px){.tmMeta150{grid-template-columns:repeat(2,minmax(0,1fr))}.tmMeta150>div:first-child{grid-column:1/-1}}
+@media print{.tmFigure150 svg{min-width:0;width:100%}}
+</style>
+<script id="builder-threat-review-v152">
+/* The model retains stable data keys for edits while exposing readable DFD IDs. */
+const builderThreatModelBefore152=builderThreatModel150;
+function builderThreatMfa152(edge){return /required|enabled|yes|enforced|on/i.test(String(edge?.mfa||edge?.relation?.mfa||''))&&!/not |no|unknown/i.test(String(edge?.mfa||edge?.relation?.mfa||''))}
+function builderThreatAdd152(model,key,category,target,title,control,risk='Medium',status='Open',owner=''){
+  if(model.threats.some(t=>t.key===key))return;
+  const saved=state.builderThreatModel150.overrides[key]||{};
+  model.threats.push({key,category,target,title,control:saved.control??control,risk:saved.risk??risk,status:saved.status??status,owner:saved.owner??owner,notes:saved.notes||''});
+}
+builderThreatModel150=function(){
+  const model=builderThreatModelBefore152(),nodes=new Map(model.nodes.map(n=>[n.id,n]));
+  model.flowIds=new Map(model.edges.map((edge,i)=>[edge.plane+':'+edge.id,'DF-'+(i+1)]));
+  let external=0,process=0,store=0;
+  model.elementIds=new Map();
+  for(const node of model.nodes)model.elementIds.set('node:'+node.id,(builderTierOf130(node)==='sources'||/authUser|authProvider/i.test(node.type)?'E'+(++external):'P'+(++process)));
+  for(const item of model.stores)model.elementIds.set('store:'+item.id,'D'+(++store));
+  for(const item of model.edges){
+    const from=nodes.get(item.from),to=nodes.get(item.to),key=item.plane+':'+item.id,d=ensureRelationshipDetails(item.edge);
+    if(!from||!to)continue;
+    const auth=String(d.authenticationType||'');
+    if(/S2S|Splunk.to.Splunk/i.test(String(d.protocol||''))&&/certificate|mutual TLS/i.test(auth)){
+      builderThreatAdd152(model,'flow:'+key+':S-certificate','S',key,'The forwarding peer must present its approved certificate.','Verify mutual TLS and certificate rotation.','Medium','Mitigated');
+    }
+    if(from.type==='syslogSource'&&/syslog/i.test(to.type)){
+      builderThreatAdd152(model,'flow:'+key+':R','R',key,'Unauthenticated syslog can be repudiated or falsely attributed.','Record the sender identity, listener evidence and source-side audit trail.','Medium');
+    }
+    if(item.plane==='authentication'){
+      builderThreatAdd152(model,'flow:'+key+':S','S',key,'Interactive sign-in may be impersonated without a verified factor.','Enforce MFA and validate the identity-provider assertion.','High',builderThreatMfa152(item.edge)?'Mitigated':'Open');
+    }
+    if(to.type==='syslog'&&(to.persistent||to.diskBuffer||to.diskBufferEnabled)){
+      builderThreatAdd152(model,'flow:'+key+':D-buffer','D',key,'A relay outage could discard incoming events.','Keep the relay disk buffer monitored and sized for outages.','Medium','Mitigated');
+    }
+    for(const threat of model.threats.filter(t=>t.target===key)){
+      if(state.builderThreatModel150.overrides[threat.key])continue;
+      if(threat.category==='S'&&(/mutual TLS|certificate/i.test(auth)||builderThreatMfa152(item.edge)))threat.status='Mitigated';
+      if(threat.category==='D'&&(from.persistent||to.persistent)&&(/ack/i.test(String(d.acknowledgement||''))||from.ack||to.ack))threat.status='Mitigated';
+      if(threat.category==='D'&&to.type==='syslog'&&(to.persistent||to.diskBuffer||to.diskBufferEnabled))threat.status='Mitigated';
+      if((typeof builderIsCloudIndexer148==='function'&&[from,to].some(builderIsCloudIndexer148))&&threat.category==='I'){threat.status='Transferred';threat.owner='Splunk Cloud provider'}
+    }
+  }
+  for(const node of model.nodes){
+    const key='node:'+node.id,managed=typeof builderIsCloudIndexer148==='function'&&builderIsCloudIndexer148(node);
+    if(['awsLambda','azureFunction','hecClient'].includes(node.type)){
+      builderThreatAdd152(model,key+':I-token','I',key,'A HEC token held by this process could be disclosed.','Use a scoped token, secret store and rotation.','High');
+    }
+    if(['search','sh','searchHead','shcMember','shcCluster'].includes(node.type)){
+      builderThreatAdd152(model,key+':E-role','E',key,'Search roles may grant broader access than intended.','Review least-privilege role mappings and search audit events.','High');
+    }
+    if(['uf','hf'].includes(node.type)&&node.persistent){
+      builderThreatAdd152(model,key+':I-queue','I',key,'Queued telemetry resides on a forwarder host.','Restrict host access and protect the persistent queue.','Low','Accepted');
+    }
+    for(const threat of model.threats.filter(t=>t.target===key)){
+      if(state.builderThreatModel150.overrides[threat.key])continue;
+      if(managed){threat.status='Transferred';threat.owner='Splunk Cloud provider'}
+      else if(threat.category==='D'&&node.persistent)threat.status='Mitigated';
+    }
+  }
+  for(const item of model.stores){
+    if(!/Deployment app/i.test(item.name))continue;
+    builderThreatAdd152(model,'store:'+item.nodeId+':T','T','node:'+item.nodeId,'Deployment app content could be tampered with.','Sign, review and audit deployment apps before release.','High');
+  }
+  model.retired=Object.entries(state.builderThreatModel150.overrides).filter(([key])=>!model.threats.some(t=>t.key===key)).map(([key,value])=>({key,...value}));
+  return model;
+};
+/* Preserve a retired decision after its originating flow or component is removed. */
+const builderThreatCleanBefore152=builderThreatClean150;
+builderThreatClean150=function(raw){
+  const value=builderThreatCleanBefore152(raw),retired={};
+  for(const [key,item] of Object.entries(raw?.retired||{}).slice(0,600)){
+    if(!/^[\w:.-]{1,100}$/.test(key)||!item||typeof item!=='object')continue;
+    retired[key]={title:String(item.title||'Retired threat').slice(0,220),category:String(item.category||'').slice(0,1),status:String(item.status||'Open').slice(0,30),risk:String(item.risk||'Medium').slice(0,20),owner:String(item.owner||'').slice(0,120)};
+  }
+  return{...value,retired};
+};
+state.builderThreatModel150.retired??={};
+const builderThreatSeedBefore152=builderThreatModel150;
+let builderThreatSeen152=null;
+builderThreatModel150=function(){
+  const model=builderThreatSeedBefore152(),current=new Map(model.threats.map(t=>[t.key,t]));
+  if(builderThreatSeen152)for(const [key,prior] of builderThreatSeen152){
+    if(!current.has(key))state.builderThreatModel150.retired[key]={title:prior.title,category:prior.category,status:prior.status,risk:prior.risk,owner:prior.owner};
+  }
+  for(const key of current.keys())delete state.builderThreatModel150.retired[key];
+  builderThreatSeen152=current;
+  model.retired=[...new Map([...model.retired,...Object.entries(state.builderThreatModel150.retired).map(([key,item])=>({key,...item}))].map(item=>[item.key,item])).values()];
+  return model;
+};
+const builderThreatLoadBefore152=loadTopologyDocument;
+loadTopologyDocument=function(...args){
+  builderThreatSeen152=null;
+  const result=builderThreatLoadBefore152(...args);
+  builderThreatSeen152=null;
+  return result;
+};
+function builderThreatTarget152(model,key){
+  if(model.flowIds.has(key)){
+    const edge=model.edges.find(e=>e.plane+':'+e.id===key);
+    return model.flowIds.get(key)+' · '+componentInstanceLabel(edge.edge.source)+' → '+componentInstanceLabel(edge.edge.target);
+  }
+  if(model.elementIds.has(key)){
+    const node=model.nodes.find(n=>'node:'+n.id===key);
+    return model.elementIds.get(key)+' · '+componentInstanceLabel(node);
+  }
+  return 'Retired element';
+}
+/* Two-column zone layout gives the site and collection paths room without truncating names. */
+function builderThreatLines152(value,max=18){
+  const words=String(value||'').split(/\s+/),lines=[];
+  for(const word of words){
+    if(!lines.length||lines.at(-1).length+word.length+1>max)lines.push(word);
+    else lines[lines.length-1]+=' '+word;
+  }
+  return lines.slice(0,4);
+}
+builderThreatSvg150=function(model){
+  const esc=builderV125Text125,zoneWidth=300,gap=54,margin=22,positions=new Map(),zoneRects=new Map();
+  let height=260;
+  model.zones.forEach((zone,index)=>{
+    const x=margin+index*(zoneWidth+gap),rows=Math.ceil(zone.nodes.length/2),h=76+rows*150+(zone.stores?.length||0)*39+18;
+    zoneRects.set(zone.key,{x,y:38,w:zoneWidth,h});
+    height=Math.max(height,38+h+24);
+    zone.nodes.forEach((node,i)=>positions.set(node.id,{x:x+12+(i%2)*142,y:114+Math.floor(i/2)*150,cx:x+78+(i%2)*142,cy:180+Math.floor(i/2)*150,r:59}));
+    zone.stores?.forEach((item,i)=>positions.set('store:'+item.id,{x:x+18,y:114+rows*150+i*39,w:zoneWidth-36,h:29}));
+  });
+  const width=Math.max(780,margin+model.zones.length*(zoneWidth+gap));
+  const frames=model.zones.map(zone=>{
+    const r=zoneRects.get(zone.key),name=builderThreatLines152(zone.name,35);
+    return `<g><rect class="tmZone150${zone.managed?' managed':''}" x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" rx="7"/><text x="${r.x+10}" y="${r.y+22}" font-weight="700">${esc(name[0])}</text><text class="tmSmall150" x="${r.x+10}" y="${r.y+43}">${zone.managed?'Provider managed':'Trust boundary'}</text></g>`;
+  }).join('');
+  const flows=model.edges.map(edge=>{
+    const a=positions.get(edge.from),b=positions.get(edge.to);if(!a||!b)return'';
+    const dx=b.cx-a.cx,dy=b.cy-a.cy,horizontal=Math.abs(dx)>Math.abs(dy),right=dx>=0,down=dy>=0;
+    const x1=a.cx+(horizontal?(right?a.r:-a.r):0),y1=a.cy+(horizontal?0:(down?a.r:-a.r));
+    const x2=b.cx-(horizontal?(right?b.r:-b.r):0),y2=b.cy-(horizontal?0:(down?b.r:-b.r));
+    const middle=horizontal?(x1+x2)/2:(y1+y2)/2;
+    const d=horizontal?`M${x1} ${y1} L${middle} ${y1} L${middle} ${y2} L${x2} ${y2}`:`M${x1} ${y1} L${x1} ${middle} L${x2} ${middle} L${x2} ${y2}`;
+    const key=edge.plane+':'+edge.id,id=model.flowIds.get(key);
+    const open=model.threats.some(t=>t.target===key&&t.status==='Open'&&['T','I'].includes(t.category));
+    const crosses=model.byNode.get(edge.from)!==model.byNode.get(edge.to),boundary=zoneRects.get(model.byNode.get(edge.from));
+    const crossX=right?boundary.x+boundary.w:boundary.x,crossY=y1+(y2-y1)*Math.max(0,Math.min(1,(crossX-x1)/(x2-x1||1)));
+    const px=horizontal?middle:(x1+x2)/2,py=horizontal?(y1+y2)/2:middle;
+    const title=componentInstanceLabel(edge.edge.source)+' → '+componentInstanceLabel(edge.edge.target)+' · '+ensureRelationshipDetails(edge.edge).protocol;
+    return `<g data-tm-target="${esc(key)}" data-key="${esc(key)}" tabindex="0" aria-label="${esc(id+' '+title)}"><path class="tmFlow150 ${edge.plane}" d="${d}"/><title>${esc(title)}</title>${crosses?`<path class="tmCross150${open?' open':''}" d="M${crossX} ${crossY-7}L${crossX+7} ${crossY}L${crossX} ${crossY+7}L${crossX-7} ${crossY}Z"/>`:''}<g class="tmFlowPill152${open?' open':''}" transform="translate(${px-22} ${py-12})"><rect width="44" height="23" rx="10"/><text x="22" y="16">${esc(id)}</text></g></g>`;
+  }).join('');
+  const cards=model.nodes.map(node=>{
+    const p=positions.get(node.id),id=model.elementIds.get('node:'+node.id);
+    const external=id.startsWith('E'),name=componentInstanceLabel(node),lines=builderThreatLines152(name,19);
+    const shape=external?`<rect class="tmNode150" x="${p.cx-61}" y="${p.cy-54}" width="122" height="108" rx="2"/>`:
+      `<circle class="tmProcess152" cx="${p.cx}" cy="${p.cy}" r="${p.r}"/>`;
+    const start=p.cy-(lines.length*12)/2+7;
+    return `<g data-tm-target="node:${node.id}" data-key="node:${node.id}" tabindex="0" aria-label="${esc(id+' '+name)}">${shape}<text class="tmNodeId152" x="${p.cx}" y="${p.cy-30}" text-anchor="middle">${esc(id)}</text>${lines.map((line,i)=>`<text x="${p.cx}" y="${start+i*12}" text-anchor="middle">${esc(line)}</text>`).join('')}<title>${esc(name)}</title></g>`;
+  }).join('');
+  const stores=model.stores.map(item=>{
+    const p=positions.get('store:'+item.id),id=model.elementIds.get('store:'+item.id);
+    return `<g data-tm-target="node:${item.nodeId}" data-key="store:${item.id}" tabindex="0"><path class="tmStore150" d="M${p.x} ${p.y}H${p.x+p.w}M${p.x} ${p.y+p.h}H${p.x+p.w}M${p.x+3} ${p.y+2}V${p.y+p.h-2}M${p.x+p.w-3} ${p.y+2}V${p.y+p.h-2}"/><text x="${p.x+8}" y="${p.y+19}">${esc(id+' · '+item.name)}</text></g>`;
+  }).join('');
+  return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Data flow diagram with ${model.zones.length} trust boundaries, ${model.nodes.length} elements and ${model.edges.length} flows">${frames}${flows}${cards}${stores}</svg>`;
+};
+const builderThreatPageBefore152=builderThreatPage150;
+builderThreatPage150=function(editable=false){
+  const page=builderThreatPageBefore152(editable),model=builderThreatModel150(),root=document.createElement('div');
+  root.innerHTML=page.content;
+  root.querySelector('.tmFigure150')?.replaceChildren();
+  const figure=root.querySelector('.tmFigure150');
+  if(figure)figure.innerHTML=builderThreatSvg150(model);
+  const meta=root.querySelector('.tmMeta150');
+  if(meta){const cell=document.createElement('div');cell.innerHTML='<small>Build · prepared</small><b>'+builderV125Text125($('#topologyBuilder').dataset.buildNumber)+' · 4 Oct 2026</b>';meta.append(cell)}
+  for(const chip of root.querySelectorAll('[data-tm-filter]')){
+    const count=model.threats.filter(t=>t.category===chip.dataset.tmFilter&&t.status==='Open').length,badge=document.createElement('span');
+    badge.className='tmCount152'+(count?'':' zero');badge.textContent=String(count);chip.append(badge);
+  }
+  const crossingRows=[...root.querySelectorAll('.tmScroll150 table:first-child tbody tr[data-tm-target]')];
+  for(const row of crossingRows){
+    const crossing=model.crossings.find(c=>c.key===row.dataset.tmTarget);if(!crossing)continue;
+    row.dataset.key=crossing.key;row.children[1].textContent=model.flowIds.get(crossing.key);
+    const encrypted=['Required','Enabled'].includes(String(crossing.detail.tls||''));
+    if(!encrypted){row.children[6].textContent=String(crossing.detail.tls||'').toLowerCase()==='not applicable'?'None':'Not confirmed';row.children[6].classList.add('tmEncryptionOpen152')}
+  }
+  for(const row of root.querySelectorAll('tr[data-tm-stride]')){
+    row.dataset.key=row.dataset.tmTarget;
+    row.children[2].textContent=builderThreatTarget152(model,row.dataset.tmTarget);
+  }
+  const register=root.querySelectorAll('.tmScroll150')[1];
+  if(register&&model.retired.length){
+    const section=document.createElement('details');section.className='tmRetired152';
+    section.innerHTML='<summary>Retired · '+model.retired.length+' recorded decision'+(model.retired.length===1?'':'s')+'</summary><ul>'+model.retired.map(item=>'<li><code>'+builderV125Text125(item.key)+'</code> · '+builderV125Text125(item.status||'Open')+' · '+builderV125Text125(item.owner||'Not set')+'</li>').join('')+'</ul>';
+    register.after(section);
+  }
+  const footer=root.querySelector('.tmFoot150 span:last-child');
+  if(footer)footer.textContent='TM-1 · Build '+$('#topologyBuilder').dataset.buildNumber;
+  page.content=root.innerHTML;
+  return page;
+};
+const builderThreatOvRenderBefore152=builderOvRender135;
+builderOvRender135=function(...args){
+  const result=builderThreatOvRenderBefore152(...args);
+  for(const sheet of builderOvRoot135.querySelectorAll('[data-ov-panel="tm1"] .ovSectionTitle135 span'))sheet.textContent='TM-1 · 1 of 1';
+  return result;
+};
+const builderThreatRulesBefore152=evaluateArchitectureRules;
+evaluateArchitectureRules=function(...args){
+  const results=builderThreatRulesBefore152(...args),open=builderThreatModel150().threats.filter(t=>t.status==='Open'&&t.risk==='High');
+  if(open.length){
+    results.push({id:'TM-OPEN-HIGH',title:'Open high-risk threats',severity:'High',description:open.length+' high-risk threat'+(open.length===1?'':'s')+' require a recorded decision.',status:'fail',evidence:open.map(t=>t.title),nodes:[],edges:[]});
+    const unowned=open.filter(t=>!t.owner);
+    if(unowned.length)results.push({id:'TM-OWNER',title:'Threat owner not set',severity:'Medium',description:unowned.length+' open high-risk threat'+(unowned.length===1?'s':'')+' lack an owner.',status:'advisory',evidence:unowned.map(t=>t.title),nodes:[],edges:[]});
+  }
+  return results;
+};
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['TM-1 review fixes','Apply seeded STRIDE decisions, show readable DFD identifiers and a two-column trust-boundary diagram.',true]);
+document.title='Splunk Pipeline Explorer · Build 152 · 4 Oct 2026';
+$('#topologyBuilder').dataset.buildNumber='152';$('#topologyBuilder').dataset.buildDate='2026-10-04';
+const builderStamp152=$('.builderBuildStamp');
+if(builderStamp152){builderStamp152.setAttribute('aria-label','Build 152, dated 4 October 2026');builderStamp152.querySelector('b').textContent='Build 152';const date=builderStamp152.querySelector('time');if(date){date.dateTime='2026-10-04';date.textContent='4 Oct 2026'}}
 </script>
 </body>
 </html>
