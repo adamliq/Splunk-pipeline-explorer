@@ -1,5 +1,7 @@
 # Builder handoff: Build 141 review
 
+> **Superseded by [`builder-handoff-build149.md`](builder-handoff-build149.md)** (Build 149 review). Open items here are carried there by reference.
+
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Reviewed:** `main` at `dbaff23` (Build 141, 29 Sep 2026: `builder-ov2-visual-v138`, `builder-ov3-visual-v139`, `builder-canvas-space-v140`, `builder-canvas-sharp-v141`), also merged into branch `claude/build-page-layout-bl6jk1`
 **History:** `builder-handoff-build137.md` plus the four rework specs it links: `builder-handoff-ov2-diagram.md`, `builder-handoff-ov3-matrix.md`, `builder-handoff-canvas-space.md` and `builder-handoff-zoom-sharpness.md`. This file replaces them as the task list; they stay as the full specs.
