@@ -1,5 +1,7 @@
 # Builder handoff: Build 149 review
 
+> **Superseded by [`builder-handoff-build152.md`](builder-handoff-build152.md)** (Build 152 review). Kept as the record.
+
 > **Still current.** Build 150 added only the threat model and fixed none of these items (the P0 included). See [`builder-handoff-build150.md`](builder-handoff-build150.md) for the threat-model review.
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
