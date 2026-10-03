@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 153 · 4 Oct 2026</title>
+  <title>Splunk Pipeline Explorer · Build 154 · 4 Oct 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,9 +202,9 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="153" data-build-date="2026-10-04">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="154" data-build-date="2026-10-04">
     <div class="builderHead">
-      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 153, dated 4 October 2026"><b>Build 153</b><time datetime="2026-10-04">4 Oct 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
+      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 154, dated 4 October 2026"><b>Build 154</b><time datetime="2026-10-04">4 Oct 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
         <div class="builderActions"><div class="builderHistoryControls"><button class="builderBtn" id="builderUndo" disabled>↶ Undo <kbd>Ctrl Z</kbd></button><button class="builderBtn" id="builderRedo" disabled>↷ Redo <kbd>Ctrl Y</kbd></button><button class="builderBtn" id="builderHistoryToggle" aria-expanded="false">History <span class="builderHistoryCount" id="builderHistoryCount">0</span></button></div><button class="builderBtn" id="builderLoadPath">Load selected path</button><button class="builderBtn" id="builderClear">Clear</button><button class="builderBtn" id="builderFailure">Open in Failure Lab</button><button class="builderBtn primary" id="builderUse">Use in explorer</button></div>
         <div class="builderPersistence"><select id="builderSaved" aria-label="Saved custom topologies"><option value="">Saved topologies</option></select><button class="builderBtn" id="builderSave">Save</button><button class="builderBtn" id="builderLoadSaved">Load</button><button class="builderBtn" id="builderImport">Import JSON</button><button class="builderBtn" id="builderExport">Export JSON</button><input id="builderImportFile" type="file" accept="application/json,.json" hidden></div>
@@ -7467,6 +7467,89 @@ document.title='Splunk Pipeline Explorer · Build 153 · 4 Oct 2026';
 $('#topologyBuilder').dataset.buildNumber='153';$('#topologyBuilder').dataset.buildDate='2026-10-04';
 const builderStamp153=$('.builderBuildStamp');
 if(builderStamp153){builderStamp153.setAttribute('aria-label','Build 153, dated 4 October 2026');builderStamp153.querySelector('b').textContent='Build 153';const date=builderStamp153.querySelector('time');if(date){date.dateTime='2026-10-04';date.textContent='4 Oct 2026'}}
+</script>
+<style id="builder-threat-polish-v154-styles">
+.tmFigure150 .tmPillLeader154{fill:none;stroke:#d2e9ef;stroke-width:1.3;stroke-dasharray:2 3;pointer-events:none}
+.tmFigure150 .tmFlowPill152{isolation:isolate}
+</style>
+<script id="builder-threat-polish-v154">
+/* Preserve recorded decisions, while assigning defaults to the actual control
+   on a flow, component or data store. The store has its own DFD identifier. */
+const builderThreatModelBefore154=builderThreatModel150;
+builderThreatModel150=function(){
+  const model=builderThreatModelBefore154(),byId=new Map(model.nodes.map(node=>[node.id,node]));
+  for(const edge of model.edges){
+    const key=edge.plane+':'+edge.id,from=byId.get(edge.from),to=byId.get(edge.to),details=ensureRelationshipDetails(edge.edge);
+    if(!from||!to)continue;
+    const mfa=edge.plane==='authentication'&&(builderThreatMfa152(edge.edge)||edge.edge.relation?.mfa==='inherited'&&[from,to].some(node=>node.providerMfa==='enforced'));
+    const buffered=!!(from.persistent||to.persistent||from.diskBuffer||to.diskBuffer||from.diskBufferEnabled||to.diskBufferEnabled);
+    const acknowledged=!!(from.ack||to.ack||/acknowledg/i.test(String(details.acknowledgement||'')));
+    const cloud=typeof builderIsCloudIndexer148==='function'&&[from,to].some(builderIsCloudIndexer148);
+    for(const threat of model.threats.filter(item=>item.target===key&&!state.builderThreatModel150.overrides[item.key])){
+      if(threat.category==='S'&&mfa)threat.status='Mitigated';
+      if(threat.category==='D'&&buffered&&(acknowledged||to.type==='syslog'))threat.status='Mitigated';
+      if(cloud&&['D','I'].includes(threat.category)){threat.status='Transferred';threat.owner='Splunk Cloud provider'}
+    }
+    if(mfa)builderThreatAdd152(model,'flow:'+key+':S-mfa','S',key,'Interactive sign-in requires a second factor.','Keep the factor enforced and audit sign-in decisions.','Medium','Mitigated');
+  }
+  for(const store of model.stores){
+    const node=byId.get(store.nodeId),key='store:'+store.id;
+    if(node?.type==='idx'&&typeof builderIsCloudIndexer148==='function'&&builderIsCloudIndexer148(node))
+      builderThreatAdd152(model,key+':I','I',key,'Provider-managed index storage can contain sensitive telemetry.','Confirm provider encryption, retention and access controls.','Medium','Transferred','Splunk Cloud provider');
+    if(['uf','hf'].includes(node?.type)&&node.persistent)
+      builderThreatAdd152(model,key+':I','I',key,'The forwarder host retains telemetry in its local queue.','Protect queue files and accept the documented residual exposure.','Low','Accepted');
+  }
+  for(const node of model.nodes.filter(item=>['uf','hf'].includes(item.type)&&!item.persistent))
+    builderThreatAdd152(model,'node:'+node.id+':I-buffer','I','node:'+node.id,'The forwarder host temporarily buffers events in memory.','Restrict access to the forwarder host and document the residual exposure.','Low','Accepted');
+  return model;
+};
+const builderThreatTargetBefore154=builderThreatTarget152;
+builderThreatTarget152=function(model,key){
+  if(key.startsWith('store:')){const store=model.stores.find(item=>'store:'+item.id===key);if(store)return model.elementIds.get(key)+' · '+store.name+' on '+componentInstanceLabel(model.nodes.find(node=>node.id===store.nodeId))}
+  return builderThreatTargetBefore154(model,key);
+};
+/* Place each identifier in clear space, and connect displaced pills back to
+   their own line. This also keeps close parallel flows distinguishable. */
+const builderThreatSvgBefore154=builderThreatSvg150;
+builderThreatSvg150=function(model){
+  const holder=document.createElement('div');holder.innerHTML=builderThreatSvgBefore154(model);
+  const svg=holder.querySelector('svg');if(!svg)return holder.innerHTML;
+  const width=Number(svg.getAttribute('width')),height=Number(svg.getAttribute('height')),shapeBoxes=[];
+  for(const group of svg.querySelectorAll('[data-key^="node:"]')){const box=builderThreatBox153(group);if(box)shapeBoxes.push(box)}
+  for(const store of svg.querySelectorAll('[data-key^="store:"]'))store.dataset.tmTarget=store.dataset.key;
+  const occupied=[],padding=5,intersects=(a,b)=>a.x<b.x+b.w+padding&&a.x+a.w+padding>b.x&&a.y<b.y+b.h+padding&&a.y+a.h+padding>b.y;
+  for(const group of svg.querySelectorAll('g[data-key]')){
+    const pill=group.querySelector('.tmFlowPill152'),path=group.querySelector('.tmFlow150');if(!pill||!path)continue;
+    const values=[...path.getAttribute('d').matchAll(/[ML]\s*(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)/g)].map(match=>({x:+match[1],y:+match[2]}));
+    const segments=values.slice(1).map((end,i)=>({a:values[i],b:end,length:Math.hypot(end.x-values[i].x,end.y-values[i].y)})).filter(segment=>segment.length>3).sort((a,b)=>b.length-a.length);
+    let chosen=null;
+    for(const offset of [0,-27,27,-46,46,-67,67,-90,90]){
+      for(const segment of segments)for(const fraction of [.5,.3,.7,.15,.85]){
+        const point={x:segment.a.x+(segment.b.x-segment.a.x)*fraction,y:segment.a.y+(segment.b.y-segment.a.y)*fraction};
+        const horizontal=Math.abs(segment.b.x-segment.a.x)>=Math.abs(segment.b.y-segment.a.y);
+        const box={x:point.x-22+(horizontal?0:offset),y:point.y-12+(horizontal?offset:0),w:44,h:23};
+        if(box.x<2||box.y<2||box.x+box.w>width-2||box.y+box.h>height-2)continue;
+        if(shapeBoxes.some(shape=>intersects(box,shape))||occupied.some(other=>intersects(box,other)))continue;
+        chosen={box,point,offset};break;
+      }
+      if(chosen)break;
+    }
+    if(!chosen)continue;
+    pill.setAttribute('transform',`translate(${chosen.box.x} ${chosen.box.y})`);occupied.push(chosen.box);
+    if(chosen.offset){const leader=document.createElementNS('http://www.w3.org/2000/svg','path');leader.setAttribute('class','tmPillLeader154');leader.setAttribute('d',`M${chosen.point.x} ${chosen.point.y}L${chosen.box.x+22} ${chosen.box.y+11.5}`);group.insertBefore(leader,pill)}
+  }
+  return holder.innerHTML;
+};
+/* The rail owns its own counter; update its singular grammar at the source. */
+const builderSpaceRailBefore154=builderSpaceRail140;
+builderSpaceRail140=function(){const result=builderSpaceRailBefore154(),summary=validateItems.parentElement?.querySelector('summary'),count=builderFindingSummary().errors;if(summary){const badge=summary.querySelector('.builderSpaceValidation140');if(badge&&count)badge.textContent=count+' '+(count===1?'error':'errors');summary.title=count+' '+(count===1?'error':'errors')+' · '+builderFindingSummary().review+' to review'}return result};
+const builderThreatPageBefore154=builderThreatPage150;
+builderThreatPage150=function(...args){const page=builderThreatPageBefore154(...args),root=document.createElement('div');root.innerHTML=page.content;for(const row of root.querySelectorAll('tr[data-tm-target]')){if(row.hasAttribute('data-tm-stride'))continue;const cell=row.children[7];if(cell){const unique=[...new Set(cell.textContent.split(',').map(value=>value.trim()).filter(Boolean))];cell.textContent=unique.join(', ')}}page.content=root.innerHTML;return page};
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['TM-1 decisions and identifiers','Keep store and flow decisions data-driven, space DFD identifiers clear of shapes and fix review counter grammar.',true]);
+document.title='Splunk Pipeline Explorer · Build 154 · 4 Oct 2026';
+$('#topologyBuilder').dataset.buildNumber='154';$('#topologyBuilder').dataset.buildDate='2026-10-04';
+const builderStamp154=$('.builderBuildStamp');
+if(builderStamp154){builderStamp154.setAttribute('aria-label','Build 154, dated 4 October 2026');builderStamp154.querySelector('b').textContent='Build 154';const date=builderStamp154.querySelector('time');if(date){date.dateTime='2026-10-04';date.textContent='4 Oct 2026'}}
 </script>
 </body>
 </html>
