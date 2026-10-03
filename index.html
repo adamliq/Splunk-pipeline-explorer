@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 152 · 4 Oct 2026</title>
+  <title>Splunk Pipeline Explorer · Build 153 · 4 Oct 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,9 +202,9 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="152" data-build-date="2026-10-04">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="153" data-build-date="2026-10-04">
     <div class="builderHead">
-      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 152, dated 4 October 2026"><b>Build 152</b><time datetime="2026-10-04">4 Oct 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
+      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 153, dated 4 October 2026"><b>Build 153</b><time datetime="2026-10-04">4 Oct 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
         <div class="builderActions"><div class="builderHistoryControls"><button class="builderBtn" id="builderUndo" disabled>↶ Undo <kbd>Ctrl Z</kbd></button><button class="builderBtn" id="builderRedo" disabled>↷ Redo <kbd>Ctrl Y</kbd></button><button class="builderBtn" id="builderHistoryToggle" aria-expanded="false">History <span class="builderHistoryCount" id="builderHistoryCount">0</span></button></div><button class="builderBtn" id="builderLoadPath">Load selected path</button><button class="builderBtn" id="builderClear">Clear</button><button class="builderBtn" id="builderFailure">Open in Failure Lab</button><button class="builderBtn primary" id="builderUse">Use in explorer</button></div>
         <div class="builderPersistence"><select id="builderSaved" aria-label="Saved custom topologies"><option value="">Saved topologies</option></select><button class="builderBtn" id="builderSave">Save</button><button class="builderBtn" id="builderLoadSaved">Load</button><button class="builderBtn" id="builderImport">Import JSON</button><button class="builderBtn" id="builderExport">Export JSON</button><input id="builderImportFile" type="file" accept="application/json,.json" hidden></div>
@@ -7235,16 +7235,19 @@ function builderThreatLines152(value,max=18){
   return lines.slice(0,4);
 }
 builderThreatSvg150=function(model){
-  const esc=builderV125Text125,zoneWidth=300,gap=54,margin=22,positions=new Map(),zoneRects=new Map();
+  const esc=builderV125Text125,zoneWidth=336,gap=54,margin=22,positions=new Map(),zoneRects=new Map();
   let height=260;
+  const zoneHeight=zone=>76+Math.ceil(zone.nodes.length/2)*150+(zone.stores?.length||0)*39+18;
+  const firstRowHeight=Math.max(0,...model.zones.slice(0,3).map(zoneHeight));
   model.zones.forEach((zone,index)=>{
-    const x=margin+index*(zoneWidth+gap),rows=Math.ceil(zone.nodes.length/2),h=76+rows*150+(zone.stores?.length||0)*39+18;
-    zoneRects.set(zone.key,{x,y:38,w:zoneWidth,h});
-    height=Math.max(height,38+h+24);
-    zone.nodes.forEach((node,i)=>positions.set(node.id,{x:x+12+(i%2)*142,y:114+Math.floor(i/2)*150,cx:x+78+(i%2)*142,cy:180+Math.floor(i/2)*150,r:59}));
-    zone.stores?.forEach((item,i)=>positions.set('store:'+item.id,{x:x+18,y:114+rows*150+i*39,w:zoneWidth-36,h:29}));
+    const row=index<3?0:1+Math.floor((index-3)/3),column=index<3?index:(index-2)%3;
+    const x=margin+column*(zoneWidth+gap),y=38+row*(firstRowHeight+28),rows=Math.ceil(zone.nodes.length/2),h=zoneHeight(zone);
+    zoneRects.set(zone.key,{x,y,w:zoneWidth,h});
+    height=Math.max(height,y+h+24);
+    zone.nodes.forEach((node,i)=>positions.set(node.id,{x:x+12+(i%2)*178,y:y+76+Math.floor(i/2)*150,cx:x+77+(i%2)*178,cy:y+142+Math.floor(i/2)*150,r:59}));
+    zone.stores?.forEach((item,i)=>positions.set('store:'+item.id,{x:x+18,y:y+76+rows*150+i*39,w:zoneWidth-36,h:29}));
   });
-  const width=Math.max(780,margin+model.zones.length*(zoneWidth+gap));
+  const width=Math.max(780,margin+Math.min(3,model.zones.length)*(zoneWidth+gap));
   const frames=model.zones.map(zone=>{
     const r=zoneRects.get(zone.key),name=builderThreatLines152(zone.name,35);
     return `<g><rect class="tmZone150${zone.managed?' managed':''}" x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" rx="7"/><text x="${r.x+10}" y="${r.y+22}" font-weight="700">${esc(name[0])}</text><text class="tmSmall150" x="${r.x+10}" y="${r.y+43}">${zone.managed?'Provider managed':'Trust boundary'}</text></g>`;
@@ -7291,7 +7294,7 @@ builderThreatPage150=function(editable=false){
     const count=model.threats.filter(t=>t.category===chip.dataset.tmFilter&&t.status==='Open').length,badge=document.createElement('span');
     badge.className='tmCount152'+(count?'':' zero');badge.textContent=String(count);chip.append(badge);
   }
-  const crossingRows=[...root.querySelectorAll('.tmScroll150 table:first-child tbody tr[data-tm-target]')];
+  const crossingRows=[...root.querySelector('.tmScroll150')?.querySelectorAll('tbody tr[data-tm-target]')||[]];
   for(const row of crossingRows){
     const crossing=model.crossings.find(c=>c.key===row.dataset.tmTarget);if(!crossing)continue;
     row.dataset.key=crossing.key;row.children[1].textContent=model.flowIds.get(crossing.key);
@@ -7321,7 +7324,11 @@ builderOvRender135=function(...args){
 };
 const builderThreatRulesBefore152=evaluateArchitectureRules;
 evaluateArchitectureRules=function(...args){
-  const results=builderThreatRulesBefore152(...args),open=builderThreatModel150().threats.filter(t=>t.status==='Open'&&t.risk==='High');
+  const results=builderThreatRulesBefore152(...args);
+  /* Ordinary canvas redraws request rules repeatedly; seed TM-1 only when
+     the validation drawer is open, or from the TM-1/pack render path. */
+  if(state.view==='builder'&&!state.builderRules?.open)return results;
+  const open=builderThreatModel150().threats.filter(t=>t.status==='Open'&&t.risk==='High');
   if(open.length){
     results.push({id:'TM-OPEN-HIGH',title:'Open high-risk threats',severity:'High',description:open.length+' high-risk threat'+(open.length===1?'':'s')+' require a recorded decision.',status:'fail',evidence:open.map(t=>t.title),nodes:[],edges:[]});
     const unowned=open.filter(t=>!t.owner);
@@ -7334,6 +7341,132 @@ document.title='Splunk Pipeline Explorer · Build 152 · 4 Oct 2026';
 $('#topologyBuilder').dataset.buildNumber='152';$('#topologyBuilder').dataset.buildDate='2026-10-04';
 const builderStamp152=$('.builderBuildStamp');
 if(builderStamp152){builderStamp152.setAttribute('aria-label','Build 152, dated 4 October 2026');builderStamp152.querySelector('b').textContent='Build 152';const date=builderStamp152.querySelector('time');if(date){date.dateTime='2026-10-04';date.textContent='4 Oct 2026'}}
+</script>
+<style id="builder-threat-layout-v153-styles">
+.tmFigure150 .tmFlowPill152{pointer-events:all}
+.tmFigure150 .tmFlowPill152 text{font-size:11px}
+.tmPage150 .tmRetired152 code{overflow-wrap:anywhere}
+</style>
+<script id="builder-threat-layout-v153">
+/* Re-evaluate defaults from the stored controls; explicit review decisions win. */
+const builderThreatModelBefore153=builderThreatModel150;
+builderThreatModel150=function(){
+  const model=builderThreatModelBefore153(),nodes=new Map(model.nodes.map(n=>[n.id,n]));
+  for(const edge of model.edges){
+    const from=nodes.get(edge.from),to=nodes.get(edge.to),key=edge.plane+':'+edge.id;
+    const d=ensureRelationshipDetails(edge.edge),auth=String(d.authenticationType||'');
+    const credentials=d.forwarderCredentialsApp==='Yes'||/certificate|mutual TLS/i.test(auth);
+    const mfa=edge.plane==='authentication'&&edge.edge.relation?.mfa==='enforced';
+    const queued=!!(from?.persistent||to?.persistent||from?.diskBuffer||to?.diskBuffer);
+    const ack=/acknowledg/i.test(String(d.acknowledgement||''))||!!(from?.ack||to?.ack);
+    for(const threat of model.threats.filter(t=>t.target===key&&!state.builderThreatModel150.overrides[t.key])){
+      if(threat.category==='S'&&(credentials||mfa))threat.status='Mitigated';
+      if(threat.category==='D'&&queued&&(ack||to?.type==='syslog'))threat.status='Mitigated';
+      if(typeof builderIsCloudIndexer148==='function'&&builderIsCloudIndexer148(to)&&threat.category==='I'){
+        threat.status='Transferred';threat.owner='Splunk Cloud provider';
+      }
+    }
+    if(mfa)builderThreatAdd152(model,'flow:'+key+':S-mfa','S',key,'Interactive sign-in requires the recorded second factor.','Keep MFA enforced and audit sign-in decisions.','Medium','Mitigated');
+    if(credentials&&/S2S|Splunk.to.Splunk/i.test(String(d.protocol||edge.edge.label||'')))
+      builderThreatAdd152(model,'flow:'+key+':S-verified','S',key,'Forwarder certificate authenticates the receiving peer.','Maintain certificate trust and rotation.','Medium','Mitigated');
+  }
+  for(const node of model.nodes){
+    const key='node:'+node.id,managed=typeof builderIsCloudIndexer148==='function'&&builderIsCloudIndexer148(node);
+    for(const threat of model.threats.filter(t=>t.target===key&&!state.builderThreatModel150.overrides[t.key])){
+      if(managed){threat.status='Transferred';threat.owner='Splunk Cloud provider'}
+      else if(['uf','hf'].includes(node.type)&&node.persistent&&threat.category==='I'){threat.status='Accepted';threat.risk='Low'}
+    }
+    if(['uf','hf'].includes(node.type)&&node.persistent)
+      builderThreatAdd152(model,key+':I-forwarder-queue','I',key,'The forwarder keeps event data on its host while queued.','Protect local queue storage and document the accepted residual exposure.','Low','Accepted');
+  }
+  return model;
+};
+function builderThreatBox153(group){
+  const circle=group.querySelector('circle.tmProcess152');
+  if(circle){const x=+circle.getAttribute('cx'),y=+circle.getAttribute('cy'),r=+circle.getAttribute('r');return{x:x-r,y:y-r,w:2*r,h:2*r,cx:x,cy:y,r}}
+  const rect=group.querySelector('rect.tmNode150');
+  if(rect){const x=+rect.getAttribute('x'),y=+rect.getAttribute('y'),w=+rect.getAttribute('width'),h=+rect.getAttribute('height');return{x,y,w,h,cx:x+w/2,cy:y+h/2,r:Math.min(w,h)/2}}
+  return null;
+}
+function builderThreatSegmentHit153(a,b,r){
+  const pad=5,x=r.x-pad,y=r.y-pad,w=r.w+2*pad,h=r.h+2*pad;
+  if(Math.abs(a.x-b.x)<.01)return a.x>x&&a.x<x+w&&Math.max(a.y,b.y)>y&&Math.min(a.y,b.y)<y+h;
+  if(Math.abs(a.y-b.y)<.01)return a.y>y&&a.y<y+h&&Math.max(a.x,b.x)>x&&Math.min(a.x,b.x)<x+w;
+  return false;
+}
+function builderThreatRoute153(a,b,obstacles,width,height){
+  const horizontal=Math.abs(b.cx-a.cx)>=Math.abs(b.cy-a.cy),right=b.cx>=a.cx,down=b.cy>=a.cy;
+  const start=horizontal?{x:right?a.x+a.w:a.x,y:a.cy}:{x:a.cx,y:down?a.y+a.h:a.y};
+  const end=horizontal?{x:right?b.x:b.x+b.w,y:b.cy}:{x:b.cx,y:down?b.y:b.y+b.h};
+  const stubA=horizontal?{x:start.x+(right?15:-15),y:start.y}:{x:start.x,y:start.y+(down?15:-15)};
+  const stubB=horizontal?{x:end.x+(right?-15:15),y:end.y}:{x:end.x,y:end.y+(down?-15:15)};
+  const xChannels=[(stubA.x+stubB.x)/2,...obstacles.flatMap(r=>[r.x-18,r.x+r.w+18])].filter(x=>x>8&&x<width-8);
+  const yChannels=[(stubA.y+stubB.y)/2,...obstacles.flatMap(r=>[r.y-18,r.y+r.h+18])].filter(y=>y>8&&y<height-8);
+  const candidates=[
+    ...xChannels.map(x=>[start,stubA,{x,y:stubA.y},{x,y:stubB.y},stubB,end]),
+    ...yChannels.map(y=>[start,stubA,{x:stubA.x,y},{x:stubB.x,y},stubB,end])
+  ];
+  let best=null,scoreBest=Infinity;
+  for(const points of candidates){
+    let hits=0,length=0;
+    for(let i=1;i<points.length;i++){
+      const p=points[i-1],q=points[i];length+=Math.abs(q.x-p.x)+Math.abs(q.y-p.y);
+      if(i>1&&i<points.length-1)hits+=obstacles.filter(r=>builderThreatSegmentHit153(p,q,r)).length;
+    }
+    const score=hits*1e6+length;
+    if(score<scoreBest){scoreBest=score;best=points}
+    if(!hits&&length<240)break;
+  }
+  return best||[start,end];
+}
+function builderThreatPill153(points,boxes,placed){
+  const segments=points.slice(1).map((p,i)=>({a:points[i],b:p,len:Math.abs(p.x-points[i].x)+Math.abs(p.y-points[i].y)})).filter(s=>s.len>20).sort((a,b)=>b.len-a.len);
+  let best=null,bestScore=Infinity;
+  for(const segment of segments)for(const fraction of [.5,.3,.7])for(const offset of [0,-19,19]){
+    const x=segment.a.x+(segment.b.x-segment.a.x)*fraction+(segment.a.x===segment.b.x?offset:0);
+    const y=segment.a.y+(segment.b.y-segment.a.y)*fraction+(segment.a.y===segment.b.y?0:offset);
+    const box={x:x-22,y:y-12,w:44,h:23};
+    const overlap=r=>box.x<r.x+r.w&&box.x+box.w>r.x&&box.y<r.y+r.h&&box.y+box.h>r.y;
+    const score=boxes.filter(overlap).length*1000+placed.filter(overlap).length*100+Math.abs(offset)+Math.abs(fraction-.5)*10;
+    if(score<bestScore){bestScore=score;best=box}
+    if(!score)break;
+  }
+  return best||{x:points[0].x-22,y:points[0].y-30,w:44,h:23};
+}
+const builderThreatSvgBefore153=builderThreatSvg150;
+builderThreatSvg150=function(model){
+  const holder=document.createElement('div');holder.innerHTML=builderThreatSvgBefore153(model);
+  const svg=holder.querySelector('svg');if(!svg)return holder.innerHTML;
+  const width=+svg.getAttribute('width'),height=+svg.getAttribute('height'),boxes=new Map(),placed=[];
+  for(const group of svg.querySelectorAll('[data-key^="node:"]'))boxes.set(group.dataset.key,builderThreatBox153(group));
+  const all=[...boxes.values()].filter(Boolean);
+  for(const edge of model.edges){
+    const key=edge.plane+':'+edge.id,group=[...svg.querySelectorAll('.tmFlow150')].map(p=>p.parentElement).find(g=>g.dataset.key===key);
+    const a=boxes.get('node:'+edge.from),b=boxes.get('node:'+edge.to);
+    if(!group||!a||!b)continue;
+    const route=builderThreatRoute153(a,b,all,width,height),path=group.querySelector('.tmFlow150');
+    path?.setAttribute('d',route.map((p,i)=>(i?'L':'M')+p.x+' '+p.y).join(' '));
+    const pill=group.querySelector('.tmFlowPill152'),spot=builderThreatPill153(route,all,placed);
+    if(pill){pill.setAttribute('transform','translate('+spot.x+' '+spot.y+')');placed.push(spot)}
+  }
+  return holder.innerHTML;
+};
+/* Grammar and button help are refreshed after every Builder render. */
+const builderRenderBefore153=renderBuilder;
+renderBuilder=function(...args){
+  const result=builderRenderBefore153(...args),bar=$('#builderValidation');
+  for(const selector of ['strong','b']){
+    const label=bar?.querySelector(selector);
+    if(label)label.textContent=label.textContent.replace(/\b1 errors\b/g,'1 error');
+  }
+  const use=$('#builderUse');if(use)use.title='Use this topology in the explorer';
+  return result;
+};
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['TM-1 register and layout','Keep STRIDE decisions editable, fit trust zones to the page and route flow labels around DFD shapes.',true]);
+document.title='Splunk Pipeline Explorer · Build 153 · 4 Oct 2026';
+$('#topologyBuilder').dataset.buildNumber='153';$('#topologyBuilder').dataset.buildDate='2026-10-04';
+const builderStamp153=$('.builderBuildStamp');
+if(builderStamp153){builderStamp153.setAttribute('aria-label','Build 153, dated 4 October 2026');builderStamp153.querySelector('b').textContent='Build 153';const date=builderStamp153.querySelector('time');if(date){date.dateTime='2026-10-04';date.textContent='4 Oct 2026'}}
 </script>
 </body>
 </html>
