@@ -1,5 +1,7 @@
 # Builder handoff: Build 149 review
 
+> **Still current.** Build 150 added only the threat model and fixed none of these items (the P0 included). See [`builder-handoff-build150.md`](builder-handoff-build150.md) for the threat-model review.
+
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Reviewed:** `main` at `7ef3f6d` (Build 149: `builder-shared-hosts-v147`, `builder-cloud-indexing-v148`, `builder-canvas-perf-v149`), also merged into branch `claude/build-page-layout-bl6jk1`
 **Specs this build implements:** `builder-handoff-shared-hosts.md`, `builder-handoff-splunk-cloud-indexing.md`, `builder-handoff-canvas-performance.md`. Open items from `builder-handoff-build141.md` still apply where not listed as done here.
