@@ -19,6 +19,13 @@ Still at 2, waiting for the owner's decision: Recovery calculator `state.recover
 
 ## Relationship lines on the default topology (not new in 165; same in 164)
 
+While checking, I also noticed a line problem on the default 4-card topology. It isn't new in 165: Build 164 draws exactly the same lines.
+
+- **Detour:** the Universal Forwarder 1 → Indexer 1 line goes up over the cards and back down, even though both ends are at the same height with 124px of clear space between them. The fix for this in 164 worked on the reference topology but not here. The likely cause is an old routing rule that picks a longer route so the "Splunk-to-Splunk" label has room.
+- **Small step:** the Syslog Server 1 → Universal Forwarder 1 line steps down 13px, because cards in the same row have different heights and lines attach at each card's middle.
+
+Details and fixes follow.
+
 All four default cards sit in one row (`y = 58`), but the routes are:
 ```
 Syslog Source 1 → Syslog Server 1   M241 141.5 … L365 141.5            straight ✅
