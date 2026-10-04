@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 158 · 4 Oct 2026</title>
+  <title>Splunk Pipeline Explorer · Build 159 · 4 Oct 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,7 +202,7 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="158" data-build-date="2026-10-04">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="159" data-build-date="2026-10-04">
     <div class="builderHead">
       <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 158, dated 4 October 2026"><b>Build 158</b><time datetime="2026-10-04">4 Oct 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
@@ -7942,6 +7942,61 @@ builderThreatSvg150=function(model){const original=builderThreatSvgBefore158(mod
 changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Query compatibility and unobstructed phone controls','Check selector parity in development builds, document earlier edits, centre phone Fit on cards and reserve separate space for zoom and an optional minimap.',true]);
 document.title='Splunk Pipeline Explorer · Build 158 · 4 Oct 2026';$('#topologyBuilder').dataset.buildNumber='158';
 const stamp158=$('.builderBuildStamp');if(stamp158){stamp158.setAttribute('aria-label','Build 158, dated 4 October 2026');stamp158.querySelector('b').textContent='Build 158'}
+</script>
+<style id="builder-phone-space-v159-styles">
+@media(max-width:600px){
+ body[data-view="builder"] .toolbar .seg{display:flex;flex-wrap:nowrap;overflow-x:auto;max-width:100%;min-width:0;width:100%;box-sizing:border-box}
+ body[data-view="builder"] .toolbar .seg button{flex:0 0 auto;white-space:nowrap}
+ #topologyBuilder .builderBuildTitle{display:flex!important;flex-wrap:nowrap!important;gap:5px;align-items:center}
+ #topologyBuilder .builderBuildTitle h2{font-size:15px!important;white-space:nowrap}
+ #topologyBuilder .builderBuildStamp{white-space:nowrap;margin:0}
+ #topologyBuilder .builderBuildStamp time,#topologyBuilder .builderHead>div:first-child>p:not(.builderInfoText159){display:none!important}
+ #topologyBuilder .builderHead{margin-bottom:6px!important}
+ #topologyBuilder .builderInfo159{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;border:1px solid #466577;border-radius:50%;background:#102b3a;color:#d7ecf2}
+ #topologyBuilder .builderInfoText159{margin:0;padding:8px;color:#b2c6d4;font-size:12px}
+ #topologyBuilder .builderMobileMoreBody .builderGroupingControl130{position:static;width:auto;min-width:0;margin:0}
+ #topologyBuilder .builderMobileMoreBody .builderMobileFindToggle{display:block;width:100%}
+ #topologyBuilder .builderMobileMoreBody #builderSearchBar,#topologyBuilder .builderMobileMoreBody #builderLargeNav{max-width:100%;min-width:0;margin:0}
+ #topologyBuilder .builderMobileMoreBody .builderFind159:not([open]){display:none}
+ #topologyBuilder .builderPhoneFooter158{grid-template-columns:minmax(0,1fr) 36px 64px}
+ #topologyBuilder .builderPhoneFooter158 .builderMinimap{grid-column:3}
+ #topologyBuilder .builderMap159{display:block;grid-row:1;grid-column:2;width:32px;height:32px;padding:0;border:1px solid #466577;border-radius:7px;background:#102b3a;color:#d7ecf2}
+}
+.builderInfo159,.builderInfoText159,.builderMap159{display:none}
+</style>
+<script id="builder-phone-space-and-margin-v159">
+/* v159: scoped wrappers keep prior build records intact. */
+const builderInfo159=document.createElement('button'),builderInfoText159=document.createElement('p');
+builderInfo159.type='button';builderInfo159.className='builderInfo159';builderInfo159.textContent='ⓘ';builderInfo159.setAttribute('aria-label','About Builder');builderInfo159.setAttribute('aria-expanded','false');builderInfoText159.className='builderInfoText159';builderInfoText159.id='builderInfoText159';builderInfoText159.hidden=true;builderInfoText159.textContent=$('.builderHead>div:first-child>p')?.textContent||'';builderInfo159.setAttribute('aria-controls',builderInfoText159.id);builderInfo159.onclick=()=>{builderInfoText159.hidden=!builderInfoText159.hidden;builderInfoText159.style.display=builderInfoText159.hidden?'none':'block';builderInfo159.setAttribute('aria-expanded',String(!builderInfoText159.hidden))};$('.builderBuildTitle').appendChild(builderInfo159);$('.builderHead>div:first-child').appendChild(builderInfoText159);
+const builderMap159=document.createElement('button');builderMap159.type='button';builderMap159.className='builderMap159';builderMap159.textContent='▧';builderMap159.title='Show minimap';builderMap159.setAttribute('aria-label','Show minimap');builderMap159.setAttribute('aria-pressed','false');builderPhoneFooter158.appendChild(builderMap159);builderMap159.onclick=()=>builderPhoneMapToggle158.click();builderPhoneMapToggle158.addEventListener('click',()=>{const shown=builderPhoneFooter158.classList.contains('phoneMapShown158');builderMap159.setAttribute('aria-pressed',String(shown));builderMap159.setAttribute('aria-label',shown?'Hide minimap':'Show minimap');builderMap159.title=shown?'Hide minimap':'Show minimap'});
+const builderPhoneMoves159=new Map();
+function builderPhoneMove159(node,parent){if(!node)return;if(!builderPhoneMoves159.has(node)){const marker=document.createComment('v159 phone chrome original position');node.before(marker);builderPhoneMoves159.set(node,marker)}if(node.parentElement!==parent)parent.appendChild(node)}
+const builderFind159=document.createElement('div');builderFind159.className='builderFind159';builderFind159.hidden=true;
+function builderPhoneChrome159(){if(builderPhoneMedia158.matches){builderPhoneMove159(builderMobileFind,builderMobileMoreBody);if(!builderFind159.isConnected)builderMobileMoreBody.appendChild(builderFind159);for(const selector of ['#builderSearchBar','#builderLargeNav'])builderPhoneMove159($(selector),builderFind159);builderPhoneMove159($('#builderGroupBy130')?.closest('.builderGroupingControl130'),builderMobileMoreBody);$('.builderBuildTitle h2').textContent='Builder ·';}else{for(const [node,marker] of builderPhoneMoves159)if(marker.isConnected)marker.replaceWith(node);builderPhoneMoves159.clear();builderFind159.remove();builderInfoText159.hidden=true;builderInfoText159.style.display='none';builderInfo159.setAttribute('aria-expanded','false');builderMap159.setAttribute('aria-pressed','false')}}
+const builderFindBefore159=builderMobileFind.onclick;builderMobileFind.onclick=function(...args){const result=builderFindBefore159.apply(this,args);if(builderPhoneMedia158.matches){const open=$('.builderWorkspace').classList.contains('builderMobileFindOpen');builderFind159.hidden=!open;builderFind159.toggleAttribute('open',open)}return result};
+const builderGroupingChromeBefore159=builderGroupingChrome131;builderGroupingChrome131=function(...args){const result=builderGroupingChromeBefore159(...args);if(builderPhoneMedia158.matches)builderPhoneChrome159();return result};
+const builderPhoneControlsBefore159=builderPhoneControls158;builderPhoneControls158=function(...args){const result=builderPhoneControlsBefore159(...args);builderPhoneChrome159();return result};
+const builderPhoneHeightBefore159=builderPhoneHeight157;builderPhoneHeight157=function(...args){if(!builderPhoneMedia158.matches)return builderPhoneHeightBefore159(...args);if(state.view!=='builder')return;const c=$('.builderCanvas');if(!c)return;const viewport=window.visualViewport?.height||innerHeight,minimum=Math.max(320,viewport*.55),height=Math.max(minimum,viewport-Math.max(0,c.getBoundingClientRect().top)-92),value=Math.round(height)+'px';if(c.style.getPropertyValue('--builder-phone-height157')!==value)c.style.setProperty('--builder-phone-height157',value)};
+const builderFitBefore159=fitBuilderView;fitBuilderView=function(...args){if(builderPhoneMedia158.matches&&state.view==='builder'){builderPhoneChrome159();builderPhoneHeight157();$('.builderCanvas')?.scrollIntoView({block:'start',behavior:'instant'});}return builderFitBefore159(...args)};
+window.addEventListener('resize',()=>{builderPhoneChrome159();builderPhoneHeight157()});builderPhoneMedia158.addEventListener('change',builderPhoneChrome159);
+/* v151 already tracks new text nodes. Coalesce nested mutation roots so each
+   new element is visited once, retaining the shared WeakSet and font floors. */
+polishBuilderText=function(){if(!builderTextPending151.size)return;const roots=[...builderTextPending151].filter(root=>root.isConnected);builderTextPending151.clear();const pending=new Set(roots);for(const root of roots){let parent=root.parentElement,covered=false;while(parent){if(pending.has(parent)){covered=true;break}parent=parent.parentElement}if(covered)continue;for(const element of [root,...root.querySelectorAll('*')]){if(builderPerfPolished149.has(element)||![...element.childNodes].some(n=>n.nodeType===Node.TEXT_NODE&&n.textContent.trim()))continue;builderPerfPolished149.add(element);element.dataset.polished='true';const font=parseFloat(getComputedStyle(element).fontSize),floor=element.closest('#builderTree')?11.5:10;if(font&&font<floor)element.style.fontSize=floor+'px'}}};
+/* Skip identical list markup while retaining existing event wiring. Mutation
+   invalidation handles external list edits without a stale signature. */
+const builderHTML159=Object.getOwnPropertyDescriptor(Element.prototype,'innerHTML');
+for(const id of ['builderUnresolvedPanel','builderRulesPanel']){const panel=document.getElementById(id);if(!panel)continue;let last=null;const observer=new MutationObserver(()=>{last=null});observer.observe(panel,{childList:true,subtree:true,characterData:true});Object.defineProperty(panel,'innerHTML',{configurable:true,get(){return builderHTML159.get.call(this)},set(value){if(observer.takeRecords().length)last=null;const next=String(value);if(next===last)return;builderHTML159.set.call(this,next);observer.takeRecords();last=next}})}
+/* Validation status changes only when its displayed findings change. */
+const builderText159=Object.getOwnPropertyDescriptor(Node.prototype,'textContent');for(const element of $$('#builderValidation strong,#builderValidation small,#builderValidation b,#builderValidation .builderValidationIcon'))Object.defineProperty(element,'textContent',{configurable:true,get(){return builderText159.get.call(this)},set(value){if(builderText159.get.call(this)!==String(value))builderText159.set.call(this,value)}});
+/* Header width fitting responds to actual size changes and disclosures, rather
+   than queued redraw callbacks. Rail badges still refresh when findings change. */
+const builderHeaderBefore159=builderHeaderFit142;let builderHeaderDirty159=true;
+builderHeaderFit142=function(...args){if(!builderHeaderDirty159)return;builderHeaderDirty159=false;return builderHeaderBefore159(...args)};
+function builderHeaderInvalidate159(){builderHeaderDirty159=true;requestAnimationFrame(()=>builderHeaderFit142())}window.addEventListener('resize',builderHeaderInvalidate159);$('#topologyBuilder').addEventListener('toggle',builderHeaderInvalidate159,true);if(typeof ResizeObserver==='function')new ResizeObserver(builderHeaderInvalidate159).observe($('.builderHead'));
+const builderRailBefore159=builderSpaceRail140;let builderRailSignature159='';builderSpaceRail140=function(...args){const signature=JSON.stringify([builderFindingSummary(),state.view,state.builderCanvasFocus,!!$('#builderGroupBar')?.closest('#builderSpaceGroups140'),builderSpaceMedia140.matches]);if(signature===builderRailSignature159)return;builderRailSignature159=signature;return builderRailBefore159(...args)};
+const builderAttachBefore159=builderSpaceAttach140;builderSpaceAttach140=function(...args){const result=builderAttachBefore159(...args);if(builderPhoneMedia158.matches)builderPhoneChrome159();return result};
+changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Phone canvas space and redraw margin','Keep at least 55% viewport height for the phone canvas, move navigation and grouping into More, expose minimap in the footer and avoid repeated text/list/header work.',true]);
+document.title='Splunk Pipeline Explorer · Build 159 · 4 Oct 2026';$('#topologyBuilder').dataset.buildNumber='159';const stamp159=$('.builderBuildStamp');if(stamp159){stamp159.setAttribute('aria-label','Build 159, dated 4 October 2026');stamp159.querySelector('b').textContent='Build 159'}builderPhoneChrome159();builderPhoneHeight157();
 </script>
 </body>
 </html>
