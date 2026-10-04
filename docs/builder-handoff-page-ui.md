@@ -8,6 +8,12 @@
 - Components palette, inspector and bottom bar;
 - widths from 600 to 2560.
 
+**Mockup:** [Builder Page Redesign](https://claude.ai/artifact/S6uCJh7g7eCMCQfdEXogNZ), a design canvas (private until the owner shares it). Its artboards:
+- an interactive 1440 desktop prototype: every header menu opens; Validate items open the right drawer; Analyze → Statistics opens the overlay; File → Clear canvas shows the confirmation, the empty state and Undo;
+- the drawer and Statistics states;
+- a sheet with every menu, the component menu, the Clear dialog and the rail panels;
+- the 1024×768 tablet layout.
+
 **Companion lists:**
 - [`builder-handoff-canvas-ux.md`](builder-handoff-canvas-ux.md): the canvas itself (layout, level of detail, card/connector UX).
 - [`builder-handoff-build162.md`](builder-handoff-build162.md): performance and hygiene.
@@ -109,7 +115,7 @@ The rail (⌕ ▤ ◇ ⚒ ▦) opens 440px popovers. Three of the five cut off t
 - **Width:** popovers at `min(600px, 45vw)`; content wraps (no `overflow:hidden` on text rows, `flex-wrap:wrap` on button rows). Or open rail panels in the same right drawer the analysis panels use (item 3).
 - **Labels:** show icon + label ("Find", "Profile", "Findings", "Tools", "Groups") at ≥ 1440, icon + tooltip below.
 - **Position:** place the rail **inside** `.builderCanvas` (`position:absolute`), so it never overlaps content outside the canvas.
-- **Duplicates:** fold Find into a header search field (item 4) and drop the rail's Review findings entry (Validate owns it). Keep Profile, Tools and Groups.
+- **Duplicates:** fold Find into a header search field (item 4), drop the rail's Review findings entry (Validate owns it), and move the architecture profile into the Validate menu ("Validating for: Splunk Enterprise · Change"). The rail keeps **Tools** and **Groups** only.
 
 **Check:**
 - For every rail panel, no element inside has `scrollWidth > clientWidth + 1` with hidden overflow.
