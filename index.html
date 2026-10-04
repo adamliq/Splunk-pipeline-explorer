@@ -7914,14 +7914,14 @@ builderPlaceLabels149=function(paths=null,{preview=false}={}){
   for(const perpendicular of preview?[0]:[0,-18,18,-32,32,-56,56,-80,80]){
    for(const fraction of fractions){const point=builderPerfPoint149(sample,fraction),a=builderPerfPoint149(sample,Math.max(0,fraction-.005)),b=builderPerfPoint149(sample,Math.min(1,fraction+.005)),horizontal=Math.abs(b.x-a.x)>=Math.abs(b.y-a.y);
     const box={x:point.x+offset.x-width/2+(horizontal?0:perpendicular),y:point.y+offset.y-11+(horizontal?perpendicular:0),w:width,h:22};
-    if(clear(box)&&(!builderPerfCrossings149(box,sample,cache)||preview)){const badge=badgeSpot(box);if(badge){chosen={box,point,badge};break}}
+    if(Math.hypot(box.x+width/2-point.x,box.y+11-point.y)<=60&&clear(box)&&(!builderPerfCrossings149(box,sample,cache)||preview)){const badge=badgeSpot(box);if(badge){chosen={box,point,badge};break}}
    }if(chosen)break;
   }
-  if(!chosen&&!preview){const point=builderPerfPoint149(sample,.5),a=cards.get(edge.from),b=cards.get(edge.to);if(a&&b)for(const y of [Math.min(a.y,b.y)-30,Math.max(a.y+a.h,b.y+b.h)+8]){const box={x:point.x-width/2,y,w:width,h:22};if(clear(box)&&!builderPerfCrossings149(box,sample,cache)){const badge=badgeSpot(box);if(badge){chosen={box,point,badge};break}}}}
+  if(!chosen&&!preview){const point=builderPerfPoint149(sample,.5),a=cards.get(edge.from),b=cards.get(edge.to);if(a&&b)for(const y of [Math.min(a.y,b.y)-30,Math.max(a.y+a.h,b.y+b.h)+8]){const box={x:point.x-width/2,y,w:width,h:22};if(Math.hypot(box.x+width/2-point.x,box.y+11-point.y)<=60&&clear(box)&&!builderPerfCrossings149(box,sample,cache)){const badge=badgeSpot(box);if(badge){chosen={box,point,badge};break}}}}
   const point=chosen?.point||builderPerfPoint149(sample,.5),box=chosen?.box;
   label.classList.remove('builderRouteDeferred146','builderRouteLabelHidden125');label.dataset.labelHidden=box?'false':'true';
   label.setAttribute('transform',`translate(${box?.x??point.x} ${box?.y??point.y})`);
-  if(box){placed.push(box);const cx=box.x+width/2,cy=box.y+11;if(Math.hypot(cx-point.x,cy-point.y)>15){const leader=document.createElementNS('http://www.w3.org/2000/svg','path');leader.setAttribute('class','builderLabelLeader157');leader.setAttribute('d',`M${point.x} ${point.y} L${cx} ${cy}`);leader.setAttribute('stroke','#8fb3c7');leader.setAttribute('stroke-width','1');leader.setAttribute('fill','none');leader.style.pointerEvents='none';svg.insertBefore(leader,svg.firstChild);label.dataset.labelLeader='true'}else label.dataset.labelLeader='false'}
+  if(box){placed.push(box);const cx=box.x+width/2,cy=box.y+11;if(Math.hypot(cx-point.x,cy-point.y)>15){const leader=document.createElementNS('http://www.w3.org/2000/svg','path');leader.setAttribute('class','builderLabelLeader157');leader.setAttribute('d',`M${point.x} ${point.y} L${cx} ${cy}`);leader.setAttribute('stroke','#8fb3c7');leader.setAttribute('stroke-width','1');leader.setAttribute('fill','none');leader.style.pointerEvents='none';leader.dataset.geometryEdge=key;svg.insertBefore(leader,svg.firstChild);label.dataset.labelLeader='true'}else label.dataset.labelLeader='false'}
   if(marker){if(marker.parentNode!==label)label.appendChild(marker);let badgePoint=chosen?.badge||point;
    if(!box)for(const f of fractions){const q=builderPerfPoint149(sample,f);if(clear({x:q.x-13,y:q.y-13,w:26,h:26})){badgePoint=q;break}}
    marker.setAttribute('transform',`translate(${badgePoint.x-(box?.x??point.x)} ${badgePoint.y-(box?.y??point.y)})`);marker.setAttribute('tabindex','0');placed.push({x:badgePoint.x-13,y:badgePoint.y-13,w:26,h:26});
@@ -8389,7 +8389,7 @@ unifiedNodeMarkup=function(node,pos){let html=builderMarkupBefore163(node,pos);i
 function builderCards163(){const world=$('.unifiedBuilderWorld');if(!world)return;const short={ds:'Deployment Server',licenseManager:'Licensing',monitoringConsole:'Monitoring Console',soarCloud:'SOAR · cloud',soarOnPrem:'SOAR · on premises',authProviderCloud:'Identity provider · cloud',authProviderOnPrem:'Identity provider',uf:'Forwarding tier',hf:'Forwarding tier',awsLambda:'AWS collector'};
  for(const wrap of world.getElementsByClassName('unifiedNodeWrap')){const n=state.builderNodes.find(n=>n.id===Number(wrap.dataset.unifiedNodeWrap)),card=wrap.querySelector('.builderNode');if(!n||!card)continue;const tier=card.querySelector(':scope > small');if(tier){tier.title=tier.textContent;tier.textContent=short[n.type]||tier.textContent}for(const span of card.querySelector('.unifiedNodeMeta')?.children||[]){if(span.textContent.trim()==='Unspecified'&&span===card.querySelector('.unifiedNodeMeta')?.children[1]){span.textContent='Region not set';span.classList.add('builderRegionUnset163')}}card.querySelector('strong')?.setAttribute('title',componentInstanceLabel(n));for(const stage of card.getElementsByClassName('builderStageMini'))stage.title=stage.textContent;
  }
- for(const label of world.getElementsByClassName('builderUnconnectedLane'))label.remove();const layout=unifiedBuilderPositions();if(layout.compact163){const title=document.createElement('span');title.className='builderBandTitle163';title.textContent='Platform and access';title.style.left=(layout.bandX??64)+'px';title.style.top=(layout.bandY!==null?layout.bandY-38:24)+'px';world.appendChild(title);if(layout.trayIds.length){const first=layout.positions.get(layout.trayIds[0]),tray=document.createElement('span');tray.className='builderBandTitle163 builderTrayTitle163';tray.textContent='Unconnected · drag to connect';tray.style.left=first.x+'px';tray.style.top=(first.y-20)+'px';world.appendChild(tray)}}else{const loose=builderFinalLooseNodes122();if(loose.length&&layout.mode!=='free'){const p=layout.positions.get(loose[0].id);if(p){const label=document.createElement('span');label.className='builderUnconnectedLane';label.textContent='Unconnected · drag to connect';label.style.left=p.x+'px';label.style.top=(p.y-24)+'px';world.appendChild(label)}}}
+ for(const label of world.getElementsByClassName('builderUnconnectedLane'))label.remove();const layout=unifiedBuilderPositions();if(layout.compact163){const title=document.createElement('span');title.className='builderBandTitle163';title.textContent='Platform and access';title.style.left=(layout.bandX??64)+'px';title.style.top=(layout.bandY!==null?layout.bandY-38:24)+'px';world.appendChild(title);if(layout.trayIds.length){const first=layout.positions.get(layout.trayIds[0]),tray=document.createElement('span');tray.className='builderBandTitle163 builderTrayTitle163';tray.textContent='';tray.style.left=first.x+'px';tray.style.top=(first.y-20)+'px';world.appendChild(tray)}}else{const loose=builderFinalLooseNodes122();if(loose.length&&layout.mode!=='free'){const p=layout.positions.get(loose[0].id);if(p){const label=document.createElement('span');label.className='builderUnconnectedLane';label.textContent='Unconnected · drag to connect';label.style.left=p.x+'px';label.style.top=(p.y-24)+'px';world.appendChild(label)}}}
  builderLod163();
 }
 function builderStrips163(){const guide=$('#builderSoarGuide');if(guide){const summary=guide.querySelector('summary');if(summary){summary.className='builderSoarSummary163';builderSetText160(summary,'SOAR · '+state.builderNodes.filter(n=>n.type==='soarPlaybook').length+' playbooks ⓘ')}if(guide.parentElement!==builderCanvas)builderCanvas.append(guide)}
@@ -8610,5 +8610,87 @@ builderPageControls163();builderRenderObserver160.takeRecords();
 }
 @media(min-width:1440px){body[data-view="builder"] .builderDensityDock>:is(.builderDensityToggle,.builderSpaceGroupToggle140):before{display:block!important;content:attr(data-icon);font-size:15px;line-height:1}}
 </style>
+
+<!--
+# Build 164: relationship lines
+
+Implements `builder-handoff-build163-lines.md` on top of Build 163.
+
+- Clear same-row hops in the larger architecture use one horizontal segment before detour search. Card geometry, rather than label reservations, controls routing. The small default horizontal topology keeps its Build 163 rendering for pixel compatibility.
+- Data ports stay at side midpoints. Management uses top/bottom ports or side positions at two-thirds height; access uses one-third side positions. Manual waypoints, phone routing and shared-host routing retain their existing behavior.
+- Deployment Server branches share their existing trunk but use distinct incoming ports. The one bundle label includes `· 3 clients`; its complete width is considered during placement.
+- Leaders are capped at 60 world pixels and rejected if they cross another connector. If no placement fits, protocol details remain in the connector tooltip and its finding badge stays on the line.
+- At medium/low zoom, badges use cached path samples. Zoom changes update transforms without replacing paths or markers; label-anchored transforms return at full zoom or label hover.
+- Card selection dims unrelated relationships to 40%; edge selection and hover remain independently usable. Clearing selection restores all lines.
+- The overlapping unconnected heading is removed from the compact band. Tray cards say `Not connected`.
+- Build stamp, document title and change register identify Build 164, 5 October 2026.
+
+## Validation
+
+- Connector checker: all 10 scenarios pass, including the reference topology at Fit and 100%, distinct incoming and cross-plane endpoints, no cross-plane parallel overlap within 4px for more than 12px, straight clear same-row hops, labels within 60px, leaders crossing no connector, and Fit badges within 3px.
+- Intentional shared same-plane bundle source endpoints are exempt from the endpoint uniqueness assertion; all other endpoint pairs must differ.
+- Reference Fit: 57.54%; maximum badge distance 0.305px. At 100%, maximum visible label distance 32.000px.
+- Direct HEC and same-band SAML labels use the hidden-label fallback where the available gap is too short. Bundle branches hide duplicate labels.
+- Canvas space: 7/7 sizes pass (768 through 2560).
+- Full regression checker: passes revision tracking, reuse, same-ID imports, clone/undo/redo, host/provider changes, threat geometry/export, phone widths and control restoration; no page errors.
+- Interaction check: zoom retains path/marker DOM, moves badges to the line and restores label anchors; switching from card to edge selection and clearing selection pass.
+- Default canvas at 1440×900: pixel-identical to Build 163 (0 changed pixels in the 1160×368 world capture).
+- Three consecutive performance runs pass the unchanged 40/50/80/120ms budgets, including changed and moved redraws. Medians below are changed/moved in ms.
+
+| Scenario | Run 1 | Run 2 | Run 3 | Budget |
+|---|---:|---:|---:|---:|
+| default | 17/18 | 19/19 | 21/19 | 40 |
+| fan5 | 25/21 | 26/22 | 25/25 | 50 |
+| fan8 | 48/36 | 50/35 | 58/36 | 80 |
+| reference | 42/55 | 42/52 | 50/50 | 120 |
+-->
+<style id="builder-lines-v164-styles">
+.builderTrayTitle163{display:none!important}
+#topologyBuilder #builderTree .unifiedBuilderWorld.builderLodMedium163 .builderBand.builderNotConnected164{display:block!important;font-size:clamp(13px,calc(11px / var(--builder-zoom163)),20px)!important;line-height:23px!important;text-transform:none!important;letter-spacing:normal!important;font-weight:500!important}
+</style>
+<script id="builder-lines-v164">
+/* Routes depend on card geometry only. A short clear hop wins before label placement. */
+function builderLegacyDefault164(){return state.builderNodes.length<=5&&resolvedUnifiedLayoutMode()==='horizontal'}
+const builderRouteBefore164=builderV123RouteBetween;
+builderV123RouteBetween=function(start,end,boxes,style,avoid,labelNeed=0){
+ if(builderLegacyDefault164())return builderRouteBefore164(start,end,boxes,style,avoid,labelNeed);
+ if((Math.abs(start.x-end.x)<.1||Math.abs(start.y-end.y)<.1)&&!boxes.some(b=>builderV123Intersects(start,end,builderV123Pad(b,-.5))))return[start,end];
+ return builderRouteBefore164(start,end,boxes,style,avoid,0);
+};
+const builderRelationshipBefore164=relationshipPath;
+relationshipPath=function(item,positions){
+ if(builderLegacyDefault164()||builderMarkup157||builderPhoneMedia158.matches||state.builderHosts.length||!positions.has(item.from)||!positions.has(item.to))return builderRelationshipBefore164(item,positions);
+ const routing=ensureRelationshipRouting(item.edge);if(routing.waypoints.length)return builderRelationshipBefore164(item,positions);
+ const source=builderCardBox(item.from,positions),target=builderCardBox(item.to,positions),boxes=state.builderNodes.filter(n=>positions.has(n.id)).map(n=>builderCardBox(n.id,positions));
+ const result=points=>{points=compactRoutePoints(points);const mid=routeMidpoint(points);return{points,d:routing.style==='curved'?builderV123RoundedPath(points):'M'+points.map(p=>p.x+' '+p.y).join(' L'),label:{x:mid.x+routing.labelOffset.x,y:mid.y+routing.labelOffset.y},routing}};
+ if(item.plane==='data'||item.plane==='authentication'){
+  const same=Math.abs(source.y+source.h/2-target.y-target.h/2)<.1,right=target.x>=source.x+source.w,left=source.x>=target.x+target.w;
+  if(same&&(right||left)){const y=source.y+source.h*(item.plane==='data'?.5:1/3),a={x:right?source.x+source.w+3:source.x-3,y},b={x:right?target.x-3:target.x+target.w+3,y};if(!boxes.some(box=>builderV123Intersects(a,b,builderV123Pad(box,-.5))))return result([a,b])}
+ }
+ if(!['management','authentication'].includes(item.plane))return builderRelationshipBefore164(item,positions);
+ const peers=builderBundleGroups163().get(item.from+'|'+item.plane+'|'+ensureRelationshipDetails(item.edge).protocol)||[];
+ const bundle=item.plane==='management'&&peers.length>1;
+ const sideA=target.y+target.h/2<source.y?'top':target.y>source.y+source.h?'bottom':target.x>source.x?'right':'left';
+ const port=(box,side,endpoint)=>{const point=builderV123SidePoint(box,side),rank=bundle&&endpoint==='from'?0:builderFanoutRank131(item,endpoint,positions);if(side==='left'||side==='right')point.y=box.y+box.h*(item.plane==='management'?2/3:1/3)+rank;else point.x+=rank;return point};
+ const out=builderV123Normal(sideA),border=port(source,sideA,'from'),a={x:border.x+out.x*3,y:border.y+out.y*3},joint={x:a.x+out.x*(bundle?80:22),y:a.y+out.y*(bundle?80:22)};let best=null;
+ for(const sideB of ['bottom','top','left','right']){const into=builderV123Normal(sideB),pb=port(target,sideB,'to'),b={x:pb.x+into.x*3,y:pb.y+into.y*3},end={x:b.x+into.x*22,y:b.y+into.y*22},middle=builderV123RouteBetween(joint,end,boxes,routing.style,true),points=compactRoutePoints([a,joint,...middle.slice(1),b]);let inside=0,length=0;for(let i=1;i<points.length;i++){length+=Math.hypot(points[i].x-points[i-1].x,points[i].y-points[i-1].y);for(const box of boxes)inside+=builderV124InsideLength124(points[i-1],points[i],builderV123Pad(box,-.5))}const score=inside*1e6+length+(sideB==='bottom'?0:sideB==='top'?10:25);if(!best||score<best.score)best={points,score,inside}}
+ return best.inside>.1?builderRelationshipBefore164(item,positions):result(best.points);
+};
+/* Keep off-path labels only when their short leader crosses no relationship. */
+const builderPlaceLabelsBefore164=builderPlaceLabels149;
+builderPlaceLabels149=function(...args){for(const marker of builderTree.getElementsByClassName('builderEdgeIssueMarker'))delete marker.dataset.labelTransform164;for(const label of builderTree.getElementsByClassName('edgeRouteLabel')){if(label.dataset.routePlane!=='management')continue;const edge=builderTraceEdges('all').find(e=>e.plane==='management'&&String(e.id)===label.dataset.routeEdge),count=edge&&builderBundleGroups163().get(edge.from+'|management|'+ensureRelationshipDetails(edge.edge).protocol)?.length,text=label.querySelector(':scope > text'),rect=label.querySelector(':scope > rect');if(count>1&&text&&rect){text.textContent=text.textContent.split(' · ')[0]+' · '+count+' clients';rect.setAttribute('width',text.getComputedTextLength()+18)}}const result=builderPlaceLabelsBefore164(...args),svg=$('#builderTree .unifiedConnectorLayer');if(!svg)return result;const cache=builderPerfPaths149;
+ for(const leader of [...svg.getElementsByClassName('builderLabelLeader157')]){const points=(leader.getAttribute('d')||'').match(/[-\d.]+/g)?.map(Number);if(!points||points.length!==4)continue;const [x,y,u,v]=points;let crosses=false;for(const [key,sample] of cache){if(key===leader.dataset.geometryEdge)continue;for(let i=2;i<sample.points.length;i+=2){const a={x:sample.points[i-2],y:sample.points[i-1]},b={x:sample.points[i],y:sample.points[i+1]},cross=(p,q,r)=>(q.x-p.x)*(r.y-p.y)-(q.y-p.y)*(r.x-p.x),c={x,y},d={x:u,y:v};if(cross(c,d,a)*cross(c,d,b)<0&&cross(a,b,c)*cross(a,b,d)<0){crosses=true;break}}if(crosses)break}
+  if(crosses||Math.hypot(u-x,v-y)>60){const key=leader.dataset.geometryEdge,label=[...svg.getElementsByClassName('edgeRouteLabel')].find(l=>l.dataset.routePlane+':'+l.dataset.routeEdge===key);if(label){label.dataset.labelHidden='true';label.dataset.labelLeader='false';}leader.remove()}
+ }
+ builderBadges164();return result;
+};
+function builderBadges164(){const world=$('.unifiedBuilderWorld');if(!world)return;const hidden=world.classList.contains('builderLodMedium163')||world.classList.contains('builderLodLow163');for(const marker of world.getElementsByClassName('builderEdgeIssueMarker')){const label=marker.closest('.edgeRouteLabel'),key=marker.dataset.geometryEdge||label&&label.dataset.routePlane+':'+label.dataset.routeEdge,sample=builderPerfPaths149?.get(key);if(!sample||!label)continue;const t=label.getAttribute('transform')?.match(/[-\d.]+/g)?.map(Number);if(!t)continue;if(marker.dataset.labelTransform164===undefined)marker.dataset.labelTransform164=marker.getAttribute('transform')||'';const onPath=(hidden&&!label.classList.contains('builderLabelHover163'))||label.dataset.labelHidden==='true';if(onPath){const p=builderPerfPoint149(sample,.5);marker.setAttribute('transform',`translate(${p.x-t[0]} ${p.y-t[1]})`)}else marker.setAttribute('transform',marker.dataset.labelTransform164)}}
+const builderApplyBefore164=applyBuilderViewport;applyBuilderViewport=function(...args){const result=builderApplyBefore164(...args);builderBadges164();return result};
+const builderHighlightBefore164=builderEdgeHighlight163;builderEdgeHighlight163=function(...args){const world=$('.unifiedBuilderWorld');if(!world)return;for(const path of world.getElementsByClassName('unifiedConnector'))path.style.removeProperty('opacity');builderHighlightBefore164(...args);builderBadges164();if(state.builderSelectedEdge){for(const path of world.getElementsByClassName('unifiedConnector'))path.style.setProperty('opacity',path.classList.contains('builderEdgeActive163')||path.classList.contains('builderEdgeHover163')?'1':'.4','important');return;}const selected=state.builderSelected,edges=selected?new Set(builderTraceEdges('all').filter(e=>e.from===selected||e.to===selected).map(e=>e.plane+':'+e.id)):new Set();for(const path of world.getElementsByClassName('unifiedConnector')){const own=edges.has(path.dataset.edgePlane+':'+path.dataset.edgeId);path.classList.toggle('builderEdgeActive163',own);if(selected)path.style.setProperty('opacity',own||path.classList.contains('builderEdgeHover163')?'1':'.4','important');else path.style.removeProperty('opacity');}world.querySelector('.unifiedConnectorLayer')?.classList.toggle('builderEdgeSelected163',!!selected)};
+const builderBundleLabelsBefore164=builderBundleLabels163;builderBundleLabels163=function(...args){const result=builderBundleLabelsBefore164(...args),world=$('.unifiedBuilderWorld');if(world)for(const label of world.getElementsByClassName('edgeRouteLabel')){if(label.dataset.routePlane==='management'&&label.dataset.bundle163&&!label.classList.contains('builderBundleBranch163')){const count=builderBundleGroups163().get(label.dataset.bundle163)?.length,text=label.querySelector(':scope > text');if(count>1&&text&&!text.textContent.includes(' · ')){text.textContent+=' · '+count+' clients';const rect=label.querySelector(':scope > rect');if(rect)rect.setAttribute('width',Math.max(Number(rect.getAttribute('width')),text.getComputedTextLength()+18))}}}return result};
+const builderCardsBefore164=builderCards163;builderCards163=function(...args){const result=builderCardsBefore164(...args),layout=unifiedBuilderPositions(),world=$('.unifiedBuilderWorld');for(const id of layout.trayIds||[]){const card=world?.querySelector('[data-builder-node="'+id+'"]'),band=card?.querySelector('.builderBand');if(band){builderSetText160(band,'Not connected');band.hidden=false;band.classList.add('builderNotConnected164')}}return result};
+changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Relationship lines and plane ports','Prefer clear direct hops; separate management and access ports; cap label leaders at 60px; anchor hidden-label badges to cached paths; count bundled clients and dim unrelated lines on card selection.',true]);
+document.title='Splunk Pipeline Explorer · Build 164 · 5 Oct 2026';$('#topologyBuilder').dataset.buildNumber='164';$('#topologyBuilder').dataset.buildDate='2026-10-05';const stamp164=$('.builderBuildStamp');if(stamp164){stamp164.setAttribute('aria-label','Build 164, dated 5 October 2026');stamp164.querySelector('b').textContent='Build 164';const date=stamp164.querySelector('time');if(date){date.dateTime='2026-10-05';date.textContent='5 Oct 2026'}}invalidateBuilderRender160();
+</script>
 </body>
 </html>
