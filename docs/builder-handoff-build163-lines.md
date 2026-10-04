@@ -108,3 +108,27 @@ At Fit (labels hidden by the level-of-detail rule), connector badges stay where 
 2. Perf `allOk` on three runs (routing changes touch the redraw); space 7/7.
 3. Default topology: unchanged (pixel comparison).
 4. A `changeRegister` entry and the build stamp for v164.
+
+---
+
+## Build 164 recheck (`main` at `0249bad`, `builder-lines-v164`)
+
+| # | Item | Result |
+|---|---|---|
+| 1 | Same-row detours | ✅ **Fixed.** All 7 data lines and Administrator → Auth Provider are single straight segments (`M… L…`). |
+| 2 | Management line on the data port | ✅ **Fixed.** Management branches enter at ⅔ height (UF1 at y = 207, HF at y = 703); no shared endpoints or overlapping segments. |
+| 3 | Far labels and long leaders | ✅ **Fixed.** Every visible label is ≤ 32px from its line. Two labels with no room (Direct HEC, Administrator → Auth SAML) fall back to the hidden label + badge on the line. |
+| 4 | Badges at Fit | ✅ **Fixed.** All 12 connector badges are within 1px of their own line at Fit. At 100% they sit at their label's right end, as designed. |
+| 5 | Bundle label count | ✅ "Phone-home and app delivery · 3 clients" |
+
+**Also:**
+- No line crosses a card; no label overlaps a card.
+- Connector tool: all OK.
+- Space check: 7/7.
+- 0 errors.
+
+**Still open:**
+- **Selection dimming** (item 5 above): not rechecked here.
+- **Perf:** one run gave default 32/31 ✓, fan5 51/54 ✗, fan8 58/70 ✓, reference 71/83 ✓. fan5 is at the edge again.
+
+Screenshots: `build164-lines-ref-fit.png`, `build164-lines-uf1-100.png`.
