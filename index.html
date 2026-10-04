@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 154 · 4 Oct 2026</title>
+  <title>Splunk Pipeline Explorer · Build 155 · 4 Oct 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,9 +202,9 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="154" data-build-date="2026-10-04">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="155" data-build-date="2026-10-04">
     <div class="builderHead">
-      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 154, dated 4 October 2026"><b>Build 154</b><time datetime="2026-10-04">4 Oct 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
+      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 155, dated 4 October 2026"><b>Build 155</b><time datetime="2026-10-04">4 Oct 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
         <div class="builderActions"><div class="builderHistoryControls"><button class="builderBtn" id="builderUndo" disabled>↶ Undo <kbd>Ctrl Z</kbd></button><button class="builderBtn" id="builderRedo" disabled>↷ Redo <kbd>Ctrl Y</kbd></button><button class="builderBtn" id="builderHistoryToggle" aria-expanded="false">History <span class="builderHistoryCount" id="builderHistoryCount">0</span></button></div><button class="builderBtn" id="builderLoadPath">Load selected path</button><button class="builderBtn" id="builderClear">Clear</button><button class="builderBtn" id="builderFailure">Open in Failure Lab</button><button class="builderBtn primary" id="builderUse">Use in explorer</button></div>
         <div class="builderPersistence"><select id="builderSaved" aria-label="Saved custom topologies"><option value="">Saved topologies</option></select><button class="builderBtn" id="builderSave">Save</button><button class="builderBtn" id="builderLoadSaved">Load</button><button class="builderBtn" id="builderImport">Import JSON</button><button class="builderBtn" id="builderExport">Export JSON</button><input id="builderImportFile" type="file" accept="application/json,.json" hidden></div>
@@ -7550,6 +7550,172 @@ document.title='Splunk Pipeline Explorer · Build 154 · 4 Oct 2026';
 $('#topologyBuilder').dataset.buildNumber='154';$('#topologyBuilder').dataset.buildDate='2026-10-04';
 const builderStamp154=$('.builderBuildStamp');
 if(builderStamp154){builderStamp154.setAttribute('aria-label','Build 154, dated 4 October 2026');builderStamp154.querySelector('b').textContent='Build 154';const date=builderStamp154.querySelector('time');if(date){date.dateTime='2026-10-04';date.textContent='4 Oct 2026'}}
+</script>
+<style id="builder-threat-routing-v155-styles">
+.tmFigure150 .tmPillLeader154{stroke-opacity:.6;stroke-width:1.4}
+</style>
+<script id="builder-threat-routing-v155">
+/* An inbound cloud handoff remains the sender's responsibility. A flow
+   originating inside the managed service is owned by its provider. */
+const builderThreatModelBefore155=builderThreatModel150;
+builderThreatModel150=function(){
+  const model=builderThreatModelBefore155(),nodes=new Map(model.nodes.map(node=>[node.id,node]));
+  for(const edge of model.edges){
+    const from=nodes.get(edge.from),to=nodes.get(edge.to),key=edge.plane+':'+edge.id;
+    if(!from||!to)continue;
+    const providerMfa=edge.plane==='authentication'&&[from,to].some(node=>isAuthProviderType(node.type)&&node.providerMfa==='enforced');
+    if(providerMfa){
+      for(const threat of model.threats.filter(item=>item.target===key&&item.category==='S'&&!state.builderThreatModel150.overrides[item.key]))threat.status='Mitigated';
+      builderThreatAdd152(model,'flow:'+key+':S-provider-mfa','S',key,'The identity provider enforces a second factor.','Keep provider MFA enforced and retain sign-in audit evidence.','Medium','Mitigated');
+    }
+    if(typeof builderIsCloudIndexer148!=='function'||!builderIsCloudIndexer148(to)||builderIsCloudIndexer148(from))continue;
+    const detail=ensureRelationshipDetails(edge.edge),buffered=!!(from.persistent||from.diskBuffer||from.diskBufferEnabled),acked=!!(from.ack||/acknowledg/i.test(String(detail.acknowledgement||'')));
+    for(const threat of model.threats.filter(item=>item.target===key&&['D','I'].includes(item.category)&&!state.builderThreatModel150.overrides[item.key])){
+      threat.status=threat.category==='D'&&buffered&&acked?'Mitigated':'Open';
+      if(threat.owner==='Splunk Cloud provider'||threat.owner==='Splunk')threat.owner='';
+    }
+  }
+  /* A persistent queue has one data-store threat. Reuse an earlier recorded
+     decision from either node-level queue key if the store has no override. */
+  for(const node of model.nodes.filter(item=>['uf','hf'].includes(item.type)&&item.persistent)){
+    const storeKey='store:D-'+node.id+':I',storeThreat=model.threats.find(item=>item.key===storeKey);
+    if(storeThreat&&!state.builderThreatModel150.overrides[storeKey]){
+      const prior=state.builderThreatModel150.overrides['node:'+node.id+':I-forwarder-queue']||state.builderThreatModel150.overrides['node:'+node.id+':I-queue'];
+      if(prior)for(const field of ['status','risk','owner','control','notes'])if(prior[field]!==undefined)storeThreat[field]=prior[field];
+    }
+    model.threats=model.threats.filter(item=>item.key!=='node:'+node.id+':I-queue'&&item.key!=='node:'+node.id+':I-forwarder-queue');
+  }
+  return model;
+};
+/* Work in SVG world coordinates. The first exit from the source trust zone
+   is the crossing; a prior diamond based on the source centre can be far away. */
+function builderThreatPoints155(path){return[...String(path?.getAttribute('d')||'').matchAll(/[ML]\s*(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)/g)].map(match=>({x:+match[1],y:+match[2]}))}
+function builderThreatCrossing155(points,rect){
+  if(!rect)return null;
+  const inside=point=>point.x>=rect.x-.01&&point.x<=rect.x+rect.w+.01&&point.y>=rect.y-.01&&point.y<=rect.y+rect.h+.01;
+  const candidates=[];
+  for(let i=1;i<points.length;i++){
+    const a=points[i-1],b=points[i],dx=b.x-a.x,dy=b.y-a.y;
+    for(const x of [rect.x,rect.x+rect.w])if(Math.abs(dx)>1e-8){const t=(x-a.x)/dx,y=a.y+t*dy;if(t>=0&&t<=1&&y>=rect.y-.01&&y<=rect.y+rect.h+.01)candidates.push({i,t,point:{x,y},exit:inside(a)&&!inside(b)})}
+    for(const y of [rect.y,rect.y+rect.h])if(Math.abs(dy)>1e-8){const t=(y-a.y)/dy,x=a.x+t*dx;if(t>=0&&t<=1&&x>=rect.x-.01&&x<=rect.x+rect.w+.01)candidates.push({i,t,point:{x,y},exit:inside(a)&&!inside(b)})}
+  }
+  return(candidates.find(item=>item.exit)||candidates[0])?.point||null;
+}
+function builderThreatStoreBoxes155(svg){const result=[];for(const path of svg.querySelectorAll('.tmStore150')){const match=path.getAttribute('d').match(/M\s*(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s*H\s*(-?\d+(?:\.\d+)?)\s*M\s*-?\d+(?:\.\d+)?\s+(-?\d+(?:\.\d+)?)/);if(match)result.push({x:+match[1],y:+match[2],w:+match[3]- +match[1],h:+match[4]- +match[2]})}return result}
+function builderThreatAwsRoute155(a,b,obstacles,zones){
+  const start={x:a.cx,y:a.y},end={x:b.cx,y:b.y+b.h},stubA={x:start.x,y:start.y-17},stubB={x:end.x,y:end.y+17};
+  const channels=[a.cx,b.cx,...obstacles.flatMap(box=>[box.x-18,box.x+box.w+18]),...zones.flatMap(box=>[box.x+16,box.x+box.w-16])];
+  let best=null,bestScore=Infinity;
+  for(const x of channels){
+    const points=[start,stubA,{x,y:stubA.y},{x,y:stubB.y},stubB,end];
+    let hits=0,length=0;
+    for(let i=1;i<points.length;i++){const p=points[i-1],q=points[i];length+=Math.abs(p.x-q.x)+Math.abs(p.y-q.y);if(i>1&&i<points.length-1)hits+=obstacles.filter(box=>builderThreatSegmentHit153(p,q,box)).length}
+    const border=zones.some(box=>Math.abs(x-box.x)<10||Math.abs(x-box.x-box.w)<10);
+    const score=hits*1e6+(border?1e4:0)+length;
+    if(score<bestScore){bestScore=score;best=points}
+  }
+  return best;
+}
+const builderThreatSvgBefore155=builderThreatSvg150;
+builderThreatSvg150=function(model){
+  const holder=document.createElement('div');holder.innerHTML=builderThreatSvgBefore155(model);
+  const svg=holder.querySelector('svg');if(!svg)return holder.innerHTML;
+  const zones=new Map(),frames=[...svg.querySelectorAll('rect.tmZone150')];model.zones.forEach((zone,i)=>{const rect=frames[i];if(rect)zones.set(zone.key,{x:+rect.getAttribute('x'),y:+rect.getAttribute('y'),w:+rect.getAttribute('width'),h:+rect.getAttribute('height')})});
+  const groups=new Map([...svg.querySelectorAll('g[data-key]')].map(group=>[group.dataset.key,group]));
+  const shapes=new Map(model.nodes.map(node=>[node.id,builderThreatBox153(groups.get('node:'+node.id))]));
+  const stores=builderThreatStoreBoxes155(svg);
+  for(const edge of model.edges){
+    const source=model.nodes.find(node=>node.id===edge.from),target=model.nodes.find(node=>node.id===edge.to),group=groups.get(edge.plane+':'+edge.id),path=group?.querySelector('.tmFlow150');
+    if(!source||!target||!path)continue;
+    if(['awsLambda','azureFunction'].includes(source.type)&&target.type==='hf'){
+      const a=shapes.get(source.id),b=shapes.get(target.id);
+      if(a&&b&&a.cy>b.cy+100){const obstacles=[...shapes.entries()].filter(([id])=>id!==source.id&&id!==target.id).map(([,box])=>box).filter(Boolean).concat(stores),route=builderThreatAwsRoute155(a,b,obstacles,[...zones.values()]);if(route)path.setAttribute('d',route.map((point,i)=>(i?'L':'M')+point.x+' '+point.y).join(' '))}
+    }
+    const diamond=group.querySelector('.tmCross150'),zone=zones.get(model.byNode.get(edge.from));
+    if(diamond&&zone){const crossing=builderThreatCrossing155(builderThreatPoints155(path),zone);if(crossing)diamond.setAttribute('d',`M${crossing.x} ${crossing.y-7}L${crossing.x+7} ${crossing.y}L${crossing.x} ${crossing.y+7}L${crossing.x-7} ${crossing.y}Z`)}
+  }
+  /* Re-place identifiers after rerouting, accounting for every other flow.
+     Each candidate is checked against its own SVG rectangle, not the group. */
+  const flowGroups=model.edges.map(edge=>groups.get(edge.plane+':'+edge.id)).filter(Boolean);
+  const routes=flowGroups.map(group=>({group,points:builderThreatPoints155(group.querySelector('.tmFlow150'))}));
+  const shapeBoxes=[...shapes.values()].filter(Boolean).concat(stores),placed=[];
+  const overlaps=(a,b)=>a.x<b.x+b.w+5&&a.x+a.w+5>b.x&&a.y<b.y+b.h+5&&a.y+a.h+5>b.y;
+  const lineHits=(box,points)=>points.slice(1).some((point,i)=>builderV123Intersects(points[i],point,box));
+  const width=+svg.getAttribute('width'),height=+svg.getAttribute('height');
+  for(const {group,points} of routes){
+    const pill=group.querySelector('.tmFlowPill152');if(!pill||points.length<2)continue;
+    group.querySelectorAll('.tmPillLeader154').forEach(leader=>leader.remove());
+    const segments=points.slice(1).map((point,i)=>({a:points[i],b:point,len:Math.hypot(point.x-points[i].x,point.y-points[i].y)})).filter(item=>item.len>3).sort((a,b)=>b.len-a.len);
+    let chosen=null,best=null,bestScore=Infinity;
+    for(const offset of [0,-27,27,-46,46,-67,67,-90,90,-115,115,-140,140]){
+      for(const segment of segments)for(const fraction of [.5,.3,.7,.15,.85,.05,.95]){
+        const point={x:segment.a.x+(segment.b.x-segment.a.x)*fraction,y:segment.a.y+(segment.b.y-segment.a.y)*fraction},horizontal=Math.abs(segment.b.x-segment.a.x)>=Math.abs(segment.b.y-segment.a.y);
+        const box={x:point.x-22+(horizontal?0:offset),y:point.y-12+(horizontal?offset:0),w:44,h:23};
+        if(box.x<2||box.y<2||box.x+box.w>width-2||box.y+box.h>height-2||shapeBoxes.some(shape=>overlaps(box,shape))||placed.some(item=>overlaps(box,item)))continue;
+        const otherHits=routes.filter(item=>item.group!==group).filter(item=>lineHits(box,item.points)).length;
+        const score=otherHits*10000+Math.abs(offset)+Math.abs(fraction-.5)*10;
+        if(score<bestScore){bestScore=score;best={box,point,offset}}
+        if(!otherHits){chosen=best;break}
+      }
+      if(chosen)break;
+    }
+    chosen??=best;if(!chosen)continue;
+    pill.setAttribute('transform',`translate(${chosen.box.x} ${chosen.box.y})`);placed.push(chosen.box);
+    if(chosen.offset){const leader=document.createElementNS('http://www.w3.org/2000/svg','path'),line=group.querySelector('.tmFlow150');leader.setAttribute('class','tmPillLeader154');leader.setAttribute('d',`M${chosen.point.x} ${chosen.point.y}L${chosen.box.x+22} ${chosen.box.y+11.5}`);leader.style.stroke=line.classList.contains('management')?'#087967':line.classList.contains('authentication')?'#8653bd':'var(--tm-blue)';group.insertBefore(leader,pill)}
+  }
+  return holder.innerHTML;
+};
+/* Repeated canvas redraws rebuild the same Inspector and closed inventory.
+   Keep their event handlers and the current form focus when inputs are equal. */
+const builderInspectorBefore155=renderBuilderInspector;
+let builderInspectorSignature155='',builderInsideRender155=false;
+renderBuilderInspector=function(...args){
+  if(!builderInsideRender155)return builderInspectorBefore155(...args);
+  const signature=JSON.stringify([state.builderSelected,state.builderSelectedEdge,state.builderPlane,state.builderNodes,state.builderRelations,state.builderAuthRelations,state.builderGroups,state.builderHosts,state.securityClassification,state.builderRules?.profile]);
+  if(signature===builderInspectorSignature155&&$('#builderInstanceInspector')?.isConnected)return;
+  builderInspectorSignature155=signature;
+  return builderInspectorBefore155(...args);
+};
+const builderInventoryBefore155=renderBuilderInventory;
+renderBuilderInventory=function(...args){
+  const panel=$('#builderInventoryPanel');
+  if(!state.builderInventory?.open&&panel&&!panel.classList.contains('open')&&!panel.childElementCount)return;
+  return builderInventoryBefore155(...args);
+};
+const builderRenderBefore155=renderBuilder;
+renderBuilder=function(...args){builderInsideRender155=true;try{return builderRenderBefore155(...args)}finally{builderInsideRender155=false}};
+/* The legacy label pass can exhaust its sparse fractions on a reversed or
+   close route. Search the already sampled path more densely only when a label
+   still touches a card or another label. The badge travels with its label. */
+const builderPlaceLabelsBefore155=builderPlaceLabels149;
+builderPlaceLabels149=function(...args){
+  const result=builderPlaceLabelsBefore155(...args),svg=$('#builderTree .unifiedConnectorLayer'),cache=builderPerfPaths149;
+  if(!svg||!cache?.size)return result;
+  const layout=unifiedBuilderPositions(),cards=state.builderNodes.filter(node=>layout.positions.has(node.id)).map(node=>builderV123Pad(builderCardBox(node.id,layout.positions),3));
+  const labels=[...svg.querySelectorAll('.edgeRouteLabel')],placed=[];
+  const boxOf=label=>{const match=String(label.getAttribute('transform')||'').match(/translate\(\s*(-?[\d.]+)[ ,]+(-?[\d.]+)/);if(!match)return null;return{x:+match[1],y:+match[2],w:(+label.querySelector(':scope > rect')?.getAttribute('width')||100)+27,h:22}};
+  for(const label of labels){
+    const original=boxOf(label),key=label.dataset.routePlane+':'+label.dataset.routeEdge,sample=cache.get(key);
+    if(!original||!sample)continue;
+    const blocked=cards.some(card=>builderPerfOverlap149(original,card))||placed.some(box=>builderPerfOverlap149(original,box));
+    if(!blocked){placed.push(original);continue}
+    const width=original.w-27,edge=builderTraceEdges('all').find(item=>item.plane===label.dataset.routePlane&&String(item.id)===label.dataset.routeEdge),offset=edge?ensureRelationshipRouting(edge.edge).labelOffset:{x:0,y:0};
+    let best={box:original,score:cards.filter(card=>builderPerfOverlap149(original,card)).length*10000+placed.filter(box=>builderPerfOverlap149(original,box)).length*1000};
+    for(let step=2;step<=48;step++){
+      const fraction=step/50,point=builderPerfPoint149(sample,fraction),box={x:point.x+offset.x-width/2,y:point.y+offset.y-11,w:original.w,h:22};
+      const cardHits=cards.filter(card=>builderPerfOverlap149(box,card)).length,labelHits=placed.filter(item=>builderPerfOverlap149(box,item)).length;
+      const score=cardHits*10000+labelHits*1000+Math.abs(fraction-.5);
+      if(score<best.score)best={box,score};
+      if(!cardHits&&!labelHits)break;
+    }
+    label.setAttribute('transform',`translate(${best.box.x} ${best.box.y})`);placed.push(best.box);
+  }
+  return result;
+};
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['TM-1 routed crossings and canvas redraw','Anchor trust-boundary diamonds to final paths, keep flow identifiers clear of other lines, assign incoming cloud handoffs to the sender and avoid unchanged Inspector writes.',true]);
+document.title='Splunk Pipeline Explorer · Build 155 · 4 Oct 2026';
+$('#topologyBuilder').dataset.buildNumber='155';$('#topologyBuilder').dataset.buildDate='2026-10-04';
+const builderStamp155=$('.builderBuildStamp');if(builderStamp155){builderStamp155.setAttribute('aria-label','Build 155, dated 4 October 2026');builderStamp155.querySelector('b').textContent='Build 155';const date=builderStamp155.querySelector('time');if(date){date.dateTime='2026-10-04';date.textContent='4 Oct 2026'}}
 </script>
 </body>
 </html>
