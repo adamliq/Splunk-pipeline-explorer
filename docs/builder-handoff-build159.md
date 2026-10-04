@@ -1,5 +1,7 @@
 # Builder handoff: Build 158 review and tasks for Build 159
 
+> **Superseded by [`builder-handoff-build160.md`](builder-handoff-build160.md)** (Build 159 review and Build 160 tasks). Kept as the record.
+
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Reviewed:** `main` at `4a96232` (Build 158: `builder-query-and-phone-v158`), merged into branch `claude/build-page-layout-bl6jk1`. Checked against [`builder-handoff-build158.md`](builder-handoff-build158.md).
 **Next block:** `builder-…-v159`.
