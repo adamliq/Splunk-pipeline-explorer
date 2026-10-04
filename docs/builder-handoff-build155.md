@@ -1,5 +1,7 @@
 # Builder handoff: tasks for Build 155
 
+> **Superseded by [`builder-handoff-build156.md`](builder-handoff-build156.md)** (Build 155 review and Build 156 tasks). Kept as the record.
+
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Start from:** `main` at `49d4f46` (Build 154). Add one new block, `<script id="builder-threat-fixes-v155">`, after `builder-threat-polish-v154`.
 - Use the wrapper pattern (`const fooBefore155=foo; foo=function(){…}`).
