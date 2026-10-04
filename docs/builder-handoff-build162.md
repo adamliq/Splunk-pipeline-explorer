@@ -3,6 +3,7 @@
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Reviewed:** `main` at `abe5ce5` (Build 161: `builder-indexed-redraw-v161`), merged into branch `claude/build-page-layout-bl6jk1`. Checked against [`builder-handoff-build161.md`](builder-handoff-build161.md).
 **Next block:** `builder-…-v162`.
+**Also:** [`builder-handoff-canvas-ux.md`](builder-handoff-canvas-ux.md), the canvas UX review of Build 161 (layout, level of detail, overlays, card consistency). Do it after or alongside this list.
 
 **Tool update:** `tools/builder-perf-check.js` on branch `claude/build-page-layout-bl6jk1` now also measures **`movedRedrawMs`**.
 - **What it does:** switches to free layout, moves the last card by a different offset before each of 5 timed redraws, then restores the layout. Routes and path `d` strings change on every move, so caches keyed on unchanged geometry can't help. This is the realistic drag/drop case.
