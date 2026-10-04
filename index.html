@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore Splunk data processing stages across Universal Forwarders, Heavy Forwarders, and indexers.">
-  <title>Splunk Pipeline Explorer · Build 155 · 4 Oct 2026</title>
+  <title>Splunk Pipeline Explorer · Build 156 · 4 Oct 2026</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23091420'/%3E%3Cpath d='M14 19h12l8 13-8 13H14l8-13zM34 19h16v8H39zM39 37h11v8H34z' fill='%236ee7b7'/%3E%3C/svg%3E">
   <style>
     :root{--bg:#071019;--panel:#0c1722;--panel2:#101e2b;--line:#213345;--muted:#90a2b5;--text:#edf5fb;--green:#66e0a3;--cyan:#57c7e8;--amber:#f3bd61;--red:#f17a7a;--violet:#a996ff;--blue:#6fa8ff;--shadow:0 18px 54px rgba(0,0,0,.32)}
@@ -202,9 +202,9 @@
   <div id="matrix" class="matrixWrap"><table><thead><tr><th>Pipeline</th><th>Stage</th><th>Configuration</th><th>Deployment Server</th><th>Syslog Server</th><th>HEC</th><th>SQL Database</th><th>DB Connect</th><th>UF</th><th>HF</th><th>Ingest Processor</th><th>Indexer</th><th>AWS S3</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
   <section id="diagnosticMode" class="diagnosticMode" aria-live="polite"><aside id="symptomPanel" class="symptomPanel" aria-label="Observed symptoms"></aside><article id="diagnosticResults" class="diagnosticResults"></article></section>
   <section id="failureLab" class="failureLab" aria-live="polite"><aside id="scenarioList" class="scenarioList" aria-label="Failure scenarios"></aside><article id="failureDetail" class="failureDetail"></article></section>
-  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="155" data-build-date="2026-10-04">
+  <section id="topologyBuilder" class="topologyBuilder" aria-live="polite" data-build-number="156" data-build-date="2026-10-04">
     <div class="builderHead">
-      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 155, dated 4 October 2026"><b>Build 155</b><time datetime="2026-10-04">4 Oct 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
+      <div><div class="builderBuildTitle"><h2>Custom topology builder</h2><span class="builderBuildStamp" aria-label="Build 156, dated 4 October 2026"><b>Build 156</b><time datetime="2026-10-04">4 Oct 2026</time></span></div><p>Model event data, fleet management and interactive user access independently. Authentication links never carry telemetry.</p></div>
       <div class="builderActionWrap">
         <div class="builderActions"><div class="builderHistoryControls"><button class="builderBtn" id="builderUndo" disabled>↶ Undo <kbd>Ctrl Z</kbd></button><button class="builderBtn" id="builderRedo" disabled>↷ Redo <kbd>Ctrl Y</kbd></button><button class="builderBtn" id="builderHistoryToggle" aria-expanded="false">History <span class="builderHistoryCount" id="builderHistoryCount">0</span></button></div><button class="builderBtn" id="builderLoadPath">Load selected path</button><button class="builderBtn" id="builderClear">Clear</button><button class="builderBtn" id="builderFailure">Open in Failure Lab</button><button class="builderBtn primary" id="builderUse">Use in explorer</button></div>
         <div class="builderPersistence"><select id="builderSaved" aria-label="Saved custom topologies"><option value="">Saved topologies</option></select><button class="builderBtn" id="builderSave">Save</button><button class="builderBtn" id="builderLoadSaved">Load</button><button class="builderBtn" id="builderImport">Import JSON</button><button class="builderBtn" id="builderExport">Export JSON</button><input id="builderImportFile" type="file" accept="application/json,.json" hidden></div>
@@ -3704,6 +3704,7 @@ for(const [index,label] of ['Find & navigate','Architecture profile','Review fin
 builderDensityDock.appendChild(builderDensityPanels);
 function builderDensitySync(){for(const button of builderDensityDock.querySelectorAll('.builderDensityToggle')){const panel=$('#'+button.getAttribute('aria-controls'));button.setAttribute('aria-expanded',String(!!panel?.open));const label=button.querySelector('span');if(panel?.id==='builderRuleProfileDisclosure')label.textContent='Architecture profile '+($('#builderRuleProfileDisclosureStatus')?.textContent||'');if(panel?.id==='builderReviewDisclosure')label.textContent='Review findings '+($('#builderReviewDisclosureStatus')?.textContent||'');if(panel?.id==='builderSecondaryTools')label.textContent='Tools '+($('#builderSecondaryToolsStatus')?.textContent||'')}}
 function builderDensityLayout(){
+  if(builderDensityMedia.matches&&typeof builderMobileRestorePanels156==='function')builderMobileRestorePanels156();
   if(!builderDensityMedia.matches){builderDensityRestore();builderDensityDock.remove();builderFindNavigate.remove();builderDensityHeaderPrimary.remove();builderDensityExtraActions.remove();return}
   const group=$('#builderGroupBar');builderDensityWorkspace.insertBefore(builderDensityDock,group);
   builderDensityMove(group,builderDensityDock);
@@ -4132,7 +4133,7 @@ $('#builderInspectorDrawerClose').addEventListener('click',()=>{if(!builderSheet
 const builderMobileMore=document.createElement('details');builderMobileMore.className='builderMobileMore';builderMobileMore.innerHTML='<summary>More</summary><div class="builderMobileMoreBody"></div>';
 const builderMobileMoreBody=builderMobileMore.querySelector('.builderMobileMoreBody'),builderMobileMoves=new Map();
 function builderMobileMove(node){if(!node)return;if(!builderMobileMoves.has(node)){const marker=document.createComment('Mobile toolbar original position');node.before(marker);builderMobileMoves.set(node,marker)}builderMobileMoreBody.appendChild(node)}
-function syncBuilderMobileToolbar(){if(builderSheetMedia.matches){const navigation=$('.builderNavigation');if(!builderMobileMore.isConnected)navigation?.appendChild(builderMobileMore);for(const node of [...navigation.children])if(node!==builderMobileMore&&!node.classList.contains('builderCanvasQuickActions')&&!['builderZoomOut','builderZoomIn','builderZoomReadout'].includes(node.id))builderMobileMove(node);builderMobileMove($('.builderActionWrap'));return}for(const [node,marker] of builderMobileMoves)marker.replaceWith(node);builderMobileMoves.clear();builderMobileMore.remove();if(builderToolbarMedia.matches)builderToolbarAttach()}
+function syncBuilderMobileToolbar(){if(builderSheetMedia.matches){const navigation=$('.builderNavigation');if(!builderMobileMore.isConnected)navigation?.appendChild(builderMobileMore);for(const node of [...navigation.children])if(node!==builderMobileMore&&!node.classList.contains('builderCanvasQuickActions')&&!node.classList.contains('builderMobilePlanes')&&!['builderZoomOut','builderZoomIn','builderZoomReadout'].includes(node.id))builderMobileMove(node);builderMobileMove($('.builderActionWrap'));return}for(const [node,marker] of builderMobileMoves)marker.replaceWith(node);builderMobileMoves.clear();builderMobileMore.remove();if(builderToolbarMedia.matches)builderToolbarAttach()}
 builderSheetMedia.addEventListener('change',syncBuilderMobileToolbar);
 const builderMobileFind=document.createElement('button');builderMobileFind.type='button';builderMobileFind.className='builderMobileFindToggle';builderMobileFind.textContent='Find & navigate ▸';builderMobileFind.setAttribute('aria-controls','builderSearchBar builderLargeNav');builderMobileFind.setAttribute('aria-expanded','false');$('.builderWorkspace').insertBefore(builderMobileFind,$('.builderCanvas'));
 builderMobileFind.onclick=()=>{const workspace=$('.builderWorkspace'),open=workspace.classList.toggle('builderMobileFindOpen');builderMobileFind.setAttribute('aria-expanded',String(open));builderMobileFind.textContent=`Find & navigate ${open?'▾':'▸'}`;if(open)$('#builderSearchInput')?.focus()};
@@ -7653,9 +7654,10 @@ builderThreatSvg150=function(model){
         const box={x:point.x-22+(horizontal?0:offset),y:point.y-12+(horizontal?offset:0),w:44,h:23};
         if(box.x<2||box.y<2||box.x+box.w>width-2||box.y+box.h>height-2||shapeBoxes.some(shape=>overlaps(box,shape))||placed.some(item=>overlaps(box,item)))continue;
         const otherHits=routes.filter(item=>item.group!==group).filter(item=>lineHits(box,item.points)).length;
-        const score=otherHits*10000+Math.abs(offset)+Math.abs(fraction-.5)*10;
+        const zoneHits=[...zones.values()].filter(r=>((box.x<r.x&&box.x+box.w>r.x)||(box.x<r.x+r.w&&box.x+box.w>r.x+r.w))&&box.y<r.y+r.h&&box.y+box.h>r.y||((box.y<r.y&&box.y+box.h>r.y)||(box.y<r.y+r.h&&box.y+box.h>r.y+r.h))&&box.x<r.x+r.w&&box.x+box.w>r.x).length;
+        const score=otherHits*10000+zoneHits*5000+Math.abs(offset)+Math.abs(fraction-.5)*10;
         if(score<bestScore){bestScore=score;best={box,point,offset}}
-        if(!otherHits){chosen=best;break}
+        if(!otherHits&&!zoneHits){chosen=best;break}
       }
       if(chosen)break;
     }
@@ -7717,5 +7719,165 @@ document.title='Splunk Pipeline Explorer · Build 155 · 4 Oct 2026';
 $('#topologyBuilder').dataset.buildNumber='155';$('#topologyBuilder').dataset.buildDate='2026-10-04';
 const builderStamp155=$('.builderBuildStamp');if(builderStamp155){builderStamp155.setAttribute('aria-label','Build 155, dated 4 October 2026');builderStamp155.querySelector('b').textContent='Build 155';const date=builderStamp155.querySelector('time');if(date){date.dateTime='2026-10-04';date.textContent='4 Oct 2026'}}
 </script>
+<style id="builder-canvas-review-v156-styles">
+/* Keep an unresolved short connector's review badge available on the line. */
+.topologyBuilder #builderTree .builderLane{font-size:11.5px!important}
+@media(min-width:1121px){
+ body[data-view="builder"] .builderHead:has(.builderLayoutPersistence){height:auto;min-height:116px}
+ body[data-view="builder"] .builderHead:has(.builderLayoutPersistence) .builderPlaneBar{flex-wrap:wrap;grid-column:1/-1;grid-row:2;min-height:70px}
+ body[data-view="builder"] .builderHead .builderLayoutPersistence{flex-basis:100%;margin:0}
+}
+#builderTree .edgeRouteLabel[data-label-hidden="true"] > rect,
+#builderTree .edgeRouteLabel[data-label-hidden="true"] > text{display:none}
+</style>
+<script id="builder-canvas-review-v156">
+/* Consolidate controls on the existing stable threat key. Explicit decisions
+   survive import and supersede the defaults, including decisions on old keys. */
+const builderThreatModelBefore156=builderThreatModel150;
+builderThreatModel150=function(){
+  const model=builderThreatModelBefore156(),overrides=state.builderThreatModel150.overrides,removed=new Set();
+  const merge=(key,aliases,defaults)=>{
+    const threat=model.threats.find(item=>item.key===key);if(!threat)return;
+    if(!overrides[key]){const previous=aliases.map(alias=>overrides[alias]).find(Boolean);if(previous)overrides[key]={...previous}}
+    Object.assign(threat,defaults,overrides[key]||{});
+    for(const alias of aliases){removed.add(alias);delete overrides[alias];delete state.builderThreatModel150.retired?.[alias]}
+  };
+  for(const edge of model.edges){
+    const key='flow:'+edge.plane+':'+edge.id;
+    if(edge.plane==='authentication'){
+      const endpoints=model.nodes.filter(node=>node.id===edge.from||node.id===edge.to);
+      const enforced=builderThreatMfa152(edge.edge)||endpoints.some(node=>isAuthProviderType(node.type)&&node.providerMfa==='enforced');
+      merge(key+':S',[key+':S-mfa',key+':S-provider-mfa'],enforced?{control:'Second factor enforced; audit sign-in decisions.',status:'Mitigated'}:{});
+    }
+    if(model.threats.some(item=>item.key===key+':S-certificate')&&model.threats.some(item=>item.key===key+':S-verified'))
+      merge(key+':S-certificate',[key+':S-verified'],{title:'Forwarder and receiver authenticate with certificates',control:'Maintain certificate trust and rotation.',status:'Mitigated'});
+  }
+  model.threats=model.threats.filter(item=>!removed.has(item.key));
+  model.retired=model.retired?.filter(item=>!removed.has(item.key));
+  return model;
+};
+/* The profile's dominant cost was routing candidate scores repeatedly during
+   sort. Score each candidate once and retain the first minimum (stable ties).
+   Most segments are orthogonal, so reject bounding boxes before clipping. */
+const builderIntersectsBefore156=builderV123Intersects;
+builderV123Intersects=function(a,b,box){
+  const right=box.x+box.w,bottom=box.y+box.h;
+  if(Math.max(a.x,b.x)<box.x||Math.min(a.x,b.x)>right||Math.max(a.y,b.y)<box.y||Math.min(a.y,b.y)>bottom)return false;
+  if(Math.abs(a.x-b.x)<1e-8||Math.abs(a.y-b.y)<1e-8)return true;
+  return builderIntersectsBefore156(a,b,box);
+};
+builderV123RouteBetween=function(start,end,boxes,style,avoid,labelNeed=0){
+  const padded=boxes.map(box=>builderV123Pad(box)),xs=padded.flatMap(box=>[box.x-22,box.x+box.w+22]),ys=padded.flatMap(box=>[box.y-22,box.y+box.h+22]);
+  let best=null,bestScore=Infinity;
+  const consider=raw=>{
+    const points=compactRoutePoints(raw);let hits=0,length=0,span=0;
+    for(let i=1;i<points.length;i++){
+      const a=points[i-1],b=points[i],segment=Math.hypot(b.x-a.x,b.y-a.y);length+=segment;span=Math.max(span,segment);
+      if(avoid)for(const box of padded)if(builderV123Intersects(a,b,box))hits++;
+    }
+    const score=hits*1e6+(labelNeed&&span<labelNeed?5000:0)+length+points.length*12;
+    if(score<bestScore){best=points;bestScore=score}
+  };
+  if(style==='straight'||Math.abs(start.x-end.x)<.1||Math.abs(start.y-end.y)<.1)consider([start,end]);
+  consider([start,{x:end.x,y:start.y},end]);consider([start,{x:start.x,y:end.y},end]);
+  for(const x of [(start.x+end.x)/2,Math.min(start.x,end.x,...xs)-30,Math.max(start.x,end.x,...xs)+30,...xs])consider([start,{x,y:start.y},{x,y:end.y},end]);
+  for(const y of [(start.y+end.y)/2,Math.min(start.y,end.y,...ys)-30,Math.max(start.y,end.y,...ys)+30,...ys])consider([start,{x:start.x,y},{x:end.x,y},end]);
+  return best||[start,end];
+};
+/* Complete label and badge geometry in one pass, with perpendicular escape
+   positions for short/reversed routes. The same full box governs collision
+   testing and placement; badges never retain a prior pass's coordinates. */
+builderPlaceLabels149=function(paths=null,{preview=false}={}){
+  const svg=$('#builderTree .unifiedConnectorLayer');if(!svg)return;
+  const cache=paths||builderPerfSample149(svg),positions=unifiedBuilderPositions().positions,edges=builderTraceEdges('all'),edgeMap=new Map(edges.map(edge=>[edge.plane+':'+edge.id,edge]));
+  const cards=state.builderNodes.filter(node=>positions.has(node.id)).map(node=>builderV123Pad(builderCardBox(node.id,positions),3));
+  const selected=state.builderSelected,handles=$(`#builderTree [data-unified-node-wrap="${selected}"] .builderConnectionHandles`),card=positions.has(selected)?builderCardBox(selected,positions):null;
+  if(resolvedUnifiedLayoutMode()==='vertical'&&card&&handles){const r=handles.getBoundingClientRect();if(r.height)cards.push({x:card.x,y:card.y+card.h,w:card.w,h:r.height/(state.builderViewport.zoom||1)})}
+  const origin=$('.unifiedBuilderWorld')?.getBoundingClientRect(),zoom=state.builderViewport.zoom||1;
+  const nodeBadges=[...$('#builderTree').querySelectorAll('.builderNodeIssueMarker')].map(marker=>{const r=marker.getBoundingClientRect();return{x:(r.left-origin.left)/zoom,y:(r.top-origin.top)/zoom,w:r.width/zoom,h:r.height/zoom}});
+  const markerKeys=[...new Set(unresolvedValues().filter(issue=>issue.edge).map(issue=>issue.edge.plane+':'+issue.edge.id))].filter(key=>cache.has(key));
+  const markers=[...svg.querySelectorAll('.builderEdgeIssueMarker')],markerMap=new Map();
+  markers.filter(marker=>!marker.dataset.geometryEdge).forEach((marker,i)=>{if(markerKeys[i])marker.dataset.geometryEdge=markerKeys[i]});
+  for(const marker of markers)markerMap.set(marker.dataset.geometryEdge,marker);
+  const fanout=new Map();for(const edge of edges)for(const endpoint of [edge.from,edge.to]){const key=edge.plane+':'+endpoint;fanout.set(key,(fanout.get(key)||0)+1)}
+  const rank=edge=>edge?Math.max(fanout.get(edge.plane+':'+edge.from)||0,fanout.get(edge.plane+':'+edge.to)||0):0;
+  const labels=[...svg.querySelectorAll('.edgeRouteLabel')],placed=[];
+  labels.sort((a,b)=>{const ka=a.dataset.routePlane+':'+a.dataset.routeEdge,kb=b.dataset.routePlane+':'+b.dataset.routeEdge;return rank(edgeMap.get(kb))-rank(edgeMap.get(ka))||(cache.get(ka)?.total||0)-(cache.get(kb)?.total||0)});
+  for(const label of labels){
+    const key=label.dataset.routePlane+':'+label.dataset.routeEdge,edge=edgeMap.get(key),sample=cache.get(key);if(!edge||!sample)continue;
+    const rect=label.querySelector(':scope > rect'),width=Number(rect?.getAttribute('width'))||100,marker=markerMap.get(key),totalWidth=width+(marker?30:0),offset=ensureRelationshipRouting(edge.edge).labelOffset;
+    const preferred=rank(edge)>1?.65:.5,fractions=[preferred,.5,.35,.72,.25,.85,.15,.95,.05];
+    if(!preview)for(let i=2;i<49;i++)fractions.push(i/50);
+    let chosen=null,best=null;
+    for(const fraction of fractions){
+      const point=builderPerfPoint149(sample,fraction),before=builderPerfPoint149(sample,Math.max(0,fraction-.005)),after=builderPerfPoint149(sample,Math.min(1,fraction+.005)),horizontal=Math.abs(after.x-before.x)>=Math.abs(after.y-before.y);
+      for(const perpendicular of preview?[0]:[0,-18,18,-32,32]){
+        const box={x:point.x+offset.x-totalWidth/2+(horizontal?0:perpendicular),y:point.y+offset.y-11+(horizontal?perpendicular:0),w:totalWidth,h:24};
+        const occupied={x:box.x-2,y:box.y-3,w:box.w+4,h:28};
+        if(!preview&&[...cards,...nodeBadges,...placed].some(other=>builderPerfOverlap149(occupied,other)))continue;
+        const crossing=preview?0:builderPerfCrossings149(box,sample,cache),score=crossing*1000+Math.abs(perpendicular)+Math.abs(fraction-preferred);
+        if(!best||score<best.score)best={box,point,score};
+        if(!crossing){chosen=best;break}
+      }
+      if(chosen)break;
+    }
+    chosen??=best;
+    label.classList.remove('builderRouteDeferred146','builderRouteLabelHidden125');
+    label.dataset.labelHidden=chosen?'false':'true';
+    const box=chosen?.box;let point=chosen?.point||builderPerfPoint149(sample,.5);
+    if(!box&&marker)for(const fraction of fractions){const candidate=builderPerfPoint149(sample,fraction),badge={x:candidate.x-14,y:candidate.y-14,w:28,h:28};if(![...cards,...nodeBadges,...placed].some(other=>builderPerfOverlap149(badge,other))){point=candidate;break}}
+    label.setAttribute('transform',`translate(${box?.x??point.x} ${box?.y??point.y-11})`);
+    if(box)placed.push({x:box.x-2,y:box.y-3,w:box.w+4,h:28});
+    if(marker){
+      if(marker.parentNode!==label)label.appendChild(marker);
+      marker.setAttribute('transform',box?`translate(${box.w-15} 11)`:'translate(0 11)');
+      marker.setAttribute('tabindex','0');
+      if(!marker.dataset.geometryWired){marker.dataset.geometryWired='true';marker.addEventListener('pointerdown',event=>event.stopPropagation())}
+      if(!box)placed.push({x:point.x-13,y:point.y-13,w:26,h:26});
+    }
+    if(!box){let title=sample.path.querySelector('title');if(!title){title=document.createElementNS('http://www.w3.org/2000/svg','title');sample.path.appendChild(title)}title.textContent=label.querySelector(':scope > text')?.textContent||'Relationship'}
+  }
+  builderPerfPaths149=cache;
+};
+/* Free-place persistence adds a third header row, so the normal width-only
+   header decision must also account for that row. */
+const builderHeaderFitBefore156=builderHeaderFit142;
+builderHeaderFit142=function(...args){const result=builderHeaderFitBefore156(...args);const head=$('.builderHead');if(state.view==='builder'&&builderSpaceMedia140.matches&&!state.builderCanvasFocus&&head?.querySelector('.builderLayoutPersistence')){head.classList.add('builderTwoRows142');builderSpaceSchedule140()}return result};
+/* Mobile Fit must include the visible topology, rather than applying v124's
+   70% selected-card floor, which clips the first source off the canvas. */
+const builderFitBefore156=fitBuilderView;
+fitBuilderView=function(...args){
+  const result=builderFitBefore156(...args);if(state.view!=='builder'||!builderSheetMedia.matches)return result;
+  const canvas=$('.builderCanvas'),bounds=builderVisibleFitBounds();if(!canvas?.clientWidth||!bounds)return result;
+  const left=26,right=26,top=48,bottom=92,width=Math.max(1,bounds.right-bounds.left),height=Math.max(1,bounds.bottom-bounds.top);
+  const roomWidth=Math.max(1,canvas.clientWidth-left-right),roomHeight=Math.max(1,canvas.clientHeight-top-bottom);
+  const zoom=clampBuilderZoom(Math.min(roomWidth/width,roomHeight/height,1.15));
+  Object.assign(state.builderViewport,{zoom,x:left+(roomWidth-width*zoom)/2-bounds.left*zoom,y:top+(roomHeight-height*zoom)/2-bounds.top*zoom,initialized:true,pendingFit:false});
+  applyBuilderViewport();return result;
+};
+/* Reuse More and the existing control nodes, preserving handlers and their
+   desktop restoration markers. Closed panels need not occupy mobile rows. */
+function builderMobileRestorePanels156(){
+  for(const selector of ['#builderRuleProfileDisclosure','#builderReviewDisclosure','#builderSecondaryTools','#builderGroupBar']){const node=$(selector),marker=builderMobileMoves.get(node);if(marker){marker.replaceWith(node);builderMobileMoves.delete(node)}}
+}
+const builderMobileToolbarBefore156=syncBuilderMobileToolbar;
+syncBuilderMobileToolbar=function(...args){const result=builderMobileToolbarBefore156(...args);if(builderSheetMedia.matches)for(const selector of ['#builderRuleProfileDisclosure','#builderReviewDisclosure','#builderSecondaryTools','#builderGroupBar'])builderMobileMove($(selector));return result};
+const builderMobileRenderBefore156=renderBuilder;
+renderBuilder=function(...args){const result=builderMobileRenderBefore156(...args);if(builderSheetMedia.matches)syncBuilderMobileToolbar();return result};
+syncBuilderMobileToolbar();
+/* Inferred response frequency is not a delivery target. Preserve an explicit
+   latency target, otherwise record that the target has not been supplied. */
+const builderOvTimelinessBefore156=builderOv3Timeliness139;
+builderOv3Timeliness139=function(flow){const value=builderOvTimelinessBefore156(flow);if(String(value).toLowerCase()!==String(builderOv3Periodicity139(flow)).toLowerCase())return value;const seconds=Number(flow.details?.latencySloSeconds);return seconds>0?'≤ '+seconds+' s':'Not set'};
+/* Restore full inspector invalidation. Older callbacks mutate fields without
+   committing history; the v155 subset signature could leave those edits stale.
+   Routing improvements make that risky shortcut unnecessary. */
+renderBuilderInspector=function(...args){return builderInspectorBefore155(...args)};
+changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Canvas routing and consolidated threats','Score routing candidates once, keep connector labels and review badges clear, preserve decisions when merging MFA and certificate threats.',true]);
+document.title='Splunk Pipeline Explorer · Build 156 · 4 Oct 2026';
+$('#topologyBuilder').dataset.buildNumber='156';$('#topologyBuilder').dataset.buildDate='2026-10-04';
+const builderStamp156=$('.builderBuildStamp');if(builderStamp156){builderStamp156.setAttribute('aria-label','Build 156, dated 4 October 2026');builderStamp156.querySelector('b').textContent='Build 156';const date=builderStamp156.querySelector('time');if(date){date.dateTime='2026-10-04';date.textContent='4 Oct 2026'}}
+</script>
+
 </body>
 </html>
