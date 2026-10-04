@@ -22,11 +22,18 @@ const BUDGET = { default: 40, fan5: 50, fan8: 80, reference: 120 };
     const g = SVGGeometryElement.prototype.getPointAtLength;
     SVGGeometryElement.prototype.getPointAtLength = function (x) { points++; return g.call(this, x); };
     const times = [];
-    for (let i = 0; i < 5; i++) { const t = performance.now(); renderBuilder(); times.push(performance.now() - t); }
+    // Each timed redraw follows a state change (an inert field on the first node), as a drop, add or
+    // edit does. Build 160+ skips a redraw when nothing changed, which would otherwise time as ~0 ms.
+    const probe = state.builderNodes[0];
+    for (let i = 0; i < 5; i++) { probe.perfProbe = Date.now() + i; const t = performance.now(); renderBuilder(); times.push(performance.now() - t); }
+    const changedPoints = points;
+    delete probe.perfProbe; renderBuilder();
+    const same = []; for (let i = 0; i < 5; i++) { const t = performance.now(); renderBuilder(); same.push(performance.now() - t); }
+    same.sort((a, b) => a - b);
     SVGGeometryElement.prototype.getPointAtLength = g;
     times.sort((a, b) => a - b);
     return { label, nodes: state.builderNodes.length, links: builderTraceEdges('all').length,
-      redrawMs: Math.round(times[2]), pathPointLookupsPerRedraw: Math.round(points / 5) };
+      redrawMs: Math.round(times[2]), unchangedRedrawMs: Math.round(same[2]), pathPointLookupsPerRedraw: Math.round(changedPoints / 5) };
   }, label);
 
   const out = [];
