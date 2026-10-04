@@ -32,7 +32,15 @@ const BUDGET = { default: 40, fan5: 50, fan8: 80, reference: 120 };
     same.sort((a, b) => a - b);
     SVGGeometryElement.prototype.getPointAtLength = g;
     times.sort((a, b) => a - b);
-    return { label, nodes: state.builderNodes.length, links: builderTraceEdges('all').length,
+    // A redraw after a card moves (free layout), so routes and path geometry change, as in a drag/drop.
+    // Caches keyed on unchanged geometry can't help here; this is the realistic worst case.
+    const layoutBefore = state.builderCanvasLayout, moved = [];
+    state.builderCanvasLayout = 'free'; renderBuilder();
+    const mover = state.builderNodes[state.builderNodes.length - 1], home = { ...(state.builderFreePositions[mover.id] || { x: 24, y: 24 }) };
+    for (let i = 0; i < 5; i++) { state.builderFreePositions[mover.id] = { x: home.x + 17 * (i + 1), y: home.y + 23 * (i + 1) }; const t = performance.now(); renderBuilder(); moved.push(performance.now() - t); }
+    state.builderFreePositions[mover.id] = home; state.builderCanvasLayout = layoutBefore; renderBuilder();
+    moved.sort((a, b) => a - b);
+    return { label, movedRedrawMs: Math.round(moved[2]), nodes: state.builderNodes.length, links: builderTraceEdges('all').length,
       redrawMs: Math.round(times[2]), unchangedRedrawMs: Math.round(same[2]), pathPointLookupsPerRedraw: Math.round(changedPoints / 5) };
   }, label);
 
@@ -52,7 +60,7 @@ const BUDGET = { default: 40, fan5: 50, fan8: 80, reference: 120 };
     await page.waitForTimeout(500);
     out.push(await measure('reference'));
   }
-  for (const row of out) { row.budgetMs = BUDGET[row.label]; row.ok = row.redrawMs <= row.budgetMs; }
+  for (const row of out) { row.budgetMs = BUDGET[row.label]; row.ok = row.redrawMs <= row.budgetMs && row.movedRedrawMs <= row.budgetMs; }
   console.log(JSON.stringify({ results: out, errors, allOk: out.every(r => r.ok) && !errors.length }, null, 1));
   await browser.close();
 })();
