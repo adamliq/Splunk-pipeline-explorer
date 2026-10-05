@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>SV-1 Systems Interface Description</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV, DIV and CV mockups. Banners, title block, purpose, then the
+   systems diagram (Builder components inside dashed location frames, interfaces tagged SI-n) beside a detail panel, the
+   interface and system registers, and findings. Line colour encodes the plane; dashed lines are inferred or missing. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+
+.model{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.model>*{min-width:0}
+@media (max-width:1150px){.model{grid-template-columns:1fr}}
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+svg.sv1{display:block;width:100%;min-width:900px;height:auto}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.frame rect{fill:var(--sheet);stroke:var(--rule);stroke-width:1;stroke-dasharray:5 4}
+.frame text{font:600 10px var(--font-code);letter-spacing:.12em;text-transform:uppercase;fill:var(--muted)}
+.sys{cursor:pointer}
+.sys:focus{outline:none}
+.sys rect.box{fill:var(--node);stroke:var(--rule)}
+.sys.lonely rect.box{stroke:var(--review);stroke-dasharray:4 3}
+.sys:focus-visible rect.box,.sys.sel rect.box{stroke:var(--sel);stroke-width:2.5}
+.sys .t{font:600 11.5px var(--font-title);fill:var(--ink)}
+.sys .ty{font:500 9.5px var(--font-code);fill:var(--muted)}
+.ifc{cursor:pointer}
+.ifc path.ln{fill:none;stroke-width:2}
+.ifc.data path.ln{stroke:var(--d-index)}
+.ifc.management path.ln{stroke:var(--d-collect);stroke-dasharray:7 4;stroke-width:1.6}
+.ifc.access path.ln{stroke:var(--d-govern);stroke-dasharray:2 4;stroke-linecap:round;stroke-width:2.2}
+.ifc.response path.ln{stroke:var(--d-detect)}
+.ifc.inferred path.ln{stroke-dasharray:3 3;opacity:.9}
+.ifc.missing path.ln{stroke:var(--stop);stroke-dasharray:6 4}
+.ifc .hd{stroke:none}
+.ifc.data .hd{fill:var(--d-index)}.ifc.management .hd{fill:var(--d-collect)}.ifc.access .hd{fill:var(--d-govern)}.ifc.response .hd{fill:var(--d-detect)}.ifc.missing .hd{fill:var(--stop)}
+.ifc rect.tag{fill:var(--sheet);stroke:var(--line);stroke-width:1}
+.ifc.missing rect.tag{stroke:var(--stop)}
+.ifc.inferred rect.tag{stroke-dasharray:3 2}
+.ifc text{font:600 9px var(--font-code);fill:var(--ink-2)}
+.ifc .hit{fill:none;stroke:transparent;stroke-width:12}
+svg.focused .sys:not(.on):not(.sel){opacity:.28}
+svg.focused .ifc:not(.on){opacity:.12}
+svg.focused .ifc.on rect.tag{stroke:var(--sel);stroke-width:2}
+
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:9px;align-content:start}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:0;font:700 1.12rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.85rem}
+.detail dl{margin:0;display:grid;gap:7px}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.84rem}
+.detail ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:.84rem}
+.detail li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
+.detail code{font:500 .74rem var(--font-code);background:var(--zone);padding:1px 4px;border-radius:3px}
+.detail .hint{font-size:.78rem;color:var(--muted)}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tr:last-child td{border-bottom:0}
+.reg tbody tr{cursor:pointer}
+.reg tbody tr:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code);white-space:nowrap}
+.plane{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.sys,.ifc{transition:opacity .15s}}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="sTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="sTitle">SV-1 · Systems Interface Description</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Systems (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">System owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>The systems in the Builder topology, where they run, and every interface between them with its protocol, port and protection. Interfaces the topology declares are drawn solid; interfaces OV-2 needs but the topology does not declare are drawn dashed so they can be added.</p></div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="model">
+        <figure>
+          <div class="figscroll">
+            <svg class="sv1" id="sv1" viewBox="0 0 1240 500" role="group" aria-label="SV-1 systems interface diagram"></svg>
+          </div>
+          <figcaption>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--d-index)" stroke-width="2"/></svg>event data</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--d-collect)" stroke-width="1.6" stroke-dasharray="7 4"/></svg>management</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M2 5h30" stroke="var(--d-govern)" stroke-width="2.2" stroke-dasharray="2 4" stroke-linecap="round"/></svg>access</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--d-detect)" stroke-width="2"/></svg>response</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--line)" stroke-width="2" stroke-dasharray="3 3"/></svg>inferred, not in topology</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--stop)" stroke-width="2" stroke-dasharray="6 4"/></svg>missing output</span>
+            <span class="key">Dashed frames are locations. Click a system or an interface tag.</span>
+          </figcaption>
+        </figure>
+        <aside class="detail" id="detail" aria-live="polite"></aside>
+      </div>
+
+      <h2>Interface register</h2>
+      <p class="sub">Every interface between systems. "Declared" comes from the Builder topology; "inferred" is needed by an OV-2 resource flow but has no relationship in the topology yet.</p>
+      <div class="tablewrap"><table class="reg" id="ifcs">
+        <thead><tr><th>ID</th><th>From</th><th>To</th><th>Protocol</th><th>Port</th><th>TLS</th><th>Carries (DIV-2)</th><th>Source</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+
+      <h2>System register</h2>
+      <div class="tablewrap"><table class="reg" id="systems">
+        <thead><tr><th>System</th><th>Builder component</th><th>Location</th><th>Interfaces</th><th>Version</th><th>Owner</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+
+      <div class="findings">
+        <h2>What the view shows</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · System owner not set · Systems and interfaces from the Builder topology (17 components)</span><span>SV-1 · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+const W=130,H=44;
+// id, name, Builder component, location, x, y, owner
+const SYS=[
+ ['s6','Syslog Source 2','Syslog Source','Melbourne',40,48,'Network team'],
+ ['s7','Syslog Server 2','Syslog Server','Melbourne',200,48,'Log onboarding team'],
+ ['s8','Universal Forwarder 2','Universal Forwarder','Melbourne',360,48,'Log onboarding team'],
+ ['s1','Firewalls and network devices','Syslog Source','Sydney',40,160,'Network team'],
+ ['s2','Syslog Server 1','Syslog Server','Sydney',200,160,'Log onboarding team'],
+ ['s3','Universal Forwarder 1','Universal Forwarder','Sydney',360,160,'Log onboarding team'],
+ ['s5','Windows Event Log 1','Windows Event Log','Sydney',40,230,'Not set'],
+ ['s10','Heavy Forwarder 1','Heavy Forwarder','Sydney',360,230,'Log onboarding team'],
+ ['s15','Deployment Server 1','Deployment Server','Sydney',40,305,'Splunk platform team'],
+ ['s16','License Manager 1','License Manager','Sydney',200,305,'Splunk platform team'],
+ ['s17','Monitoring Console 1','Monitoring Console','Sydney',360,305,'Splunk platform team'],
+ ['s9','AWS Lambda 1','AWS Lambda','AWS ap-southeast-2',40,428,'Cloud team'],
+ ['s4','Indexer 1','Indexer','Multisite',575,160,'Splunk platform team'],
+ ['s11','Search Head 1','Search Head','Multisite',725,160,'Splunk platform team'],
+ ['s12','Splunk SOAR · Cloud 1','Splunk SOAR · Cloud','Cloud',990,160,'Security operations'],
+ ['s14','Authentication Provider · Cloud 1','Authentication Provider · Cloud','Cloud',990,250,'Identity team'],
+ ['s13','Administrator 1','User / Administrator','Security operations',990,405,'Security operations']
+];
+const FRAMES=[['Melbourne',20,20,500,92],['Sydney',20,130,500,250],['AWS ap-southeast-2',20,398,500,90],['Multisite',555,20,315,370],['Cloud',965,20,260,300],['Security operations',965,345,260,143]];
+// id, from, to, plane, source(declared|inferred|missing), protocol, port, tls, carries, path points, tag segment, status note
+const IFC=[
+ ['SI-1','s1','s2','data','declared','Syslog TCP/TLS or UDP','514 / 6514','Not applicable','Event',[[170,182],[200,182]],0,'plain'],
+ ['SI-2','s2','s3','data','declared','File handoff (local disk)','—','Not applicable','Event',[[330,182],[360,182]],0,'ok'],
+ ['SI-3','s3','s4','data','declared','Splunk-to-Splunk','9997','Required','Event',[[490,182],[575,182]],0,'ok'],
+ ['SI-4','s6','s7','data','declared','Syslog TCP/TLS or UDP','514 / 6514','Not applicable','Event',[[170,70],[200,70]],0,'plain'],
+ ['SI-5','s7','s8','data','declared','File handoff (local disk)','—','Not applicable','Event',[[330,70],[360,70]],0,'ok'],
+ ['SI-6','s9','s10','data','declared','HEC HTTPS','8088','Required','Event',[[170,450],[345,450],[345,252],[360,252]],0,'ok'],
+ ['SI-7','s4','s11','data','declared','Search dispatch (REST)','8089','Required','Event, Bucket',[[705,182],[725,182]],-1,'ok'],
+ ['SI-8','s15','s3','management','declared','Phone-home and app delivery','8089','Required','DeploymentApp, ServerClass, DataInput',[[170,320],[185,320],[185,120],[420,120],[420,160]],3,'ok'],
+ ['SI-9','s15','s8','management','declared','Phone-home and app delivery','8089','Required','DeploymentApp, ServerClass, DataInput',[[185,120],[445,120],[445,92]],1,'ok'],
+ ['SI-10','s15','s10','management','declared','Phone-home and app delivery','8089','Required','DeploymentApp, ServerClass, DataInput',[[185,215],[440,215],[440,230]],0,'ok'],
+ ['SI-11','s13','s14','access','declared','SAML SSO','443','Required','User',[[1055,405],[1055,330],[1055,294]],1,'ok'],
+ ['SI-12','s14','s11','access','declared','SAML assertion via search-tier load balancer','8000','Required','User, UserRole',[[990,272],[790,272],[790,204]],0,'ok'],
+ ['SI-13','s8','s4','data','missing','Splunk-to-Splunk','9997','Required','Event',[[490,70],[610,70],[610,160]],0,'missing'],
+ ['SI-14','s10','s4','data','missing','Splunk-to-Splunk','9997','Required','Event',[[490,252],[555,252],[555,198],[575,198]],0,'missing'],
+ ['SI-15','s11','s12','response','inferred','Findings to cases (REST)','443','Required','Finding, SOARContainer',[[855,182],[990,182]],0,'inferred'],
+ ['SI-16','s16','s4','management','inferred','Licence peer reporting','8089','Required','LicenseUsage',[[265,349],[265,372],[600,372],[600,204]],1,'inferred'],
+ ['SI-17','s17','s4','management','inferred','Monitoring console (REST)','8089','Required','Bucket, LicenseUsage',[[490,327],[580,327],[580,204]],0,'inferred']
+];
+const STATUS={ok:['ok','Declared'],plain:['gap','Plaintext'],missing:['stop','Missing output'],inferred:['gap','Add to topology']};
+const PLANE={data:'--d-index',management:'--d-collect',access:'--d-govern',response:'--d-detect'};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sys=id=>SYS.find(s=>s[0]===id);
+const ifcOf=id=>IFC.filter(i=>i[1]===id||i[2]===id);
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+const svg=document.getElementById('sv1');
+const fG=el('g',{},svg),iG=el('g',{},svg),sG=el('g',{},svg),tG=el('g',{},svg);
+FRAMES.forEach(([n,x,y,w,h])=>{const g=el('g',{class:'frame'},fG);el('rect',{x,y,width:w,height:h,rx:6},g);el('text',{x:x+10,y:y+15},g).textContent=n});
+const ifcEls={},sysEls={};
+IFC.forEach(i=>{const [id,,,plane,src,,,,,pts,seg]=i,g=el('g',{class:`ifc ${plane} ${src}`},iG);g.dataset.id=id;
+  const last=pts[pts.length-1],prev=pts[pts.length-2],dx=Math.sign(last[0]-prev[0]),dy=Math.sign(last[1]-prev[1]),ah=8,end=[last[0]-dx*ah,last[1]-dy*ah];
+  const d='M'+pts.slice(0,-1).map(p=>p.join(' ')).join(' L')+' L'+end.join(' ');
+  el('path',{class:'hit',d:'M'+pts.map(p=>p.join(' ')).join(' L')},g);el('path',{class:'ln',d},g);
+  el('path',{class:'hd',d:`M${last[0]} ${last[1]} L${end[0]-dy*4.5} ${end[1]+dx*4.5} L${end[0]+dy*4.5} ${end[1]-dx*4.5}Z`},g);
+  const tg=el('g',{class:`ifc ${plane} ${src}`},tG);tg.dataset.id=id;
+  let m;if(seg<0){m=[(pts[0][0]+pts[1][0])/2,pts[0][1]-16]}else{const a=pts[seg],b=pts[seg+1];m=[(a[0]+b[0])/2,(a[1]+b[1])/2]}
+  const tw=id.length*6+8;el('rect',{class:'tag',x:m[0]-tw/2,y:m[1]-8,width:tw,height:16,rx:8},tg);el('text',{x:m[0],y:m[1]+3,'text-anchor':'middle'},tg).textContent=id;
+  ifcEls[id]=[g,tg]});
+SYS.forEach(([id,name,type,loc,x,y])=>{const lonely=!ifcOf(id).length,g=el('g',{class:'sys'+(lonely?' lonely':''),tabindex:0,role:'button','aria-pressed':'false','aria-label':`${name}, ${type}, ${loc}`},sG);g.dataset.id=id;
+  el('rect',{class:'box',x,y,width:W,height:H,rx:4},g);
+  const words=name.split(' '),lines=[];let cur='';words.forEach(w=>{if((cur+" "+w).trim().length>15&&cur){lines.push(cur);cur=w}else cur=(cur+' '+w).trim()});lines.push(cur);
+  if(lines.length>2){lines[1]=lines.slice(1).join(' ')}
+  lines.slice(0,2).forEach((t,k)=>el('text',{class:'t',x:x+8,y:y+16+k*13},g).textContent=t);
+  if(lines.length===1)el('text',{class:'ty',x:x+8,y:y+34},g).textContent=type===name.replace(/ \d+$/,'')?loc:type;
+  sysEls[id]=g});
+
+const counts={declared:IFC.filter(i=>i[4]==='declared').length,inferred:IFC.filter(i=>i[4]==='inferred').length,missing:IFC.filter(i=>i[4]==='missing').length,plain:IFC.filter(i=>i[11]==='plain').length,lonely:SYS.filter(s=>!ifcOf(s[0]).length).length};
+document.getElementById('summary').innerHTML=`<span><b>${SYS.length}</b>systems</span><span><b>${FRAMES.length}</b>locations</span><span><b>${counts.declared}</b>declared interfaces</span><span class="rv"><b>${counts.inferred}</b>inferred, not in topology</span><span class="rv"><b>${counts.missing}</b>forwarders with no output</span><span class="rv"><b>${counts.plain}</b>plaintext</span><span class="rv"><b>${counts.lonely}</b>unconnected system</span>`;
+
+const detail=document.getElementById('detail');
+const chip=i=>`<span class="chip ${STATUS[i[11]][0]}">${STATUS[i[11]][1]}</span>`;
+function showSys(id){const s=sys(id),list=ifcOf(id);
+  detail.innerHTML=`<span class="dom">System · ${esc(s[3])}</span><h3>${esc(s[1])}</h3><p>Builder component: <b>${esc(s[2])}</b></p>
+  <dl><dt>Interfaces</dt><dd>${list.length?`<ul>${list.map(i=>`<li><span class="id">${i[0]}</span><span>${i[1]===id?'to':'from'} ${esc(sys(i[1]===id?i[2]:i[1])[1])} · ${esc(i[5])}${i[6]!=='—'?' '+i[6]:''} ${i[11]!=='ok'?chip(i):''}</span></li>`).join('')}</ul>`:'<span class="chip gap">None</span> Not connected in the topology. It sends nothing to the platform.'}</dd>
+  <dt>Owner</dt><dd>${s[6]==='Not set'?'<span class="notset">Not set</span>':esc(s[6])}</dd><dt>Version</dt><dd><span class="notset">Not set</span></dd></dl>`}
+function showIfc(id){const i=IFC.find(x=>x[0]===id);
+  detail.innerHTML=`<span class="dom">Interface · ${i[3]} plane · ${i[4]}</span><h3>${id} · ${esc(sys(i[1])[1])} → ${esc(sys(i[2])[1])}</h3>
+  <dl><dt>Protocol and port</dt><dd>${esc(i[5])} <code>${esc(i[6])}</code></dd><dt>TLS</dt><dd>${esc(i[7])}</dd><dt>Carries (DIV-2)</dt><dd>${esc(i[8])}</dd><dt>Status</dt><dd>${chip(i)}</dd></dl>
+  <p class="hint">${i[4]==='missing'?'The forwarder receives events but has no output relationship, so nothing it collects reaches an indexer. Connect it to Indexer 1 in the Builder.':i[4]==='inferred'?'OV-2 needs this flow, but the topology has no relationship for it. Add it in the Builder so its port and TLS can be validated.':i[11]==='plain'?'UDP syslog has no transport security. Use TCP with TLS on 6514 where the device supports it.':'Declared in the Builder topology.'}</p>`}
+function intro(){detail.innerHTML=`<span class="dom">Interface health</span><h3>${counts.declared} declared, ${counts.inferred+counts.missing} to add</h3>
+  <ul>${IFC.filter(i=>i[11]!=='ok').map(i=>`<li>${chip(i)}<span>${i[0]} ${esc(sys(i[1])[1])} → ${esc(sys(i[2])[1])}</span></li>`).join('')}<li><span class="chip gap">Unconnected</span><span>Windows Event Log 1</span></li></ul>
+  <p class="hint">Select a system or an interface tag to trace it. Esc clears.</p>`}
+let current=null;
+function select(k){current=k;svg.classList.add('focused');const isSys=k[0]==='s',on=new Set([k]);
+  if(isSys)ifcOf(k).forEach(i=>{on.add(i[0]);on.add(i[1]);on.add(i[2])});else{const i=IFC.find(x=>x[0]===k);on.add(i[1]);on.add(i[2])}
+  Object.entries(sysEls).forEach(([id,g])=>{g.classList.toggle('on',on.has(id));g.classList.toggle('sel',id===k);g.setAttribute('aria-pressed',String(id===k))});
+  Object.entries(ifcEls).forEach(([id,gs])=>gs.forEach(g=>g.classList.toggle('on',on.has(id))));
+  document.querySelectorAll('#ifcs tbody tr').forEach(r=>r.classList.toggle('sel',on.has(r.dataset.k)));
+  document.querySelectorAll('#systems tbody tr').forEach(r=>r.classList.toggle('sel',r.dataset.k===k));
+  isSys?showSys(k):showIfc(k)}
+function clear(){current=null;svg.classList.remove('focused');document.querySelectorAll('.sel,.on').forEach(e=>e.classList.remove('sel','on'));intro()}
+const pick=k=>current===k?clear():select(k);
+Object.entries(sysEls).forEach(([id,g])=>{g.addEventListener('click',()=>pick(id));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(id)}})});
+Object.entries(ifcEls).forEach(([id,gs])=>gs.forEach(g=>g.addEventListener('click',()=>pick(id))));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)clear()});
+
+document.querySelector('#ifcs tbody').innerHTML=IFC.map(i=>`<tr data-k="${i[0]}"><td class="id">${i[0]}</td><td>${esc(sys(i[1])[1])}</td><td>${esc(sys(i[2])[1])}</td><td><span class="plane" style="background:var(${PLANE[i[3]]})"></span>${esc(i[5])}</td><td class="mono">${esc(i[6])}</td><td>${i[7]==='Required'?'Required':'<span class="chip '+(i[11]==='plain'?'gap':'ext')+'">'+esc(i[7])+'</span>'}</td><td>${esc(i[8])}</td><td>${i[4]==='declared'?'Declared':i[4]==='inferred'?'Inferred (OV-2)':'Missing'}</td><td>${chip(i)}</td></tr>`).join('');
+document.querySelectorAll('#ifcs tbody tr').forEach(r=>r.addEventListener('click',()=>pick(r.dataset.k)));
+document.querySelector('#systems tbody').innerHTML=SYS.map(s=>{const n=ifcOf(s[0]).length;return `<tr data-k="${s[0]}"><td><b>${esc(s[1])}</b></td><td>${esc(s[2])}</td><td>${esc(s[3])}</td><td class="mono">${n||'<span class="chip gap">None</span>'}</td><td><span class="notset">Not set</span></td><td>${s[6]==='Not set'?'<span class="notset">Not set</span>':esc(s[6])}</td></tr>`}).join('');
+document.querySelectorAll('#systems tbody tr').forEach(r=>r.addEventListener('click',()=>pick(r.dataset.k)));
+
+document.getElementById('findings').innerHTML=[
+ ['stop','Missing output','<b>Universal Forwarder 2 and Heavy Forwarder 1 have no output to an indexer.</b> Melbourne syslog and the AWS Lambda events stop at the forwarder. OV-1 draws these flows because it groups forwarders by tier; the topology does not have them. Connect both to Indexer 1 (SI-13, SI-14).'],
+ ['gap','Inferred','<b>Three interfaces exist in OV-2 but not in the topology</b>: Search Head → SOAR (SI-15), License Manager → Indexer (SI-16) and Monitoring Console → Indexer (SI-17). Add them so their ports and TLS settings are recorded and validated.'],
+ ['gap','Plaintext','<b>Both syslog interfaces (SI-1, SI-4) allow UDP</b>, which has no transport security. Event data, including PII in <code>_raw</code>, crosses the site network in clear text until the syslog server.'],
+ ['gap','Unconnected','<b>Windows Event Log 1 has no interface.</b> Either add a Universal Forwarder on the Windows hosts or remove it from the topology. CV-2 C1.2 (endpoint collection) counts on it.'],
+ ['ok','TLS',`<b>Every Splunk-to-Splunk, HEC, management and SAML interface requires TLS</b> (${IFC.filter(i=>i[7]==='Required').length} of ${IFC.length}). Certificate expiry is the shared risk; see the PKI entry in CV-4 external dependencies.`]
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+intro();
+</script>
+
+</body>
+</html>
