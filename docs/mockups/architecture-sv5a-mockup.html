@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>SV-5a Activity to Function</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV, DIV, CV and SV mockups. Banners, title block, purpose, a
+   detail strip for the selection, then the function × activity matrix (SV-4 functions down, OV-5 activities across) with an activity support row, and findings. Amber marks partial or limited, red marks not realised or blocked. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.sw{width:12px;height:12px;border-radius:2px;display:inline-block;vertical-align:-1px}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.part,.chip.plan,.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+
+/* Detail strip */
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px 16px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.3fr) minmax(0,1fr);gap:12px 22px;min-height:132px}
+@media (max-width:960px){.detail{grid-template-columns:1fr}}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:4px 0 6px;font:700 1.16rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.86rem;line-height:1.5}
+.detail dl{margin:0;display:grid;gap:7px;align-content:start}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.85rem}
+.detail ul{margin:2px 0 0;padding:0;list-style:none;display:grid;gap:4px;font-size:.84rem}
+.detail code{font:500 .76rem var(--font-code);background:var(--zone);padding:1px 5px;border-radius:3px}
+
+/* Matrix */
+.mwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.mx{border-collapse:separate;border-spacing:0;width:100%;font-size:.8rem}
+.mx th,.mx td{border-bottom:1px solid var(--rule);padding:0}
+.mx thead th{background:var(--zone);font:600 .62rem/1.2 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);vertical-align:bottom}
+.mx thead tr.fam th{border-bottom:0;padding:7px 6px 2px;text-align:center;border-left:1px solid var(--rule)}
+.mx thead tr.fam th:first-child{border-left:0}
+.mx thead tr.cols th{padding:4px 4px 8px}
+.mx th.colh{width:58px;min-width:58px;text-align:center;border-left:1px solid var(--rule);cursor:pointer}
+.mx th.colh button{all:unset;cursor:pointer;display:grid;gap:3px;justify-items:center;width:100%;padding:2px 0}
+.mx th.colh .cid{font:600 .66rem var(--font-code);color:var(--ink)}
+.mx th.colh .nm{font:500 .62rem/1.2 var(--font-body);letter-spacing:0;text-transform:none;color:var(--ink-2);max-width:56px;text-wrap:balance}
+.mx th.colh button:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+.mx th.rowh{position:sticky;left:0;z-index:1;background:var(--sheet);text-align:left;font-weight:400;padding:6px 10px;min-width:250px;border-right:1px solid var(--rule);cursor:pointer}
+.mx thead th.rowh{background:var(--zone);vertical-align:bottom;padding:8px 10px}
+.mx th.rowh .cid{font:600 .7rem var(--font-code);color:var(--muted);margin-right:6px}
+.mx th.rowh .dot{margin-left:6px}
+.mx tr.grp th,.mx tr.grp td{background:var(--zone);font:700 .78rem var(--font-title);padding:5px 10px}
+.mx tr.grp th{position:sticky;left:0;z-index:1}
+.mx td.c{text-align:center;border-left:1px solid var(--rule);font:600 .95rem/1 var(--font-code);height:30px}
+.mx td.c.p{color:var(--ink)}
+.mx td.c.s{color:var(--muted)}
+.mx td.c.gap{color:var(--review);background:color-mix(in srgb,var(--review) 9%,transparent)}
+.mx td.c.okc{color:var(--ok)}
+.mx td.st{padding:6px 10px;white-space:nowrap;border-left:1px solid var(--rule)}
+.mx tfoot td,.mx tfoot th{background:var(--zone);padding:6px 4px;text-align:center;font:600 .66rem/1.3 var(--font-code);border-bottom:0;border-top:1px solid var(--rule)}
+.mx tfoot th.rowh{text-align:left;padding:6px 10px;background:var(--zone)}
+.mx tfoot td{border-left:1px solid var(--rule)}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;vertical-align:1px}
+.dot.ok{background:var(--ok)}.dot.part{background:var(--review)}.dot.plan{border:1.5px solid var(--review)}
+.mx tbody tr:not(.grp):hover th.rowh,.mx tbody tr:not(.grp):hover td{background-color:var(--hi)}
+.mx.focused tbody tr:not(.grp):not(.on){opacity:.35}
+.mx.focused .col-on{background-color:color-mix(in srgb,var(--sel) 10%,transparent)}
+.mx tr.on th.rowh{box-shadow:inset 3px 0 0 var(--sel)}
+.mx th.colh.sel{box-shadow:inset 0 -3px 0 var(--sel)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.78rem;color:var(--ink-2)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend b{font:600 .95rem var(--font-code)}
+
+/* Findings */
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tr:last-child td{border-bottom:0}
+.reg tbody tr{cursor:pointer}
+.reg tbody tr:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.mx tbody tr{transition:opacity .15s}}
+
+
+.mx tr.grp th{text-align:left;white-space:nowrap}
+.mx td.c.no{color:var(--stop);background:color-mix(in srgb,var(--stop) 8%,transparent)}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="sTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="sTitle">SV-5a · Operational Activity to Systems Function Traceability Matrix</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Systems (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">System owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>Which SV-4 system functions carry out each OV-5 operational activity. An activity is supported only when at least one function that implements it is realised in the topology.</p></div>
+
+      <div class="summary" id="summary"></div>
+      <div class="detail" id="detail" aria-live="polite"></div>
+
+      <div class="legend">
+        <span><b>●</b>implements the activity</span>
+        <span><b style="color:var(--muted)">○</b>supports it</span>
+        <span><b style="color:var(--review)">●</b>function partial</span>
+        <span><b style="color:var(--stop)">●</b>function not realised</span>
+        <span>Click a function or an activity. Esc clears.</span>
+      </div>
+      <div class="mwrap"><table class="mx" id="mx"></table></div>
+
+      <div class="findings">
+        <h2>What the matrix shows</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · System owner not set · Activities from OV-5 / CV-6; functions from SV-4</span><span>SV-5a · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+const ACT=[
+ ['A1','Generate security telemetry','Security sources'],['A2','Collect, buffer and forward','Collection'],['A3','Forward and deliver events','Collection'],
+ ['A4','Process and route events','Processing'],['A5','Index and replicate','Indexing'],['A6','Search and detect','Search and detection'],
+ ['A7','Manage the platform','Management'],['A8','Authenticate and investigate','People'],['A9','Coordinate response','Response']];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ST={ok:['ok','Realised'],partial:['gap','Partial'],none:['stop','Not realised'],ext:['ext','Outside platform']};
+
+const GROUPS={F1:'Collect',F2:'Parse',F3:'Forward',F4:'Index',F5:'Search',F6:'Detect and respond',F7:'Manage',F8:'Access'};
+// id, name, status, {activity: 'p' implements | 's' supports}
+const FN=[
+ ['F1.1','Receive syslog and write per-host files','ok',{A2:'p'}],['F1.2','Monitor files and event logs','ok',{A2:'p',A1:'s'}],['F1.3','Receive HTTP Event Collector events','ok',{A2:'p',A1:'s'}],
+ ['F2.1','Break lines (parsingQueue)','ok',{A4:'p'}],['F2.2','Merge lines (aggQueue)','ok',{A4:'p'}],['F2.3','Extract timestamps','ok',{A4:'p',A6:'s'}],['F2.4','Route, filter and mask (typingQueue)','partial',{A4:'p'}],
+ ['F3.1','Load-balanced output (tcpout)','partial',{A3:'p'}],['F3.2','Acknowledge and queue (useACK)','ok',{A3:'p',A5:'s'}],
+ ['F4.1','Write journal and tsidx (indexQueue)','ok',{A5:'p'}],['F4.2','Roll buckets hot → warm → cold → frozen','ok',{A5:'p',A7:'s'}],['F4.3','Replicate buckets','none',{A5:'p'}],
+ ['F5.1','Dispatch searches to peers','ok',{A6:'p',A8:'s'}],['F5.2','Extract fields and apply lookups at search time','ok',{A6:'p',A8:'s'}],['F5.3','Accelerate data models (CIM)','ok',{A6:'p'}],
+ ['F6.1','Run correlation searches (ES)','none',{A6:'p',A9:'s'}],['F6.2','Create cases and run playbooks','partial',{A9:'p',A8:'s'}],
+ ['F7.1','Distribute configuration (phone-home)','ok',{A7:'p',A2:'s'}],['F7.2','Report licence usage','ok',{A7:'p'}],['F7.3','Monitor platform health','ok',{A7:'p'}],
+ ['F8.1','Authenticate users (SAML)','ok',{A8:'p'}],['F8.2','Authorise by role','ok',{A8:'p',A6:'s'}]
+];
+// Activity coverage: best status among implementing functions; A1 is outside the platform
+function cover(a){if(a==='A1')return 'ext';const imp=FN.filter(f=>f[3][a]==='p');if(!imp.length)return 'none';
+  if(imp.every(f=>f[2]==='ok'))return 'ok';if(imp.some(f=>f[2]==='ok'))return 'partial';return imp.some(f=>f[2]==='partial')?'partial':'none'}
+const COV={ok:['ok','Supported'],partial:['gap','Partly'],none:['stop','Unsupported'],ext:['ext','Outside platform']};
+const mx=document.getElementById('mx');
+mx.innerHTML=`<thead><tr class="cols"><th class="rowh">System function (SV-4)</th>${ACT.map(a=>`<th class="colh" data-a="${a[0]}"><button type="button" aria-pressed="false"><span class="cid">${a[0]}</span><span class="nm">${esc(a[1])}</span></button></th>`).join('')}<th class="st">Function status</th></tr></thead>
+<tbody>${Object.entries(GROUPS).map(([g,n])=>`<tr class="grp"><th>${g} · ${esc(n)}</th><td colspan="${ACT.length+1}"></td></tr>`+FN.filter(f=>f[0].startsWith(g+'.')).map(f=>`<tr data-c="${f[0]}"><th class="rowh" tabindex="0"><span class="cid">${f[0]}</span>${esc(f[1])}</th>${ACT.map(a=>{const v=f[3][a[0]];return `<td class="c ${v||''} ${v==='p'?(f[2]==='partial'?'gap':f[2]==='none'?'no':''):''}" data-a="${a[0]}">${v==='p'?'●':v==='s'?'○':''}</td>`}).join('')}<td class="st"><span class="chip ${ST[f[2]][0]}">${ST[f[2]][1]}</span></td></tr>`).join('')).join('')}</tbody>
+<tfoot><tr><th class="rowh">Activity support today</th>${ACT.map(a=>{const c=cover(a[0]);return `<td><span class="chip ${COV[c][0]}">${COV[c][1]}</span><br>${FN.filter(f=>f[3][a[0]]==='p').length} ● · ${FN.filter(f=>f[3][a[0]]==='s').length} ○</td>`}).join('')}<td></td></tr></tfoot>`;
+
+const detail=document.getElementById('detail');
+function showAct(a){const act=ACT.find(x=>x[0]===a),imp=FN.filter(f=>f[3][a]==='p'),sup=FN.filter(f=>f[3][a]==='s'),c=cover(a);
+  detail.innerHTML=`<div><span class="dom">Operational activity · ${esc(act[2])}</span><h3>${a} · ${esc(act[1])}</h3><p>Support today: <span class="chip ${COV[c][0]}">${COV[c][1]}</span></p>${a==='A1'?'<p>Performed by the monitored systems. Platform functions only support it.</p>':''}</div>
+  <dl><dt>Implemented by</dt><dd>${imp.length?`<ul>${imp.map(f=>`<li>${f[0]} ${esc(f[1])}${f[2]!=='ok'?' <span class="chip '+ST[f[2]][0]+'">'+ST[f[2]][1]+'</span>':''}</li>`).join('')}</ul>`:'—'}</dd></dl>
+  <dl><dt>Supported by</dt><dd>${sup.length?`<ul>${sup.map(f=>`<li>${f[0]} ${esc(f[1])}</li>`).join('')}</ul>`:'—'}</dd></dl>`}
+function showFn(id){const f=FN.find(x=>x[0]===id),imp=ACT.filter(a=>f[3][a[0]]==='p'),sup=ACT.filter(a=>f[3][a[0]]==='s');
+  detail.innerHTML=`<div><span class="dom">System function · ${GROUPS[id.split('.')[0]]}</span><h3>${id} · ${esc(f[1])}</h3><p>Status in the topology: <span class="chip ${ST[f[2]][0]}">${ST[f[2]][1]}</span></p></div>
+  <dl><dt>Implements</dt><dd><ul>${imp.map(a=>`<li>${a[0]} ${esc(a[1])}</li>`).join('')}</ul></dd></dl><dl><dt>Supports</dt><dd>${sup.length?`<ul>${sup.map(a=>`<li>${a[0]} ${esc(a[1])}</li>`).join('')}</ul>`:'—'}</dd></dl>`}
+let current=null;
+function select(k){current=k;mx.classList.add('focused');
+  mx.querySelectorAll('tbody tr[data-c]').forEach(r=>r.classList.toggle('on',k[0]==='F'?r.dataset.c===k:!!FN.find(f=>f[0]===r.dataset.c)[3][k]));
+  mx.querySelectorAll('[data-a]').forEach(e=>e.classList.toggle('col-on',e.dataset.a===k));
+  mx.querySelectorAll('th.colh').forEach(h=>{h.classList.toggle('sel',h.dataset.a===k);h.querySelector('button').setAttribute('aria-pressed',String(h.dataset.a===k))});
+  k[0]==='F'?showFn(k):showAct(k)}
+function clear(){current=null;mx.classList.remove('focused');mx.querySelectorAll('.on,.col-on,.sel').forEach(e=>e.classList.remove('on','col-on','sel'));showAct('A6')}
+mx.querySelectorAll('th.colh button').forEach(b=>b.addEventListener('click',()=>{const a=b.parentElement.dataset.a;current===a?clear():select(a)}));
+mx.querySelectorAll('tbody tr[data-c] th.rowh').forEach(h=>{const c=h.parentElement.dataset.c;h.addEventListener('click',()=>current===c?clear():select(c));h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();current===c?clear():select(c)}})});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)clear()});
+
+const cs=ACT.map(a=>cover(a[0]));
+document.getElementById('summary').innerHTML=`<span><b>${ACT.length}</b>activities</span><span><b>${FN.length}</b>functions</span><span><b>${FN.reduce((n,f)=>n+Object.keys(f[3]).length,0)}</b>mappings</span><span><b>${cs.filter(c=>c==='ok').length}</b>activities fully supported</span><span class="rv"><b>${cs.filter(c=>c==='partial').length}</b>partly</span><span class="rv"><b>${cs.filter(c=>c==='none').length}</b>unsupported</span><span><b>1</b>outside the platform</span>`;
+document.getElementById('findings').innerHTML=[
+ ['gap','A3','<b>Forward and deliver events is only partly supported.</b> Load-balanced output (F3.1) is partial: two forwarders have no output target, so their events never reach an indexer.'],
+ ['gap','A4','<b>Process and route events depends on masking (F2.4)</b>, which is partial: on the syslog path it runs only on the indexer, after PII has crossed the network.'],
+ ['gap','A5','<b>Index and replicate is supported for indexing, not replication.</b> F4.3 has no system until an indexer cluster is added.'],
+ ['gap','A6, A9','<b>Search works; detection and response do not.</b> Correlation searches (F6.1) need Enterprise Security, and cases in SOAR (F6.2) receive no findings. A9 Coordinate response is the activity furthest from being supported.'],
+ ['ok','A2, A7, A8','<b>Collection, management and authentication are fully supported</b> by realised functions, each with at least two implementing functions.']
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+clear();
+</script>
+
+</body>
+</html>
