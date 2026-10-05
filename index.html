@@ -8792,5 +8792,71 @@ const packBefore167=architecturePackHtml;architecturePackHtml=function(...args){
 changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Build review refinements','Refresh connector emphasis after real selection, keep architecture profile within Validate, clarify Analyze actions and improve History and card typography.',true]);
 document.title='Splunk Pipeline Explorer · Build 167 · 5 Oct 2026';$('#topologyBuilder').dataset.buildNumber='167';const stamp167=$('.builderBuildStamp');if(stamp167){stamp167.setAttribute('aria-label','Build 167, dated 5 October 2026');stamp167.querySelector('b').textContent='Build 167'}builderInfoText159.textContent=builderInfoText159.textContent.replace('Build 163 · 4 Oct 2026','Build 167 · 5 Oct 2026');builderPageControls163();invalidateBuilderRender160();
 </script>
+<script id="builder-operational-labels-v168">
+/* Retain every compact connection label; resolve geometry in OV-1 only. */
+const ovLayoutBefore168=builderOvLayout137;
+builderOvLayout137=function(...args){const layout=ovLayoutBefore168(...args);layout.width+=100;const originalCards=layout.cards.map(c=>({...c}));for(const area of [1,2,3]){const column=layout.cards.filter(c=>c.shape.area===area).sort((a,b)=>a.y-b.y);column.forEach((card,i)=>{card.y+=24*i;for(const [key,box] of layout.boxes)if(box!==card&&box.shape.key===card.shape.key)box.y=card.y})}for(const frame of layout.innerFrames){const members=originalCards.filter(c=>c.x>=frame.x&&c.x+c.w<=frame.x+frame.w&&c.y>=frame.y&&c.y+c.h<=frame.y+frame.h).map(c=>layout.cards.find(n=>n.shape.key===c.shape.key));if(members.length){const oldTop=Math.min(...originalCards.filter(c=>members.some(n=>n.shape.key===c.shape.key)).map(c=>c.y));frame.y+=Math.min(...members.map(c=>c.y))-oldTop;frame.h=Math.max(...members.map(c=>c.y+c.h))+14-frame.y}}layout.height=Math.max(layout.height,...layout.cards.map(c=>c.y+c.h+25),...layout.innerFrames.map(f=>f.y+f.h+25));return layout};
+const ovDiagramBefore168=builderOvDiagram137;
+builderOvDiagram137=function(model){
+ const holder=document.createElement('div');holder.className='ov1Visual137';holder.style.cssText='position:fixed;left:-10000px;top:0;opacity:0;pointer-events:none';holder.innerHTML=ovDiagramBefore168(model);const svg=holder.querySelector('svg');if(!svg)return holder.innerHTML;
+ document.body.append(holder);
+ try{
+  const layout=builderOvLayout137(model),cards=layout.cards,paths=[...svg.querySelectorAll('path.ovPath137')],order={data:0,authentication:1,response:2,management:3};
+  const links=[...model.links].sort((a,b)=>(order[a.plane]??4)-(order[b.plane]??4)).filter(l=>layout.boxes.has(l.from)&&layout.boxes.has(l.to));
+  const overlap=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+  const samples=new Map();const pathHits=(path,box)=>{const d=path.getAttribute('d');let cached=samples.get(path);if(!cached||cached.d!==d){const points=[],length=path.getTotalLength();for(let at=0;at<=length;at+=2){const p=path.getPointAtLength(at);points.push({x:p.x,y:p.y})}cached={d,points};samples.set(path,cached)}return cached.points.some(p=>p.x>box.x&&p.x<box.x+box.w&&p.y>box.y&&p.y<box.y+box.h)};
+  const pad=(b,n)=>({x:b.x-n,y:b.y-n,w:b.w+2*n,h:b.h+2*n});
+  const segmentHits=(a,b,r)=>{if(a.x===b.x)return a.x>r.x&&a.x<r.x+r.w&&Math.max(a.y,b.y)>r.y&&Math.min(a.y,b.y)<r.y+r.h;if(a.y===b.y)return a.y>r.y&&a.y<r.y+r.h&&Math.max(a.x,b.x)>r.x&&Math.min(a.x,b.x)<r.x+r.w;return true};
+  const poly=points=>'M'+points.map(p=>p.x+' '+p.y).join(' L');
+  let response=0;
+  for(const [index,link] of links.entries()){
+   const path=paths[index],a=layout.boxes.get(link.from),b=layout.boxes.get(link.to);path.dataset.ovLink168=String(index);path.dataset.ovFrom168=link.from;path.dataset.ovTo168=link.to;
+   if(link.plane==='response'){
+    const gutter=layout.zones.at(-1).x-38+(response++%3)*10;
+    const start={x:a.shape.area===3?a.x:a.x+a.w,y:a.y+a.h/2},end={x:b.x,y:b.y+b.h/2};
+    path.setAttribute('d',poly([start,{x:gutter,y:start.y},{x:gutter,y:end.y},end]));
+   }
+   const obstacles=cards.filter(c=>c!==a&&c!==b).map(c=>pad(c,8));
+   if(!obstacles.some(box=>pathHits(path,box)))continue;
+   const length=path.getTotalLength(),start=path.getPointAtLength(0),end=path.getPointAtLength(length),candidates=[];
+   for(const x of [...cards.flatMap(c=>[c.x-12,c.x+c.w+12]),start.x,end.x])candidates.push([start,{x,y:start.y},{x,y:end.y},end]);
+   for(const y of [...cards.flatMap(c=>[c.y-12,c.y+c.h+12]),start.y,end.y])candidates.push([start,{x:start.x,y},{x:end.x,y},end]);
+   const clear=candidates.filter(points=>points.slice(1).every((p,i)=>!obstacles.some(box=>segmentHits(points[i],p,box)))).sort((u,v)=>{const length=points=>points.slice(1).reduce((n,p,i)=>n+Math.abs(p.x-points[i].x)+Math.abs(p.y-points[i].y),0);return length(u)-length(v)})[0];
+   if(clear)path.setAttribute('d',poly(clear));
+  }
+  // Keep thread markers beside their own paths after response rerouting.
+  const occupied=[],reserved=links.flatMap((l,i)=>builderOvTag132(l)==='S2S · TLS'?[{x:layout.boxes.get(l.from).x+layout.boxes.get(l.from).w+12,y:layout.boxes.get(l.from).y-3,w:64,h:15}]:[]);
+  for(const marker of svg.querySelectorAll('.ovThreadMarker137')){
+   let best=null;for(const path of paths.filter(p=>p.dataset.thread===marker.dataset.thread)){const length=path.getTotalLength();for(let i=1;i<50;i++){const point=path.getPointAtLength(length*i/50);for(const [dx,dy] of [[0,-18],[0,18],[-18,0],[18,0]]){const box={x:point.x+dx-11,y:point.y+dy-11,w:22,h:22};if(box.x<3||box.y<36||box.x+22>layout.width-3||box.y+22>layout.height-3||[...cards,...occupied,...reserved].some(b=>overlap(box,b)))continue;const score=Math.abs(i/50-.5);if(!best||score<best.score)best={box,score}}}}
+   if(best){marker.querySelector('circle').setAttribute('cx',best.box.x+11);marker.querySelector('circle').setAttribute('cy',best.box.y+11);marker.querySelector('text').setAttribute('x',best.box.x+11);marker.querySelector('text').setAttribute('y',best.box.y+11);occupied.push(best.box)}
+  }
+  const borders=[...svg.querySelectorAll('.ovSite137')].flatMap(e=>{const x=+e.getAttribute('x'),y=+e.getAttribute('y'),w=+e.getAttribute('width'),h=+e.getAttribute('height');return[{x:x-2,y:y-2,w:w+4,h:4},{x:x-2,y:y+h-2,w:w+4,h:4},{x:x-2,y:y-2,w:4,h:h+4},{x:x+w-2,y:y-2,w:4,h:h+4}]});
+  svg.querySelectorAll('.ovTag137').forEach(e=>e.remove());
+  for(const [index,link] of links.entries()){
+   const value=builderOvTag132(link)+(link.edges.length>1?' ×'+link.edges.length:''),path=paths[index];
+   // Preserve the original compact-label policy; longer descriptions stay in the flow register.
+   if(!value||value.length*5.8>175)continue;
+   const tag=document.createElementNS('http://www.w3.org/2000/svg','text');tag.classList.add('ovTag137');tag.dataset.thread=path.dataset.thread;tag.dataset.ovLink168=String(index);tag.textContent=value;svg.append(tag);
+   const measured=tag.getBBox(),w=measured.width,h=measured.height,candidates=[],length=path.getTotalLength();
+   for(const fraction of [.5,.4,.6,.3,.7,.2,.8,.1,.9]){const p=path.getPointAtLength(length*fraction);for(const dy of [-16,16,0,-30,30,-44,44,-60,60,-80,80])for(const dx of [0,-w/2,w/2,-w/2-18,w/2+18,-w,w])candidates.push({x:p.x-w/2+dx,y:p.y+dy-h/2,w,h,preference:Math.abs(fraction-.5)+Math.abs(dx)*.1+Math.abs(dy)*.1})}
+   const marker=svg.querySelector('.ovThreadMarker137[data-thread="'+path.dataset.thread+'"] circle');if(marker){const x=+marker.getAttribute('cx'),y=+marker.getAttribute('cy');for(const [dx,dy] of [[18,0],[-w-18,0],[-w/2,-30],[-w/2,20]])candidates.push({x:x+dx,y:y+dy,w,h,preference:10})}
+   let best=null;
+   for(const box of candidates){if(box.x<3||box.y<36||box.x+w>layout.width-3||box.y+h>layout.height-3)continue;
+    const shapeHits=[...cards,...occupied,...borders].filter(b=>overlap(pad(box,2),b)).length,lineHits=paths.filter(p=>p!==path&&pathHits(p,pad(box,3))).length;
+    const spanPenalty=value==='S2S · TLS'&&(box.x<layout.boxes.get(link.from).x+layout.boxes.get(link.from).w||box.x+w>layout.boxes.get(link.to).x)?10000:0;
+    const score=shapeHits*100000+lineHits*100000+spanPenalty+box.preference;if(!best||score<best.score)best={box,score,shapeHits,lineHits};
+   }
+   const chosen=best?.box||candidates[0];tag.setAttribute('x',chosen.x-measured.x);tag.setAttribute('y',chosen.y-measured.y);tag.dataset.placementFallback168=String(!best||!!(best.shapeHits||best.lineHits));occupied.push(chosen);
+  }
+  return holder.innerHTML;
+ }finally{holder.remove()}
+};
+const pageControlsBefore168=builderPageControls163;
+builderPageControls163=function(...args){const result=pageControlsBefore168(...args);if(validateItems.firstElementChild!==profileAction163)validateItems.prepend(profileAction163);if(profileAction163.nextElementSibling!==profileDisclosure167)profileAction163.after(profileDisclosure167);const tools=builderDensityDock.querySelector('[aria-controls="builderSecondaryTools"]');if(tools){if(tools.dataset.icon!=='🔧')tools.dataset.icon='🔧';if(tools.title!=='Tools')tools.title='Tools';if(!tools.querySelector('.builderToolsIcon168')){const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');icon.classList.add('builderToolsIcon168');icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('aria-hidden','true');icon.innerHTML='<g fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 5h18M3 12h18M3 19h18"/><circle cx="8" cy="5" r="2.5" fill="var(--panel)"/><circle cx="16" cy="12" r="2.5" fill="var(--panel)"/><circle cx="10" cy="19" r="2.5" fill="var(--panel)"/></g>';tools.prepend(icon)}}return result};
+const style168=document.createElement('style');style168.textContent='#builderRuleProfileDisclosure:not([open]){display:none!important} #topologyBuilder .builderDensityDock>[aria-controls="builderSecondaryTools"]:before,#topologyBuilder .builderDensityDock>[aria-controls="builderSecondaryTools"]:after{display:none!important}.builderToolsIcon168{display:block;width:16px;height:16px;flex:0 0 16px;margin:0 auto 3px}';document.head.append(style168);
+const packBefore168=architecturePackHtml;architecturePackHtml=function(...args){return packBefore168(...args).replace('</style></head>',style168.textContent+'</style></head>')};
+changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Operational labels and response spacing','Retain compact OV-1 connection labels, route response paths through the gutter, and lead Validate with its architecture profile.',true]);
+document.title='Splunk Pipeline Explorer · Build 168 · 5 Oct 2026';$('#topologyBuilder').dataset.buildNumber='168';$('#topologyBuilder').dataset.buildDate='2026-10-05';const stamp168=$('.builderBuildStamp');if(stamp168){stamp168.setAttribute('aria-label','Build 168, dated 5 October 2026');stamp168.querySelector('b').textContent='Build 168'}builderInfoText159.textContent=builderInfoText159.textContent.replace('Build 167','Build 168');builderPageControls163();invalidateBuilderRender160();
+</script>
 </body>
 </html>
