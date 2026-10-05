@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>SV-10c System Event Traces</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV, DIV, CV and SV mockups. Banners, title block, purpose, then
+   a scenario switch, the sequence diagram with a running-time column beside a detail panel, timing against targets, and findings. Amber marks planned or not set; red marks failures, data loss or blocked paths. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+.plane{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.model{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.model>*{min-width:0}
+@media (max-width:1150px){.model{grid-template-columns:1fr}}
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:9px;align-content:start}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:0;font:700 1.12rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.85rem}
+.detail dl{margin:0;display:grid;gap:7px}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.84rem}
+.detail ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:.84rem}
+.detail li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
+.detail code{font:500 .74rem var(--font-code);background:var(--zone);padding:1px 4px;border-radius:3px}
+.detail .hint{font-size:.78rem;color:var(--muted)}
+.headrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{font:600 .78rem var(--font-body);padding:6px 12px;border:0;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sheet)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg th.n,.reg td.n{text-align:right}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tbody tr:last-child td{border-bottom:0}
+.reg td.n{font:500 .76rem var(--font-code);font-variant-numeric:tabular-nums;white-space:nowrap}
+.reg tbody tr[data-k]{cursor:pointer}
+.reg tbody tr[data-k]:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+svg.seq{display:block;width:100%;min-width:900px;height:auto}
+.ll rect{fill:var(--node);stroke:var(--line)}
+.ll.absent rect{stroke:var(--review);stroke-dasharray:4 3;fill:color-mix(in srgb,var(--review) 6%,var(--node))}
+.ll text{font:600 11px var(--font-title);fill:var(--ink)}
+.ll text.s{font:500 9.5px var(--font-code);fill:var(--muted)}
+.ll line{stroke:var(--rule);stroke-width:1.5;stroke-dasharray:4 4}
+.msg{cursor:pointer}
+.msg path.l{fill:none;stroke:var(--ink-2);stroke-width:1.6}
+.msg .hd{fill:var(--ink-2)}
+.msg.ret path.l{stroke-dasharray:5 4}
+.msg.planned path.l{stroke:var(--review);stroke-dasharray:3 3}
+.msg.planned .hd{fill:var(--review)}
+.msg.missing path.l{stroke:var(--stop);stroke-dasharray:6 4}
+.msg.missing .hd{fill:var(--stop)}
+.msg text{font:500 10.5px var(--font-body);fill:var(--ink);paint-order:stroke;stroke:var(--sheet);stroke-width:4px;stroke-linejoin:round}
+.msg.planned text{fill:var(--review)}
+.msg.missing text{fill:var(--stop)}
+.msg .hit{fill:none;stroke:transparent;stroke-width:14}
+.msg .n{font:600 9.5px var(--font-code);fill:var(--muted)}
+.tcol text{font:500 10px var(--font-code);fill:var(--muted);text-anchor:end}
+.tcol text.over{fill:var(--stop);font-weight:600}
+.stopx{stroke:var(--stop);stroke-width:2.5}
+svg.focused .msg:not(.on){opacity:.2}
+svg.focused .msg.on path.l{stroke-width:2.6}
+.budget{display:grid;gap:8px}
+.brow{display:grid;grid-template-columns:270px minmax(0,1fr) 130px;gap:12px;align-items:center;font-size:.82rem}
+@media (max-width:700px){.brow{grid-template-columns:1fr}}
+.bbar{position:relative;height:14px;border-radius:7px;background:var(--zone);border:1px solid var(--rule)}
+.bbar i{position:absolute;inset:0 auto 0 0;border-radius:7px;background:var(--d-index)}
+.bbar i.over{background:var(--stop)}
+.bbar i.na{background:repeating-linear-gradient(135deg,var(--review) 0 4px,transparent 4px 8px);opacity:.6}
+.brow .v{font:500 .76rem var(--font-code);font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:no-preference){.msg{transition:opacity .15s}}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="sTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="sTitle">SV-10c · Systems Event-Trace Description</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Systems (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">System owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>The order of messages between systems for a few critical scenarios, with the time each step takes. The running time on the left is checked against the latency targets from SV-6 and the detection goal in CV-1.</p></div>
+
+      <div class="headrow">
+        <div class="seg" role="group" aria-label="Scenario" id="scen"></div>
+      </div>
+      <p class="sub" id="snote" style="margin:0"></p>
+
+      <div class="model">
+        <figure>
+          <div class="figscroll"><svg class="seq" id="seq" viewBox="0 0 1000 500" role="group"></svg></div>
+          <figcaption>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--ink-2)" stroke-width="1.6"/></svg>message</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--ink-2)" stroke-width="1.6" stroke-dasharray="5 4"/></svg>reply</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--review)" stroke-width="1.6" stroke-dasharray="3 3"/></svg>planned or inferred</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--stop)" stroke-width="1.6" stroke-dasharray="6 4"/></svg>missing in topology</span>
+            <span class="key">Left column: running time from the first message</span>
+          </figcaption>
+        </figure>
+        <aside class="detail" id="detail" aria-live="polite"></aside>
+      </div>
+
+      <h2>Timing against targets</h2>
+      <div class="budget" id="budget"></div>
+
+      <div class="findings">
+        <h2>What the traces show</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · System owner not set · Interfaces from SV-1; targets from SV-6 and CV-1</span><span>SV-10c · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// lifelines: id, name, type, absent; messages: from, to, label, seconds, kind ('' | ret | planned | missing), interface, note
+const SC={
+ sydney:{name:'Sydney firewall event → SOAR case',note:'Path A, end to end. Steps after indexing need Enterprise Security and the SOAR link, so they are drawn as planned.',
+  ll:[['fw','Firewalls and network devices','Syslog Source'],['ss','Syslog Server 1','Syslog Server'],['uf','Universal Forwarder 1','Universal Forwarder'],['ix','Indexer 1','Indexer'],['sh','Search Head 1','Search Head'],['es','Enterprise Security','not in topology',true],['so','Splunk SOAR · Cloud 1','Splunk SOAR']],
+  m:[['fw','ss','syslog UDP 514',0.1,'','SI-1','No acknowledgement: a lost packet is a lost event.'],['ss','ss','write per-host file',0.5,'','F1.1',''],['ss','uf','new lines tailed',1,'','SI-2','Tailing processor checks files about every second.'],['uf','ix','S2S block (TLS)',2,'','SI-3','Forwarder sends in 64 KB blocks; small sites wait for the block to fill or the timeout.'],['ix','uf','ACK',0.2,'ret','SI-3','useACK releases the block from the forwarder wait queue.'],['ix','ix','parse, index (indexQueue)',5,'','F2.1–F4.1','Event is searchable once written to the hot bucket.'],
+   ['es','ix','scheduled correlation search',300,'planned','F6.1','Runs every 5 minutes; worst case the event waits a full interval.'],['ix','es','results',30,'planned','SI-7',''],['es','es','create finding (notable)',1,'planned','F6.1',''],['es','so','send finding',2,'planned','SI-15','Inferred in SV-1; not in the topology.'],['so','so','create case, run playbook',5,'','F6.2','']],
+  targets:[['Searchable (ingest)',6,8.8,60],['Detected (finding)',9,340,900],['Case opened',11,347,900]]},
+ melb:{name:'Melbourne appliance event',note:'Path A from Melbourne. The trace stops at Universal Forwarder 2: it has no output.',
+  ll:[['sr','Syslog Source 2','Syslog Source'],['ss','Syslog Server 2','Syslog Server'],['uf','Universal Forwarder 2','Universal Forwarder'],['ix','Indexer 1','Indexer'],['sh','Search Head 1','Search Head']],
+  m:[['sr','ss','syslog UDP 514',0.1,'','SI-4',''],['ss','ss','write per-host file',0.5,'','F1.1',''],['ss','uf','new lines tailed',1,'','SI-5',''],['uf','ix','S2S block over the WAN',3,'missing','SI-13','Missing in the topology: no output target. Needs firewall rule FW-5.'],['ix','ix','parse, index',5,'missing','F2.1–F4.1','Never reached.'],['sh','ix','search',5,'missing','SI-7','Never returns Melbourne events.']],
+  stopAt:3,
+  targets:[['Searchable (ingest)',5,null,60]]},
+ signin:{name:'Analyst sign-in (SAML)',note:'Browser-mediated SAML. The search head never talks to the identity provider directly.',
+  ll:[['ad','Administrator 1','browser on VPN'],['sh','Search Head 1','behind load balancer'],['idp','Authentication Provider · Cloud 1','identity provider']],
+  m:[['ad','sh','GET Splunk Web',0.3,'','SI-12',''],['sh','ad','302 redirect with AuthnRequest',0.1,'ret','SI-12',''],['ad','idp','AuthnRequest',0.4,'','SI-11',''],['idp','ad','sign-in page and MFA prompt',8,'ret','SI-11','Time is mostly the person approving MFA.'],['ad','idp','credentials and MFA',0.5,'','SI-11',''],['idp','ad','signed SAML assertion',0.3,'ret','SI-11',''],['ad','sh','POST assertion',0.4,'','SI-12',''],['sh','sh','validate signature, map groups to roles',0.2,'','F8.1, F8.2','roleMap_SAML in authentication.conf.'],['sh','ad','session cookie, home app',0.5,'ret','SI-12','']],
+  targets:[['Signed in',9,10.7,30]]},
+ config:{name:'Configuration change to a forwarder',note:'A new inputs.conf app reaches Universal Forwarder 1 on its next phone-home.',
+  ll:[['ad','Administrator 1','Splunk admin'],['ds','Deployment Server 1','Deployment Server'],['uf','Universal Forwarder 1','deployment client'],['ix','Indexer 1','Indexer']],
+  m:[['ad','ds','commit app, reload server class',5,'','—','splunk reload deploy-server'],['uf','ds','phone-home',60,'','SI-8','Worst case a full phoneHomeIntervalInSecs (60 s).'],['ds','uf','checksum differs',0.2,'ret','SI-8',''],['uf','ds','download app',1,'','SI-8',''],['uf','uf','reload inputs',3,'','F7.1','activation = reload; no restart.'],['uf','ix','first events from the new input',2,'','SI-3','']],
+  targets:[['Change live',5,71.2,120]]}
+};
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+const svg=document.getElementById('seq');let s='sydney',current=null;
+const fmt=v=>v<60?(Math.round(v*10)/10)+' s':v<3600?(Math.floor(v/60))+' min '+(Math.round(v%60))+' s':v;
+function draw(){const S=SC[s],n=S.ll.length,left=110,right=980,colW=(right-left)/n,X=i=>left+colW*i+colW/2,top=20,headH=44,rowH=42,H=top+headH+20+S.m.length*rowH+20;
+  svg.setAttribute('viewBox',`0 0 1000 ${H}`);svg.innerHTML='';svg.classList.remove('focused');svg.setAttribute('aria-label',S.name+' sequence');
+  const idx=id=>S.ll.findIndex(l=>l[0]===id);
+  S.ll.forEach((l,i)=>{const g=el('g',{class:'ll'+(l[3]?' absent':'')},svg),w=Math.min(colW-10,150);el('line',{x1:X(i),y1:top+headH,x2:X(i),y2:H-10},g);el('rect',{x:X(i)-w/2,y:top,width:w,height:headH,rx:4},g);
+    const words=l[1].split(' '),lines=[];let cur='';words.forEach(wd=>{if((cur+' '+wd).trim().length>Math.floor(w/6.6)&&cur){lines.push(cur);cur=wd}else cur=(cur+' '+wd).trim()});lines.push(cur);
+    lines.slice(0,2).forEach((t,k)=>el('text',{x:X(i),y:top+15+k*13,'text-anchor':'middle'},g).textContent=t);el('text',{class:'s',x:X(i),y:top+headH-5,'text-anchor':'middle'},g).textContent=l[2]});
+  const tcol=el('g',{class:'tcol'},svg);el('text',{x:left-14,y:top+headH+8,style:'font:600 9px var(--font-code);letter-spacing:.1em;text-transform:uppercase'},tcol).textContent='T+';
+  let t=0;
+  S.m.forEach((mm,k)=>{const y=top+headH+30+k*rowH,a=idx(mm[0]),b=idx(mm[1]),g=el('g',{class:'msg '+mm[4]},svg);g.dataset.k=k;
+    const stopped=S.stopAt!==undefined&&k>S.stopAt;
+    if(!stopped&&mm[4]!=='missing')t+=mm[3];
+    el('text',{x:left-14,y:y+4,class:(S.stopAt!==undefined&&k>=S.stopAt)?'over':''},tcol).textContent=(S.stopAt!==undefined&&k>=S.stopAt)?'—':fmt(t);
+    if(a===b){const x=X(a);el('path',{class:'hit',d:`M${x} ${y-8} h40 v16 h-40`},g);el('path',{class:'l',d:`M${x} ${y-8} h34 v16 h-28`},g);el('path',{class:'hd',d:`M${x} ${y+8} l7 -4 l0 8z`},g);const lastCol=a===S.ll.length-1;el('text',{x:lastCol?x-8:x+42,y:y+4,'text-anchor':lastCol?'end':'start'},g).textContent=mm[2]}
+    else{const x1=X(a),x2=X(b),dir=Math.sign(x2-x1),end=x2-dir*8;el('path',{class:'hit',d:`M${x1} ${y} L${x2} ${y}`},g);el('path',{class:'l',d:`M${x1} ${y} L${end} ${y}`},g);el('path',{class:'hd',d:`M${x2} ${y} L${end} ${y-4.5} L${end} ${y+4.5}Z`},g);
+      el('text',{x:(x1+x2)/2,y:y-6,'text-anchor':'middle'},g).textContent=mm[2]}
+    el('text',{class:'n',x:left+4,y:y+4},g).textContent=(k+1)+'';
+    if(S.stopAt===k){const x=X(b);el('path',{class:'stopx',d:`M${x-7} ${y-7} L${x+7} ${y+7} M${x+7} ${y-7} L${x-7} ${y+7}`},svg)}
+    g.addEventListener('click',()=>pick(k))});
+  document.getElementById('snote').textContent=S.note;
+  document.querySelectorAll('#scen button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.s===s)));
+  document.getElementById('budget').innerHTML=S.targets.map(([n,,v,tg])=>{const pct=v==null?100:Math.min(100,v/tg*100);return `<div class="brow"><span>${esc(n)} · target ${fmt(tg)}</span><span class="bbar"><i class="${v==null?'na':v>tg?'over':''}" style="width:${pct}%"></i></span><span class="v">${v==null?'never (blocked)':fmt(v)+' · '+Math.round(v/tg*100)+'%'}</span></div>`}).join('');
+  current=null;intro()}
+const detail=document.getElementById('detail');
+function intro(){const S=SC[s],gaps=S.m.filter(x=>x[4]==='missing'||x[4]==='planned');
+  detail.innerHTML=`<span class="dom">Scenario</span><h3>${esc(S.name)}</h3><p>${S.m.length} messages across ${S.ll.length} systems.</p>
+  ${gaps.length?`<dl><dt>Not in the topology</dt><dd><ul>${gaps.map(x=>`<li><span class="chip ${x[4]==='missing'?'stop':'gap'}">${x[5]}</span><span>${esc(x[2])}</span></li>`).join('')}</ul></dd></dl>`:'<p>Every step uses a declared interface.</p>'}<p class="hint">Select a message for details. Esc clears.</p>`}
+function pick(k){const S=SC[s];if(current===k){current=null;svg.classList.remove('focused');svg.querySelectorAll('.msg.on').forEach(e=>e.classList.remove('on'));intro();return}
+  current=k;svg.classList.add('focused');svg.querySelectorAll('.msg').forEach(g=>g.classList.toggle('on',+g.dataset.k===k));const mm=S.m[k],nm=id=>S.ll.find(l=>l[0]===id)[1];
+  detail.innerHTML=`<span class="dom">Message ${k+1} · ${mm[5]}</span><h3>${esc(mm[2])}</h3><p>${esc(nm(mm[0]))} → ${esc(nm(mm[1]))}</p><dl><dt>Takes</dt><dd>${fmt(mm[3])}</dd><dt>Status</dt><dd><span class="chip ${mm[4]==='missing'?'stop':mm[4]==='planned'?'gap':'ok'}">${mm[4]==='missing'?'Missing in topology':mm[4]==='planned'?'Planned or inferred':'Declared'}</span></dd>${mm[6]?`<dt>Note</dt><dd>${esc(mm[6])}</dd>`:''}</dl>`}
+document.getElementById('scen').innerHTML=Object.entries(SC).map(([k,v])=>`<button type="button" data-s="${k}">${esc(v.name)}</button>`).join('');
+document.querySelectorAll('#scen button').forEach(b=>b.addEventListener('click',()=>{s=b.dataset.s;draw()}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current!==null)pick(current)});
+document.getElementById('findings').innerHTML=[
+ ['ok','Ingest','<b>A Sydney firewall event is searchable in about 9 seconds</b>, well inside the 60-second target. Most of it is S2S batching and indexing.'],
+ ['gap','Detection','<b>Detection time is set by the correlation schedule, not the pipeline.</b> With a 5-minute schedule the event waits up to 300 s, so a finding lands at about 5 min 40 s, inside the 15-minute MTTD goal. But steps 7–10 need Enterprise Security and the SOAR link, so today the trace stops at "searchable".'],
+ ['stop','Blocked','<b>A Melbourne appliance event never becomes searchable.</b> The trace stops at Universal Forwarder 2 because it has no output (SI-13). The UDP hop before it has no acknowledgement either, so a loss there is silent.'],
+ ['ext','Sign-in','<b>Sign-in takes about 11 seconds, almost all of it MFA.</b> The search head and identity provider never talk directly; both SAML legs go through the browser on the VPN (SV-2 FW-4).'],
+ ['ok','Config','<b>A configuration change is live within about 70 seconds</b>, bounded by the 60-second phone-home interval. The Heavy Forwarder in the DMZ follows the same sequence through FW-3.']
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+draw();
+</script>
+
+</body>
+</html>
