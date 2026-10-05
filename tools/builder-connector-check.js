@@ -4,7 +4,8 @@
    after an unconnected palette add, and 6 free-layout drags). For each connector it checks
    start/end contact with the card border, arrow direction, running along borders, passing
    through its own or other cards, label distance from the line, labels over cards and
-   badges over labels, both while dragging and after drop. Prints JSON; "OK" means clean.
+   badges over labels, both while dragging and after drop. Scenarios 9 and 10 load the reference topology
+   (docs/mockups/ov1-reference-topology.json) and check every plane at Fit and at 100%. Prints JSON; "OK" means clean.
    Requires the playwright package (a global install is found automatically). */
 const path=require('path'),fs=require('fs');
 let playwright;try{playwright=require('playwright')}catch{playwright=require(require('child_process').execSync('npm root -g').toString().trim()+'/playwright')}
@@ -68,4 +69,30 @@ for(const [label,idx,[dx,dy]] of scenarios){p=await go();await p.evaluate(()=>{c
  await p.mouse.up();await p.waitForTimeout(500);
  const after=await p.evaluate(MEASURE);
  results[label]={whileDragging:summarise(mid),afterDrop:summarise(after),errors:p.errs};await shot(p,`edge-${label[0]}.png`);await p.close()}
+// 9, 10) reference topology (docs/mockups/ov1-reference-topology.json), all planes, at Fit and at 100%.
+// Checks every connector: one-to-one hops between cards in the same row with nothing between are a single straight
+// segment; no two connectors share an endpoint; no connector passes through a card other than its own two; visible
+// labels sit within 60px of their own line and off cards; at Fit (labels hidden by level of detail) badges sit
+// within 3px of their own line.
+const refFile=[path.join(path.dirname(path.resolve(process.argv[2]||'index.html')),'docs/mockups/ov1-reference-topology.json'),path.resolve('docs/mockups/ov1-reference-topology.json')].find(x=>fs.existsSync(x))||'';
+if(fs.existsSync(refFile)){
+ const REF=()=>{const z=state.builderViewport.zoom||1,world=document.querySelector('.unifiedBuilderWorld').getBoundingClientRect(),toW=r=>({x:(r.left-world.left)/z,y:(r.top-world.top)/z,w:r.width/z,h:r.height/z});
+  const name=id=>{const n=state.builderNodes.find(n=>n.id===id);return n?(typeof componentInstanceLabel==='function'?componentInstanceLabel(n):n.name):id};
+  const cards=new Map([...document.querySelectorAll('#builderTree [data-unified-node-wrap]')].filter(w=>w.getBoundingClientRect().width>0).map(w=>[+w.dataset.unifiedNodeWrap,toW((w.querySelector('.builderNode')||w).getBoundingClientRect())]));
+  const edges=builderTraceEdges('all'),paths=[...document.querySelectorAll('#builderTree path.unifiedConnector')].filter(x=>getComputedStyle(x).display!=='none');
+  const sample=pth=>{const L=pth.getTotalLength(),M=pth.getScreenCTM(),pts=[];for(let t=0;t<=L;t+=3){const q=pth.getPointAtLength(t),s=new DOMPoint(q.x,q.y).matrixTransform(M);pts.push({x:(s.x-world.left)/z,y:(s.y-world.top)/z})}return pts};
+  const ends=new Map(),out=[];
+  for(const pth of paths){const key=pth.dataset.edgePlane+':'+pth.dataset.edgeId,e=edges.find(x=>x.plane+':'+x.id===key);if(!e)continue;const pts=sample(pth),bad=[],A=cards.get(e.from),B=cards.get(e.to);
+   for(const [i,q] of [[0,pts[0]],[1,pts[pts.length-1]]]){const tag={key,x:q.x,y:q.y,bundle:i===0?e.plane+':'+e.from:null},prev=[...ends.values()].find(o=>o.key!==key&&Math.hypot(o.x-q.x,o.y-q.y)<3);/* a bundle (same plane, same source) shares its trunk start on purpose */if(prev&&!(tag.bundle&&prev.bundle===tag.bundle))bad.push('shares an endpoint with '+prev.key);ends.set(key+':'+i,tag)}
+   for(const [id,R] of cards){if(id===e.from||id===e.to)continue;if(pts.some(q=>q.x>R.x+4&&q.x<R.x+R.w-4&&q.y>R.y+4&&q.y<R.y+R.h-4))bad.push('crosses '+name(id))}
+   if(A&&B&&Math.abs((A.y+A.h/2)-(B.y+B.h/2))<2&&![...cards].some(([id,R])=>id!==e.from&&id!==e.to&&R.x>Math.min(A.x,B.x)+A.w-2&&R.x+R.w<Math.max(A.x,B.x)+2&&R.y<A.y+A.h&&R.y+R.h>A.y)){const segs=(pth.getAttribute('d').match(/[LQC]/g)||[]).length;if(segs>1&&new Set(pts.map(q=>Math.round(q.y))).size>3)bad.push('same-row hop is not straight')}
+   const lab=document.querySelector(`#builderTree [data-route-label][data-route-plane="${pth.dataset.edgePlane}"][data-route-edge="${CSS.escape(pth.dataset.edgeId)}"]`),rect=lab?.querySelector(':scope > rect'),rr=rect?.getBoundingClientRect(),labelShown=lab&&lab.dataset.labelHidden!=='true'&&rr&&rr.width>0&&getComputedStyle(lab).visibility!=='hidden'&&getComputedStyle(lab).display!=='none'&&parseFloat(getComputedStyle(lab).opacity||1)>0.05;
+   if(labelShown){const LR=toW(rr),c={x:LR.x+LR.w/2,y:LR.y+LR.h/2},d=Math.min(...pts.map(q=>Math.hypot(q.x-c.x,q.y-c.y)));if(d>60)bad.push(`label ${Math.round(d)}px off line`);for(const [id,R] of cards)if(LR.x<R.x+R.w&&LR.x+LR.w>R.x&&LR.y<R.y+R.h&&LR.y+LR.h>R.y)bad.push('label over '+name(id))}
+   else{const m=[...document.querySelectorAll('#builderTree .builderEdgeIssueMarker')].find(x=>(x.dataset.geometryEdge||'')===key);const mr=m?.getBoundingClientRect();if(mr&&mr.width){const M=toW(mr),c={x:M.x+M.w/2,y:M.y+M.h/2},d=Math.min(...pts.map(q=>Math.hypot(q.x-c.x,q.y-c.y)));if(d>3)bad.push(`badge ${Math.round(d)}px off line (label hidden)`)}}
+   out.push(`${name(e.from)} → ${name(e.to)} [${e.plane}]: ${bad.length?bad.join('; '):'OK'}`)}
+  return out};
+ for(const [label,zoom] of [['9 reference topology at Fit',null],['10 reference topology at 100%',1]]){const p=await go();await p.evaluate(d=>loadTopologyDocument(JSON.parse(d)),fs.readFileSync(refFile,'utf8'));await p.waitForTimeout(700);
+  await p.evaluate(z=>{document.querySelector('#builderInspectorDrawerClose')?.click();if(z==null)fitBuilderView();else{state.builderViewport.zoom=z;applyBuilderViewport()}},zoom);await p.waitForTimeout(500);
+  results[label]={connectors:await p.evaluate(REF),zoom:+(await p.evaluate(()=>state.builderViewport.zoom)).toFixed(2),errors:p.errs};await shot(p,`edge-ref-${zoom==null?'fit':'100'}.png`);await p.close()}
+}
 console.log(JSON.stringify(results,null,1));await b.close()})();

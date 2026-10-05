@@ -119,3 +119,43 @@ Screenshot: `build166-default-1440.png`.
 - **Validate menu:** a thin empty bar sits under the "Validating for" row, probably the closed profile disclosure (`build167-validate-menu.png`). Hide it while closed.
 - **Tools rail icon:** it's now ◇, the glyph the old rail used for review findings. Use a wrench or sliders icon, so the old "findings" meaning doesn't carry over.
 - **Profile row placement:** "Validating for …" is last in Validate. The mockup puts it first, as context for the items below. Optional.
+
+---
+
+## Build 167: OV pages and connector tool
+
+### OV pages (reference topology, compared with Build 166)
+
+- **OV-2:** pixel-identical to Build 166 ✅.
+- **OV-3:** identical (30 rows, same text) ✅.
+- **OV-1 changed** (screenshots `build166-ov1.png` → `build167-ov1.png`):
+  - ✅ **Thread markers no longer stack.** In 166, markers 2, 4 and 1 sat on top of each other at the Sydney syslog line. In 167 they're spread along their own threads.
+  - ✅ **Fewer lines through boxes:** 2 → 1, so the response line no longer crosses a box.
+  - ❌ **Five connection labels are gone** (removed from the SVG, not just hidden):
+    - "Syslog UDP/TCP" (×2, both syslog sites → relays);
+    - "phone-home · 8089 · TLS ×2" and "phone-home · 8089 · TLS" (Deployment Server → forwarders);
+    - "licence usage and health · TLS" (License Manager → Search Head).
+
+    Only S2S, HEC, SAML and "cases and ticket updates" remain. v167's new OV pass (`builderOvDiagram137` wrapper, "search every path in a thread") seems to drop a label when it can't find a clear spot. Fall back to the best candidate, or to the label beside the thread marker, instead of removing it.
+  - ❌ **Cramped response routing at the right:** the Search Head → User/Administrator → Splunk SOAR (brown) lines now run a vertical at x≈1030 that touches the left edge of the Authentication Provider box. They also run a horizontal at y≈120 squeezed between the User/Administrator box and the Authentication Provider box, and the "cases and ticket updates · TLS" label sits against that vertical. Route the response threads in the gutter between the Splunk platform column and People & response (x≈960–1015), not along the box edges.
+  - The "S2S · TLS" label now sits left of the UF → Indexer arrow, under marker 2, where the dashed management line crosses it. Move it onto the arrow's span (x 575–660).
+
+**Check:**
+- OV-1 shows every connection label Build 166 had (11 labels).
+- No line runs within 4px of a box edge.
+- Markers stay unstacked.
+
+### Connector tool: reference topology scenarios added
+
+`tools/builder-connector-check.js` now has **scenarios 9 and 10**. They load `docs/mockups/ov1-reference-topology.json` (from beside the HTML file or the repo) and check every plane at **Fit** and at **100%**:
+- same-row one-to-one hops are a single straight segment;
+- no two connectors share an endpoint (a bundle's shared trunk start is allowed);
+- no connector crosses a card;
+- visible labels are within 60px of their line and off cards;
+- with labels hidden, badges are within 3px of their line.
+
+Validated both ways:
+- **Build 163:** it reports the four detours, the two far labels and the management/data shared port.
+- **Build 167:** all 12 connectors are OK in both scenarios.
+
+Copy `tools/` to `main`.
