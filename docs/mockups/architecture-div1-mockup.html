@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>DIV-1 Conceptual Data Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV-1/OV-2/OV-3 and TM-1 mockups — banners, title block,
+   purpose line, then the conceptual model (concept boxes in domain columns, named relationships), a detail panel for the
+   selected concept, and the concept and relationship registers that make DIV-1 traceable to OV-2/OV-3.
+   Colour encodes the data domain only. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+/* Model + detail panel */
+.model{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+@media (max-width:1060px){.model{grid-template-columns:1fr}}
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+svg.div1{display:block;width:100%;min-width:880px;height:auto}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:2px;display:inline-block}
+.colhead{font:600 11px var(--font-code);letter-spacing:.12em;text-transform:uppercase;fill:var(--muted)}
+.concept rect.box{fill:var(--node);stroke:var(--rule);stroke-width:1}
+.concept rect.stripe{stroke:none}
+.concept text{font:600 14px var(--font-title);fill:var(--ink)}
+.concept{cursor:pointer}
+.concept:focus{outline:none}
+.concept:focus-visible rect.box,.concept.sel rect.box{stroke:var(--sel);stroke-width:2.5}
+.rel path{fill:none;stroke:var(--line);stroke-width:1.6}
+.rel text{font:500 11.5px var(--font-body);fill:var(--ink-2);paint-order:stroke;stroke:var(--zone);stroke-width:4px;stroke-linejoin:round}
+.rel.gen path{stroke-dasharray:none}
+svg.focused .concept:not(.on){opacity:.28}
+svg.focused .rel:not(.on){opacity:.15}
+svg.focused .rel.on path{stroke:var(--sel);stroke-width:2.4}
+svg.focused .rel.on text{fill:var(--ink);font-weight:600}
+.head{fill:var(--line)}
+svg.focused .rel.on .head{fill:var(--sel)}
+.ghead{fill:var(--zone);stroke:var(--line);stroke-width:1.6}
+svg.focused .rel.on .ghead{stroke:var(--sel)}
+
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:10px;align-content:start}
+.detail h3{margin:0;font:700 1.15rem/1.2 var(--font-title)}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase}
+.detail p{margin:0;font-size:.88rem;line-height:1.5}
+.detail dl{margin:0;display:grid;gap:8px}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.85rem}
+.detail code{font:500 .78rem var(--font-code);background:var(--zone);padding:1px 5px;border-radius:3px}
+.detail ul{margin:0;padding-left:16px;font-size:.85rem;display:grid;gap:3px}
+.detail .hint{font-size:.78rem;color:var(--muted)}
+
+/* Registers */
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table{width:100%;border-collapse:collapse;font-size:.84rem}
+th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td code{font:500 .76rem var(--font-code)}
+tbody tr{cursor:pointer}
+tbody tr:hover,tbody tr.sel{background:var(--hi)}
+.tag{display:inline-flex;align-items:center;gap:6px;font-weight:600;white-space:nowrap}
+.id{font:600 .76rem var(--font-code);color:var(--muted);white-space:nowrap}
+.card{font:500 .76rem var(--font-code);white-space:nowrap}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.concept,.rel{transition:opacity .15s}}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="divTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="divTitle">DIV-1 · Conceptual Data Model</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Data and Information (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">Data owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>The data concepts the Splunk pipeline must create, store, search and act on, and how they relate, independent of product schema. DIV-2 adds attributes and keys; DIV-3 maps them to physical stores (indexes, KV store, SOAR).</p></div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="model">
+        <figure>
+          <div class="figscroll">
+            <svg class="div1" id="div1" viewBox="0 0 1160 770" role="group" aria-label="DIV-1 conceptual data model: 21 concepts in five domains joined by 22 named relationships"></svg>
+          </div>
+          <figcaption>
+            <span class="key"><span class="sw" style="background:var(--d-collect)"></span>Collection and configuration</span>
+            <span class="key"><span class="sw" style="background:var(--d-index)"></span>Indexing and storage</span>
+            <span class="key"><span class="sw" style="background:var(--d-search)"></span>Search and knowledge</span>
+            <span class="key"><span class="sw" style="background:var(--d-detect)"></span>Detection and response</span>
+            <span class="key"><span class="sw" style="background:var(--d-govern)"></span>Governance and access</span>
+            <span class="key"><svg width="30" height="10" aria-hidden="true"><path d="M1 5h22" stroke="var(--line)" stroke-width="1.6"/><path d="M23 1l6 4-6 4z" fill="var(--line)"/></svg>relationship, read from subject to object</span>
+            <span class="key"><svg width="30" height="10" aria-hidden="true"><path d="M1 5h20" stroke="var(--line)" stroke-width="1.6"/><path d="M21 1l7 4-7 4z" fill="var(--zone)" stroke="var(--line)" stroke-width="1.4"/></svg>is a kind of</span>
+          </figcaption>
+        </figure>
+        <aside class="detail" id="detail" aria-live="polite"></aside>
+      </div>
+
+      <h2>Concept register</h2>
+      <div class="tablewrap"><table id="concepts">
+        <thead><tr><th>Concept</th><th>Definition</th><th>Realised in Splunk</th><th>Carried by (OV-2 / OV-3)</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+
+      <h2>Relationship register</h2>
+      <div class="tablewrap"><table id="rels">
+        <thead><tr><th>ID</th><th>Subject</th><th>Relationship</th><th>Object</th><th>Cardinality</th><th>Rule</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Data owner not set · Generated from the Builder topology and the Splunk data model</span><span>DIV-1 · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+const DOM={collect:['Collection and configuration','--d-collect'],index:['Indexing and storage','--d-index'],search:['Search and knowledge','--d-search'],detect:['Detection and response','--d-detect'],govern:['Governance and access','--d-govern']};
+const C0=30,C1=330,C2=630,C3=930,R=[90,210,330,450,570,690];
+const CONCEPTS=[
+ {id:'serverClass',name:'Server Class',dom:'collect',x:C0,y:R[0],def:'A rule that selects which forwarders receive which deployment apps.',splunk:'<code>serverclass.conf</code> on the Deployment Server',flow:'Phone-home · 8089 · TLS'},
+ {id:'deploymentApp',name:'Deployment App',dom:'collect',x:C0,y:R[1],def:'A versioned bundle of configuration delivered to forwarders.',splunk:'<code>deployment-apps/</code> on the Deployment Server',flow:'Phone-home · 8089 · TLS'},
+ {id:'dataInput',name:'Data Input',dom:'collect',x:C0,y:R[2],def:'A configured way of collecting events from a source: a monitored file, a network port, a token or a script.',splunk:'<code>inputs.conf</code> stanza (monitor, udp/tcp, HEC token, scripted)',flow:'Syslog UDP/TCP; HEC HTTPS · 8088 · TLS'},
+ {id:'sourceSystem',name:'Source System',dom:'collect',x:C0,y:R[3],def:'A device or service that originates telemetry.',splunk:'The <code>host</code> value on each event; not a Splunk object',flow:'Syslog sources (Sydney, Melbourne); Windows servers; AWS Lambda'},
+ {id:'classification',name:'Data Classification',dom:'govern',x:C0,y:R[4],def:'The sensitivity label the data carries. Here: Security telemetry + PII.',splunk:'Index naming and role restrictions; the banner on this pack',flow:'All flows'},
+ {id:'retention',name:'Retention Policy',dom:'govern',x:C0,y:R[5],def:'How long data stays searchable and when it is frozen or deleted.',splunk:'<code>frozenTimePeriodInSecs</code>, <code>maxTotalDataSizeMB</code> in <code>indexes.conf</code>',flow:'—'},
+ {id:'licenseUsage',name:'License Usage',dom:'index',x:C2,y:R[0],def:'Daily ingested volume, measured per index, sourcetype and host.',splunk:'<code>license_usage.log</code> on the License Manager',flow:'Licence usage and health · TLS'},
+ {id:'sourcetype',name:'Sourcetype',dom:'index',x:C1,y:R[1],def:'The format of a set of events and the rules for parsing them.',splunk:'<code>props.conf</code> / <code>transforms.conf</code>',flow:'—'},
+ {id:'event',name:'Event',dom:'index',x:C1,y:R[2],def:'One timestamped record of raw data, with its host, source, sourcetype and index.',splunk:'<code>_raw</code>, <code>_time</code>, <code>host</code>, <code>source</code>, <code>sourcetype</code>, <code>index</code>',flow:'Syslog UDP/TCP; S2S · TLS; HEC HTTPS · 8088 · TLS'},
+ {id:'index',name:'Index',dom:'index',x:C1,y:R[3],def:'A named store that holds events and carries their access and retention settings.',splunk:'<code>indexes.conf</code> on the indexers',flow:'—'},
+ {id:'bucket',name:'Bucket',dom:'index',x:C1,y:R[4],def:'A time-bounded unit of index storage that ages from hot to warm, cold and frozen.',splunk:'<code>$SPLUNK_DB/&lt;index&gt;/db</code>, <code>colddb</code>, <code>thaweddb</code>',flow:'Replication between indexer peers (multisite)'},
+ {id:'role',name:'Role',dom:'govern',x:C1,y:R[5],def:'A named set of capabilities and the indexes they may search.',splunk:'<code>authorize.conf</code> (<code>srchIndexesAllowed</code>)',flow:'—'},
+ {id:'dataModel',name:'Data Model',dom:'search',x:C2,y:R[1],def:'A normalised schema that maps fields from many sourcetypes to common names.',splunk:'<code>datamodels.conf</code>; Common Information Model (CIM)',flow:'—'},
+ {id:'field',name:'Field',dom:'search',x:C2,y:R[2],def:'A named value extracted from events at index or search time.',splunk:'<code>EXTRACT</code>/<code>REPORT</code> in <code>props.conf</code>; CIM field names',flow:'—'},
+ {id:'lookup',name:'Lookup',dom:'search',x:C2,y:R[3],def:'A reference table that adds context to events, such as asset owner or user department.',splunk:'<code>lookups/*.csv</code> or a KV store collection',flow:'—'},
+ {id:'search',name:'Search',dom:'search',x:C2,y:R[4],def:'A query over indexed events, run ad hoc or on a schedule.',splunk:'SPL; <code>savedsearches.conf</code>',flow:'Search dispatch (search head → indexers)'},
+ {id:'user',name:'User',dom:'govern',x:C2,y:R[5],def:'A person or service account that searches, triages or administers.',splunk:'SAML identity mapped to roles',flow:'SAML 2.0 · TLS; dashboards · triage'},
+ {id:'playbook',name:'Playbook',dom:'detect',x:C3,y:R[1],def:'An automated response workflow run against a container.',splunk:'Splunk SOAR playbook',flow:'—'},
+ {id:'container',name:'SOAR Container',dom:'detect',x:C3,y:R[2],def:'A case in Splunk SOAR that holds the artifacts of a finding.',splunk:'SOAR container and artifacts',flow:'Cases and ticket updates · TLS'},
+ {id:'finding',name:'Finding',dom:'detect',x:C3,y:R[3],def:'A recorded detection for analyst triage (a notable event).',splunk:'<code>notable</code> index (Enterprise Security)',flow:'Cases and ticket updates · TLS'},
+ {id:'correlation',name:'Correlation Search',dom:'detect',x:C3,y:R[4],def:'A scheduled search that detects a condition and raises findings.',splunk:'Enterprise Security correlation search',flow:'—'}
+];
+const RELS=[
+ {id:'R1',s:'serverClass',v:'assigns',o:'deploymentApp',c:'0..* — 0..*',rule:'A forwarder gets an app only through a server class.',p:[[130,140],[130,208]],l:[138,179,'start']},
+ {id:'R2',s:'deploymentApp',v:'defines',o:'dataInput',c:'1 — 0..*',rule:'Inputs are managed as code in apps, not edited on hosts.',p:[[130,260],[130,328]],l:[138,299,'start']},
+ {id:'R3',s:'dataInput',v:'reads from',o:'sourceSystem',c:'0..* — 1',rule:'Each input names exactly one source.',p:[[130,380],[130,448]],l:[138,419,'start']},
+ {id:'R4',s:'dataInput',v:'collects',o:'event',c:'1 — 0..*',rule:'Every event records the input it came through (source).',p:[[230,350],[328,350]],l:[279,343,'middle']},
+ {id:'R5',s:'sourceSystem',v:'produces',o:'event',c:'1 — 0..*',rule:'Every event carries the host that produced it.',p:[[230,475],[300,475],[300,368],[328,368]],l:[294,428,'end']},
+ {id:'R6',s:'sourcetype',v:'describes',o:'event',c:'1 — 0..*',rule:'Each event has exactly one sourcetype.',p:[[430,260],[430,328]],l:[438,299,'start']},
+ {id:'R7',s:'index',v:'stores',o:'event',c:'1 — 0..*',rule:'Each event is written to exactly one index.',p:[[430,450],[430,382]],l:[438,419,'start']},
+ {id:'R8',s:'index',v:'is partitioned into',o:'bucket',c:'1 — 0..*',rule:'Buckets belong to one index and one time range.',p:[[430,500],[430,568]],l:[438,539,'start']},
+ {id:'R9',s:'classification',v:'applies to',o:'index',c:'1 — 0..*',rule:'Data of different classifications is not mixed in one index.',p:[[230,595],[260,595],[260,488],[328,488]],l:[295,503,'middle']},
+ {id:'R10',s:'retention',v:'governs',o:'bucket',c:'1 — 0..*',rule:'Buckets freeze when they pass the retention period or size cap.',p:[[230,715],[280,715],[280,605],[328,605]],l:[274,662,'end']},
+ {id:'R11',s:'event',v:'has',o:'field',c:'1 — 0..*',rule:'Fields are extracted from the event, mostly at search time.',p:[[530,355],[628,355]],l:[579,348,'middle']},
+ {id:'R12',s:'dataModel',v:'normalises',o:'field',c:'0..* — 1..*',rule:'Detections use CIM field names, not raw vendor names.',p:[[730,260],[730,328]],l:[738,299,'start']},
+ {id:'R13',s:'lookup',v:'enriches',o:'field',c:'0..* — 0..*',rule:'Enrichment keys match on a field such as src_ip or user.',p:[[730,450],[730,382]],l:[738,419,'start']},
+ {id:'R14',s:'licenseUsage',v:'is measured per',o:'sourcetype',c:'0..* — 1',rule:'Ingest volume is reported per sourcetype, index and host.',p:[[630,115],[580,115],[580,235],[532,235]],l:[586,178,'start']},
+ {id:'R15',s:'search',v:'reads',o:'index',c:'0..* — 1..*',rule:'A search only reads indexes the running user’s role allows.',p:[[630,590],[600,590],[600,470],[532,470]],l:[566,464,'middle']},
+ {id:'R16',s:'search',v:'uses',o:'dataModel',c:'0..* — 0..*',rule:'Accelerated data models back most detections.',p:[[830,585],[880,585],[880,245],[832,245]],l:[886,420,'start']},
+ {id:'R17',s:'correlation',v:'is a kind of',o:'search',c:'—',rule:'A correlation search is a scheduled search with a detection outcome.',p:[[930,605],[834,605]],l:[881,623,'middle'],gen:true},
+ {id:'R18',s:'correlation',v:'creates',o:'finding',c:'1 — 0..*',rule:'Each finding names the search that raised it.',p:[[1030,570],[1030,502]],l:[1038,539,'start']},
+ {id:'R19',s:'finding',v:'is sent as',o:'container',c:'1 — 0..1',rule:'A finding becomes at most one SOAR container.',p:[[1030,450],[1030,382]],l:[1038,419,'start']},
+ {id:'R20',s:'playbook',v:'acts on',o:'container',c:'0..* — 0..*',rule:'Playbooks run on containers, never directly on indexes.',p:[[1030,260],[1030,328]],l:[1038,299,'start']},
+ {id:'R21',s:'role',v:'grants access to',o:'index',c:'0..* — 0..*',rule:'PII indexes are allowed only for named roles.',p:[[530,705],[580,705],[580,485],[532,485]],l:[574,642,'end']},
+ {id:'R22',s:'user',v:'holds',o:'role',c:'0..* — 1..*',rule:'Roles come from SAML group mapping, not local accounts.',p:[[630,725],[532,725]],l:[605,719,'middle']}
+];
+const byId=Object.fromEntries(CONCEPTS.map(c=>[c.id,c]));
+const NS='http://www.w3.org/2000/svg';
+const el=(tag,attrs={},parent)=>{const e=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,v);if(parent)parent.appendChild(e);return e};
+const svg=document.getElementById('div1');
+
+// Column headings
+[['Collection and configuration',C0],['Indexing and storage',C1],['Search and knowledge',C2],['Detection and response',C3]].forEach(([t,x])=>{const h=el('text',{x:x,y:62,class:'colhead'},svg);h.textContent=t});
+const gh=el('text',{x:C0,y:R[4]-14,class:'colhead'},svg);gh.textContent='Governance and access ↓';
+
+// Relationships first, so concepts paint on top
+for(const r of RELS){
+  const g=el('g',{class:'rel'+(r.gen?' gen':''),'data-rel':r.id,'data-s':r.s,'data-o':r.o},svg);
+  const d=r.p.map((q,i)=>(i?'L':'M')+q[0]+' '+q[1]).join(' ');
+  el('path',{d},g);
+  const [a,b]=[r.p[r.p.length-2],r.p[r.p.length-1]],ang=Math.atan2(b[1]-a[1],b[0]-a[0]),len=r.gen?10:8,w=r.gen?6:4.5;
+  const tip=b,bx=tip[0]-Math.cos(ang)*len,by=tip[1]-Math.sin(ang)*len,px=-Math.sin(ang)*w,py=Math.cos(ang)*w;
+  el('path',{d:`M${tip[0]} ${tip[1]} L${bx+px} ${by+py} L${bx-px} ${by-py} Z`,class:r.gen?'ghead':'head'},g);
+  const t=el('text',{x:r.l[0],y:r.l[1],'text-anchor':r.l[2]},g);t.textContent=r.v;
+  const title=el('title',{},g);title.textContent=`${r.id} · ${byId[r.s].name} ${r.v} ${byId[r.o].name} (${r.c})`;
+}
+// Concepts
+for(const c of CONCEPTS){
+  const g=el('g',{class:'concept','data-id':c.id,tabindex:'0',role:'button','aria-label':`${c.name}, ${DOM[c.dom][0]}`},svg);
+  el('rect',{x:c.x,y:c.y,width:200,height:50,rx:4,class:'box'},g);
+  el('rect',{x:c.x,y:c.y,width:6,height:50,rx:2,class:'stripe',style:`fill:var(${DOM[c.dom][1]})`},g);
+  const t=el('text',{x:c.x+18,y:c.y+31},g);t.textContent=c.name;
+  g.addEventListener('click',()=>select(c.id));
+  g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(c.id)}});
+}
+
+// Registers
+const ct=document.querySelector('#concepts tbody');
+for(const d of Object.keys(DOM))for(const c of CONCEPTS.filter(x=>x.dom===d)){
+  const tr=document.createElement('tr');tr.dataset.id=c.id;
+  tr.innerHTML=`<td><span class="tag"><span class="sw" style="background:var(${DOM[c.dom][1]})"></span>${c.name}</span></td><td>${c.def}</td><td>${c.splunk}</td><td>${c.flow}</td>`;
+  tr.addEventListener('click',()=>{select(c.id);document.getElementById('div1').scrollIntoView({block:'nearest',behavior:'smooth'})});ct.appendChild(tr)}
+const rt=document.querySelector('#rels tbody');
+for(const r of RELS){const tr=document.createElement('tr');tr.dataset.s=r.s;tr.dataset.o=r.o;
+  tr.innerHTML=`<td class="id">${r.id}</td><td>${byId[r.s].name}</td><td><b>${r.v}</b></td><td>${byId[r.o].name}</td><td class="card">${r.c}</td><td>${r.rule}</td>`;
+  tr.addEventListener('click',()=>select(r.s));rt.appendChild(tr)}
+
+// Summary
+const owned=0;
+document.getElementById('summary').innerHTML=`<span><b>${CONCEPTS.length}</b>concepts</span><span><b>${RELS.length}</b>relationships</span><span><b>${Object.keys(DOM).length}</b>domains</span><span><b>${CONCEPTS.filter(c=>c.flow!=='—').length}</b>traced to OV-2 / OV-3 flows</span><span class="rv"><b>1</b>data owner not set</span>`;
+
+// Selection
+const detail=document.getElementById('detail');
+function select(id){
+  const c=byId[id];if(!c)return;
+  svg.classList.add('focused');
+  const rels=RELS.filter(r=>r.s===id||r.o===id),near=new Set([id,...rels.flatMap(r=>[r.s,r.o])]);
+  svg.querySelectorAll('.concept').forEach(g=>{g.classList.toggle('on',near.has(g.dataset.id));g.classList.toggle('sel',g.dataset.id===id)});
+  svg.querySelectorAll('.rel').forEach(g=>g.classList.toggle('on',g.dataset.s===id||g.dataset.o===id));
+  document.querySelectorAll('#concepts tbody tr').forEach(tr=>tr.classList.toggle('sel',tr.dataset.id===id));
+  document.querySelectorAll('#rels tbody tr').forEach(tr=>tr.classList.toggle('sel',tr.dataset.s===id||tr.dataset.o===id));
+  detail.innerHTML=`<span class="dom" style="color:var(${DOM[c.dom][1]})">${DOM[c.dom][0]}</span><h3>${c.name}</h3><p>${c.def}</p>
+  <dl><div><dt>Realised in Splunk</dt><dd>${c.splunk}</dd></div><div><dt>Carried by (OV-2 / OV-3)</dt><dd>${c.flow}</dd></div>
+  <div><dt>Relationships · ${rels.length}</dt><dd><ul>${rels.map(r=>`<li><span class="id">${r.id}</span> ${byId[r.s].name} <b>${r.v}</b> ${byId[r.o].name} <span class="card">${r.c}</span></li>`).join('')}</ul></dd></div></dl>
+  <span class="hint">Select another concept on the model or in the registers. Esc clears the selection.</span>`;
+}
+function clear(){svg.classList.remove('focused');svg.querySelectorAll('.on,.sel').forEach(e=>e.classList.remove('on','sel'));document.querySelectorAll('tbody tr.sel').forEach(tr=>tr.classList.remove('sel'));
+  detail.innerHTML=`<span class="dom" style="color:var(--muted)">How to read DIV-1</span><h3>Concepts and how they relate</h3><p>Each box is a data concept the architecture must hold; each arrow names how one concept relates to another, read from subject to object. Attributes and keys belong in DIV-2.</p><span class="hint">Select a concept to see its definition, where Splunk realises it, and the flows that carry it.</span>`}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')clear()});
+select('event');
+</script>
+
+</body>
+</html>
