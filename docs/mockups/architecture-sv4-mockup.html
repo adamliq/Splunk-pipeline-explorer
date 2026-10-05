@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>SV-4 Systems Functionality</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV, DIV, CV and SV mockups. Banners, title block, purpose, a path
+   switch, then the functional flow (system swimlanes × Splunk pipeline stages) beside a detail panel, the function
+   allocation table, and findings. Amber and red mark functions that are partial, missing or not realised. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+.plane{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.model{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.model>*{min-width:0}
+@media (max-width:1150px){.model{grid-template-columns:1fr}}
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:9px;align-content:start}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:0;font:700 1.12rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.85rem}
+.detail dl{margin:0;display:grid;gap:7px}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.84rem}
+.detail ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:.84rem}
+.detail li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
+.detail code{font:500 .74rem var(--font-code);background:var(--zone);padding:1px 4px;border-radius:3px}
+.detail .hint{font-size:.78rem;color:var(--muted)}
+.headrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{font:600 .78rem var(--font-body);padding:6px 12px;border:0;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sheet)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg th.n,.reg td.n{text-align:right}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tbody tr:last-child td{border-bottom:0}
+.reg td.n{font:500 .76rem var(--font-code);font-variant-numeric:tabular-nums;white-space:nowrap}
+.reg tbody tr[data-k]{cursor:pointer}
+.reg tbody tr[data-k]:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+svg.sv4{display:block;width:100%;min-width:980px;height:auto}
+.lane rect{fill:var(--sheet);stroke:var(--rule)}
+.lane.alt rect{fill:color-mix(in srgb,var(--zone) 60%,var(--sheet))}
+.lane text{font:600 11.5px var(--font-title);fill:var(--ink)}
+.lane text.ty{font:500 9.5px var(--font-code);fill:var(--muted)}
+.stage{font:600 9.5px var(--font-code);letter-spacing:.1em;text-transform:uppercase;fill:var(--muted)}
+.fn{cursor:pointer}
+.fn:focus{outline:none}
+.fn rect{fill:var(--node);stroke:var(--rule);stroke-width:1}
+.fn rect.bar{stroke:none}
+.fn .t{font:600 10.5px var(--font-title);fill:var(--ink)}
+.fn .q{font:500 9px var(--font-code);fill:var(--muted)}
+.fn.planned rect.box{stroke:var(--review);stroke-dasharray:4 3;fill:color-mix(in srgb,var(--review) 6%,var(--node))}
+.fn.planned .t{fill:var(--review)}
+.fn:focus-visible rect.box,.fn.sel rect.box{stroke:var(--sel);stroke-width:2.5}
+.fl path{fill:none;stroke:var(--line);stroke-width:1.8}
+.fl .hd{fill:var(--line);stroke:none}
+.fl.missing path{stroke:var(--stop);stroke-dasharray:6 4}
+.fl.missing .hd{fill:var(--stop)}
+.fl.planned path{stroke:var(--review);stroke-dasharray:3 3}
+.fl.planned .hd{fill:var(--review)}
+.fl text{font:600 9.5px var(--font-code);fill:var(--ink-2);paint-order:stroke;stroke:var(--sheet);stroke-width:4px;stroke-linejoin:round}
+svg.focused .fn:not(.on){opacity:.25}
+svg.focused .fl:not(.on){opacity:.1}
+svg.focused .fl.on:not(.missing):not(.planned) path{stroke:var(--sel);stroke-width:2.4}
+svg.focused .fl.on:not(.missing):not(.planned) .hd{fill:var(--sel)}
+.pathbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.pathbar .note{font-size:.8rem;color:var(--ink-2)}
+table.al{border-collapse:separate;border-spacing:0;width:100%;font-size:.8rem}
+.al th,.al td{border-bottom:1px solid var(--rule);padding:6px 8px}
+.al thead th{background:var(--zone);font:600 .6rem/1.2 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;vertical-align:bottom}
+.al thead th.l{text-align:left}
+.al td.c{text-align:center;border-left:1px solid var(--rule);font:600 .9rem/1 var(--font-code);width:48px}
+.al td.c.ok{color:var(--ink)}
+.al td.c.gap{color:var(--review)}
+.al td.c.no{color:var(--stop)}
+.al tr.grp td{background:var(--zone);font:700 .78rem var(--font-title);padding:5px 8px}
+.al tbody tr[data-k]{cursor:pointer}
+.al tbody tr[data-k]:hover,.al tbody tr.sel{background:var(--hi)}
+.al td.fnn{min-width:230px}
+.al td.fnn small{display:block;font:500 .68rem var(--font-code);color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.fn,.fl{transition:opacity .15s}}
+.model.wide{grid-template-columns:1fr}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="sTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="sTitle">SV-4 · Systems Functionality Description</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Systems (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">System owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>The functions each system performs and the order data passes through them, from input through the parsing, merging, typing and index pipelines to search and response. It shows where parsing and masking actually happen on each path, which SV-1 cannot show.</p></div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="pathbar">
+        <div class="seg" role="group" aria-label="Data path">
+          <button type="button" data-path="all" aria-pressed="true">All functions</button>
+          <button type="button" data-path="A" aria-pressed="false">Path A · syslog via Universal Forwarder</button>
+          <button type="button" data-path="B" aria-pressed="false">Path B · HEC via Heavy Forwarder</button>
+        </div>
+        <span class="note" id="pathNote"></span>
+      </div>
+
+      <div class="model wide">
+        <figure>
+          <div class="figscroll"><svg class="sv4" id="sv4" viewBox="0 0 1240 392" role="group" aria-label="Functional flow by system: input, parsing, merging, typing, indexing, search and response"></svg></div>
+          <figcaption>
+            <span class="key">Rows are systems (SV-1); columns are pipeline stages. Each box names the Splunk queue or processor that runs it</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--stop)" stroke-width="1.8" stroke-dasharray="6 4"/></svg>missing in topology</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--review)" stroke-width="1.8" stroke-dasharray="3 3"/></svg>function not realised</span>
+          </figcaption>
+        </figure>
+        <aside class="detail" id="detail" aria-live="polite"></aside>
+      </div>
+
+      <h2>Function allocation</h2>
+      <p class="sub">Which system performs each function, and the OV-5 activity it supports (see CV-6). ● performs · ○ performs only on some paths · ✕ needed but no system in the topology performs it.</p>
+      <div class="tablewrap"><table class="al" id="alloc"></table></div>
+
+      <div class="findings">
+        <h2>What the view shows</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · System owner not set · Systems from SV-1; activities from OV-5 / CV-6</span><span>SV-4 · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+// Functions: id, name, group, performers {system: 'p' performs | 's' some paths}, activity, status (ok | partial | none), note
+const SYSC=[['syslog','Syslog Server'],['uf','Universal Forwarder'],['hf','Heavy Forwarder'],['idx','Indexer'],['search','Search Head'],['ds','Deployment Server'],['lm','License Manager'],['mc','Monitoring Console'],['soar','Splunk SOAR'],['idp','Auth Provider']];
+const GROUPS={F1:'Collect',F2:'Parse',F3:'Forward',F4:'Index',F5:'Search',F6:'Detect and respond',F7:'Manage',F8:'Access'};
+const FN=[
+ ['F1.1','Receive syslog and write per-host files',{syslog:'p'},'A2','ok','rsyslog or syslog-ng writes one file per sending host; the forwarder reads the files.'],
+ ['F1.2','Monitor files and event logs',{uf:'p',hf:'s'},'A2','ok','inputs.conf [monitor://] and [WinEventLog://] stanzas. Windows Event Log 1 has no forwarder, so its events are never read.'],
+ ['F1.3','Receive HTTP Event Collector events',{hf:'p'},'A2','ok','HEC on 8088 with a token per source. Events arrive as JSON and go straight to the parsing pipeline.'],
+ ['F2.1','Break lines (parsingQueue)',{hf:'s',idx:'s'},'A4','ok','LINE_BREAKER and TRUNCATE in props.conf. Runs on the first full Splunk instance in the path: the indexer for Path A, the heavy forwarder for Path B.'],
+ ['F2.2','Merge lines (aggQueue)',{hf:'s',idx:'s'},'A4','ok','SHOULD_LINEMERGE and multi-line event rules. Same placement as line breaking.'],
+ ['F2.3','Extract timestamps',{hf:'s',idx:'s'},'A4','ok','TIME_FORMAT, TIME_PREFIX and TZ. For Path A the timezone must be set in props.conf on the indexers, not on the universal forwarder.'],
+ ['F2.4','Route, filter and mask (typingQueue)',{hf:'s',idx:'s'},'A4','partial','Index-time transforms and SEDCMD. For Path A, masking happens only on the indexer, after PII has crossed the network.'],
+ ['F3.1','Load-balanced output (tcpout)',{uf:'p',hf:'p'},'A3','partial','outputs.conf target group with autoLB. Heavy Forwarder 1 and Universal Forwarder 2 have no output target in the topology.'],
+ ['F3.2','Acknowledge and queue (useACK)',{uf:'p',hf:'p',idx:'p'},'A3','ok','Indexer acknowledgement on S2S; persistent queues on the forwarders hold data while the indexer is unreachable.'],
+ ['F4.1','Write journal and tsidx (indexQueue)',{idx:'p'},'A5','ok','Raw data is compressed into the journal; index-time fields go into tsidx files.'],
+ ['F4.2','Roll buckets hot → warm → cold → frozen',{idx:'p'},'A5','ok','indexes.conf sizes and frozenTimePeriodInSecs (DIV-3 retention).'],
+ ['F4.3','Replicate buckets',{},'A5','none','Needs an indexer cluster. The topology has one indexer, so a site loss loses indexed data (CV-2 C3.3).'],
+ ['F5.1','Dispatch searches to peers',{search:'p',idx:'p'},'A6','ok','The search head sends the search to each indexer (map), then merges the results (reduce).'],
+ ['F5.2','Extract fields and apply lookups at search time',{search:'p'},'A6','ok','Search-time props/transforms, automatic lookups and the KV store.'],
+ ['F5.3','Accelerate data models (CIM)',{search:'p',idx:'p'},'A6','ok','Scheduled by the search head; the tsidx summaries are stored on the indexers.'],
+ ['F6.1','Run correlation searches (ES)',{},'A6','none','Needs Splunk Enterprise Security, which the Builder has no component for (CV-2 C5.1).'],
+ ['F6.2','Create cases and run playbooks',{soar:'p'},'A9','partial','Splunk SOAR · Cloud 1 exists, but no interface sends it findings (SV-1 SI-15 inferred).'],
+ ['F7.1','Distribute configuration (phone-home)',{ds:'p',uf:'p',hf:'p'},'A7','ok','Deployment Server 1 serves apps to both universal forwarders and the heavy forwarder. Indexer parsing settings are not deployed this way.'],
+ ['F7.2','Report licence usage',{lm:'p',idx:'p'},'A7','ok','Each indexer reports daily usage to License Manager 1 (license_usage.log).'],
+ ['F7.3','Monitor platform health',{mc:'p'},'A7','ok','Monitoring Console 1 polls the indexer and search head over REST.'],
+ ['F8.1','Authenticate users (SAML)',{idp:'p',search:'p'},'A8','ok','The identity provider signs the assertion; the search head validates it.'],
+ ['F8.2','Authorise by role',{search:'p'},'A8','ok','authorize.conf roles and srchIndexesAllowed, mapped from SAML groups.']
+];
+const ST={ok:['ok','Realised'],partial:['gap','Partial'],none:['stop','Not realised']};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fn=id=>FN.find(f=>f[0]===id);
+
+// Diagram
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+const svg=document.getElementById('sv4');
+const LANES=[['syslog','Syslog Server 1, 2','Syslog Server'],['uf','Universal Forwarder 1, 2','Universal Forwarder'],['hf','Heavy Forwarder 1','Heavy Forwarder'],['idx','Indexer 1','Indexer'],['search','Search Head 1','Search Head'],['soar','Splunk SOAR · Cloud 1','Splunk SOAR']];
+const LY=k=>40+LANES.findIndex(l=>l[0]===k)*56;
+const COL=[170,330,470,610,750,900,1060],BW=125,BH=38;
+const STAGES=['Input','Parsing','Merging','Typing','Output / index','Search','Respond'];
+STAGES.forEach((s,i)=>el('text',{class:'stage',x:COL[i]+BW/2,y:26,'text-anchor':'middle'},svg).textContent=s);
+LANES.forEach(([k,n,t],i)=>{const g=el('g',{class:'lane'+(i%2?' alt':'')},svg);el('rect',{x:10,y:LY(k),width:1220,height:56},g);el('text',{x:20,y:LY(k)+25},g).textContent=t;el('text',{class:'ty',x:20,y:LY(k)+40},g).textContent=n});
+const flG=el('g',{},svg),fnG=el('g',{},svg);
+// boxes: key, lane, col, label, queue/processor, function id, paths, planned
+const BOX=[
+ ['b1','syslog',0,'Receive syslog','514 → host files','F1.1','A'],
+ ['b2','uf',0,'Monitor files','tailing processor','F1.2','A'],
+ ['b3','uf',4,'Output','tcpout · raw','F3.1','A'],
+ ['b4','hf',0,'HEC input','Lambda · 8088','F1.3','B'],
+ ['b5','hf',1,'Break lines','parsingQueue','F2.1','B'],
+ ['b6','hf',2,'Merge lines','aggQueue','F2.2','B'],
+ ['b7','hf',3,'Transform, mask','typingQueue','F2.4','B'],
+ ['b8','hf',4,'Output','tcpout · cooked','F3.1','B'],
+ ['b9','idx',1,'Break lines','parsingQueue','F2.1','A'],
+ ['b10','idx',2,'Merge, timestamp','aggQueue','F2.3','A'],
+ ['b11','idx',3,'Transform, mask','typingQueue','F2.4','A'],
+ ['b12','idx',4,'Write to buckets','indexQueue','F4.1','AB'],
+ ['b13','idx',5,'Replicate buckets','needs a cluster','F4.3','AB',true],
+ ['b14','search',4,'Accelerate models','tsidx on indexers','F5.3','AB'],
+ ['b15','search',5,'Dispatch search','map / reduce','F5.1','AB'],
+ ['b16','search',6,'Correlate (ES)','not in topology','F6.1','AB',true],
+ ['b17','soar',6,'Create case','container','F6.2','AB'],
+ ['b18','soar',5,'Run playbook','playbook run','F6.2','AB']
+];
+const bx=k=>BOX.find(b=>b[0]===k);
+const X=b=>COL[b[2]],Y=b=>LY(b[1])+9,CY=b=>LY(b[1])+28;
+// flows: points, paths, kind, label [x,y,text]
+const L=(k)=>[X(bx(k)),CY(bx(k))],R=(k)=>[X(bx(k))+BW,CY(bx(k))],T=(k)=>[X(bx(k))+BW/2,Y(bx(k))],B=(k)=>[X(bx(k))+BW/2,Y(bx(k))+BH];
+const FLOW=[
+ [[[150,CY(bx('b1'))],L('b1')],'A',''],
+ [[B('b1'),T('b2')],'A',''],
+ [[R('b2'),L('b3')],'A','',[540,CY(bx('b2'))-7,'raw stream · a universal forwarder does not parse']],
+ [[B('b3'),[B('b3')[0],148],[158,148],[158,CY(bx('b9'))],L('b9')],'A','',[460,144,'S2S 9997 · SI-3']],
+ [[R('b4'),L('b5')],'B',''],[[R('b5'),L('b6')],'B',''],[[R('b6'),L('b7')],'B',''],[[R('b7'),L('b8')],'B',''],
+ [[B('b8'),T('b12')],'B','missing',[B('b8')[0]+8,204,'SI-14 missing']],
+ [[R('b9'),L('b10')],'A',''],[[R('b10'),L('b11')],'A',''],[[R('b11'),L('b12')],'A',''],
+ [[R('b12'),L('b13')],'AB','planned'],
+ [[[X(bx('b12'))+BW-20,Y(bx('b12'))+BH],[X(bx('b12'))+BW-20,CY(bx('b15'))-6],[COL[5],CY(bx('b15'))-6]],'AB','',[880,262,'results']],
+ [[R('b15'),L('b16')],'AB','planned'],
+ [[B('b16'),T('b17')],'AB','planned',[1130,323,'findings · SI-15']],
+ [[L('b17'),R('b18')],'AB','']
+];
+FLOW.forEach(([pts,paths,kind,lab],n)=>{const g=el('g',{class:'fl '+kind},flG);g.dataset.paths=paths;
+  const last=pts[pts.length-1],prev=pts[pts.length-2],dx=Math.sign(last[0]-prev[0]),dy=Math.sign(last[1]-prev[1]),ah=7,end=[last[0]-dx*ah,last[1]-dy*ah];
+  el('path',{d:'M'+pts.slice(0,-1).map(p=>p.join(' ')).join(' L')+' L'+end.join(' ')},g);
+  el('path',{class:'hd',d:`M${last[0]} ${last[1]} L${end[0]-dy*4} ${end[1]+dx*4} L${end[0]+dy*4} ${end[1]-dx*4}Z`},g);
+  if(lab){const anchor=lab[2].startsWith('SI-14')||lab[2].startsWith('findings')?'start':'middle';el('text',{x:lab[0],y:lab[1],'text-anchor':anchor},g).textContent=lab[2]}});
+const boxEls={};
+BOX.forEach(b=>{const [k,lane,c,label,q,f,paths,planned]=b,g=el('g',{class:'fn'+(planned?' planned':''),tabindex:0,role:'button','aria-label':`${label}, ${q}, ${f}`},fnG);g.dataset.k=k;g.dataset.f=f;g.dataset.paths=paths;
+  el('rect',{class:'box',x:X(b),y:Y(b),width:BW,height:BH,rx:4},g);
+  el('text',{class:'t',x:X(b)+8,y:Y(b)+16},g).textContent=label;el('text',{class:'q',x:X(b)+8,y:Y(b)+30},g).textContent=q;
+  boxEls[k]=g});
+
+// Selection
+const detail=document.getElementById('detail');
+let current=null,path='all';
+function showFn(id){const f=fn(id),perf=Object.entries(f[2]);
+  detail.innerHTML=`<span class="dom">${f[0].split('.')[0]} · ${GROUPS[f[0].split('.')[0]]}</span><h3>${f[0]} · ${esc(f[1])}</h3><p>${esc(f[5])}</p>
+  <dl><dt>Performed by</dt><dd>${perf.length?perf.map(([s,v])=>SYSC.find(x=>x[0]===s)[1]+(v==='s'?' (some paths)':'')).join(', '):'<span class="chip stop">No system</span>'}</dd><dt>Supports activity (OV-5)</dt><dd>${f[3]}</dd><dt>Status</dt><dd><span class="chip ${ST[f[4]][0]}">${ST[f[4]][1]}</span></dd></dl>`}
+function intro(){detail.innerHTML=`<span class="dom">Where parsing happens</span><h3>Depends on the path</h3>
+  <ul><li><span class="chip ext">Path A</span><span>Syslog → Universal Forwarder → <b>Indexer parses</b>. props.conf and transforms.conf must be on the indexers.</span></li>
+  <li><span class="chip ext">Path B</span><span>HEC → <b>Heavy Forwarder parses</b> and sends cooked data; the indexer only writes it.</span></li>
+  <li><span class="chip stop">Gap</span><span>Path B stops at the heavy forwarder: its output (SI-14) is missing.</span></li></ul>
+  <p class="hint">Select a function box or a table row. Esc clears.</p>`}
+function apply(){const on=new Set();
+  if(current){BOX.filter(b=>b[5]===current).forEach(b=>on.add(b[0]))}
+  const pathOn=b=>path==='all'||b[6].includes(path);
+  const focus=!!current||path!=='all';svg.classList.toggle('focused',focus);
+  BOX.forEach(b=>{const g=boxEls[b[0]];g.classList.toggle('on',current?on.has(b[0]):pathOn(b));g.classList.toggle('sel',on.has(b[0]))});
+  flG.querySelectorAll('.fl').forEach(g=>g.classList.toggle('on',!current&&(path==='all'||g.dataset.paths.includes(path))));
+  document.querySelectorAll('#alloc tbody tr[data-k]').forEach(r=>r.classList.toggle('sel',r.dataset.k===current));
+  document.getElementById('pathNote').textContent=path==='A'?'Universal forwarders send raw data; the indexer runs every parsing step.':path==='B'?'The heavy forwarder parses, so masking can happen before data leaves the DMZ. Its output is missing.':'';
+  document.querySelectorAll('[data-path]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.path===path)))}
+function pick(id){current=current===id?null:id;current?showFn(id):intro();apply()}
+Object.values(boxEls).forEach(g=>{g.addEventListener('click',()=>pick(g.dataset.f));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(g.dataset.f)}})});
+document.querySelectorAll('[data-path]').forEach(b=>b.addEventListener('click',()=>{path=b.dataset.path;current=null;intro();apply()}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(current||path!=='all')){current=null;path='all';intro();apply()}});
+
+// Allocation table
+const al=document.getElementById('alloc');
+al.innerHTML=`<thead><tr><th class="l">Function</th>${SYSC.map(s=>`<th>${esc(s[1])}</th>`).join('')}<th>OV-5</th><th class="l">Status</th></tr></thead><tbody>${Object.entries(GROUPS).map(([g,n])=>`<tr class="grp"><td colspan="${SYSC.length+3}">${g} · ${esc(n)}</td></tr>`+FN.filter(f=>f[0].startsWith(g+'.')).map(f=>`<tr data-k="${f[0]}"><td class="fnn"><span class="id">${f[0]}</span> ${esc(f[1])}</td>${SYSC.map(s=>{const v=f[2][s[0]];return `<td class="c ${v?(f[4]==='none'?'no':v==='s'?'gap':'ok'):''}">${v==='p'?'●':v==='s'?'○':''}</td>`}).join('')}<td class="mono" style="text-align:center">${f[3]}</td><td><span class="chip ${ST[f[4]][0]}">${ST[f[4]][1]}</span>${f[4]==='none'?' <span style="color:var(--stop);font-weight:600">✕</span>':''}</td></tr>`).join('')).join('')}</tbody>`;
+al.querySelectorAll('tbody tr[data-k]').forEach(r=>r.addEventListener('click',()=>{pick(r.dataset.k);document.getElementById('sv4').scrollIntoView({block:'nearest'})}));
+
+const c={ok:FN.filter(f=>f[4]==='ok').length,partial:FN.filter(f=>f[4]==='partial').length,none:FN.filter(f=>f[4]==='none').length};
+document.getElementById('summary').innerHTML=`<span><b>${Object.keys(GROUPS).length}</b>function groups</span><span><b>${FN.length}</b>functions</span><span><b>${SYSC.length}</b>system types</span><span><b>2</b>data paths</span><span><b>${c.ok}</b>realised</span><span class="rv"><b>${c.partial}</b>partial</span><span class="rv"><b>${c.none}</b>not realised</span>`;
+document.getElementById('findings').innerHTML=[
+ ['gap','Parsing','<b>Parsing runs on different systems for the two paths.</b> Syslog through a universal forwarder is parsed on Indexer 1; HEC through Heavy Forwarder 1 is parsed there. Line-breaking, timestamp and masking rules must be deployed to both, and the indexer copy does not come from the Deployment Server.'],
+ ['stop','Masking','<b>Path A masks PII only on the indexer (F2.4)</b>, after it has crossed the site LAN and WAN in syslog and S2S. Masking at source (CV-2 C1.4) or routing syslog through a heavy forwarder would move it earlier.'],
+ ['stop','Dead end','<b>Path B parses and then stops.</b> Heavy Forwarder 1 cooks the AWS events, but has no output (SI-14), so F3.1 is only partly realised and nothing from AWS is indexed.'],
+ ['gap','Not realised','<b>Two functions have no system</b>: bucket replication (F4.3, needs an indexer cluster) and correlation searches (F6.1, needs Enterprise Security). SOAR can create cases (F6.2) but receives no findings.'],
+ ['ext','Timezone','<b>Universal forwarders do not read props.conf for timestamps</b> (except structured data). Set TZ for each syslog sourcetype on the indexers, or events from Melbourne and Sydney devices may be offset.']
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+intro();apply();
+</script>
+
+</body>
+</html>
