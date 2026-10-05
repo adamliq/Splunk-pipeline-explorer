@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>OV-5b Operational Activity Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV, DIV, CV, SV and StdV mockups. Banners, title block, purpose, then
+   the activity model in OV-4 team swimlanes with OV-3 flow tags, a detail panel, the inputs and outputs table, and findings. Colour bars follow the OV-2 tier; amber and red mark partial and missing support. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+.plane{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.model{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.model>*{min-width:0}
+@media (max-width:1150px){.model{grid-template-columns:1fr}}
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:9px;align-content:start}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:0;font:700 1.12rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.85rem}
+.detail dl{margin:0;display:grid;gap:7px}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.84rem}
+.detail ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:.84rem}
+.detail li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
+.detail code{font:500 .74rem var(--font-code);background:var(--zone);padding:1px 4px;border-radius:3px}
+.detail .hint{font-size:.78rem;color:var(--muted)}
+.headrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{font:600 .78rem var(--font-body);padding:6px 12px;border:0;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sheet)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg th.n,.reg td.n{text-align:right}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tbody tr:last-child td{border-bottom:0}
+.reg td.n{font:500 .76rem var(--font-code);font-variant-numeric:tabular-nums;white-space:nowrap}
+.reg tbody tr[data-k]{cursor:pointer}
+.reg tbody tr[data-k]:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+svg.am{display:block;width:100%;min-width:1000px;height:auto}
+.lane rect{fill:var(--sheet);stroke:var(--rule)}
+.lane.alt rect{fill:color-mix(in srgb,var(--zone) 60%,var(--sheet))}
+.lane text{font:600 11px var(--font-title);fill:var(--ink)}
+.lane text.s{font:500 9px var(--font-code);fill:var(--muted)}
+.act{cursor:pointer}
+.act:focus{outline:none}
+.act rect.box{fill:var(--node);stroke:var(--line);stroke-width:1.2}
+.act rect.bar{stroke:none}
+.act .t{font:600 11.5px var(--font-title);fill:var(--ink)}
+.act .i{font:600 9.5px var(--font-code);fill:var(--muted)}
+.act.partial rect.box{stroke:var(--review)}
+.act.none rect.box{stroke:var(--stop);stroke-dasharray:4 3}
+.act:focus-visible rect.box,.act.sel rect.box{stroke:var(--sel);stroke-width:2.6}
+.fl{cursor:pointer}
+.fl path.l{fill:none;stroke:var(--line);stroke-width:1.8}
+.fl .hd{fill:var(--line)}
+.fl.partial path.l{stroke:var(--review);stroke-dasharray:6 3}.fl.partial .hd{fill:var(--review)}
+.fl.missing path.l{stroke:var(--stop);stroke-dasharray:6 4}.fl.missing .hd{fill:var(--stop)}
+.fl.planned path.l{stroke:var(--review);stroke-dasharray:2 3}.fl.planned .hd{fill:var(--review)}
+.fl rect.tag{fill:var(--sheet);stroke:var(--line)}
+.fl.partial rect.tag,.fl.planned rect.tag{stroke:var(--review)}.fl.missing rect.tag{stroke:var(--stop)}
+.fl text{font:600 9px var(--font-code);fill:var(--ink-2)}
+.fl .hit{fill:none;stroke:transparent;stroke-width:12}
+svg.focused .act:not(.on){opacity:.3}
+svg.focused .fl:not(.on){opacity:.12}
+svg.focused .fl.on path.l{stroke-width:2.6}
+.model.wide{grid-template-columns:1fr}
+@media (prefers-reduced-motion:no-preference){.act,.fl{transition:opacity .15s}}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="oTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="oTitle">OV-5b · Operational Activity Model</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Operational (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">Accountable</span><span class="tb-v">Security telemetry service owner</span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p style="margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch">How the nine activities connect: what each one takes in and passes on, who performs it, and which OV-3 resource flow carries each exchange. Swimlanes are the OV-4 teams.</p></div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="model wide">
+        <figure>
+          <div class="figscroll"><svg class="am" id="am" viewBox="0 0 1200 480" role="group" aria-label="Operational activity model in team swimlanes"></svg></div>
+          <figcaption>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--line)" stroke-width="1.8"/></svg>exchange in place</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--review)" stroke-width="1.8" stroke-dasharray="6 3"/></svg>partly in place</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--review)" stroke-width="1.8" stroke-dasharray="2 3"/></svg>planned or inferred</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--stop)" stroke-width="1.8" stroke-dasharray="6 4"/></svg>missing</span>
+            <span class="key">Tags are OV-3 resource flows. Click an activity or a tag.</span>
+          </figcaption>
+        </figure>
+      </div>
+      <div class="detail" id="detail" aria-live="polite"></div>
+
+      <h2>Activity inputs and outputs</h2>
+      <div class="tablewrap"><table class="reg" id="io"></table></div>
+
+      <div class="findings">
+        <h2>What the model shows</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Activities from OV-5a · Flows from OV-3 · Lanes from OV-4</span><span>OV-5b · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+// Activities: id, name, performer (OV-4), OV-2 tier colour, status (ok | partial | none | ext), subs [id, name, status, note]
+const ACTS=[
+ ['A1','Generate security telemetry','Source owners (Network, Cloud, IT)','collect','partial',[['A1.1','Log network and security device events','ok','Firewalls and appliances at both sites (RF-02, RF-04).'],['A1.2','Log host and authentication events','none','Windows Event Log 1 is not collected (RF-01, RF-03).'],['A1.3','Emit cloud audit events','partial','CloudTrail and GuardDuty over HEC (RF-05); onboarding in Increment 2.']]],
+ ['A2','Collect, buffer and forward','Log onboarding team','collect','partial',[['A2.1','Receive syslog','ok','Syslog Server 1 and 2 write per-host files.'],['A2.2','Read host logs','none','No forwarder on the Windows hosts.'],['A2.3','Receive cloud events','ok','HEC on Heavy Forwarder 1.'],['A2.4','Buffer during outages','partial','Acknowledgement on Universal Forwarder 1; no persistent queue on the HEC input.']]],
+ ['A3','Forward and deliver events','Log onboarding team','collect','partial',[['A3.1','Deliver to indexers','partial','Only Universal Forwarder 1 has an output (RF-06); RF-07 and RF-08 missing.'],['A3.2','Confirm delivery','ok','useACK on Universal Forwarder 1.']]],
+ ['A4','Process and route events','Log onboarding team','index','partial',[['A4.1','Break lines and extract timestamps','ok','On Indexer 1 for syslog, on Heavy Forwarder 1 for HEC.'],['A4.2','Mask personal information','partial','Only on the indexer for syslog, after PII crosses the network.'],['A4.3','Route to the right index','ok','Index per classification at Increment 2.']]],
+ ['A5','Index and replicate','Splunk platform team','index','partial',[['A5.1','Store events','ok','Indexer 1 hot, warm and cold buckets.'],['A5.2','Apply retention','ok','90 days today; frozen buckets deleted.'],['A5.3','Replicate across sites','none','No indexer cluster until Increment 3.']]],
+ ['A6','Search and detect','SOC and detection engineering','search','partial',[['A6.1','Investigate','ok','Ad hoc search on Search Head 1.'],['A6.2','Normalise to the CIM','partial','35% of sourcetypes CIM-compliant.'],['A6.3','Run correlation searches','none','Needs Enterprise Security.'],['A6.4','Score risk','none','Risk-based alerting in Increment 3.']]],
+ ['A7','Manage the platform','Splunk platform team','govern','ok',[['A7.1','Distribute configuration','ok','Deployment Server 1 to three clients (RF-12).'],['A7.2','Manage licence','ok','License Manager 1; over entitlement on 4 of 7 days (SV-7).'],['A7.3','Monitor health','ok','Monitoring Console 1.'],['A7.4','Plan capacity','ok','Forecast from license_usage.log.']]],
+ ['A8','Authenticate and authorise','Identity team','govern','ok',[['A8.1','Sign in','ok','SAML with MFA (RF-13).'],['A8.2','Control data access','ok','Roles and srchIndexesAllowed.'],['A8.3','Review access','ok','Quarterly, from _audit.']]],
+ ['A9','Coordinate response','SOC and Service desk','detect','partial',[['A9.1','Triage findings','none','No findings without Enterprise Security (RF-10).'],['A9.2','Run playbooks','partial','SOAR present but receives no findings (RF-11 inferred).'],['A9.3','Update tickets','none','No interface from SOAR to the ticketing system (RF-14).']]]
+];
+const SST={ok:['ok','Supported'],partial:['gap','Partly'],none:['stop','Not supported'],ext:['ext','Outside']};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const LANES=[['src','Source owners','Network, Cloud, IT'],['onb','Log onboarding team','Collection'],['plt','Splunk platform team','Platform'],['soc','SOC and detection','Security operations'],['iam','Identity team','Access'],['sd','Service desk','Tickets']];
+const LH=72,LT=24,LY=k=>LT+LANES.findIndex(l=>l[0]===k)*LH;
+const BW=120,BH=54;
+// activity box positions: id, lane, x
+const POS={A1:['src',160],A2:['onb',300],A3:['onb',490],A4:['onb',680],A7:['plt',490],A5:['plt',860],A6:['soc',860],A9:['soc',1050],A8:['iam',860],T:['sd',1050]};
+const act=id=>ACTS.find(a=>a[0]===id);
+const box=id=>{const [l,x]=POS[id];return {x,y:LY(l)+(LH-BH)/2,cx:x+BW/2,cy:LY(l)+LH/2}};
+// flows: id tag, from, to, resource, status (ok|partial|planned|missing), points
+const F=[
+ ['RF-01–05','A1','A2','Raw telemetry: syslog, Windows events, cloud audit events','partial','Windows events (RF-01, RF-03) never leave the hosts.'],
+ ['buffer','A2','A3','Buffered events on the collectors','ok',''],
+ ['RF-06, 07','A3','A4','Forwarded events · Sydney and Melbourne','partial','Melbourne (RF-07) has no output: SI-13 missing.'],
+ ['RF-08','A4','A5','Parsed events, PII masked','partial','Cloud events parsed on Heavy Forwarder 1 go nowhere (SI-14).'],
+ ['RF-09','A5','A6','Search results','ok',''],
+ ['RF-10, 11','A6','A9','Notable events for triage and playbooks','planned','Needs Enterprise Security; Search Head → SOAR only inferred.'],
+ ['RF-14','A9','T','Cases and ticket updates','missing','No interface from SOAR to the ticketing system.'],
+ ['RF-13','A8','A6','Authenticated analysts and roles','ok',''],
+ ['RF-13 ','A8','A9','Authenticated responders','ok',''],
+ ['RF-12','A7','A3','Apps and configuration bundles (also A2, A4)','ok',''],
+ ['RF-15','A5','A7','Licence usage and health metrics','planned','Licence peer and monitoring links inferred (SI-16, SI-17).']
+];
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+const svg=document.getElementById('am');
+LANES.forEach((l,i)=>{const g=el('g',{class:'lane'+(i%2?' alt':'')},svg);el('rect',{x:10,y:LY(l[0]),width:1180,height:LH},g);el('text',{x:20,y:LY(l[0])+30},g).textContent=l[1];el('text',{class:'s',x:20,y:LY(l[0])+45},g).textContent=l[2]});
+const fG=el('g',{},svg),aG=el('g',{},svg),tG=el('g',{},svg);
+// routes: orthogonal elbows between box edges
+function route(a,b){const A=box(a),B=box(b);
+  if(Math.abs(A.cy-B.cy)<1)return A.cx<B.cx?[[A.x+BW,A.cy],[B.x,B.cy]]:[[A.x,A.cy],[B.x+BW,B.cy]];
+  if(Math.abs(A.cx-B.cx)<1)return A.cy<B.cy?[[A.cx,A.y+BH],[B.cx,B.y]]:[[A.cx,A.y],[B.cx,B.y+BH]];
+  const down=B.cy>A.cy,mx=B.x-16;
+  if(B.x>A.x+BW)return [[A.x+BW,A.cy],[mx,A.cy],[mx,B.cy],[B.x,B.cy]];
+  return [[A.cx,down?A.y+BH:A.y],[A.cx,B.cy],[B.x+BW,B.cy]]}
+const SPECIAL={'RF-13 ':()=>{const A=box('A8'),B=box('A9');return [[A.x+BW,A.cy],[B.x+30,A.cy],[B.x+30,B.y+BH]]},'RF-12':()=>{const A=box('A7'),B=box('A3');return [[A.cx,A.y],[B.cx,B.y+BH]]},'RF-15':()=>{const A=box('A5'),B=box('A7');return [[A.x,A.cy+8],[B.x+BW,B.cy+8]]}};
+const flEls={};
+F.forEach(f=>{const pts=(SPECIAL[f[0]]||(()=>route(f[1],f[2])))(),g=el('g',{class:'fl '+f[4]},fG);g.dataset.k=f[0];
+  const last=pts[pts.length-1],prev=pts[pts.length-2],dx=Math.sign(last[0]-prev[0]),dy=Math.sign(last[1]-prev[1]),end=[last[0]-dx*8,last[1]-dy*8];
+  el('path',{class:'hit',d:'M'+pts.map(p=>p.join(' ')).join(' L')},g);el('path',{class:'l',d:'M'+pts.slice(0,-1).map(p=>p.join(' ')).join(' L')+' L'+end.join(' ')},g);
+  el('path',{class:'hd',d:`M${last[0]} ${last[1]} L${end[0]-dy*4.5} ${end[1]+dx*4.5} L${end[0]+dy*4.5} ${end[1]-dx*4.5}Z`},g);
+  if(f[0]!=='buffer'){let seg=0,best=0;for(let i=0;i<pts.length-1;i++){const L=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1]);if(L>best){best=L;seg=i}}
+    const tw=f[0].trim().length*5.6+10,horiz=pts[seg][1]===pts[seg+1][1],m=[(pts[seg][0]+pts[seg+1][0])/2,(pts[seg][1]+pts[seg+1][1])/2-(horiz&&best<tw+12?14:0)],tg=el('g',{class:'fl '+f[4]},tG);tg.dataset.k=f[0];
+    el('rect',{class:'tag',x:m[0]-tw/2,y:m[1]-8,width:tw,height:16,rx:8},tg);el('text',{x:m[0],y:m[1]+3,'text-anchor':'middle'},tg).textContent=f[0].trim();tg.addEventListener('click',()=>pick(f[0]));flEls[f[0]]=[g,tg]}
+  else flEls[f[0]]=[g];
+  g.addEventListener('click',()=>pick(f[0]))});
+const actEls={};
+Object.keys(POS).forEach(id=>{const b=box(id),a=act(id),g=el('g',{class:'act '+(a?a[4]:'none'),tabindex:0,role:'button'},aG);g.dataset.k=id;
+  const name=a?a[1]:'Track tickets',col=a?a[3]:'govern';g.setAttribute('aria-label',(a?id+' ':'')+name);
+  el('rect',{class:'box',x:b.x,y:b.y,width:BW,height:BH,rx:4},g);el('rect',{class:'bar',x:b.x,y:b.y,width:4,height:BH,rx:2,fill:`var(--d-${col})`},g);
+  el('text',{class:'i',x:b.x+12,y:b.y+14},g).textContent=a?id:'Service desk';
+  const words=name.split(' '),lines=[];let cur='';words.forEach(w=>{if((cur+' '+w).trim().length>15&&cur){lines.push(cur);cur=w}else cur=(cur+' '+w).trim()});lines.push(cur);
+  lines.slice(0,3).forEach((t,i)=>el('text',{class:'t',x:b.x+12,y:b.y+27+i*11.5},g).textContent=t);
+  g.addEventListener('click',()=>pick(id));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(id)}});actEls[id]=g});
+
+const STF={ok:['ok','In place'],partial:['gap','Partly'],planned:['gap','Planned or inferred'],missing:['stop','Missing']};
+const detail=document.getElementById('detail');let current=null;
+function show(k){const f=F.find(x=>x[0]===k);
+  if(f){const nm=id=>id==='T'?'Track tickets':act(id)[1];detail.innerHTML=`<span class="dom">Resource flow</span><h3>${esc(f[0].trim())} · ${esc(nm(f[1]))} → ${esc(nm(f[2]))}</h3><p>${esc(f[3])}</p><p><span class="chip ${STF[f[4]][0]}">${STF[f[4]][1]}</span> ${esc(f[5])}</p>`;return}
+  const a=act(k),ins=F.filter(x=>x[2]===k),outs=F.filter(x=>x[1]===k);
+  detail.innerHTML=`<span class="dom">${a?esc(a[2]):'Service desk'}</span><h3>${a?k+' · '+esc(a[1]):'Track tickets'}</h3>${a?`<p><span class="chip ${SST[a[4]][0]}">${SST[a[4]][1]}</span></p>`:''}
+  <dl><dt>Takes in</dt><dd>${ins.length?ins.map(x=>`${esc(x[3])} <span class="id">${esc(x[0].trim())}</span>`).join('<br>'):'—'}</dd><dt>Passes on</dt><dd>${outs.length?outs.map(x=>`${esc(x[3])} <span class="id">${esc(x[0].trim())}</span>`).join('<br>'):'—'}</dd></dl>`}
+function intro(){detail.innerHTML=`<span class="dom">Flow health</span><h3>${F.filter(f=>f[4]==='ok').length} of ${F.length} exchanges in place</h3><p>Select an activity or a flow tag. Esc clears.</p>`}
+function pick(k){if(current===k){current=null;svg.classList.remove('focused');svg.querySelectorAll('.on,.sel').forEach(e=>e.classList.remove('on','sel'));document.querySelectorAll('#io tr.sel').forEach(r=>r.classList.remove('sel'));intro();return}
+  current=k;svg.classList.add('focused');const f=F.find(x=>x[0]===k),onA=new Set(f?[f[1],f[2]]:[k]),onF=new Set(f?[k]:F.filter(x=>x[1]===k||x[2]===k).map(x=>x[0]));
+  Object.entries(actEls).forEach(([id,g])=>{g.classList.toggle('on',onA.has(id));g.classList.toggle('sel',id===k)});Object.entries(flEls).forEach(([id,gs])=>gs.forEach(g=>g.classList.toggle('on',onF.has(id))));
+  document.querySelectorAll('#io tbody tr').forEach(r=>r.classList.toggle('sel',onA.has(r.dataset.k)));show(k)}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)pick(current)});
+document.getElementById('io').innerHTML=`<thead><tr><th>Activity</th><th>Performer (OV-4)</th><th>Takes in</th><th>Passes on</th><th>Support</th></tr></thead><tbody>${ACTS.map(a=>{const ins=F.filter(x=>x[2]===a[0]),outs=F.filter(x=>x[1]===a[0]);return `<tr data-k="${a[0]}"><td><span class="id">${a[0]}</span> ${esc(a[1])}</td><td>${esc(a[2])}</td><td>${ins.map(x=>`${esc(x[3])} <span class="id">${esc(x[0].trim())}</span>`).join('<br>')||'—'}</td><td>${outs.map(x=>`${esc(x[3])} <span class="id">${esc(x[0].trim())}</span>`).join('<br>')||'—'}</td><td><span class="chip ${SST[a[4]][0]}">${SST[a[4]][1]}</span></td></tr>`}).join('')}</tbody>`;
+document.querySelectorAll('#io tbody tr').forEach(r=>r.addEventListener('click',()=>pick(r.dataset.k)));
+document.getElementById('summary').innerHTML=`<span><b>${ACTS.length}</b>activities</span><span><b>${LANES.length}</b>performing teams</span><span><b>${F.length}</b>exchanges</span><span><b>${F.filter(f=>f[4]==='ok').length}</b>in place</span><span class="rv"><b>${F.filter(f=>f[4]==='partial').length}</b>partly</span><span class="rv"><b>${F.filter(f=>f[4]==='planned').length}</b>planned or inferred</span><span class="rv"><b>${F.filter(f=>f[4]==='missing').length}</b>missing</span>`;
+document.getElementById('findings').innerHTML=[
+ ['gap','Main line','<b>Every exchange on the main line from source to index is only partly in place</b> (RF-01–05, RF-06/07, RF-08). Each loses one source: Windows, Melbourne and AWS.'],
+ ['stop','Hand-offs','<b>The line breaks twice between teams</b>: from detection to response (RF-10/11, needs Enterprise Security and the SOAR link) and from SOC to the service desk (RF-14, no ticket interface).'],
+ ['ext','Lanes','<b>Process and route (A4) sits in the onboarding lane but runs on the platform team\'s indexer</b> for the syslog path (SV-4). The two teams share every parsing change.'],
+ ['ok','Support','<b>Configuration (RF-12) and sign-in (RF-13) are in place</b> and reach every activity that needs them.']
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+intro();
+</script>
+
+</body>
+</html>
