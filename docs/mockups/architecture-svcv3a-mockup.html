@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>SvcV-3a Systems-Services Matrix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as every other view in the pack. Banners, title block, purpose, a detail
+   strip, then the system × service matrix (SV-1 systems by tier down, SvcV-1 services by layer across) with a provider row,
+   and findings. Amber marks providers cut off; red marks services no system provides. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.sw{width:12px;height:12px;border-radius:2px;display:inline-block;vertical-align:-1px}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.part,.chip.plan,.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+
+/* Detail strip */
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px 16px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.3fr) minmax(0,1fr);gap:12px 22px;min-height:132px}
+@media (max-width:960px){.detail{grid-template-columns:1fr}}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:4px 0 6px;font:700 1.16rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.86rem;line-height:1.5}
+.detail dl{margin:0;display:grid;gap:7px;align-content:start}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.85rem}
+.detail ul{margin:2px 0 0;padding:0;list-style:none;display:grid;gap:4px;font-size:.84rem}
+.detail code{font:500 .76rem var(--font-code);background:var(--zone);padding:1px 5px;border-radius:3px}
+
+/* Matrix */
+.mwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.mx{border-collapse:separate;border-spacing:0;width:100%;font-size:.8rem}
+.mx th,.mx td{border-bottom:1px solid var(--rule);padding:0}
+.mx thead th{background:var(--zone);font:600 .62rem/1.2 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);vertical-align:bottom}
+.mx thead tr.fam th{border-bottom:0;padding:7px 6px 2px;text-align:center;border-left:1px solid var(--rule)}
+.mx thead tr.fam th:first-child{border-left:0}
+.mx thead tr.cols th{padding:4px 4px 8px}
+.mx th.colh{width:58px;min-width:58px;text-align:center;border-left:1px solid var(--rule);cursor:pointer}
+.mx th.colh button{all:unset;cursor:pointer;display:grid;gap:3px;justify-items:center;width:100%;padding:2px 0}
+.mx th.colh .cid{font:600 .66rem var(--font-code);color:var(--ink)}
+.mx th.colh .nm{font:500 .62rem/1.2 var(--font-body);letter-spacing:0;text-transform:none;color:var(--ink-2);max-width:56px;text-wrap:balance}
+.mx th.colh button:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+.mx th.rowh{position:sticky;left:0;z-index:1;background:var(--sheet);text-align:left;font-weight:400;padding:6px 10px;min-width:250px;border-right:1px solid var(--rule);cursor:pointer}
+.mx thead th.rowh{background:var(--zone);vertical-align:bottom;padding:8px 10px}
+.mx th.rowh .cid{font:600 .7rem var(--font-code);color:var(--muted);margin-right:6px}
+.mx th.rowh .dot{margin-left:6px}
+.mx tr.grp th,.mx tr.grp td{background:var(--zone);font:700 .78rem var(--font-title);padding:5px 10px}
+.mx tr.grp th{position:sticky;left:0;z-index:1}
+.mx td.c{text-align:center;border-left:1px solid var(--rule);font:600 .95rem/1 var(--font-code);height:30px}
+.mx td.c.p{color:var(--ink)}
+.mx td.c.s{color:var(--muted)}
+.mx td.c.gap{color:var(--review);background:color-mix(in srgb,var(--review) 9%,transparent)}
+.mx td.c.okc{color:var(--ok)}
+.mx td.st{padding:6px 10px;white-space:nowrap;border-left:1px solid var(--rule)}
+.mx tfoot td,.mx tfoot th{background:var(--zone);padding:6px 4px;text-align:center;font:600 .66rem/1.3 var(--font-code);border-bottom:0;border-top:1px solid var(--rule)}
+.mx tfoot th.rowh{text-align:left;padding:6px 10px;background:var(--zone)}
+.mx tfoot td{border-left:1px solid var(--rule)}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;vertical-align:1px}
+.dot.ok{background:var(--ok)}.dot.part{background:var(--review)}.dot.plan{border:1.5px solid var(--review)}
+.mx tbody tr:not(.grp):hover th.rowh,.mx tbody tr:not(.grp):hover td{background-color:var(--hi)}
+.mx.focused tbody tr:not(.grp):not(.on){opacity:.35}
+.mx.focused .col-on{background-color:color-mix(in srgb,var(--sel) 10%,transparent)}
+.mx tr.on th.rowh{box-shadow:inset 3px 0 0 var(--sel)}
+.mx th.colh.sel{box-shadow:inset 0 -3px 0 var(--sel)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.78rem;color:var(--ink-2)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend b{font:600 .95rem var(--font-code)}
+
+/* Findings */
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tr:last-child td{border-bottom:0}
+.reg tbody tr{cursor:pointer}
+.reg tbody tr:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.mx tbody tr{transition:opacity .15s}}
+
+
+.mx tr.grp th{text-align:left;white-space:nowrap}
+.mx th.colh{width:50px;min-width:50px}
+.mx th.rowh{min-width:220px}
+.mx th.colh .nm{max-width:48px}
+.mx td.c.no{color:var(--stop);background:color-mix(in srgb,var(--stop) 8%,transparent)}
+.mx thead tr.fam th.none{color:var(--stop)}
+.mx th.colh.none .cid{color:var(--stop)}
+.mx th.rowh small{display:block;font:500 .66rem var(--font-code);color:var(--muted)}
+.mx tr.lone th.rowh{color:var(--stop)}
+.detail li{display:flex;gap:8px;align-items:baseline}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="sTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="sTitle">SvcV-3a · Systems-Services Matrix</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Services (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">Service owner</span><span class="tb-v">Security telemetry service owner</span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>Which SV-1 systems provide each SvcV-1 service, and which systems use it. A service is real only when at least one deployed system provides it and the system can reach the systems that use it.</p></div>
+
+      <div class="summary" id="summary"></div>
+      <div class="detail" id="detail" aria-live="polite"></div>
+
+      <div class="legend">
+        <span><b>●</b>provides the service</span>
+        <span><b style="color:var(--muted)">○</b>uses it</span>
+        <span><b style="color:var(--review)">●</b>provides it but is cut off</span>
+        <span><b style="color:var(--stop)">○</b>uses a service nothing provides</span>
+        <span>Click a system or a service. Esc clears.</span>
+      </div>
+      <div class="mwrap"><table class="mx" id="mx"></table></div>
+
+      <div class="findings">
+        <h2>What the matrix shows</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Systems and interfaces from SV-1 · Services from SvcV-1 · Service state from SvcV-2</span><span>SvcV-3a · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+// Systems and interfaces from SV-1 (reference topology). Systems: id, name, Builder component, location
+const SYS=[
+ ['s6','Syslog Source 2','Syslog Source','Melbourne'],['s7','Syslog Server 2','Syslog Server','Melbourne'],['s8','Universal Forwarder 2','Universal Forwarder','Melbourne'],
+ ['s1','Firewalls and network devices','Syslog Source','Sydney'],['s2','Syslog Server 1','Syslog Server','Sydney'],['s3','Universal Forwarder 1','Universal Forwarder','Sydney'],
+ ['s5','Windows Event Log 1','Windows Event Log','Sydney'],['s10','Heavy Forwarder 1','Heavy Forwarder','Sydney'],['s15','Deployment Server 1','Deployment Server','Sydney'],
+ ['s16','License Manager 1','License Manager','Sydney'],['s17','Monitoring Console 1','Monitoring Console','Sydney'],
+ ['s9','AWS Lambda 1','AWS Lambda','AWS ap-southeast-2'],
+ ['s4','Indexer 1','Indexer','Multisite'],['s11','Search Head 1','Search Head','Multisite'],
+ ['s12','Splunk SOAR · Cloud 1','Splunk SOAR · Cloud','Cloud'],['s14','Authentication Provider · Cloud 1','Authentication Provider · Cloud','Cloud'],
+ ['s13','Administrator 1','User / Administrator','Security operations']
+];
+// Interfaces: id, from, to, plane, source (declared | inferred | missing), protocol, port, TLS, status (ok | plain | missing | inferred)
+const IFC=[
+ ['SI-1','s1','s2','data','declared','Syslog TCP/TLS or UDP','514 / 6514','Not applicable','plain'],
+ ['SI-2','s2','s3','data','declared','File handoff (local disk)','—','Not applicable','ok'],
+ ['SI-3','s3','s4','data','declared','Splunk-to-Splunk','9997','Required','ok'],
+ ['SI-4','s6','s7','data','declared','Syslog TCP/TLS or UDP','514 / 6514','Not applicable','plain'],
+ ['SI-5','s7','s8','data','declared','File handoff (local disk)','—','Not applicable','ok'],
+ ['SI-6','s9','s10','data','declared','HEC HTTPS','8088','Required','ok'],
+ ['SI-7','s4','s11','data','declared','Search dispatch (REST)','8089','Required','ok'],
+ ['SI-8','s15','s3','management','declared','Phone-home and app delivery','8089','Required','ok'],
+ ['SI-9','s15','s8','management','declared','Phone-home and app delivery','8089','Required','ok'],
+ ['SI-10','s15','s10','management','declared','Phone-home and app delivery','8089','Required','ok'],
+ ['SI-11','s13','s14','access','declared','SAML SSO','443','Required','ok'],
+ ['SI-12','s14','s11','access','declared','SAML assertion via load balancer','8000','Required','ok'],
+ ['SI-13','s8','s4','data','missing','Splunk-to-Splunk','9997','Required','missing'],
+ ['SI-14','s10','s4','data','missing','Splunk-to-Splunk','9997','Required','missing'],
+ ['SI-15','s11','s12','response','inferred','Findings to cases (REST)','443','Required','inferred'],
+ ['SI-16','s16','s4','management','inferred','Licence peer reporting','8089','Required','inferred'],
+ ['SI-17','s17','s4','management','inferred','Monitoring console (REST)','8089','Required','inferred']
+];
+const STATUS={ok:['ok','Declared'],plain:['gap','Plaintext'],missing:['stop','Missing output'],inferred:['gap','Add to topology']};
+const PLANE={data:'--d-index',management:'--d-collect',access:'--d-govern',response:'--d-detect'};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sys=id=>SYS.find(s=>s[0]===id);
+const ifc=id=>IFC.find(i=>i[0]===id);
+const chipFor=i=>`<span class="chip ${STATUS[i[8]][0]}">${STATUS[i[8]][1]}</span>`;
+
+// Services from SvcV-1: id, short name, full name, layer, deployed
+const SVC=[
+ ['S3','Syslog','Syslog reception','Collection',1],['S1','UF','Universal forwarding','Collection',1],['S4','HEC','HTTP Event Collector','Collection',1],
+ ['S2','Heavy fwd','Heavy forwarding and parsing','Collection',1],['S6','Edge','Edge pipelines','Collection',0],
+ ['S7','Indexing','Indexing','Indexing',1],['S8','Replic.','Index replication','Indexing',0],
+ ['S9','Search','Search and REST API','Search',1],['S10','Data models','Data model acceleration','Search',1],['S11','SH cluster','Search head clustering','Search',0],
+ ['S12','Correl.','Correlation and risk','Detection and response',0],['S13','Cases','Cases and playbooks','Detection and response',1],
+ ['S5','Deploy','Deployment','Platform and access',1],['S14','SAML','SAML sign-in','Platform and access',1],['S15','Licence','Licence management','Platform and access',1],['S16','Monitor','Platform monitoring','Platform and access',1]
+];
+const LAYERS=['Collection','Indexing','Search','Detection and response','Platform and access'];
+// Row groups of SV-1 systems
+const GROUPS=[['Sources',['s1','s6','s5','s9']],['Collection tier',['s2','s7','s3','s8','s10']],['Indexing and search',['s4','s11']],['Response and access',['s12','s14','s13']],['Platform management',['s15','s16','s17']]];
+// Cells: system → {service: p (provides) | pg (provides, cut off) | u (uses)} and a note on cut-off cells
+const MAP={
+ s1:{S3:'u'},s6:{S3:'u'},s5:{},s9:{S4:'u'},
+ s2:{S3:'p',S1:'u'},s7:{S3:'p',S1:'u'},s3:{S1:'p',S7:'u',S5:'u'},s8:{S1:'pg',S7:'u',S5:'u'},s10:{S4:'p',S2:'pg',S7:'u',S5:'u'},
+ s4:{S7:'p',S15:'u',S16:'u'},s11:{S9:'p',S10:'p',S7:'u',S14:'u',S12:'u'},
+ s12:{S13:'pg',S9:'u'},s14:{S14:'p'},s13:{S9:'u',S14:'u',S13:'u'},
+ s15:{S5:'p'},s16:{S15:'p'},s17:{S16:'p',S9:'u'}
+};
+const NOTE={
+ 's8:S1':'Forwards nothing: no output to Indexer 1 (SI-13 missing).',
+ 's10:S2':'Parses and masks, then has nowhere to send: no output to Indexer 1 (SI-14 missing).',
+ 's12:S13':'Receives no findings (SI-15 inferred, S12 not deployed) and cannot update tickets (RF-14).',
+ 's11:S12':'Search Head 1 would host Enterprise Security; no component exists in the topology.'
+};
+const svc=id=>SVC.find(s=>s[0]===id);
+const providers=k=>Object.keys(MAP).filter(s=>/^p/.test(MAP[s][k]||''));
+const users=k=>Object.keys(MAP).filter(s=>MAP[s][k]==='u');
+const ifcOf=s=>IFC.filter(i=>i[1]===s||i[2]===s);
+const CELL={p:['p','●'],pg:['p gap','●'],u:['s','○']};
+const mx=document.getElementById('mx');
+const cellOf=(s,k)=>{const v=MAP[s][k];if(!v)return ['',''];if(v==='u'&&!svc(k)[4])return ['s no','○'];return CELL[v]};
+function role(s){const m=MAP[s],p=Object.keys(m).filter(k=>/^p/.test(m[k])),u=Object.keys(m).filter(k=>m[k]==='u');
+  if(!p.length&&!u.length)return '<span class="chip stop">Unconnected</span>';
+  const cut=Object.values(m).includes('pg');return `<span class="chip ${cut?'gap':'ext'}">${p.length} provided · ${u.length} used</span>`}
+mx.innerHTML=`<thead><tr class="fam"><th class="rowh"></th>${LAYERS.map(l=>`<th colspan="${SVC.filter(s=>s[3]===l).length}">${esc(l)}</th>`).join('')}<th></th></tr>
+<tr class="cols"><th class="rowh">System (SV-1)</th>${SVC.map(s=>`<th class="colh${s[4]?'':' none'}" data-a="${s[0]}"><button type="button" aria-pressed="false" title="${esc(s[2])}"><span class="cid">${s[0]}</span><span class="nm">${esc(s[1])}</span></button></th>`).join('')}<th class="st">Role</th></tr></thead>
+<tbody>${GROUPS.map(([g,ids])=>`<tr class="grp"><th>${esc(g)}</th><td colspan="${SVC.length+1}"></td></tr>`+ids.map(id=>{const y=sys(id);return `<tr data-c="${id}"${Object.keys(MAP[id]).length?'':' class="lone"'}><th class="rowh" tabindex="0">${esc(y[1])}<small>${esc(y[2])} · ${esc(y[3])}</small></th>${SVC.map(s=>{const c=cellOf(id,s[0]);return `<td class="c ${c[0]}" data-a="${s[0]}">${c[1]}</td>`}).join('')}<td class="st">${role(id)}</td></tr>`}).join('')).join('')}</tbody>
+<tfoot><tr><th class="rowh">Provided by</th>${SVC.map(s=>{const p=providers(s[0]),ok=p.filter(x=>MAP[x][s[0]]==='p').length;return `<td>${p.length?`<span class="chip ${ok===p.length?'ok':ok?'gap':'gap'}">${p.length}</span><br>${ok} live`:'<span class="chip stop">None</span>'}</td>`}).join('')}<td></td></tr></tfoot>`;
+
+const detail=document.getElementById('detail');
+const li=(chip,cls,txt)=>`<li><span class="chip ${cls}">${chip}</span><span>${txt}</span></li>`;
+function showSys(id){const y=sys(id),m=MAP[id],p=Object.keys(m).filter(k=>/^p/.test(m[k])),u=Object.keys(m).filter(k=>m[k]==='u'),f=ifcOf(id);
+  detail.innerHTML=`<div><span class="dom">System · ${esc(y[3])}</span><h3>${esc(y[1])}</h3><p>${esc(y[2])} · ${role(id)}</p>${!p.length&&!u.length?'<p>In the topology with no interface: it provides and uses nothing.</p>':''}</div>
+  <dl><dt>Provides</dt><dd>${p.length?`<ul>${p.map(k=>li(k,m[k]==='pg'?'gap':'ok',esc(svc(k)[2])+(NOTE[id+':'+k]?' · '+esc(NOTE[id+':'+k]):''))).join('')}</ul>`:'—'}</dd>
+  <dt>Uses</dt><dd>${u.length?`<ul>${u.map(k=>li(k,svc(k)[4]?'ext':'stop',esc(svc(k)[2])+(svc(k)[4]?'':' · not deployed')+(NOTE[id+':'+k]?' · '+esc(NOTE[id+':'+k]):''))).join('')}</ul>`:'—'}</dd></dl>
+  <dl><dt>SV-1 interfaces</dt><dd>${f.length?`<ul>${f.map(i=>li(i[0],STATUS[i[8]][0],`${esc(sys(i[1])[1])} → ${esc(sys(i[2])[1])}`)).join('')}</ul>`:'None'}</dd></dl>`}
+function showSvc(k){const s=svc(k),p=providers(k),u=users(k);
+  detail.innerHTML=`<div><span class="dom">Service · ${esc(s[3])}</span><h3>${k} · ${esc(s[2])}</h3><p>${s[4]?(p.every(x=>MAP[x][k]==='p')?'<span class="chip ok">Provided</span>':'<span class="chip gap">Provided, partly cut off</span>'):'<span class="chip stop">No system provides it</span>'}</p>${s[4]?'':`<p>${k==='S12'?'Splunk Enterprise Security has no component in the topology.':'Planned for Increment 3.'}</p>`}</div>
+  <dl><dt>Provided by</dt><dd>${p.length?`<ul>${p.map(x=>li(MAP[x][k]==='pg'?'Cut off':'Live',MAP[x][k]==='pg'?'gap':'ok',esc(sys(x)[1])+(NOTE[x+':'+k]?' · '+esc(NOTE[x+':'+k]):''))).join('')}</ul>`:'—'}</dd></dl>
+  <dl><dt>Used by</dt><dd>${u.length?`<ul>${u.map(x=>li('Uses',s[4]?'ext':'stop',esc(sys(x)[1]))).join('')}</ul>`:'—'}</dd></dl>`}
+let current=null;
+function select(k){current=k;mx.classList.add('focused');const isS=/^S\d/.test(k);
+  mx.querySelectorAll('tbody tr[data-c]').forEach(r=>r.classList.toggle('on',isS?!!MAP[r.dataset.c][k]:r.dataset.c===k));
+  mx.querySelectorAll('[data-a]').forEach(e=>e.classList.toggle('col-on',e.dataset.a===k));
+  mx.querySelectorAll('th.colh').forEach(h=>{h.classList.toggle('sel',h.dataset.a===k);h.querySelector('button').setAttribute('aria-pressed',String(h.dataset.a===k))});
+  isS?showSvc(k):showSys(k)}
+function clear(){current=null;mx.classList.remove('focused');mx.querySelectorAll('.on,.col-on,.sel').forEach(e=>e.classList.remove('on','col-on','sel'));mx.querySelectorAll('th.colh button').forEach(b=>b.setAttribute('aria-pressed','false'));showSys('s10')}
+mx.querySelectorAll('th.colh button').forEach(b=>b.addEventListener('click',()=>{const a=b.parentElement.dataset.a;current===a?clear():select(a)}));
+mx.querySelectorAll('tbody tr[data-c] th.rowh').forEach(h=>{const c=h.parentElement.dataset.c;h.addEventListener('click',()=>current===c?clear():select(c));h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();current===c?clear():select(c)}})});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)clear()});
+const all=Object.values(MAP).flatMap(m=>Object.values(m));
+document.getElementById('summary').innerHTML=`<span><b>${SYS.length}</b>systems</span><span><b>${SVC.length}</b>services</span><span><b>${all.length}</b>mappings</span><span><b>${all.filter(v=>/^p/.test(v)).length}</b>provider cells</span><span class="rv"><b>${SVC.filter(s=>!providers(s[0]).length).length}</b>services with no system</span><span class="rv"><b>${all.filter(v=>v==='pg').length}</b>providers cut off</span><span class="rv"><b>${SYS.filter(y=>!Object.keys(MAP[y[0]]).length).length}</b>system unconnected</span>`;
+document.getElementById('findings').innerHTML=[
+ ['stop','No system','<b>Four services have no system behind them.</b> Edge pipelines (S6), index replication (S8) and search head clustering (S11) wait for Increment 3. Correlation and risk (S12) has no Enterprise Security component at all, yet Search Head 1 is expected to use it.'],
+ ['gap','Cut off','<b>Three systems provide a service they cannot deliver.</b> Universal Forwarder 2 (S1) and Heavy Forwarder 1 (S2) have no output to Indexer 1 (SI-13, SI-14). SOAR (S13) receives no findings and cannot update tickets.'],
+ ['gap','Single provider','<b>Indexing, search and data models each rest on one system.</b> Indexer 1 provides S7 and Search Head 1 provides S9 and S10. Only syslog reception (S3) and universal forwarding (S1) have two providers, and one of the forwarders is cut off.'],
+ ['ext','Unconnected','<b>Windows Event Log 1 provides and uses nothing.</b> It is in SV-1 with no interface, so no service collects its events. Point it at Universal Forwarder 1 or retire it from the topology.'],
+ ['ok','Platform','<b>Every platform service has a live provider.</b> Deployment, SAML sign-in, licence management and monitoring (S5, S14, S15, S16) each run on one system with the interfaces they need.']
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+clear();
+</script>
+
+</body>
+</html>
