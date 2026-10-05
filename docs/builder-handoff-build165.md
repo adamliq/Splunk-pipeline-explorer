@@ -41,3 +41,23 @@ UF 1 → Indexer 1                    M881 155 L903 155 L903 3 … L983 3 L983 1
 **Check:**
 - Default topology at 1280, 1440 and 1920: all three data lines are single straight segments (`d` = `M… L…`).
 - Reference topology: unchanged from Build 164.
+
+---
+
+## Build 166 recheck (`main` at `ebe9da9`, `builder-default-row-v166`)
+
+- **Detour:** ✅ fixed. Universal Forwarder 1 → Indexer 1 is `M881 170 L1005 170`.
+- **Small step:** ✅ fixed. All three default data lines are on y = 170 (`M241 170 L365 170`, `M561 170 L685 170`, `M881 170 L1005 170`): one straight segment each at 1280, 1440 and 1920. Cards in the row now share a height.
+- **Reference topology:** unchanged from Build 164. All data lines are straight, management lines enter at ⅔ height, and all 12 badges sit on their lines at Fit.
+- **Single pipeline default:** still correct (`syslogSource:1 syslog:1 uf:1 idx:1`).
+- **Checks:**
+  - Connector tool: all OK.
+  - Space: 7/7.
+  - Perf: `allOk` (default 31/32, fan5 46/47, fan8 63/62, reference 66/91 ms).
+  - Errors: 0.
+
+Screenshot: `build166-default-1440.png`.
+
+**Still open:**
+- **Calculators:** the Recovery calculator and Performance guardrails still default to 2 pipeline sets; this waits on the owner's decision.
+- **Selection dimming:** not rechecked.
