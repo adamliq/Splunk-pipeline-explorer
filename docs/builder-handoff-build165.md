@@ -95,3 +95,27 @@ Screenshot: `build166-default-1440.png`.
    - OV-3: doubled chip labels;
    - OV values;
    - OV-1: markers and tags.
+
+---
+
+## Build 167 recheck (`main` at `79110fc`, `builder-review-v167`)
+
+| # | Remaining item | Result |
+|---|---|---|
+| 1 | Selection dimming | ✅ Selecting Syslog Server 1 dims the unrelated connector to 0.4. Escape or a click on empty canvas restores 1,1,1. |
+| 2 | Architecture profile out of the rail | ✅ The rail is Tools + Groups. Validate ends with "Validating for: Splunk Enterprise · Change". |
+| 3 | History popover type | ✅ About 12–13px; button matches the header controls. |
+| 4 | Lone "1" on card names | ✅ Balanced wrap ("Universal / Forwarder 1"). |
+| 5 | Calculator defaults | ⏸ Still 2 and 2, waiting on the owner. |
+| 6 | Analyze descriptions and order | ✅ Every item has a one-line description; "Load selected path" is second. |
+| 7 | Connector tool reference scenario | Tool work (mine), not the builder's. Still to add. |
+| 8 | OV carry-overs | v167 changes OV thread routing; OV-1/2/3 not rechecked in this pass. |
+
+**Checks:**
+- **Tools:** 0 errors across **185 buttons**; connector tool all OK; space 7/7.
+- **Perf:** `allOk` on 2 of 3 runs (Build 166 also 1 of 2 in the same session). Typical: default 30/34, fan5 41/44, fan8 66/70, reference 76/93 ms.
+
+**Small, new:**
+- **Validate menu:** a thin empty bar sits under the "Validating for" row, probably the closed profile disclosure (`build167-validate-menu.png`). Hide it while closed.
+- **Tools rail icon:** it's now ◇, the glyph the old rail used for review findings. Use a wrench or sliders icon, so the old "findings" meaning doesn't carry over.
+- **Profile row placement:** "Validating for …" is last in Validate. The mockup puts it first, as context for the items below. Optional.
