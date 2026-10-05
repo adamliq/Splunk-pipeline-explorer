@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>PV-3 Project to Capability Mapping</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as every other view in the pack. Banners, title block, purpose, a detail
+   strip, then the project × capability matrix (projects by owning team down, CV-2 level-2 capabilities by family across, cells
+   carry the CV-1 increment) with a capability delivery row, and findings. Amber marks unfunded delivery; red marks no project. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.sw{width:12px;height:12px;border-radius:2px;display:inline-block;vertical-align:-1px}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.part,.chip.plan,.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+
+/* Detail strip */
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px 16px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.3fr) minmax(0,1fr);gap:12px 22px;min-height:132px}
+@media (max-width:960px){.detail{grid-template-columns:1fr}}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:4px 0 6px;font:700 1.16rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.86rem;line-height:1.5}
+.detail dl{margin:0;display:grid;gap:7px;align-content:start}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.85rem}
+.detail ul{margin:2px 0 0;padding:0;list-style:none;display:grid;gap:4px;font-size:.84rem}
+.detail code{font:500 .76rem var(--font-code);background:var(--zone);padding:1px 5px;border-radius:3px}
+
+/* Matrix */
+.mwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.mx{border-collapse:separate;border-spacing:0;width:100%;font-size:.8rem}
+.mx th,.mx td{border-bottom:1px solid var(--rule);padding:0}
+.mx thead th{background:var(--zone);font:600 .62rem/1.2 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);vertical-align:bottom}
+.mx thead tr.fam th{border-bottom:0;padding:7px 6px 2px;text-align:center;border-left:1px solid var(--rule)}
+.mx thead tr.fam th:first-child{border-left:0}
+.mx thead tr.cols th{padding:4px 4px 8px}
+.mx th.colh{width:58px;min-width:58px;text-align:center;border-left:1px solid var(--rule);cursor:pointer}
+.mx th.colh button{all:unset;cursor:pointer;display:grid;gap:3px;justify-items:center;width:100%;padding:2px 0}
+.mx th.colh .cid{font:600 .66rem var(--font-code);color:var(--ink)}
+.mx th.colh .nm{font:500 .62rem/1.2 var(--font-body);letter-spacing:0;text-transform:none;color:var(--ink-2);max-width:56px;text-wrap:balance}
+.mx th.colh button:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+.mx th.rowh{position:sticky;left:0;z-index:1;background:var(--sheet);text-align:left;font-weight:400;padding:6px 10px;min-width:250px;border-right:1px solid var(--rule);cursor:pointer}
+.mx thead th.rowh{background:var(--zone);vertical-align:bottom;padding:8px 10px}
+.mx th.rowh .cid{font:600 .7rem var(--font-code);color:var(--muted);margin-right:6px}
+.mx th.rowh .dot{margin-left:6px}
+.mx tr.grp th,.mx tr.grp td{background:var(--zone);font:700 .78rem var(--font-title);padding:5px 10px}
+.mx tr.grp th{position:sticky;left:0;z-index:1}
+.mx td.c{text-align:center;border-left:1px solid var(--rule);font:600 .95rem/1 var(--font-code);height:30px}
+.mx td.c.p{color:var(--ink)}
+.mx td.c.s{color:var(--muted)}
+.mx td.c.gap{color:var(--review);background:color-mix(in srgb,var(--review) 9%,transparent)}
+.mx td.c.okc{color:var(--ok)}
+.mx td.st{padding:6px 10px;white-space:nowrap;border-left:1px solid var(--rule)}
+.mx tfoot td,.mx tfoot th{background:var(--zone);padding:6px 4px;text-align:center;font:600 .66rem/1.3 var(--font-code);border-bottom:0;border-top:1px solid var(--rule)}
+.mx tfoot th.rowh{text-align:left;padding:6px 10px;background:var(--zone)}
+.mx tfoot td{border-left:1px solid var(--rule)}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;vertical-align:1px}
+.dot.ok{background:var(--ok)}.dot.part{background:var(--review)}.dot.plan{border:1.5px solid var(--review)}
+.mx tbody tr:not(.grp):hover th.rowh,.mx tbody tr:not(.grp):hover td{background-color:var(--hi)}
+.mx.focused tbody tr:not(.grp):not(.on){opacity:.35}
+.mx.focused .col-on{background-color:color-mix(in srgb,var(--sel) 10%,transparent)}
+.mx tr.on th.rowh{box-shadow:inset 3px 0 0 var(--sel)}
+.mx th.colh.sel{box-shadow:inset 0 -3px 0 var(--sel)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.78rem;color:var(--ink-2)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend b{font:600 .95rem var(--font-code)}
+
+/* Findings */
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tr:last-child td{border-bottom:0}
+.reg tbody tr{cursor:pointer}
+.reg tbody tr:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.mx tbody tr{transition:opacity .15s}}
+
+
+.mx tr.grp th{text-align:left;white-space:nowrap}
+.mx th.colh{width:36px;min-width:36px}
+.mx th.colh .cid{font-size:.62rem}
+.mx thead tr.fam th{font-size:.58rem;line-height:1.25;white-space:normal;padding:7px 3px 3px}
+.mx th.rowh{min-width:200px}
+.mx th.rowh small{display:block;font:500 .66rem var(--font-code);color:var(--muted)}
+.mx td.c .m{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;font:700 .66rem/1 var(--font-code)}
+.mx td.c .m.d{background:var(--ink);color:var(--sheet)}
+.mx td.c .m.d.prop{background:var(--review)}
+.mx td.c .m.k{border:1.5px solid var(--muted);color:var(--ink-2)}
+.mx td.c.ok,.mx td.c.okc{color:inherit}
+.mx th.colh .dot{display:block;margin:3px auto 0}
+.dot.none{background:var(--stop)}
+.legend .m{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;font:700 .62rem/1 var(--font-code)}
+.legend .m.d{background:var(--ink);color:var(--sheet)}.legend .m.d.prop{background:var(--review)}.legend .m.k{border:1.5px solid var(--muted);color:var(--ink-2)}
+.detail li{display:flex;gap:8px;align-items:baseline}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="sTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="sTitle">PV-3 · Project to Capability Mapping</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Project (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">Portfolio owner</span><span class="tb-v">Security platform portfolio board</span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>Which projects deliver each CV-2 capability, and in which CV-1 increment. A capability is on track only when an approved or running project delivers it; a capability with no project, or only an unfunded one, will not arrive on the CV-1 roadmap.</p></div>
+
+      <div class="summary" id="summary"></div>
+      <div class="detail" id="detail" aria-live="polite"></div>
+
+      <div class="legend">
+        <span><span class="m d">2</span>delivers it, in increment 2</span>
+        <span><span class="m d prop">2</span>would deliver it, project not approved</span>
+        <span><span class="m k">2</span>contributes</span>
+        <span><span class="dot ok"></span>capability in topology today <span class="dot part"></span>partial <span class="dot plan"></span>planned (CV-2)</span>
+        <span>Click a project or a capability. Esc clears.</span>
+      </div>
+      <div class="mwrap"><table class="mx" id="mx"></table></div>
+
+      <div class="findings">
+        <h2>What the matrix shows</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Capabilities from CV-2 · Increments from CV-1 · Fixes from SV-1 and SvcV-6</span><span>PV-3 · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+// Capabilities from CV-2: level 1 [id, name, domain], level 2 [id, name, status]
+const L1=[['C1','Telemetry collection','collect'],['C2','Fleet configuration','collect'],['C3','Indexing and retention','index'],['C4','Search and analytics','search'],
+  ['C5','Threat detection','detect'],['C6','Automated response','detect'],['C7','Identity and access','govern'],['C8','Platform health and licence','index']];
+const L2=[['C1.1','Network and syslog collection','ok'],['C1.2','Endpoint collection','ok'],['C1.3','Cloud and API collection','ok'],['C1.4','Filtering and masking at source','plan'],
+  ['C2.1','Configuration as code','ok'],['C2.2','Forwarder fleet health','ok'],
+  ['C3.1','Event indexing','ok'],['C3.2','Retention management','ok'],['C3.3','Data replication','part'],
+  ['C4.1','Ad hoc investigation','ok'],['C4.2','Normalised data (CIM)','ok'],['C4.3','Search high availability','part'],
+  ['C5.1','Correlation detections','plan'],['C5.2','Risk-based alerting','plan'],
+  ['C6.1','Case management','ok'],['C6.2','Playbook automation','ok'],
+  ['C7.1','Single sign-on','ok'],['C7.2','Data access control','ok'],['C7.3','Access review','ok'],
+  ['C8.1','Licence management','ok'],['C8.2','Health monitoring','part'],['C8.3','Capacity planning','ok']];
+const ST={ok:'In topology',part:'Partial',plan:'Planned'};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const parentOf=id=>L1.find(p=>p[0]===id.split('.')[0]);
+
+// CV-2 correction: case management exists but receives no findings
+L2.find(c=>c[0]==='C6.1')[2]='part';
+
+const INC={1:'Increment 1 · Foundation · Oct – Dec 2026',2:'Increment 2 · Detection · Jan – Jun 2027',3:'Increment 3 · Response and resilience · Jul – Dec 2027'};
+const PST={prog:['ok','In progress'],appr:['ext','Approved'],prop:['gap','Proposed, not funded']};
+const OWN=['Platform engineering','SOC engineering','Cloud team','Identity team'];
+// Projects: id, name, owner, increments, status, depends on, note, {capability: [d (delivers) | c (contributes), increment]}
+const PJ=[
+ ['P1','Syslog and Windows onboarding','Platform engineering','1','prog',[],'Syslog from both sites and Windows event logs through universal forwarders.',{'C1.1':['d',1],'C1.2':['d',1],'C2.1':['c',1]}],
+ ['P2','Forwarder output fix','Platform engineering','1','prop',[],'Adds the missing outputs SI-13 (Universal Forwarder 2) and SI-14 (Heavy Forwarder 1) to Indexer 1. Raised from SV-1; no budget yet.',{'C1.1':['c',1],'C1.3':['c',1]}],
+ ['P3','AWS cloud onboarding','Cloud team','2','appr',['P2'],'Lambda and API sources over HEC with TLS. Needs P2: without SI-14 the AWS events stop at the heavy forwarder.',{'C1.3':['d',2]}],
+ ['P4','Deployment as code','Platform engineering','1–2','prog',[],'Server classes and apps in version control; a drift report in Increment 2.',{'C2.1':['d',1],'C2.2':['c',2]}],
+ ['P5','Index and retention design','Platform engineering','1–2','prog',[],'One index per data classification; 12 months searchable; PII indexes separated for role restriction.',{'C3.1':['d',1],'C3.2':['d',2],'C7.2':['c',2]}],
+ ['P6','Multisite indexer cluster','Platform engineering','3','appr',['P5'],'Two sites, replication and search factor 2. Removes the single indexer.',{'C3.3':['d',3],'C4.3':['c',3]}],
+ ['P7','Search head cluster','Platform engineering','3','appr',['P6'],'Three members behind the load balancer.',{'C4.3':['d',3]}],
+ ['P8','CIM and SOC dashboards','SOC engineering','1–2','prog',[],'SOC dashboards now; accelerated CIM data models in Increment 2.',{'C4.1':['d',1],'C4.2':['d',2]}],
+ ['P9','Enterprise Security deployment','SOC engineering','2–3','prop',['P8'],'40 correlation searches mapped to MITRE ATT&CK, then risk-based alerting. Business case with the board; no ES component in the topology.',{'C5.1':['d',2],'C5.2':['d',3],'C4.2':['c',2]}],
+ ['P10','SOAR integration and ticket sync','SOC engineering','2','appr',['P9'],'Findings become SOAR cases; cases sync to the service desk (RF-14). Needs findings from P9.',{'C6.1':['d',2],'C6.2':['c',2]}],
+ ['P11','Playbook library','SOC engineering','3','appr',['P10'],'Ten playbooks: phishing, malware, account lockout and others.',{'C6.2':['d',3]}],
+ ['P12','SSO and PII access roles','Identity team','1–3','prog',[],'SAML sign-in with four roles now; PII indexes restricted in Increment 2; quarterly access review in Increment 3.',{'C7.1':['d',1],'C7.2':['d',2],'C7.3':['d',3]}],
+ ['P13','Edge Processor masking','Platform engineering','3','prop',['P2'],'Filter and mask PII at source before it crosses the WAN.',{'C1.4':['d',3]}],
+ ['P14','Platform health and licence','Platform engineering','1–3','prog',[],'Licence alerts at 85%, Monitoring Console checks, capacity forecast per index.',{'C8.1':['d',1],'C8.2':['d',2],'C8.3':['d',3],'C2.2':['c',2]}]
+];
+const pj=id=>PJ.find(p=>p[0]===id);
+const capName=id=>L2.find(c=>c[0]===id)[1];
+const delivers=c=>PJ.filter(p=>p[7][c]&&p[7][c][0]==='d'),contributes=c=>PJ.filter(p=>p[7][c]&&p[7][c][0]==='c');
+function cover(c){const d=delivers(c);if(!d.length)return 'none';return d.some(p=>p[4]!=='prop')?'ok':'prop'}
+const COV={ok:['ok','On track'],prop:['gap','Unfunded'],none:['stop','No project']};
+const DOT={ok:'ok',part:'part',plan:'plan'};
+const mx=document.getElementById('mx');
+mx.innerHTML=`<thead><tr class="fam"><th class="rowh"></th>${L1.map(p=>`<th colspan="${L2.filter(c=>c[0].startsWith(p[0]+'.')).length}" title="${esc(p[1])}">${p[0]} ${esc(p[1])}</th>`).join('')}<th></th></tr>
+<tr class="cols"><th class="rowh">Project</th>${L2.map(c=>`<th class="colh" data-a="${c[0]}"><button type="button" aria-pressed="false" title="${c[0]} ${esc(c[1])} · ${ST[c[2]]}"><span class="cid">${c[0]}</span><span class="dot ${DOT[c[2]]}"></span></button></th>`).join('')}<th class="st">Status</th></tr></thead>
+<tbody>${OWN.map(o=>`<tr class="grp"><th>${esc(o)}</th><td colspan="${L2.length+1}"></td></tr>`+PJ.filter(p=>p[2]===o).map(p=>`<tr data-c="${p[0]}"><th class="rowh" tabindex="0"><span class="cid">${p[0]}</span>${esc(p[1])}<small>Increment ${p[3]}${p[5].length?' · needs '+p[5].join(', '):''}</small></th>${L2.map(c=>{const v=p[7][c[0]];return `<td class="c" data-a="${c[0]}">${v?`<span class="m ${v[0]==='d'?'d':'k'}${v[0]==='d'&&p[4]==='prop'?' prop':''}">${v[1]}</span>`:''}</td>`}).join('')}<td class="st"><span class="chip ${PST[p[4]][0]}">${PST[p[4]][1]}</span></td></tr>`).join('')).join('')}</tbody>
+<tfoot><tr><th class="rowh">Capability delivery</th>${L2.map(c=>{const k=cover(c[0]);return `<td><span class="chip ${COV[k][0]}" title="${COV[k][1]}">${k==='ok'?'✓':k==='prop'?'!':'✕'}</span></td>`}).join('')}<td></td></tr></tfoot>`;
+
+const detail=document.getElementById('detail');
+const li=(c,cls,t)=>`<li><span class="chip ${cls}">${c}</span><span>${t}</span></li>`;
+function showPj(id){const p=pj(id),caps=Object.entries(p[7]),req=PJ.filter(x=>x[5].includes(id));
+  detail.innerHTML=`<div><span class="dom">Project · ${esc(p[2])} · Increment ${p[3]}</span><h3>${id} · ${esc(p[1])}</h3><p><span class="chip ${PST[p[4]][0]}">${PST[p[4]][1]}</span></p><p>${esc(p[6])}</p></div>
+  <dl><dt>Delivers</dt><dd>${caps.filter(x=>x[1][0]==='d').length?`<ul>${caps.filter(x=>x[1][0]==='d').map(([c,v])=>li(c,p[4]==='prop'?'gap':'ok',`${esc(capName(c))} · Increment ${v[1]}`)).join('')}</ul>`:'—'}</dd>
+  <dt>Contributes to</dt><dd>${caps.filter(x=>x[1][0]==='c').length?`<ul>${caps.filter(x=>x[1][0]==='c').map(([c,v])=>li(c,'ext',esc(capName(c)))).join('')}</ul>`:'—'}</dd></dl>
+  <dl><dt>Needs</dt><dd>${p[5].length?`<ul>${p[5].map(d=>li(d,PST[pj(d)[4]][0],`${esc(pj(d)[1])} · ${PST[pj(d)[4]][1]}`)).join('')}</ul>`:'—'}</dd><dt>Needed by</dt><dd>${req.length?`<ul>${req.map(d=>li(d[0],PST[d[4]][0],esc(d[1]))).join('')}</ul>`:'—'}</dd></dl>`}
+function showCap(c){const cap=L2.find(x=>x[0]===c),par=parentOf(c),d=delivers(c),k=contributes(c),cv=cover(c);
+  detail.innerHTML=`<div><span class="dom">Capability · ${par[0]} ${esc(par[1])}</span><h3>${c} · ${esc(cap[1])}</h3><p>Today (CV-2): <span class="chip ${cap[2]==='ok'?'ok':'gap'}">${ST[cap[2]]}</span> · Delivery: <span class="chip ${COV[cv][0]}">${COV[cv][1]}</span></p>${cv==='none'?'<p>No project delivers this capability. Add it to an existing project or raise a new one.</p>':''}</div>
+  <dl><dt>Delivered by</dt><dd>${d.length?`<ul>${d.map(p=>li(p[0],PST[p[4]][0],`${esc(p[1])} · Increment ${p[7][c][1]} · ${PST[p[4]][1]}`)).join('')}</ul>`:'—'}</dd></dl>
+  <dl><dt>Contributed to by</dt><dd>${k.length?`<ul>${k.map(p=>li(p[0],'ext',esc(p[1]))).join('')}</ul>`:'—'}</dd></dl>`}
+let current=null;
+function select(k){current=k;mx.classList.add('focused');const isC=/^C/.test(k);
+  mx.querySelectorAll('tbody tr[data-c]').forEach(r=>r.classList.toggle('on',isC?!!pj(r.dataset.c)[7][k]:r.dataset.c===k));
+  mx.querySelectorAll('[data-a]').forEach(e=>e.classList.toggle('col-on',isC?e.dataset.a===k:!!pj(k)[7][e.dataset.a]));
+  mx.querySelectorAll('th.colh').forEach(h=>{h.classList.toggle('sel',h.dataset.a===k);h.querySelector('button').setAttribute('aria-pressed',String(h.dataset.a===k))});
+  isC?showCap(k):showPj(k)}
+function clear(){current=null;mx.classList.remove('focused');mx.querySelectorAll('.on,.col-on,.sel').forEach(e=>e.classList.remove('on','col-on','sel'));mx.querySelectorAll('th.colh button').forEach(b=>b.setAttribute('aria-pressed','false'));showPj('P9')}
+const tog=k=>current===k?clear():select(k);
+mx.querySelectorAll('th.colh button').forEach(b=>b.addEventListener('click',()=>tog(b.parentElement.dataset.a)));
+mx.querySelectorAll('tbody tr[data-c] th.rowh').forEach(h=>{const c=h.parentElement.dataset.c;h.addEventListener('click',()=>tog(c));h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog(c)}})});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)clear()});
+const cv=L2.map(c=>cover(c[0]));
+document.getElementById('summary').innerHTML=`<span><b>${PJ.length}</b>projects</span><span><b>${L2.length}</b>capabilities</span><span><b>3</b>increments</span><span><b>${cv.filter(x=>x==='ok').length}</b>on track</span><span class="rv"><b>${cv.filter(x=>x==='prop').length}</b>only unfunded projects</span><span class="rv"><b>${cv.filter(x=>x==='none').length}</b>no project</span><span class="rv"><b>${PJ.filter(p=>p[4]==='prop').length}</b>projects not funded</span>`;
+document.getElementById('findings').innerHTML=[
+ ['stop','Detection','<b>Threat detection rests on one unfunded project.</b> Enterprise Security (P9) is the only route to correlation (C5.1) and risk-based alerting (C5.2). Two approved projects need it: SOAR integration (P10) and, through P10, the playbook library (P11). Fund P9 or move P10 and P11 back.'],
+ ['stop','Fixes','<b>The fix for the two missing outputs has no budget.</b> P2 adds SI-13 and SI-14. Without it, AWS onboarding (P3, approved) lands data that stops at the heavy forwarder, and Melbourne syslog never reaches the indexer.'],
+ ['gap','No project','<b>Forwarder fleet health (C2.2) has no project.</b> Deployment as code and platform health only contribute. This is the capability that would alert on a silent forwarder (SvcV-4 S16.2).'],
+ ['gap','Load','<b>Platform engineering owns 8 of 14 projects</b>, three of them in Increment 3: the indexer cluster, search head cluster and Edge Processor. P6 and P7 must also run in order.'],
+ ['ok','Covered','<b>18 of 22 capabilities have an approved or running project.</b> Collection, indexing, search, identity and platform health are all covered across the three increments.']
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+clear();
+</script>
+
+</body>
+</html>
