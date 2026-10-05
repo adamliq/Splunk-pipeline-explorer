@@ -8650,16 +8650,14 @@ Implements `builder-handoff-build163-lines.md` on top of Build 163.
 </style>
 <script id="builder-lines-v164">
 /* Routes depend on card geometry only. A short clear hop wins before label placement. */
-function builderLegacyDefault164(){return state.builderNodes.length<=5&&resolvedUnifiedLayoutMode()==='horizontal'}
 const builderRouteBefore164=builderV123RouteBetween;
 builderV123RouteBetween=function(start,end,boxes,style,avoid,labelNeed=0){
- if(builderLegacyDefault164())return builderRouteBefore164(start,end,boxes,style,avoid,labelNeed);
  if((Math.abs(start.x-end.x)<.1||Math.abs(start.y-end.y)<.1)&&!boxes.some(b=>builderV123Intersects(start,end,builderV123Pad(b,-.5))))return[start,end];
  return builderRouteBefore164(start,end,boxes,style,avoid,0);
 };
 const builderRelationshipBefore164=relationshipPath;
 relationshipPath=function(item,positions){
- if(builderLegacyDefault164()||builderMarkup157||builderPhoneMedia158.matches||state.builderHosts.length||!positions.has(item.from)||!positions.has(item.to))return builderRelationshipBefore164(item,positions);
+ if(builderMarkup157||builderPhoneMedia158.matches||state.builderHosts.length||!positions.has(item.from)||!positions.has(item.to))return builderRelationshipBefore164(item,positions);
  const routing=ensureRelationshipRouting(item.edge);if(routing.waypoints.length)return builderRelationshipBefore164(item,positions);
  const source=builderCardBox(item.from,positions),target=builderCardBox(item.to,positions),boxes=state.builderNodes.filter(n=>positions.has(n.id)).map(n=>builderCardBox(n.id,positions));
  const result=points=>{points=compactRoutePoints(points);const mid=routeMidpoint(points);return{points,d:routing.style==='curved'?builderV123RoundedPath(points):'M'+points.map(p=>p.x+' '+p.y).join(' L'),label:{x:mid.x+routing.labelOffset.x,y:mid.y+routing.labelOffset.y},routing}};
@@ -8724,6 +8722,42 @@ Validation:
 <script id="builder-single-pipeline-default-v165">
 changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Single pipeline set by default','Pipeline-capable components start with one pipeline set. Saved topologies retain their stored set counts; the Inspector can still enable a second set.',true]);
 document.title='Splunk Pipeline Explorer · Build 165 · 5 Oct 2026';$('#topologyBuilder').dataset.buildNumber='165';$('#topologyBuilder').dataset.buildDate='2026-10-05';const stamp165=$('.builderBuildStamp');if(stamp165){stamp165.setAttribute('aria-label','Build 165, dated 5 October 2026');stamp165.querySelector('b').textContent='Build 165';const date=stamp165.querySelector('time');if(date){date.dateTime='2026-10-05';date.textContent='5 Oct 2026'}}invalidateBuilderRender160();
+</script>
+
+<!--
+# Build 166: straight default topology lines
+
+Implements `builder-handoff-build165.md` on top of Build 165.
+
+- Removes the small-default exception to Build 164's direct-first routing. Label length no longer shapes automatic clear-row routes on the default topology; labels use the existing short-leader or hidden-label fallback.
+- Applies the existing 224px desktop card height before the body's view attribute changes. First-render geometry now uses the same height for the Syslog and Splunk cards, so their data ports share one row axis.
+- Preserves the one-set defaults, saved two-set configurations, Inspector choices and unchanged calculator defaults from Build 165.
+- Adds the Build 166 stamp and change register entry.
+
+## Validation
+
+- Fresh default at 1280, 1440 and 1920: all four cards measure 224px high; every data connector is exactly one horizontal `M… L…` segment, with both ends at y=170. All nodes start with one pipeline set.
+- Reference topology: node positions, paths, label transforms, hidden-label states and badge transforms are identical to the Build 165 / Build 164 routing baseline. Pixel comparison below uses the same Fit view with help dismissed.
+- Final reference world screenshot: 0 changed pixels; maximum channel difference 0. The test allows at most four pixels differing by one channel value for Chromium boundary rasterization; geometry equality is exact.
+- Connector suite: all 10 scenarios pass, including real drags, fan-out and reference checks at Fit/100%.
+- Canvas space: 7/7 widths pass.
+- Single-set regression: all presets and Load selected path default to one; import, saved reload and recovered draft retain two; Inspector two-set lanes and merge advisory remain usable; single-set route/failure/configuration/pack wording passes.
+- Performance: unchanged 40/50/80/120ms budgets pass for changed and moved redraws.
+
+| Scenario | Redraw ms | Moved ms | Budget ms |
+|---|---:|---:|---:|
+| default | 23 | 17 | 40 |
+| fan5 | 21 | 18 | 50 |
+| fan8 | 45 | 34 | 80 |
+| reference | 39 | 53 | 120 |
+-->
+<style id="builder-default-row-v166-styles">
+/* First geometry measurement can precede the body's view attribute update. */
+@media(min-width:761px){#topologyBuilder .unifiedNodeWrap>.builderNode{height:224px!important;min-height:224px!important}}
+</style>
+<script id="builder-default-row-v166">
+changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Straight default topology relationships','Use card geometry to route clear same-row hops directly, including the default topology; keep desktop row heights consistent before the first geometry measurement.',true]);
+document.title='Splunk Pipeline Explorer · Build 166 · 5 Oct 2026';$('#topologyBuilder').dataset.buildNumber='166';$('#topologyBuilder').dataset.buildDate='2026-10-05';const stamp166=$('.builderBuildStamp');if(stamp166){stamp166.setAttribute('aria-label','Build 166, dated 5 October 2026');stamp166.querySelector('b').textContent='Build 166';const date=stamp166.querySelector('time');if(date){date.dateTime='2026-10-05';date.textContent='5 Oct 2026'}}invalidateBuilderRender160();
 </script>
 </body>
 </html>
