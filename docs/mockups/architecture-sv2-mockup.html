@@ -294,8 +294,8 @@ const POS={s6:[36,86],s7:[36,126],s8:[36,166],
 const CW={s4:152,s11:152,s10:152,s12:260,s14:260,s9:260,s13:260};
 const lonely=new Set(SYS.filter(s=>!IFC.some(i=>i[1]===s[0]||i[2]===s[0])).map(s=>s[0]));
 const chipEls={};
-SYS.forEach(([id,name])=>{const [x,y]=POS[id],w=CW[id]||190,g=el('g',{class:'chipS'+(lonely.has(id)?' lonely':'')},cG);
-  el('rect',{x,y,width:w,height:28,rx:4},g);el('text',{x:x+9,y:y+18},g).textContent=name;chipEls[id]=g});
+SYS.forEach(([id,name])=>{const [x,y]=POS[id],w=CW[id]||196,g=el('g',{class:'chipS'+(lonely.has(id)?' lonely':'')},cG);
+  el('rect',{x,y,width:w,height:28,rx:4},g);el('text',{x:x+7,y:y+18},g).textContent=name;chipEls[id]=g});
 // pipes: link id, x, y, w, label, label position
 const PIPES=[['L2',240,140,80,'L2 · WAN · 100 Mbps',280,132],['L4',720,150,45,'',0,0],['L4',720,318,45,'',0,0],['L4',845,105,45,'',0,0],['L4',845,252,45,'',0,0],['L6',845,380,45,'',0,0]];
 const pipeEls={L1:[],L2:[],L3:[],L4:[],L6:[]};
