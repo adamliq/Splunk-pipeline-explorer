@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>SV-3 Systems-Systems Matrix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV, DIV, CV and SV-1 mockups. Banners, title block, purpose, then
+   the 17 × 17 systems matrix grouped by location beside a detail panel, the location-pair matrix and the most connected systems, and findings. Colour encodes the plane; amber and red mark interfaces that need attention. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+.plane{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.model{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.model>*{min-width:0}
+@media (max-width:1150px){.model{grid-template-columns:1fr}}
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:9px;align-content:start}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:0;font:700 1.12rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.85rem}
+.detail dl{margin:0;display:grid;gap:7px}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.84rem}
+.detail ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:.84rem}
+.detail li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
+.detail code{font:500 .74rem var(--font-code);background:var(--zone);padding:1px 4px;border-radius:3px}
+.detail .hint{font-size:.78rem;color:var(--muted)}
+.headrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{font:600 .78rem var(--font-body);padding:6px 12px;border:0;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sheet)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg th.n,.reg td.n{text-align:right}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tbody tr:last-child td{border-bottom:0}
+.reg td.n{font:500 .76rem var(--font-code);font-variant-numeric:tabular-nums;white-space:nowrap}
+.reg tbody tr[data-k]{cursor:pointer}
+.reg tbody tr[data-k]:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+.mwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px;background:var(--sheet)}
+table.nn{border-collapse:separate;border-spacing:0;font-size:.78rem}
+.nn th,.nn td{border-bottom:1px solid var(--rule);border-left:1px solid var(--rule);padding:0}
+.nn thead th{background:var(--zone);font:600 .6rem/1.2 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.nn tr.loc th{padding:6px 4px 3px;text-align:center;border-bottom:0}
+.nn tr.num th{padding:4px 2px 6px;text-align:center;width:36px;min-width:36px}
+.nn tr.num th button{all:unset;cursor:pointer;display:block;width:100%;font:600 .7rem var(--font-code);color:var(--ink);letter-spacing:0}
+.nn th.corner{position:sticky;left:0;z-index:2;text-align:left;padding:6px 10px;vertical-align:bottom;min-width:200px;border-left:0}
+.nn tbody th{position:sticky;left:0;z-index:1;background:var(--sheet);text-align:left;font-weight:400;padding:0;border-left:0;min-width:200px;max-width:210px}
+.nn tbody th button{all:unset;cursor:pointer;display:grid;grid-template-columns:24px minmax(0,1fr);gap:4px;padding:5px 10px;width:calc(100% - 20px)}
+.nn tbody th .n{font:600 .7rem var(--font-code);color:var(--muted)}
+.nn tbody th .nm{font-size:.8rem;line-height:1.25}
+.nn tr.grp th{background:var(--zone);font:700 .74rem var(--font-title);padding:4px 10px}
+.nn tr.grp td{background:var(--zone)}
+.nn td.c{height:30px;text-align:center;vertical-align:middle;cursor:default}
+.nn td.self{background:repeating-linear-gradient(135deg,var(--zone) 0 4px,var(--sheet) 4px 8px)}
+.nn td.c button{all:unset;cursor:pointer;font:600 .6rem/1 var(--font-code);padding:4px 3px;border-radius:3px;border-left:3px solid var(--pc);white-space:nowrap}
+.nn td.c button.ok{background:color-mix(in srgb,var(--ok) 12%,transparent);color:var(--ink)}
+.nn td.c button.plain,.nn td.c button.inferred{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review)}
+.nn td.c button.missing{background:color-mix(in srgb,var(--stop) 14%,transparent);color:var(--stop)}
+.nn td.tot{font:600 .7rem var(--font-code);text-align:center;padding:4px 6px;background:var(--zone);color:var(--ink-2)}
+.nn tbody tr:not(.grp):hover th,.nn tbody tr:not(.grp):hover td:not(.self){background-color:var(--hi)}
+.nn .hl{background-color:color-mix(in srgb,var(--sel) 10%,transparent)}
+.nn td.c button.sel{outline:2px solid var(--sel);outline-offset:1px}
+.nn tbody th.selr{box-shadow:inset 3px 0 0 var(--sel)}
+.nn tr.num th.selc{box-shadow:inset 0 -3px 0 var(--sel)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.78rem;color:var(--ink-2)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.sw2{display:inline-block;width:22px;height:14px;border-radius:3px;border-left:3px solid var(--line)}
+table.lx{border-collapse:collapse;font-size:.8rem;width:100%}
+.lx th,.lx td{border:1px solid var(--rule);padding:6px 8px;text-align:center}
+.lx th{background:var(--zone);font:600 .62rem/1.2 var(--font-code);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.lx th.rh{text-align:left}
+.lx td{font:600 .78rem var(--font-code);font-variant-numeric:tabular-nums}
+.lx td.z{color:var(--rule)}
+.lx td.v{background:color-mix(in srgb,var(--sel) calc(var(--a) * 1%),transparent)}
+.two{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:14px;align-items:start}
+.two>div{display:grid;gap:14px;min-width:0}
+@media (max-width:1000px){.two{grid-template-columns:1fr}}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="sTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="sTitle">SV-3 · Systems-Systems Matrix</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Systems (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">System owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>Every pair of systems that has an interface, in one grid. Rows send, columns receive. The cell names the SV-1 interface and shows its status, so missing and unprotected interfaces stand out.</p></div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="legend">
+        <span><span class="sw2" style="background:color-mix(in srgb,var(--ok) 12%,transparent)"></span>declared</span>
+        <span><span class="sw2" style="background:color-mix(in srgb,var(--review) 16%,transparent)"></span>plaintext, or inferred and not in topology</span>
+        <span><span class="sw2" style="background:color-mix(in srgb,var(--stop) 14%,transparent)"></span>missing output</span>
+        <span>Left edge colour: <span class="plane" style="background:var(--d-index)"></span>data <span class="plane" style="background:var(--d-collect)"></span>management <span class="plane" style="background:var(--d-govern)"></span>access <span class="plane" style="background:var(--d-detect)"></span>response</span>
+        <span>Click a system or a cell. Esc clears.</span>
+      </div>
+
+      <div class="model">
+        <div class="mwrap"><table class="nn" id="nn"></table></div>
+        <aside class="detail" id="detail" aria-live="polite"></aside>
+      </div>
+
+      <div class="two">
+        <div>
+          <h2>Interfaces by location</h2>
+          <p class="sub">How many interfaces run between each pair of locations. Cross-location interfaces need a network path and usually a firewall rule (SV-2).</p>
+          <div class="tablewrap"><table class="lx" id="lx"></table></div>
+        </div>
+        <div>
+          <h2>Most connected systems</h2>
+          <p class="sub">Interfaces in and out, including inferred and missing ones.</p>
+          <div class="tablewrap"><table class="reg" id="deg"></table></div>
+        </div>
+      </div>
+
+      <div class="findings">
+        <h2>What the matrix shows</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · System owner not set · Interfaces from SV-1</span><span>SV-3 · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+// Systems and interfaces from SV-1 (reference topology). Systems: id, name, Builder component, location
+const SYS=[
+ ['s6','Syslog Source 2','Syslog Source','Melbourne'],['s7','Syslog Server 2','Syslog Server','Melbourne'],['s8','Universal Forwarder 2','Universal Forwarder','Melbourne'],
+ ['s1','Firewalls and network devices','Syslog Source','Sydney'],['s2','Syslog Server 1','Syslog Server','Sydney'],['s3','Universal Forwarder 1','Universal Forwarder','Sydney'],
+ ['s5','Windows Event Log 1','Windows Event Log','Sydney'],['s10','Heavy Forwarder 1','Heavy Forwarder','Sydney'],['s15','Deployment Server 1','Deployment Server','Sydney'],
+ ['s16','License Manager 1','License Manager','Sydney'],['s17','Monitoring Console 1','Monitoring Console','Sydney'],
+ ['s9','AWS Lambda 1','AWS Lambda','AWS ap-southeast-2'],
+ ['s4','Indexer 1','Indexer','Multisite'],['s11','Search Head 1','Search Head','Multisite'],
+ ['s12','Splunk SOAR · Cloud 1','Splunk SOAR · Cloud','Cloud'],['s14','Authentication Provider · Cloud 1','Authentication Provider · Cloud','Cloud'],
+ ['s13','Administrator 1','User / Administrator','Security operations']
+];
+// Interfaces: id, from, to, plane, source (declared | inferred | missing), protocol, port, TLS, status (ok | plain | missing | inferred)
+const IFC=[
+ ['SI-1','s1','s2','data','declared','Syslog TCP/TLS or UDP','514 / 6514','Not applicable','plain'],
+ ['SI-2','s2','s3','data','declared','File handoff (local disk)','—','Not applicable','ok'],
+ ['SI-3','s3','s4','data','declared','Splunk-to-Splunk','9997','Required','ok'],
+ ['SI-4','s6','s7','data','declared','Syslog TCP/TLS or UDP','514 / 6514','Not applicable','plain'],
+ ['SI-5','s7','s8','data','declared','File handoff (local disk)','—','Not applicable','ok'],
+ ['SI-6','s9','s10','data','declared','HEC HTTPS','8088','Required','ok'],
+ ['SI-7','s4','s11','data','declared','Search dispatch (REST)','8089','Required','ok'],
+ ['SI-8','s15','s3','management','declared','Phone-home and app delivery','8089','Required','ok'],
+ ['SI-9','s15','s8','management','declared','Phone-home and app delivery','8089','Required','ok'],
+ ['SI-10','s15','s10','management','declared','Phone-home and app delivery','8089','Required','ok'],
+ ['SI-11','s13','s14','access','declared','SAML SSO','443','Required','ok'],
+ ['SI-12','s14','s11','access','declared','SAML assertion via load balancer','8000','Required','ok'],
+ ['SI-13','s8','s4','data','missing','Splunk-to-Splunk','9997','Required','missing'],
+ ['SI-14','s10','s4','data','missing','Splunk-to-Splunk','9997','Required','missing'],
+ ['SI-15','s11','s12','response','inferred','Findings to cases (REST)','443','Required','inferred'],
+ ['SI-16','s16','s4','management','inferred','Licence peer reporting','8089','Required','inferred'],
+ ['SI-17','s17','s4','management','inferred','Monitoring console (REST)','8089','Required','inferred']
+];
+const STATUS={ok:['ok','Declared'],plain:['gap','Plaintext'],missing:['stop','Missing output'],inferred:['gap','Add to topology']};
+const PLANE={data:'--d-index',management:'--d-collect',access:'--d-govern',response:'--d-detect'};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sys=id=>SYS.find(s=>s[0]===id);
+const ifc=id=>IFC.find(i=>i[0]===id);
+const chipFor=i=>`<span class="chip ${STATUS[i[8]][0]}">${STATUS[i[8]][1]}</span>`;
+
+const LOCS=[...new Set(SYS.map(s=>s[3]))];
+const ORDER=LOCS.flatMap(l=>SYS.filter(s=>s[3]===l));
+const num=id=>ORDER.findIndex(s=>s[0]===id)+1;
+const outOf=id=>IFC.filter(i=>i[1]===id),inTo=id=>IFC.filter(i=>i[2]===id);
+const nn=document.getElementById('nn');
+nn.innerHTML=`<thead><tr class="loc"><th class="corner" rowspan="2">From ↓ · to →</th>${LOCS.map(l=>`<th colspan="${SYS.filter(s=>s[3]===l).length}">${esc(l)}</th>`).join('')}<th rowspan="2" style="padding:4px 6px">Out</th></tr>
+<tr class="num">${ORDER.map(s=>`<th data-col="${s[0]}" title="${esc(s[1])}"><button type="button">${num(s[0])}</button></th>`).join('')}</tr></thead>
+<tbody>${LOCS.map(l=>`<tr class="grp"><th>${esc(l)}</th><td colspan="${ORDER.length+1}"></td></tr>`+SYS.filter(s=>s[3]===l).map(r=>`<tr data-row="${r[0]}"><th><button type="button"><span class="n">${num(r[0])}</span><span class="nm">${esc(r[1])}</span></button></th>${ORDER.map(c=>{if(c[0]===r[0])return `<td class="c self" data-col="${c[0]}"></td>`;const i=IFC.find(x=>x[1]===r[0]&&x[2]===c[0]);
+  return `<td class="c" data-col="${c[0]}">${i?`<button type="button" class="${i[8]}" style="--pc:var(${PLANE[i[3]]})" data-i="${i[0]}" title="${i[0]} ${esc(i[5])}">${i[0].replace('SI-','')}</button>`:''}</td>`}).join('')}<td class="tot">${outOf(r[0]).length||'·'}</td></tr>`).join('')).join('')}
+<tr><th style="padding:5px 10px;background:var(--zone);font:600 .62rem var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">In</th>${ORDER.map(c=>`<td class="tot" data-col="${c[0]}">${inTo(c[0]).length||'·'}</td>`).join('')}<td class="tot">${IFC.length}</td></tr></tbody>`;
+
+const detail=document.getElementById('detail');
+let current=null;
+function clearHl(){nn.querySelectorAll('.hl,.sel,.selr,.selc').forEach(e=>e.classList.remove('hl','sel','selr','selc'))}
+function selSys(id){current=id;clearHl();const s=sys(id);
+  nn.querySelectorAll(`tr[data-row="${id}"] td, [data-col="${id}"]`).forEach(e=>e.classList.add('hl'));
+  nn.querySelector(`tr[data-row="${id}"] th`).classList.add('selr');nn.querySelector(`tr.num th[data-col="${id}"]`).classList.add('selc');
+  const o=outOf(id),n=inTo(id);
+  detail.innerHTML=`<span class="dom">System ${num(id)} · ${esc(s[3])}</span><h3>${esc(s[1])}</h3><p>${esc(s[2])}</p>
+  <dl><dt>Sends to (${o.length})</dt><dd>${o.length?`<ul>${o.map(i=>`<li>${chipFor(i)}<span>${i[0]} → ${esc(sys(i[2])[1])}</span></li>`).join('')}</ul>`:'Nothing'}</dd>
+  <dt>Receives from (${n.length})</dt><dd>${n.length?`<ul>${n.map(i=>`<li>${chipFor(i)}<span>${i[0]} ← ${esc(sys(i[1])[1])}</span></li>`).join('')}</ul>`:'Nothing'}</dd></dl>
+  ${!o.length&&!n.length?'<p class="hint">No interfaces. The system is in the topology but takes part in no flow.</p>':''}`}
+function selIfc(k){current=k;clearHl();const i=ifc(k);
+  nn.querySelector(`button[data-i="${k}"]`).classList.add('sel');
+  nn.querySelectorAll(`tr[data-row="${i[1]}"] td, td[data-col="${i[2]}"]`).forEach(e=>e.classList.add('hl'));
+  detail.innerHTML=`<span class="dom">Interface · ${i[3]} plane · ${i[4]}</span><h3>${k}</h3><p>${esc(sys(i[1])[1])} (row ${num(i[1])}) → ${esc(sys(i[2])[1])} (column ${num(i[2])})</p>
+  <dl><dt>Protocol and port</dt><dd>${esc(i[5])} <code>${esc(i[6])}</code></dd><dt>TLS</dt><dd>${esc(i[7])}</dd><dt>Locations</dt><dd>${esc(sys(i[1])[3])} → ${esc(sys(i[2])[3])}${sys(i[1])[3]!==sys(i[2])[3]?' · crosses a location boundary':''}</dd><dt>Status</dt><dd>${chipFor(i)}</dd></dl>`}
+function intro(){current=null;clearHl();const deg=SYS.map(s=>[s,outOf(s[0]).length+inTo(s[0]).length]).sort((a,b)=>b[1]-a[1]);
+  detail.innerHTML=`<span class="dom">Matrix</span><h3>${IFC.length} interfaces in ${SYS.length*(SYS.length-1)} possible pairs</h3>
+  <dl><dt>Needs attention</dt><dd><ul>${IFC.filter(i=>i[8]!=='ok').map(i=>`<li>${chipFor(i)}<span>${i[0]} · ${num(i[1])} → ${num(i[2])}</span></li>`).join('')}<li><span class="chip gap">No interfaces</span><span>${deg.filter(d=>!d[1]).map(d=>esc(d[0][1])).join(', ')}</span></li></ul></dd></dl>
+  <p class="hint">Row numbers match column numbers. Select a system to see its row and column together.</p>`}
+nn.querySelectorAll('tbody th button').forEach(b=>{const id=b.closest('tr').dataset.row;b.addEventListener('click',()=>current===id?intro():selSys(id))});
+nn.querySelectorAll('tr.num th button').forEach(b=>{const id=b.parentElement.dataset.col;b.addEventListener('click',()=>current===id?intro():selSys(id))});
+nn.querySelectorAll('td.c button').forEach(b=>b.addEventListener('click',()=>current===b.dataset.i?intro():selIfc(b.dataset.i)));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)intro()});
+
+// Location matrix
+const cnt=(a,b)=>IFC.filter(i=>sys(i[1])[3]===a&&sys(i[2])[3]===b).length;
+const mx=Math.max(...LOCS.flatMap(a=>LOCS.map(b=>cnt(a,b))));
+document.getElementById('lx').innerHTML=`<thead><tr><th class="rh">From ↓ · to →</th>${LOCS.map(l=>`<th>${esc(l)}</th>`).join('')}</tr></thead><tbody>${LOCS.map(a=>`<tr><th class="rh">${esc(a)}</th>${LOCS.map(b=>{const n=cnt(a,b);return n?`<td class="v" style="--a:${Math.round(10+n/mx*40)}">${n}</td>`:'<td class="z">·</td>'}).join('')}</tr>`).join('')}</tbody>`;
+const deg=SYS.map(s=>[s,outOf(s[0]).length,inTo(s[0]).length]).sort((a,b)=>(b[1]+b[2])-(a[1]+a[2]));
+document.getElementById('deg').innerHTML=`<thead><tr><th>#</th><th>System</th><th class="n">Out</th><th class="n">In</th><th class="n">Total</th><th>Of which need attention</th></tr></thead><tbody>${deg.slice(0,6).map(([s,o,n])=>{const bad=IFC.filter(i=>(i[1]===s[0]||i[2]===s[0])&&i[8]!=='ok');return `<tr data-k="${s[0]}"><td class="id">${num(s[0])}</td><td>${esc(s[1])}</td><td class="n">${o}</td><td class="n">${n}</td><td class="n"><b>${o+n}</b></td><td>${bad.length?bad.map(chipFor).join(' '):'—'}</td></tr>`}).join('')}</tbody>`;
+document.querySelectorAll('#deg tbody tr').forEach(r=>r.addEventListener('click',()=>selSys(r.dataset.k)));
+
+const cross=IFC.filter(i=>sys(i[1])[3]!==sys(i[2])[3]);
+document.getElementById('summary').innerHTML=`<span><b>${SYS.length}</b>systems</span><span><b>${IFC.length}</b>interfaces</span><span><b>${(IFC.length/(SYS.length*(SYS.length-1))*100).toFixed(1)}%</b>of pairs connected</span><span><b>${cross.length}</b>cross a location</span><span class="rv"><b>${IFC.filter(i=>i[8]!=='ok').length}</b>need attention</span><span class="rv"><b>${SYS.filter(s=>!outOf(s[0]).length&&!inTo(s[0]).length).length}</b>system with none</span>`;
+const idx=deg.find(d=>d[0][0]==='s4');
+document.getElementById('findings').innerHTML=[
+ ['gap','Hub',`<b>Indexer 1 is in ${idx[1]+idx[2]} interfaces</b>, ${IFC.filter(i=>i[2]==='s4'&&i[8]!=='ok').length} of them missing or inferred. Every data path ends at one indexer; the CV-4 single point of failure shows here as the busiest column.`],
+ ['stop','Dead ends','<b>Rows 3 and 8 (the two forwarders) only send through missing interfaces.</b> Universal Forwarder 2 and Heavy Forwarder 1 receive data but their only outputs (SI-13, SI-14) are not in the topology.'],
+ ['gap','Empty row',`<b>Windows Event Log 1 has an empty row and column.</b> It is the only system with no interface.`],
+ ['ok','Locations',`<b>${cross.length} of ${IFC.length} interfaces cross a location.</b> Sydney to Multisite carries the most; every crossing has a network path and firewall entry in SV-2.`],
+ ['ext','Direction','<b>The matrix follows SV-1 arrow direction.</b> For phone-home and licence reporting the connection is opened by the receiving system; SV-2 lists the direction firewalls need.']
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+intro();
+</script>
+
+</body>
+</html>
