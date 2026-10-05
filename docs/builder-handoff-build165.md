@@ -61,3 +61,37 @@ Screenshot: `build166-default-1440.png`.
 **Still open:**
 - **Calculators:** the Recovery calculator and Performance guardrails still default to 2 pipeline sets; this waits on the owner's decision.
 - **Selection dimming:** not rechecked.
+
+---
+
+## Remaining items for Build 167 (checked on Build 166)
+
+**Done since the canvas and page UI handoffs:**
+- Nothing is selected on load.
+- No inspector opens after import.
+- The help box has "Got it" and stays dismissed after a reload.
+- Reference topology Fit is 60%.
+- Menus fit inside the window at 1440.
+- History opens as a popover beside its button.
+- Inventory rows include `host`.
+- Space check: 7/7.
+
+**Still to do:**
+1. **Selection dimming** (canvas handoff item 6.2). Selecting a card leaves every connector at opacity 1 (measured: `1,1,1`). Keep the selected card's own connectors at full strength and dim the others to 40%. Restore them on deselect or Escape.
+2. **Architecture profile is still in the rail** (rail: Profile, Tools, Groups). Per the page UI handoff, the profile belongs in the Validate menu ("Validating for: Splunk Enterprise · Change"), and the rail keeps Tools and Groups only.
+3. **History popover type size:** "Recent changes" and its text render at about 16–17px, and the "Show all history" button is larger than every other header control (12–13px). Match the menu style: title 12px bold muted, rows 12.5px, button height 30px.
+4. **Card name wraps leaving one character:** "Universal Forwarder" / "1" leaves the "1" alone on the second line. Use `text-wrap: balance` on card names, or keep the instance number with the last word (non-breaking space before the number).
+5. **Calculator defaults (owner decision):** the Recovery calculator and Performance guardrails still default to 2 pipeline sets. Change them only if the owner asks.
+6. **Analyze menu:** add the one-line descriptions under each item, as in Validate and the mockup. Put "Load selected path" second, after Trace path, since the two belong together.
+7. **Tool coverage:** `tools/builder-connector-check.js` still tests only the default topology. Add a reference topology scenario (Fit and 100%) that checks:
+   - same-row hops are straight;
+   - endpoints are distinct;
+   - labels are within 60px;
+   - badges are within 3px at Fit.
+
+   Build 164–166 pass these by hand.
+8. **Carried over from `builder-handoff-build141.md`:**
+   - OV-2: self-needlines and pill overlaps;
+   - OV-3: doubled chip labels;
+   - OV values;
+   - OV-1: markers and tags.
