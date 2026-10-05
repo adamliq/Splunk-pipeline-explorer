@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>AV-1 Architecture Overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as every other view in the pack. Banners, title block, purpose, then
+   scope facts, the cross-cutting issues with the views that show them, the view index with links and Builder state, and assumptions. View chips link to the published views. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+.plane{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.model{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.model>*{min-width:0}
+@media (max-width:1150px){.model{grid-template-columns:1fr}}
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:9px;align-content:start}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:0;font:700 1.12rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.85rem}
+.detail dl{margin:0;display:grid;gap:7px}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.84rem}
+.detail ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:.84rem}
+.detail li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
+.detail code{font:500 .74rem var(--font-code);background:var(--zone);padding:1px 4px;border-radius:3px}
+.detail .hint{font-size:.78rem;color:var(--muted)}
+.headrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{font:600 .78rem var(--font-body);padding:6px 12px;border:0;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sheet)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg th.n,.reg td.n{text-align:right}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tbody tr:last-child td{border-bottom:0}
+.reg td.n{font:500 .76rem var(--font-code);font-variant-numeric:tabular-nums;white-space:nowrap}
+.reg tbody tr[data-k]{cursor:pointer}
+.reg tbody tr[data-k]:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+.vc{display:inline-block;font:600 .64rem/1 var(--font-code);padding:3px 5px;border-radius:3px;background:var(--zone);color:var(--ink-2);text-decoration:none;white-space:nowrap;border:1px solid transparent}
+a.vc{color:var(--sel);border-color:color-mix(in srgb,var(--sel) 35%,transparent)}
+a.vc:hover{background:color-mix(in srgb,var(--sel) 12%,transparent)}
+.vcs{display:flex;flex-wrap:wrap;gap:4px}
+.filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.filters .lbl{font:600 .62rem var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.filters button{font:600 .74rem var(--font-body);padding:5px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.filters button[aria-pressed="true"]{border-color:var(--sel);color:var(--ink);background:color-mix(in srgb,var(--sel) 10%,var(--sheet))}
+.empty{padding:16px;color:var(--muted)}
+
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.facts{grid-template-columns:1fr}}
+.fact{border:1px solid var(--rule);border-radius:4px;padding:10px 12px;display:grid;gap:6px;align-content:start;background:var(--sheet)}
+.fact h3{margin:0;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.fact p,.fact li{margin:0;font-size:.86rem;line-height:1.45}
+.fact ul{margin:0;padding-left:16px;display:grid;gap:3px}
+.state{display:inline-block;font:600 .6rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.state.generated{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.state.handoff{color:var(--sel);background:color-mix(in srgb,var(--sel) 12%,transparent)}
+.state.mockup{color:var(--muted);background:var(--zone)}
+.src{font:500 .7rem var(--font-code);color:var(--ink-2)}
+.reg td.vid a{font:600 .78rem var(--font-code);color:var(--sel);text-decoration:none}
+.reg td.vid a:hover{text-decoration:underline}
+.reg td.vid span{font:600 .78rem var(--font-code)}
+.reg tr.grp td{background:var(--zone);font:700 .78rem var(--font-title);padding:5px 10px}
+.issues{display:grid;gap:10px}
+.issue{border:1px solid var(--rule);border-left:4px solid var(--ic);border-radius:4px;padding:10px 12px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) 150px;gap:8px 18px;background:var(--sheet)}
+@media (max-width:900px){.issue{grid-template-columns:1fr}}
+.issue h3{margin:0 0 3px;font:700 .95rem/1.25 var(--font-title)}
+.issue p{margin:0;font-size:.84rem;color:var(--ink-2)}
+.issue .k{font:600 .6rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px}
+.issue .meta{font-size:.82rem;display:grid;gap:4px;align-content:start}
+.sev{font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase}
+.bar{display:block;height:6px;border-radius:3px;background:var(--zone);margin-top:4px}
+.bar i{display:block;height:100%;border-radius:3px;background:var(--line)}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="aTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="aTitle">AV-1 · Overview and Summary Information</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">All (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">Accountable</span><span class="tb-v">Security telemetry service owner</span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026 · draft</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>The front page of the architecture pack: what the architecture covers, why it was described, what the views found, and where to read each view. Twelve issues recur across the views; each is listed once here with the views that show it.</p></div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="facts">
+        <div class="fact"><h3>Scope</h3><ul><li>Security telemetry collection, indexing, search, detection and response on Splunk Enterprise.</li><li>Sydney and Melbourne sites, Windows estate, AWS ap-southeast-2 workloads, cloud identity and SOAR.</li><li>17 systems and 17 interfaces in the Builder reference topology.</li></ul></div>
+        <div class="fact"><h3>Purpose and decisions supported</h3><ul><li>Decide what to build in each of three increments (Oct 2026 – Dec 2027).</li><li>Show accreditation evidence for data handling and system monitoring (ISM, Privacy Act).</li><li>Give each team its responsibilities and the gaps it owns.</li></ul></div>
+        <div class="fact"><h3>How the pack was made</h3><ul><li>Generated from the Splunk Pipeline Explorer Builder topology (Build 167).</li><li>Views marked "example" carry illustrative values; replace them before use.</li><li>Status: draft. Architect and owners not yet named in most views.</li></ul></div>
+      </div>
+
+      <h2>Cross-cutting issues</h2>
+      <p class="sub">Each issue appears in several views. Fixing it closes findings in every view listed. Ordered by severity, then by how many views it touches.</p>
+      <div class="filters" id="sevf"></div>
+      <div class="issues" id="issues"></div>
+
+      <h2>Views in the pack</h2>
+      <p class="sub">Links open the published mockup. "Generated" means the Builder already produces the view; "Handoff" means a build specification is written.</p>
+      <div class="tablewrap"><table class="reg" id="views"></table></div>
+
+      <div class="facts">
+        <div class="fact"><h3>Assumptions</h3><ul><li>The reference topology reflects the intended production design.</li><li>One indexer and one search head until Increment 3.</li><li>Volumes and targets are examples until measured.</li></ul></div>
+        <div class="fact"><h3>Constraints</h3><ul><li>Australian Government ISM and Privacy Act 1988 apply (.gov.au estate).</li><li>Licence entitlement 180 GB/day today.</li><li>Network changes run in a weekly window.</li></ul></div>
+        <div class="fact"><h3>Not yet described</h3><ul><li>AV-1 recommends next: StdV-2 (standards forecast), CV-3 (capability phasing), PV-2 (project timelines).</li><li>SvcV views are covered by SV views for this platform.</li></ul></div>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Accountable: security telemetry service owner · Draft</span><span>AV-1 · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+// Views in the pack: id, viewpoint, name, question it answers, source (topology | example | mixed), Builder state (generated | handoff | mockup), artifact id or repo path
+const A='https://claude.ai/artifact/';
+const VIEWS=[
+ ['AV-1','All','Overview and Summary Information','What is this architecture, and what does the pack say?','mixed','mockup',A+'9ZefXnByRjKhH7N4H9sELs'],
+ ['AV-2','All','Integrated Dictionary','What do the terms and identifiers mean?','mixed','mockup',A+'SLNM2LgR4WSqGtr7euDv5q'],
+ ['CV-1','Capability','Vision','What are we trying to achieve, by when?','example','handoff',A+'DUowyB4vqqoh6wTJQ2T9W6'],
+ ['CV-2','Capability','Capability Taxonomy','Which capabilities, and how are they measured?','mixed','handoff',A+'NxSnuhNavprVruUSYgKHnu'],
+ ['CV-4','Capability','Capability Dependencies','Which capabilities depend on which?','example','mockup',A+'MHpebYVVrK5GByhbozuVpK'],
+ ['CV-6','Capability','Capability to Operational Activities','Which capabilities carry out each activity?','example','mockup',A+'7ZiFrFYXodRKQ8oTmBGDe1'],
+ ['CV-7','Capability','Capability to Services','Which services does each capability need?','mixed','mockup',A+'W8J7j3HG38XjbGiLepN9Cr'],
+ ['OV-1','Operational','High-Level Operational Concept','What does the operation look like?','topology','generated','docs/mockups/architecture-ov1-mockup.html'],
+ ['OV-2','Operational','Operational Resource Flow Description','Who exchanges what with whom?','topology','generated','docs/mockups/architecture-ov2-mockup.html'],
+ ['OV-3','Operational','Operational Resource Flow Matrix','What are the attributes of each exchange?','topology','generated','docs/mockups/architecture-ov3-mockup.html'],
+ ['OV-4','Operational','Organizational Relationships Chart','Who does the work, and who is accountable?','mixed','mockup',A+'AEp6Wi9PmEcr8hj6YMCMJj'],
+ ['OV-5a','Operational','Operational Activity Decomposition Tree','What activities make up the operation?','example','mockup',A+'U9HUqcr2jQKk3UN6gvWjQn'],
+ ['OV-5b','Operational','Operational Activity Model','How do activities pass work to each other?','mixed','mockup',A+'UfSdq2bCULSu5KvGkrfnAp'],
+ ['OV-6a','Operational','Operational Rules Model','What rules must the teams follow?','example','mockup',A+'Jv8kc94S77S6qeKpTuX8m3'],
+ ['OV-6b','Operational','Operational State Transition Description','How do findings and sources move through their life?','mixed','mockup',A+'SpWjZLzWoiVDzB3u7h6Wtz'],
+ ['OV-6c','Operational','Operational Event-Trace Description','How long do team hand-offs take?','example','mockup',A+'XUiSFPLpmyRPwsz8GHRhFc'],
+ ['DIV-1','Data','Conceptual Data Model','What data concepts exist and how do they relate?','example','handoff',A+'3MEpbKL65FdaeJacKKKsUJ'],
+ ['DIV-2','Data','Logical Data Model','What are the entities, keys and PII?','example','mockup',A+'TDyhxjYWSBJErYmzaSkXnS'],
+ ['DIV-3','Data','Physical Data Model','Where is each entity stored and how is it protected?','mixed','mockup',A+'3pPGZ1n12LwNdZNUXLbMsf'],
+ ['SV-1','Systems','Systems Interface Description','Which systems connect, and how?','topology','mockup',A+'SoLPL8qaQueVnWEh3SQAVq'],
+ ['SV-2','Systems','Systems Resource Flow Description','How does each interface cross the network?','mixed','mockup',A+'D9DrFtMnrmsM8rwCweMKEr'],
+ ['SV-3','Systems','Systems-Systems Matrix','Which pairs of systems have an interface?','topology','mockup',A+'TeihsaoMc3xt3kAGGMxf1a'],
+ ['SV-4','Systems','Systems Functionality Description','Which functions run where, in what order?','mixed','mockup',A+'Kyukj379B8DnuW6XD5kErQ'],
+ ['SV-5a','Systems','Activity to Systems Function Traceability','Which functions carry out each activity?','mixed','mockup',A+'BfA86FUWQLYTzgbosFQnMT'],
+ ['SV-5b','Systems','Activity to Systems Traceability','Which systems take part in each activity?','topology','mockup',A+'SJnvD18mSMSUToLWDBLwxq'],
+ ['SV-6','Systems','Systems Resource Flow Matrix','What are the attributes of each system exchange?','mixed','mockup',A+'JkePaamwoE8E8BJq2GMuvX'],
+ ['SV-7','Systems','Systems Measures Matrix','How are the systems performing?','example','mockup',A+'5HwaTXx29S3FhbBJcVLny6'],
+ ['SV-10a','Systems','Systems Rules Model','What rules must the systems follow, and do they?','mixed','mockup',A+'89YU8WHu4Q5u5uNdHxeQLc'],
+ ['SV-10b','Systems','Systems State Transition Description','How do systems respond to events?','mixed','mockup',A+'C3ds9JpWkHdvmsSVfBcyFP'],
+ ['SV-10c','Systems','Systems Event-Trace Description','How long do critical system sequences take?','mixed','mockup',A+'CC4Jqc6zYtH2JC3aAy8mDk'],
+ ['StdV-1','Standards','Standards Profile','Which standards apply, and are they met?','mixed','mockup',A+'NPLx285SiXptYgxxzPL47r'],
+ ['TM-1','Security','Threat Model (not DoDAF)','Which threats apply to the telemetry paths?','topology','generated','docs/mockups/architecture-threat-model-mockup.html']
+];
+const VURL=Object.fromEntries(VIEWS.map(v=>[v[0],v[6]]));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const vchip=id=>{const u=VURL[id];return u&&u.startsWith('http')?`<a class="vc" href="${u}" target="_blank" rel="noopener">${id}</a>`:`<span class="vc">${id}</span>`};
+
+// id, severity (high|medium), title, what, action, owner (OV-4), when, views
+const ISS=[
+ ['I-01','high','Two forwarders have no output to an indexer','Universal Forwarder 2 and Heavy Forwarder 1 receive data but send it nowhere. Melbourne syslog and all AWS events never reach Indexer 1.','Connect both to Indexer 1 in the Builder; request firewall rules FW-5 and FW-6.','Log onboarding team','Increment 1',['SV-1','SV-2','SV-3','SV-4','SV-5b','SV-6','SV-10a','SV-10b','SV-10c','OV-5b','OV-6b','OV-6c','CV-2']],
+ ['I-02','high','Nothing alerts when a source goes silent','A missing source took about a week to notice. Both forwarder gaps above went unnoticed for this reason.','Schedule a missing-source search (no events for 4 hours) that raises an incident to the source owner.','Splunk platform team','Now',['OV-6a','OV-6b','OV-6c','SV-7']],
+ ['I-03','high','Licence over entitlement and indexer disk filling','Licence use peaked at 104%; hot and warm free space is falling about 2 points a day.','Filter or grow the licence before AWS onboarding; add storage or tune retention before raising it.','Security telemetry service owner','Now',['SV-7','OV-6a','CV-1','DIV-3']],
+ ['I-04','high','Detection and response chain not in place','No Enterprise Security component, so no correlation searches or findings; SOAR receives nothing and cannot update tickets.','Add Enterprise Security; add the Search Head → SOAR interface (SI-15) and a SOAR → service desk interface (RF-14).','Security telemetry service owner','Increment 2',['CV-1','CV-2','CV-6','CV-7','SV-4','SV-5a','SV-5b','SV-10c','OV-5a','OV-5b','OV-6a','OV-6b','OV-6c']],
+ ['I-05','high','PII crosses the network in clear and is stored unencrypted','Syslog uses UDP without TLS; masking happens only at the indexer; index buckets, KV store and SOAR have no encryption at rest.','Move capable devices to syslog over TLS (6514); mask at source; turn on volume encryption.','Network team, Splunk platform team','Increment 2',['SV-1','SV-2','SV-4','SV-6','SV-10a','DIV-2','DIV-3','StdV-1']],
+ ['I-06','medium','Windows endpoints are not collected and have no owner','Windows Event Log 1 is in the topology with no interface and no owning team.','Name an owner; deploy Universal Forwarders to the Windows hosts.','Security telemetry service owner','Increment 1',['SV-1','SV-3','SV-5b','OV-4','OV-5a','OV-6a','OV-6b','CV-2','StdV-1']],
+ ['I-07','medium','Retention is 90 days and frozen data is deleted','Policy needs 365 days searchable and 7 years archived; coldToFrozenDir is not set.','Set retention per index; set an archive path; size storage for the target.','Splunk platform team','Increment 2',['DIV-3','SV-10b','OV-6a','SV-7']],
+ ['I-08','medium','Single indexer and search head','No replication or search clustering; each is a single point of failure.','Indexer cluster with multisite replication and a search head cluster.','Splunk platform team','Increment 3',['CV-2','CV-4','SV-3','SV-4','SV-5a','SV-5b','SV-10a']],
+ ['I-09','medium','Owners and accountability not set','Data, capability, system, network, rule, standards and PKI owners are empty; three activities have no accountable team.','Name owners in the Builder; give each OV-4 activity exactly one accountable team.','Security telemetry service owner','Now',['OV-4','OV-6a','DIV-1','CV-1','SV-1','StdV-1']],
+ ['I-10','medium','Certificate verification not recorded','TLS is required on every Splunk interface, but whether peers verify certificates is unknown.','Check sslVerifyServerCert on forwarders and deployment clients; record it on the interfaces.','Splunk platform team','Increment 1',['SV-6','SV-10a','SV-10b','StdV-1']],
+ ['I-11','medium','Search load rising','Skipped scheduled searches tripled in a week; p95 search time is over target before ES adds load.','Review search schedules; plan the search head cluster.','Detection engineering','Increment 2',['SV-7','CV-2']],
+ ['I-12','medium','Inferred links not in the topology','Licence reporting, monitoring and findings links exist only as inferences.','Add SI-15, SI-16 and SI-17 as relationships in the Builder.','Splunk platform team','Increment 1',['SV-1','SV-3','SV-6','CV-7','OV-5b']]
+];
+let fs='all';
+function renderIssues(){const list=ISS.filter(i=>fs==='all'||i[1]===fs).sort((a,b)=>(a[1]===b[1]?b[7].length-a[7].length:a[1]==='high'?-1:1)),mx=Math.max(...ISS.map(i=>i[7].length));
+  document.getElementById('issues').innerHTML=list.map(i=>`<div class="issue" style="--ic:${i[1]==='high'?'var(--stop)':'var(--review)'}"><div><span class="sev" style="color:${i[1]==='high'?'var(--stop)':'var(--review)'}">${i[0]} · ${i[1]==='high'?'High':'Medium'}</span><h3>${esc(i[2])}</h3><p>${esc(i[3])}</p><p style="margin-top:6px;color:var(--ink)"><b>Do:</b> ${esc(i[4])}</p></div>
+   <div><span class="k">Shown in ${i[7].length} views</span><div class="vcs">${i[7].map(vchip).join('')}</div><span class="bar"><i style="width:${i[7].length/mx*100}%"></i></span></div>
+   <div class="meta"><span><span class="k">Owner</span>${esc(i[5])}</span><span><span class="k">When</span>${esc(i[6])}</span></div></div>`).join('');
+  document.querySelectorAll('#sevf button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.s===fs)))}
+document.getElementById('sevf').innerHTML='<span class="lbl">Severity</span>'+[['all','All'],['high','High'],['medium','Medium']].map(([k,n])=>`<button type="button" data-s="${k}">${n} · ${k==='all'?ISS.length:ISS.filter(i=>i[1]===k).length}</button>`).join('');
+document.querySelectorAll('#sevf button').forEach(b=>b.addEventListener('click',()=>{fs=b.dataset.s;renderIssues()}));
+const ST={generated:'Generated by the Builder',handoff:'Handoff written',mockup:'Mockup'},SRC={topology:'From the topology',example:'Example content',mixed:'Topology + examples'};
+const groups=[...new Set(VIEWS.map(v=>v[1]))];
+document.getElementById('views').innerHTML=`<thead><tr><th>View</th><th>Name</th><th>Answers</th><th>Content</th><th>In the Builder</th><th>Issues shown</th></tr></thead><tbody>${groups.map(g=>`<tr class="grp"><td colspan="6">${esc(g)}</td></tr>`+VIEWS.filter(v=>v[1]===g).map(v=>{const n=ISS.filter(i=>i[7].includes(v[0])).length,u=v[6];return `<tr><td class="vid">${u.startsWith('http')?`<a href="${u}" target="_blank" rel="noopener">${v[0]}</a>`:`<span>${v[0]}</span>`}</td><td>${esc(v[2])}${u.startsWith('docs/')?`<br><span class="src">${esc(u)}</span>`:''}</td><td>${esc(v[3])}</td><td class="src">${SRC[v[4]]}</td><td><span class="state ${v[5]}">${ST[v[5]]}</span></td><td class="mono">${n||'—'}</td></tr>`}).join('')).join('')}</tbody>`;
+document.getElementById('summary').innerHTML=`<span><b>${VIEWS.length}</b>views</span><span><b>${VIEWS.filter(v=>v[5]==='generated').length}</b>generated by the Builder</span><span><b>${VIEWS.filter(v=>v[5]==='handoff').length}</b>with a build handoff</span><span><b>17</b>systems</span><span><b>17</b>interfaces</span><span class="rv"><b>${ISS.filter(i=>i[1]==='high').length}</b>high issues</span><span class="rv"><b>${ISS.filter(i=>i[1]==='medium').length}</b>medium issues</span>`;
+renderIssues();
+</script>
+
+</body>
+</html>
