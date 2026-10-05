@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>SV-7 Systems Measures Matrix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV, DIV, CV and SV mockups. Banners, title block, purpose, status
+   tiles and system filters, then the measures table (thresholds, today, 7-day sparkline, increment targets) beside a detail panel
+   with a 7-day chart and the producing search, and findings. Status always pairs an icon and a word with its colour. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+.plane{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.model{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.model>*{min-width:0}
+@media (max-width:1150px){.model{grid-template-columns:1fr}}
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:9px;align-content:start}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:0;font:700 1.12rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.85rem}
+.detail dl{margin:0;display:grid;gap:7px}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.84rem}
+.detail ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:.84rem}
+.detail li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
+.detail code{font:500 .74rem var(--font-code);background:var(--zone);padding:1px 4px;border-radius:3px}
+.detail .hint{font-size:.78rem;color:var(--muted)}
+.headrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{font:600 .78rem var(--font-body);padding:6px 12px;border:0;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sheet)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg th.n,.reg td.n{text-align:right}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tbody tr:last-child td{border-bottom:0}
+.reg td.n{font:500 .76rem var(--font-code);font-variant-numeric:tabular-nums;white-space:nowrap}
+.reg tbody tr[data-k]{cursor:pointer}
+.reg tbody tr[data-k]:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+.filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.filters .lbl{font:600 .62rem var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.filters button{font:600 .74rem var(--font-body);padding:5px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.filters button[aria-pressed="true"]{border-color:var(--sel);color:var(--ink);background:color-mix(in srgb,var(--sel) 10%,var(--sheet))}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tiles button{all:unset;cursor:pointer;border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:9px 12px;display:grid;gap:3px}
+.tiles button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--sel)}
+.tiles b{font:600 1.5rem/1 var(--font-title);font-variant-numeric:tabular-nums}
+.tiles span{font-size:.78rem;color:var(--ink-2);display:flex;gap:6px;align-items:center}
+.ic{font:700 .8rem/1 var(--font-code)}
+.ic.ok{color:var(--ok)}.ic.warn{color:var(--review)}.ic.crit{color:var(--stop)}.ic.nd{color:var(--muted)}
+table.ms{width:100%;border-collapse:collapse;font-size:.82rem}
+.ms th{text-align:left;font:600 .6rem/1.2 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 9px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.ms th.n,.ms td.n{text-align:right}
+.ms td{padding:7px 9px;border-bottom:1px solid var(--rule);vertical-align:middle}
+.ms tr.grp td{background:var(--zone);font:700 .78rem var(--font-title);padding:5px 9px}
+.ms tr.grp td small{font:500 .68rem var(--font-code);color:var(--muted);margin-left:6px}
+.ms tbody tr[data-k]{cursor:pointer}
+.ms tbody tr[data-k]:hover,.ms tbody tr.sel{background:var(--hi)}
+.ms td.n{font:500 .76rem var(--font-code);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ms td.now{font-weight:600;color:var(--ink)}
+.ms td.thr{font:500 .72rem var(--font-code);color:var(--ink-2);white-space:nowrap}
+.spark{display:block}
+.spark .ln{fill:none;stroke:var(--sel);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.spark .w{stroke:var(--review);stroke-width:1;stroke-dasharray:3 3}
+.spark .c{stroke:var(--stop);stroke-width:1;stroke-dasharray:3 3}
+.spark .end{fill:var(--sel);stroke:var(--sheet);stroke-width:2}
+.st{display:inline-flex;gap:5px;align-items:center;font:600 .66rem/1 var(--font-code);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.st.ok{color:var(--ok)}.st.warn{color:var(--review)}.st.crit{color:var(--stop)}.st.nd{color:var(--muted)}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto}
+.chart .gl{stroke:var(--rule);stroke-width:1}
+.chart .ax{font:500 10px var(--font-code);fill:var(--muted)}
+.chart .ln{fill:none;stroke:var(--sel);stroke-width:2;stroke-linejoin:round}
+.chart .pt{fill:var(--sel);stroke:var(--sheet);stroke-width:2}
+.chart .tl{font:600 9.5px var(--font-code)}
+.chart .w{stroke:var(--review);stroke-dasharray:4 3}.chart .tl.w{fill:var(--review);stroke:none}
+.chart .c{stroke:var(--stop);stroke-dasharray:4 3}.chart .tl.c{fill:var(--stop);stroke:none}
+.chart .hit{fill:transparent;cursor:crosshair}
+.chart .cross{stroke:var(--line);stroke-width:1}
+.tip{position:absolute;pointer-events:none;background:var(--sheet);border:1px solid var(--rule);border-radius:4px;padding:5px 8px;font:500 .74rem var(--font-body);box-shadow:0 2px 8px color-mix(in srgb,var(--ink) 12%,transparent);white-space:nowrap}
+.tip b{font:600 .8rem var(--font-code)}
+.detail pre{margin:0;font:500 .72rem/1.45 var(--font-code);background:var(--zone);border:1px solid var(--rule);border-radius:3px;padding:8px;white-space:pre-wrap;overflow-wrap:anywhere}
+.empty{padding:16px;color:var(--muted)}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="sTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="sTitle">SV-7 · Systems Measures Matrix</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Systems (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">System owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026 · last 7 days</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>The performance measures for each system: thresholds, today's value with its last seven days, the targets for the next two increments, and the Monitoring Console panel or search that produces the value.</p></div>
+
+      <div class="tiles" id="tiles" role="group" aria-label="Filter by status"></div>
+
+      <div class="filters" id="sysf"></div>
+
+      <div class="model">
+        <div class="tablewrap"><table class="ms" id="ms"></table></div>
+        <aside class="detail" id="detail" aria-live="polite"></aside>
+      </div>
+
+      <div class="findings">
+        <h2>What the measures show</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · System owner not set · Systems from SV-1; targets from CV-1, CV-2 and SV-6</span><span>SV-7 · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const DAYS=['29 Sep','30 Sep','1 Oct','2 Oct','3 Oct','4 Oct','5 Oct'];
+// id, system, type, measure, unit, warn, crit, lowerIsBad, series (7 days, null = no data), inc2, inc3, source, note
+const MS=[
+ ['M1','Indexer 1','idx','Ingest against indexing capacity','%',70,90,false,[77,79,82,84,83,80,83],'≤ 60% of 300 GB/day','≤ 60% across the cluster','Monitoring Console · Indexing performance: instance','150 GB/day against 180 GB/day sustained capacity (CV-2 C3.1).'],
+ ['M2','Indexer 1','idx','Indexing latency, p95','s',30,60,false,[5.8,6.1,7.4,6,6.5,5.9,6.2],'≤ 60','≤ 60','index=* earliest=-1h | eval lag=_indextime-_time\n| stats p95(lag) as p95_lag by index','Time from event to searchable; SV-6 target 60 s.'],
+ ['M3','Indexer 1','idx','Index queue fill','%',50,80,false,[22,25,41,30,28,27,34],'≤ 50','≤ 50','index=_internal source=*metrics.log group=queue name=indexqueue\n| eval fill=current_size_kb/max_size_kb*100 | timechart p95(fill)','A sustained fill above 80% blocks the forwarders (SV-10b Blocked).'],
+ ['M4','Indexer 1','idx','Hot and warm volume free space','%',20,10,true,[31,28,26,24,22,20,18],'≥ 25','≥ 25','| rest /services/server/status/partitions-space splunk_server=*\n| eval free_pct=free/capacity*100','Falling about 2 points a day; at this rate it reaches 10% in 4 days.'],
+ ['M5','Search Head 1','search','Scheduled searches skipped','%',1,5,false,[1.2,1.8,2.1,2.9,3.3,3.5,3.8],'≤ 1','≤ 1','index=_internal sourcetype=scheduler\n| stats count(eval(status="skipped")) as skipped count as total\n| eval pct=skipped/total*100','Rising for a week. Correlation searches (ES) will add load in Increment 2.'],
+ ['M6','Search Head 1','search','Search runtime, 24 h window, p95','s',30,60,false,[33,35,38,36,40,39,41],'≤ 30','≤ 30','index=_audit action=search info=completed\n| stats p95(total_run_time) as p95','CV-2 C4.1 target 30 s; baseline was not measured until this week.'],
+ ['M7','Search Head 1','search','Concurrent searches against limit','%',70,90,false,[48,52,55,51,57,54,55],'≤ 70','≤ 70 per member','Monitoring Console · Search activity: instance',''],
+ ['M8','Universal Forwarder 1','uf','Output blocked','events/day',1,10,false,[0,0,2,0,0,0,0],'0','0','index=_internal source=*metrics.log host="uf1*" group=queue blocked=true\n| stats count','One block on 1 Oct during indexer maintenance; acknowledgement held the data.'],
+ ['M9','Universal Forwarder 2','uf','Output blocked','events/day',1,10,false,null,'0','0','index=_internal source=*metrics.log host="uf2*" group=queue blocked=true','No output target (SI-13), so nothing reaches _internal on the indexer either.'],
+ ['M10','Heavy Forwarder 1','hf','HEC requests rejected','%',0.5,2,false,null,'≤ 0.5','≤ 0.5','index=_internal sourcetype=splunkd component=HttpInputDataHandler\n| stats count(eval(status!=200)) as bad count as all','No HEC traffic yet (AWS onboarding is Increment 2), and no output to report from.'],
+ ['M11','Syslog Server 1','syslog','UDP receive buffer drops','packets/day',1,100,false,null,'< 0.1%','< 0.1%','netstat -su | grep "receive buffer errors"  (on the host)','CV-2 C1.1 baseline: not measured. Not visible to Splunk unless a script input collects it.'],
+ ['M12','Deployment Server 1','ds','Clients phoned home in 24 h','%',99,95,true,null,'≥ 99','≥ 99','| rest /services/deployment/server/clients splunk_server=local\n| eval age=now()-lastPhoneHomeTime | stats count(eval(age<86400)) as ok count as all','Topology records no phone-home times (SV-10b).'],
+ ['M13','License Manager 1','lm','Daily licence use against entitlement','%',85,100,false,[96,101,99,104,102,98,104],'≤ 85','≤ 85','index=_internal source=*license_usage.log type=RolloverSummary\n| eval pct=b/stacksz*100 | timechart span=1d max(pct)','Over entitlement on 4 of 7 days. CV-1 G4 target is ≤ 85%.'],
+ ['M14','Monitoring Console 1','mc','Health checks passing','%',95,90,true,[96,96,94,93,93,92,92],'100','100','Monitoring Console · Health check','Failing checks: disk space (M4) and skipped searches (M5).'],
+ ['M15','Splunk SOAR · Cloud 1','soar','Containers created','per day',null,null,false,[0,0,0,0,0,0,0],'≥ 1 per high finding','≥ 1 per high finding','SOAR · Reports: container summary','No findings arrive: the Search Head → SOAR link is only inferred (SI-15).']
+];
+const SYSN={idx:'Indexer',search:'Search Head',uf:'Universal Forwarder',hf:'Heavy Forwarder',syslog:'Syslog Server',ds:'Deployment Server',lm:'License Manager',mc:'Monitoring Console',soar:'Splunk SOAR'};
+const now=m=>m[8]?m[8][m[8].length-1]:null;
+function status(m){const v=now(m);if(v==null)return 'nd';if(m[5]==null)return m===MS.find(x=>x[0]==='M15')?'warn':'ok';
+  if(m[7])return v<=m[6]?'crit':v<=m[5]?'warn':'ok';return v>=m[6]?'crit':v>=m[5]?'warn':'ok'}
+const STL={ok:['✓','Within threshold'],warn:['!','Warning'],crit:['✕','Critical'],nd:['–','No data']};
+const fmt=(v,u)=>v==null?'—':(Math.abs(v)<10&&v%1?v.toFixed(1):Math.round(v))+(u==='%'?'%':u==='s'?' s':'');
+function spark(m){if(!m[8])return '<span class="st nd">no data</span>';const w=110,h=26,p=3,vals=m[8].concat([m[5],m[6]].filter(x=>x!=null)),mn=Math.min(...vals,0),mx=Math.max(...vals)*1.08||1;
+  const X=i=>p+i*(w-2*p)/6,Y=v=>h-p-(v-mn)/(mx-mn)*(h-2*p);
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">${m[5]!=null?`<line class="w" x1="0" x2="${w}" y1="${Y(m[5])}" y2="${Y(m[5])}"/>`:''}${m[6]!=null?`<line class="c" x1="0" x2="${w}" y1="${Y(m[6])}" y2="${Y(m[6])}"/>`:''}<polyline class="ln" points="${m[8].map((v,i)=>X(i)+','+Y(v)).join(' ')}"/><circle class="end" cx="${X(6)}" cy="${Y(now(m))}" r="3.5"/></svg>`}
+let fs=null,fsys='all',current=null;
+function render(){const list=MS.filter(m=>(!fs||status(m)===fs)&&(fsys==='all'||m[2]===fsys)),groups=[...new Set(list.map(m=>m[1]))];
+  document.getElementById('ms').innerHTML=`<thead><tr><th>Measure</th><th class="n">Warn · critical</th><th class="n">Today</th><th>Last 7 days</th><th>Increment 2</th><th>Increment 3</th><th>Status</th></tr></thead><tbody>${list.length?groups.map(g=>{const t=list.find(m=>m[1]===g)[2];return `<tr class="grp"><td colspan="7">${esc(g)}<small>${SYSN[t]}</small></td></tr>`+list.filter(m=>m[1]===g).map(m=>{const s=status(m);
+   return `<tr data-k="${m[0]}" tabindex="0"><td><span class="id">${m[0]}</span> ${esc(m[3])} <span class="id">${esc(m[4])}</span></td><td class="thr n">${m[5]==null?'—':(m[7]?'≤ ':'≥ ')+m[5]+' · '+(m[7]?'≤ ':'≥ ')+m[6]}</td><td class="n now">${fmt(now(m),m[4])}</td><td>${spark(m)}</td><td class="mono">${esc(m[9])}</td><td class="mono">${esc(m[10])}</td><td><span class="st ${s}"><span class="ic ${s}">${STL[s][0]}</span>${STL[s][1]}</span></td></tr>`}).join('')}).join(''):'<tr><td colspan="7" class="empty">No measures match these filters.</td></tr>'}</tbody>`;
+  document.querySelectorAll('#ms tbody tr[data-k]').forEach(r=>{r.classList.toggle('sel',r.dataset.k===current);r.addEventListener('click',()=>pick(r.dataset.k));r.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(r.dataset.k)}})});
+  document.querySelectorAll('#tiles button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.s===fs)));
+  document.querySelectorAll('#sysf button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.t===fsys)))}
+document.getElementById('tiles').innerHTML=['crit','warn','ok','nd'].map(s=>`<button type="button" data-s="${s}"><b>${MS.filter(m=>status(m)===s).length}</b><span><span class="ic ${s}">${STL[s][0]}</span>${STL[s][1]}</span></button>`).join('');
+document.querySelectorAll('#tiles button').forEach(b=>b.addEventListener('click',()=>{fs=fs===b.dataset.s?null:b.dataset.s;render()}));
+const types=[...new Set(MS.map(m=>m[2]))];
+document.getElementById('sysf').innerHTML='<span class="lbl">System</span>'+['all',...types].map(t=>`<button type="button" data-t="${t}">${t==='all'?'All':SYSN[t]}</button>`).join('');
+document.querySelectorAll('#sysf button').forEach(b=>b.addEventListener('click',()=>{fsys=b.dataset.t;render()}));
+
+const detail=document.getElementById('detail');
+function chart(m){if(!m[8])return '<p class="hint">No values in the last 7 days.</p>';const W=280,H=150,L=34,R=8,T=10,B=22,vals=m[8].concat([m[5],m[6]].filter(x=>x!=null)),mn=Math.min(0,...vals),mx=Math.max(...vals)*1.1||1;
+  const X=i=>L+i*(W-L-R)/6,Y=v=>T+(H-T-B)*(1-(v-mn)/(mx-mn)),ticks=[mn,(mn+mx)/2,mx].map(v=>mx>=10?Math.round(v):Math.round(v*10)/10);
+  return `<div class="chart" id="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(m[3])}, last 7 days">${ticks.map(t=>`<line class="gl" x1="${L}" x2="${W-R}" y1="${Y(t)}" y2="${Y(t)}"/><text class="ax" x="${L-5}" y="${Y(t)+3}" text-anchor="end">${t}</text>`).join('')}
+  ${m[5]!=null?`<line class="w" x1="${L}" x2="${W-R}" y1="${Y(m[5])}" y2="${Y(m[5])}"/><text class="tl w" x="${W-R}" y="${Y(m[5])-3}" text-anchor="end">warn ${m[5]}</text>`:''}${m[6]!=null?`<line class="c" x1="${L}" x2="${W-R}" y1="${Y(m[6])}" y2="${Y(m[6])}"/><text class="tl c" x="${W-R}" y="${Y(m[6])-3}" text-anchor="end">critical ${m[6]}</text>`:''}
+  <polyline class="ln" points="${m[8].map((v,i)=>X(i)+','+Y(v)).join(' ')}"/>${m[8].map((v,i)=>`<circle class="pt" cx="${X(i)}" cy="${Y(v)}" r="4"/>`).join('')}
+  ${[0,6].map(i=>`<text class="ax" x="${X(i)}" y="${H-6}" text-anchor="${i?'end':'start'}">${DAYS[i]}</text>`).join('')}<line class="cross" id="cross" x1="0" x2="0" y1="${T}" y2="${H-B}" visibility="hidden"/>
+  ${m[8].map((v,i)=>`<rect class="hit" data-i="${i}" x="${X(i)-(W-L-R)/12}" y="${T}" width="${(W-L-R)/6}" height="${H-T-B}"/>`).join('')}</svg><div class="tip" id="tip" hidden></div></div>`}
+function wireChart(m){const c=document.getElementById('chart');if(!c)return;const tip=document.getElementById('tip'),cross=document.getElementById('cross'),svgEl=c.querySelector('svg');
+  c.querySelectorAll('.hit').forEach(r=>{r.addEventListener('mouseenter',()=>{const i=+r.dataset.i,x=+r.getAttribute('x')+(+r.getAttribute('width'))/2;cross.setAttribute('x1',x);cross.setAttribute('x2',x);cross.setAttribute('visibility','visible');
+    tip.innerHTML=`${DAYS[i]} · <b>${fmt(m[8][i],m[4])}</b> ${m[4]==='%'||m[4]==='s'?'':esc(m[4])}`;tip.hidden=false;const sc=svgEl.clientWidth/280;tip.style.left=Math.min(x*sc+8,svgEl.clientWidth-110)+'px';tip.style.top='4px'});
+    r.addEventListener('mouseleave',()=>{tip.hidden=true;cross.setAttribute('visibility','hidden')})})}
+function show(k){const m=MS.find(x=>x[0]===k),s=status(m);
+  detail.innerHTML=`<span class="dom">${esc(m[1])} · ${SYSN[m[2]]}</span><h3>${m[0]} · ${esc(m[3])}</h3><p><span class="st ${s}"><span class="ic ${s}">${STL[s][0]}</span>${STL[s][1]}</span> · today ${fmt(now(m),m[4])} ${m[4]==='%'||m[4]==='s'?'':esc(m[4])}</p>${chart(m)}
+  <dl>${m[12]?`<dt>Note</dt><dd>${esc(m[12])}</dd>`:''}<dt>Targets</dt><dd>Increment 2: ${esc(m[9])} · Increment 3: ${esc(m[10])}</dd><dt>Measured by</dt><dd><pre>${esc(m[11])}</pre></dd></dl>`;wireChart(m)}
+function intro(){const bad=MS.filter(m=>['crit','warn'].includes(status(m))).sort((a,b)=>(status(a)==='crit'?0:1)-(status(b)==='crit'?0:1));
+  detail.innerHTML=`<span class="dom">Needs attention</span><h3>${bad.length} measures over threshold</h3><ul>${bad.map(m=>`<li><span class="st ${status(m)}"><span class="ic ${status(m)}">${STL[status(m)][0]}</span>${m[0]}</span><span>${esc(m[1])} · ${esc(m[3])}: ${fmt(now(m),m[4])}</span></li>`).join('')}</ul><p class="hint">Select a measure for its 7-day chart and the search that produces it. Esc clears.</p>`}
+function pick(k){current=current===k?null:k;current?show(k):intro();document.querySelectorAll('#ms tbody tr').forEach(r=>r.classList.toggle('sel',r.dataset.k===current))}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current){current=null;intro();render()}});
+document.getElementById('findings').innerHTML=[
+ ['stop','Licence','<b>Licence use is over entitlement on 4 of the last 7 days (M13)</b>, peaking at 104%. Increment 2 takes daily ingest from about 150 to 222 GB/day (SV-2), so licence has to grow or volume has to be filtered (C1.4) before then.'],
+ ['stop','Disk','<b>Indexer 1 hot and warm free space is falling about 2 points a day (M4)</b>, now 18%. It crosses the 10% critical line in about 4 days and then rolls buckets to cold early. Raising retention to 365 days (DIV-3) makes this five times worse.'],
+ ['gap','Search','<b>Skipped scheduled searches have tripled in a week (M5)</b> and search runtime is over the 30 s target (M6). Both will get worse when Enterprise Security correlation searches start; a search head cluster (C4.3) is the Increment 3 fix.'],
+ ['ext','No data','<b>Four measures have no data</b>: the two forwarders without output (M9, M10) cannot report to the indexer, syslog UDP drops (M11) are invisible to Splunk, and phone-home times (M12) are not recorded.'],
+ ['ok','Ingest','<b>Indexing latency is about 6 s at p95 (M2)</b>, far inside the 60 s target, and Universal Forwarder 1 blocked only once in the week, with acknowledgement holding the data.']
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+render();intro();
+</script>
+
+</body>
+</html>
