@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>CV-7 Capability to Services</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV, DIV-1 and CV mockups. Banners, title block, purpose, a detail
+   strip for the selected row or column, then the capability × service matrix (CV-2 parts down, services grouped by family across) with a readiness column, and the findings.
+   Colour encodes the capability domain; amber marks gaps, partial or planned items. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.sw{width:12px;height:12px;border-radius:2px;display:inline-block;vertical-align:-1px}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.part,.chip.plan,.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+
+/* Detail strip */
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px 16px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.3fr) minmax(0,1fr);gap:12px 22px;min-height:132px}
+@media (max-width:960px){.detail{grid-template-columns:1fr}}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:4px 0 6px;font:700 1.16rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.86rem;line-height:1.5}
+.detail dl{margin:0;display:grid;gap:7px;align-content:start}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.85rem}
+.detail ul{margin:2px 0 0;padding:0;list-style:none;display:grid;gap:4px;font-size:.84rem}
+.detail code{font:500 .76rem var(--font-code);background:var(--zone);padding:1px 5px;border-radius:3px}
+
+/* Matrix */
+.mwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.mx{border-collapse:separate;border-spacing:0;width:100%;font-size:.8rem}
+.mx th,.mx td{border-bottom:1px solid var(--rule);padding:0}
+.mx thead th{background:var(--zone);font:600 .62rem/1.2 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);vertical-align:bottom}
+.mx thead tr.fam th{border-bottom:0;padding:7px 6px 2px;text-align:center;border-left:1px solid var(--rule)}
+.mx thead tr.fam th:first-child{border-left:0}
+.mx thead tr.cols th{padding:4px 4px 8px}
+.mx th.colh{width:47px;min-width:47px;text-align:center;border-left:1px solid var(--rule);cursor:pointer}
+.mx th.colh button{all:unset;cursor:pointer;display:grid;gap:3px;justify-items:center;width:100%;padding:2px 0}
+.mx th.colh .cid{font:600 .66rem var(--font-code);color:var(--ink)}
+.mx th.colh .nm{font:500 .62rem/1.2 var(--font-body);letter-spacing:0;text-transform:none;color:var(--ink-2);max-width:46px;text-wrap:balance}
+.mx th.colh button:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+.mx th.rowh{position:sticky;left:0;z-index:1;background:var(--sheet);text-align:left;font-weight:400;padding:6px 10px;min-width:200px;border-right:1px solid var(--rule);cursor:pointer}
+.mx thead th.rowh{background:var(--zone);vertical-align:bottom;padding:8px 10px}
+.mx th.rowh .cid{font:600 .7rem var(--font-code);color:var(--muted);margin-right:6px}
+.mx th.rowh .dot{margin-left:6px}
+.mx tr.grp th,.mx tr.grp td{background:var(--zone);font:700 .78rem var(--font-title);padding:5px 10px}
+.mx tr.grp th{position:sticky;left:0;z-index:1;text-align:left;white-space:nowrap}
+.mx td.c{text-align:center;border-left:1px solid var(--rule);font:600 .95rem/1 var(--font-code);height:30px}
+.mx td.c.p{color:var(--ink)}
+.mx td.c.s{color:var(--muted)}
+.mx td.c.gap{color:var(--review);background:color-mix(in srgb,var(--review) 9%,transparent)}
+.mx td.c.okc{color:var(--ok)}
+.mx td.st{padding:6px 10px;white-space:nowrap;border-left:1px solid var(--rule)}
+.mx tfoot td,.mx tfoot th{background:var(--zone);padding:6px 4px;text-align:center;font:600 .66rem/1.3 var(--font-code);border-bottom:0;border-top:1px solid var(--rule)}
+.mx tfoot th.rowh{text-align:left;padding:6px 10px;background:var(--zone)}
+.mx tfoot td{border-left:1px solid var(--rule)}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;vertical-align:1px}
+.dot.ok{background:var(--ok)}.dot.part{background:var(--review)}.dot.plan{border:1.5px solid var(--review)}
+.mx tbody tr:not(.grp):hover th.rowh,.mx tbody tr:not(.grp):hover td{background-color:var(--hi)}
+.mx.focused tbody tr:not(.grp):not(.on){opacity:.35}
+.mx.focused .col-on{background-color:color-mix(in srgb,var(--sel) 10%,transparent)}
+.mx tr.on th.rowh{box-shadow:inset 3px 0 0 var(--sel)}
+.mx th.colh.sel{box-shadow:inset 0 -3px 0 var(--sel)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.78rem;color:var(--ink-2)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend b{font:600 .95rem var(--font-code)}
+
+/* Findings */
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tr:last-child td{border-bottom:0}
+.reg tbody tr{cursor:pointer}
+.reg tbody tr:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.mx tbody tr{transition:opacity .15s}}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="cvTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="cvTitle">CV-7 · Capability to Services Mapping</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Capability (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">Capability owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>Which Splunk services each capability needs, and whether the Builder topology deploys them. A capability is ready only when every service it needs is deployed. Services are the ones the SvcV-1 components provide.</p></div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="detail" id="detail" aria-live="polite"></div>
+
+      <div class="legend">
+        <span><b style="color:var(--ok)">●</b>needs the service; deployed</span>
+        <span><b style="color:var(--review)">○</b>needs the service; not deployed</span>
+        <span>Shaded columns are services not in the topology</span>
+        <span>Click a capability or a service to trace it. Esc clears.</span>
+      </div>
+      <div class="mwrap"><table class="mx" id="mx"></table></div>
+
+      <h2>Service register</h2>
+      <p class="sub">The services in the matrix, the Builder component that provides each one, and the interface it is reached on.</p>
+      <div class="tablewrap"><table class="reg" id="svc">
+        <thead><tr><th>ID</th><th>Service</th><th>Provided by (Builder component)</th><th>Interface</th><th>Used by</th><th>In topology</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+
+      <div class="findings">
+        <h2>What the mapping shows</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Capabilities from CV-2 · Services from SvcV-1 and the Builder topology</span><span>CV-7 · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+// Capabilities from CV-2: level 1 [id, name, domain], level 2 [id, name, status]
+const L1=[['C1','Telemetry collection','collect'],['C2','Fleet configuration','collect'],['C3','Indexing and retention','index'],['C4','Search and analytics','search'],
+  ['C5','Threat detection','detect'],['C6','Automated response','detect'],['C7','Identity and access','govern'],['C8','Platform health and licence','index']];
+const L2=[['C1.1','Network and syslog collection','ok'],['C1.2','Endpoint collection','ok'],['C1.3','Cloud and API collection','ok'],['C1.4','Filtering and masking at source','plan'],
+  ['C2.1','Configuration as code','ok'],['C2.2','Forwarder fleet health','ok'],
+  ['C3.1','Event indexing','ok'],['C3.2','Retention management','ok'],['C3.3','Data replication','part'],
+  ['C4.1','Ad hoc investigation','ok'],['C4.2','Normalised data (CIM)','ok'],['C4.3','Search high availability','part'],
+  ['C5.1','Correlation detections','plan'],['C5.2','Risk-based alerting','plan'],
+  ['C6.1','Case management','ok'],['C6.2','Playbook automation','ok'],
+  ['C7.1','Single sign-on','ok'],['C7.2','Data access control','ok'],['C7.3','Access review','ok'],
+  ['C8.1','Licence management','ok'],['C8.2','Health monitoring','part'],['C8.3','Capacity planning','ok']];
+const ST={ok:'In topology',part:'Partial',plan:'Planned'};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const parentOf=id=>L1.find(p=>p[0]===id.split('.')[0]);
+
+// id, name, family, provider component, interface, deployed in the reference topology
+const SVC=[
+ ['S1','Universal forwarding','Collection','Universal Forwarder','S2S 9997 · TLS',true],
+ ['S2','Heavy forwarding and parsing','Collection','Heavy Forwarder','S2S 9997 · TLS',true],
+ ['S3','Syslog reception','Collection','Syslog Server','514 UDP/TCP · 6514 TLS',true],
+ ['S4','HTTP Event Collector','Collection','HEC Endpoint on Heavy Forwarder','HTTPS 8088 · TLS',true],
+ ['S5','Deployment','Collection','Deployment Server','Phone-home 8089 · TLS',true],
+ ['S6','Edge pipelines','Collection','Edge Processor','S2S / HEC · TLS',false],
+ ['S7','Indexing','Indexing','Indexer','S2S 9997 · TLS',true],
+ ['S8','Index replication','Indexing','Indexer Cluster Manager','Replication 9887 · TLS',false],
+ ['S9','Search and REST API','Search','Search Head','HTTPS 8000 · REST 8089',true],
+ ['S10','Data model acceleration','Search','Search Head (CIM add-on)','Internal',true],
+ ['S11','Search head clustering','Search','Search Head Cluster Deployer','REST 8089 · TLS',false],
+ ['S12','Correlation and risk','Detection and response','Splunk Enterprise Security','On the search tier',false],
+ ['S13','Cases and playbooks','Detection and response','Splunk SOAR','HTTPS 443 · REST',true],
+ ['S14','SAML sign-in','Platform and access','Authentication Provider · Cloud','SAML 2.0 · HTTPS',true],
+ ['S15','Licence management','Platform and access','License Manager','REST 8089 · TLS',true],
+ ['S16','Platform monitoring','Platform and access','Monitoring Console','REST 8089 · TLS',false]
+];
+const NEEDS={
+ 'C1.1':['S3','S1'],'C1.2':['S1'],'C1.3':['S4','S2'],'C1.4':['S6'],
+ 'C2.1':['S5'],'C2.2':['S5'],
+ 'C3.1':['S7'],'C3.2':['S7'],'C3.3':['S7','S8'],
+ 'C4.1':['S9','S14'],'C4.2':['S10'],'C4.3':['S11'],
+ 'C5.1':['S12','S10'],'C5.2':['S12'],
+ 'C6.1':['S13','S12'],'C6.2':['S13','S9'],
+ 'C7.1':['S14'],'C7.2':['S9','S7'],'C7.3':['S9'],
+ 'C8.1':['S15'],'C8.2':['S16'],'C8.3':['S15','S9']
+};
+const svc=id=>SVC.find(s=>s[0]===id);
+const missing=c=>NEEDS[c].filter(s=>!svc(s)[5]);
+const usedBy=s=>L2.filter(c=>NEEDS[c[0]].includes(s));
+const ready=L2.filter(c=>!missing(c[0]).length);
+const conflict=L2.filter(c=>c[2]==='ok'&&missing(c[0]).length);
+
+document.getElementById('summary').innerHTML=`<span><b>${L2.length}</b>capabilities</span><span><b>${SVC.length}</b>services</span><span><b>${SVC.filter(s=>s[5]).length}</b>deployed</span><span class="rv"><b>${SVC.filter(s=>!s[5]).length}</b>not deployed</span><span><b>${ready.length}</b>capabilities service-ready</span><span class="rv"><b>${L2.length-ready.length}</b>waiting on a service</span><span class="rv"><b>${conflict.length}</b>CV-2 status to correct</span>`;
+
+// Matrix with a family header row
+const fams=[...new Set(SVC.map(s=>s[2]))];
+const mx=document.getElementById('mx');
+const offCol=SVC.filter(s=>!s[5]).map(s=>s[0]);
+mx.innerHTML=`<thead><tr class="fam"><th class="rowh" rowspan="2">Capability (CV-2)</th>${fams.map(f=>`<th colspan="${SVC.filter(s=>s[2]===f).length}">${esc(f)}</th>`).join('')}<th class="st" rowspan="2">Services</th></tr>
+<tr class="cols">${SVC.map(s=>`<th class="colh" data-a="${s[0]}" ${s[5]?'':'style="background:color-mix(in srgb,var(--review) 12%,var(--zone))"'}><button type="button" aria-pressed="false"><span class="cid">${s[0]}</span><span class="nm">${esc(s[1])}</span></button></th>`).join('')}</tr></thead>
+<tbody>${L1.map(p=>`<tr class="grp"><th><span class="sw" style="background:var(--d-${p[2]});margin-right:6px"></span>${p[0]} ${esc(p[1])}</th><td colspan="${SVC.length+1}"></td></tr>`+
+ L2.filter(c=>c[0].startsWith(p[0]+'.')).map(c=>{const miss=missing(c[0]);return `<tr data-c="${c[0]}"><th class="rowh" tabindex="0"><span class="cid">${c[0]}</span>${esc(c[1])}</th>${SVC.map(s=>{const n=NEEDS[c[0]].includes(s[0]);
+   return `<td class="c ${n?(s[5]?'okc':'gap'):''}" data-a="${s[0]}" ${!s[5]&&!n?'style="background:color-mix(in srgb,var(--review) 5%,transparent)"':''} title="${n?esc(s[1])+(s[5]?' · deployed':' · not deployed'):''}">${n?(s[5]?'●':'○'):''}</td>`}).join('')}
+   <td class="st">${miss.length?`<span class="chip gap">Waiting on ${miss.join(', ')}</span>`:'<span class="chip ok">Ready</span>'}</td></tr>`}).join('')).join('')}</tbody>
+<tfoot><tr><th class="rowh">Capabilities using the service</th>${SVC.map(s=>`<td>${usedBy(s[0]).length}</td>`).join('')}<td></td></tr></tfoot>`;
+
+const detail=document.getElementById('detail');
+function showSvc(id){const s=svc(id),u=usedBy(id);
+  detail.innerHTML=`<div><span class="dom">Service · ${esc(s[2])}</span><h3>${id} · ${esc(s[1])}</h3><p>Provided by <b>${esc(s[3])}</b>. <span class="chip ${s[5]?'ok':'gap'}">${s[5]?'Deployed':'Not in topology'}</span></p></div>
+  <dl><dt>Interface</dt><dd><code>${esc(s[4])}</code></dd><dt>Needed by</dt><dd><ul>${u.map(c=>`<li>${c[0]} ${esc(c[1])}</li>`).join('')}</ul></dd></dl>
+  <dl><dt>If not deployed</dt><dd>${s[5]?'—':u.length+' '+(u.length===1?'capability waits':'capabilities wait')+' on it. Add a '+esc(s[3])+' in the Builder.'}</dd></dl>`}
+function showCap(id){const c=L2.find(x=>x[0]===id),p=parentOf(id),miss=missing(id);
+  detail.innerHTML=`<div><span class="dom" style="color:var(--d-${p[2]})">Capability · part of ${p[0]} ${esc(p[1])}</span><h3>${id} · ${esc(c[1])}</h3><p>CV-2 status <span class="chip ${c[2]}">${ST[c[2]]}</span> · services <span class="chip ${miss.length?'gap':'ok'}">${miss.length?'Waiting on '+miss.join(', '):'Ready'}</span></p></div>
+  <dl><dt>Needs</dt><dd><ul>${NEEDS[id].map(s=>`<li><span class="dot ${svc(s)[5]?'ok':'plan'}"></span> ${s} ${esc(svc(s)[1])} · ${esc(svc(s)[3])}</li>`).join('')}</ul></dd></dl>
+  <dl><dt>To make it ready</dt><dd>${miss.length?'Add '+miss.map(s=>esc(svc(s)[3])).join(' and ')+' to the topology.':'Nothing. Every service is deployed.'}</dd></dl>`}
+let current=null;
+function select(k){current=k;mx.classList.add('focused');
+  mx.querySelectorAll('tbody tr[data-c]').forEach(r=>r.classList.toggle('on',k[0]==='C'?r.dataset.c===k:NEEDS[r.dataset.c].includes(k)));
+  mx.querySelectorAll('[data-a]').forEach(e=>e.classList.toggle('col-on',e.dataset.a===k));
+  mx.querySelectorAll('th.colh').forEach(h=>{h.classList.toggle('sel',h.dataset.a===k);h.querySelector('button').setAttribute('aria-pressed',String(h.dataset.a===k))});
+  document.querySelectorAll('#svc tbody tr').forEach(r=>r.classList.toggle('sel',k[0]==='S'?r.dataset.s===k:NEEDS[k].includes(r.dataset.s)));
+  k[0]==='C'?showCap(k):showSvc(k)}
+function clear(){current=null;mx.classList.remove('focused');document.querySelectorAll('.on,.col-on,.sel').forEach(e=>e.classList.remove('on','col-on','sel'));showSvc('S12')}
+mx.querySelectorAll('th.colh button').forEach(b=>b.addEventListener('click',()=>{const a=b.parentElement.dataset.a;current===a?clear():select(a)}));
+mx.querySelectorAll('tbody tr[data-c] th.rowh').forEach(h=>{const c=h.parentElement.dataset.c;h.addEventListener('click',()=>current===c?clear():select(c));h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();current===c?clear():select(c)}})});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)clear()});
+
+document.querySelector('#svc tbody').innerHTML=SVC.map(s=>`<tr data-s="${s[0]}"><td class="id">${s[0]}</td><td>${esc(s[1])}</td><td>${esc(s[3])}</td><td class="mono">${esc(s[4])}</td><td class="mono">${usedBy(s[0]).map(c=>c[0]).join(', ')}</td><td><span class="chip ${s[5]?'ok':'gap'}">${s[5]?'Deployed':'Not deployed'}</span></td></tr>`).join('');
+document.querySelectorAll('#svc tbody tr').forEach(r=>r.addEventListener('click',()=>current===r.dataset.s?clear():select(r.dataset.s)));
+
+const blockers=SVC.filter(s=>!s[5]).map(s=>[s,usedBy(s[0])]).sort((a,b)=>b[1].length-a[1].length);
+document.getElementById('findings').innerHTML=[
+ ['stop','Biggest gap',`<b>S12 Correlation and risk</b> (Enterprise Security) is not deployed, and ${blockers[0][1].length} capabilities wait on it: ${blockers[0][1].map(c=>c[0]).join(', ')}. Adding it unblocks most of goal G2.`],
+ ...conflict.map(c=>['gap','Correct CV-2',`<b>${c[0]} ${esc(c[1])}</b> is marked "In topology" in CV-2, but it needs ${missing(c[0]).map(s=>s+' '+esc(svc(s)[1])).join(', ')}, which is not deployed. SOAR is there, but no findings reach it without ES. Mark it Partial.`]),
+ ['part','Planned',`<b>S6, S8, S11 and S16</b> match the CV-1 roadmap: Edge Processor and replication in Increment 3, search head clustering in Increment 3, the Monitoring Console in Increment 2.`],
+ ['ok','Shared',`<b>S9 Search and REST API</b> is used by ${usedBy('S9').length} capabilities and <b>S7 Indexing</b> by ${usedBy('S7').length}. They are the most shared services; their availability targets come from G4.`]
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+clear();
+</script>
+
+</body>
+</html>

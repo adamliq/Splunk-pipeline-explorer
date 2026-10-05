@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>CV-6 Capability to Activities</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV, DIV-1 and CV mockups. Banners, title block, purpose, a detail
+   strip for the selected row or column, then the capability × operational activity matrix (CV-2 parts down, OV-5 activities across) with a coverage row, and the findings.
+   Colour encodes the capability domain; amber marks gaps, partial or planned items. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.sw{width:12px;height:12px;border-radius:2px;display:inline-block;vertical-align:-1px}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.part,.chip.plan,.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+
+/* Detail strip */
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px 16px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.3fr) minmax(0,1fr);gap:12px 22px;min-height:132px}
+@media (max-width:960px){.detail{grid-template-columns:1fr}}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:4px 0 6px;font:700 1.16rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.86rem;line-height:1.5}
+.detail dl{margin:0;display:grid;gap:7px;align-content:start}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.85rem}
+.detail ul{margin:2px 0 0;padding:0;list-style:none;display:grid;gap:4px;font-size:.84rem}
+.detail code{font:500 .76rem var(--font-code);background:var(--zone);padding:1px 5px;border-radius:3px}
+
+/* Matrix */
+.mwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.mx{border-collapse:separate;border-spacing:0;width:100%;font-size:.8rem}
+.mx th,.mx td{border-bottom:1px solid var(--rule);padding:0}
+.mx thead th{background:var(--zone);font:600 .62rem/1.2 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);vertical-align:bottom}
+.mx thead tr.fam th{border-bottom:0;padding:7px 6px 2px;text-align:center;border-left:1px solid var(--rule)}
+.mx thead tr.fam th:first-child{border-left:0}
+.mx thead tr.cols th{padding:4px 4px 8px}
+.mx th.colh{width:52px;min-width:52px;text-align:center;border-left:1px solid var(--rule);cursor:pointer}
+.mx th.colh button{all:unset;cursor:pointer;display:grid;gap:3px;justify-items:center;width:100%;padding:2px 0}
+.mx th.colh .cid{font:600 .66rem var(--font-code);color:var(--ink)}
+.mx th.colh .nm{font:500 .62rem/1.2 var(--font-body);letter-spacing:0;text-transform:none;color:var(--ink-2);max-width:56px;text-wrap:balance}
+.mx th.colh button:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+.mx th.rowh{position:sticky;left:0;z-index:1;background:var(--sheet);text-align:left;font-weight:400;padding:6px 10px;min-width:220px;border-right:1px solid var(--rule);cursor:pointer}
+.mx thead th.rowh{background:var(--zone);vertical-align:bottom;padding:8px 10px}
+.mx th.rowh .cid{font:600 .7rem var(--font-code);color:var(--muted);margin-right:6px}
+.mx th.rowh .dot{margin-left:6px}
+.mx tr.grp th,.mx tr.grp td{background:var(--zone);font:700 .78rem var(--font-title);padding:5px 10px}
+.mx tr.grp th{position:sticky;left:0;z-index:1;text-align:left;white-space:nowrap}
+.mx td.c{text-align:center;border-left:1px solid var(--rule);font:600 .95rem/1 var(--font-code);height:30px}
+.mx td.c.p{color:var(--ink)}
+.mx td.c.s{color:var(--muted)}
+.mx td.c.gap{color:var(--review);background:color-mix(in srgb,var(--review) 9%,transparent)}
+.mx td.c.okc{color:var(--ok)}
+.mx td.st{padding:6px 10px;white-space:nowrap;border-left:1px solid var(--rule)}
+.mx tfoot td,.mx tfoot th{background:var(--zone);padding:6px 4px;text-align:center;font:600 .66rem/1.3 var(--font-code);border-bottom:0;border-top:1px solid var(--rule)}
+.mx tfoot th.rowh{text-align:left;padding:6px 10px;background:var(--zone)}
+.mx tfoot td{border-left:1px solid var(--rule)}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;vertical-align:1px}
+.dot.ok{background:var(--ok)}.dot.part{background:var(--review)}.dot.plan{border:1.5px solid var(--review)}
+.mx tbody tr:not(.grp):hover th.rowh,.mx tbody tr:not(.grp):hover td{background-color:var(--hi)}
+.mx.focused tbody tr:not(.grp):not(.on){opacity:.35}
+.mx.focused .col-on{background-color:color-mix(in srgb,var(--sel) 10%,transparent)}
+.mx tr.on th.rowh{box-shadow:inset 3px 0 0 var(--sel)}
+.mx th.colh.sel{box-shadow:inset 0 -3px 0 var(--sel)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.78rem;color:var(--ink-2)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend b{font:600 .95rem var(--font-code)}
+
+/* Findings */
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tr:last-child td{border-bottom:0}
+.reg tbody tr{cursor:pointer}
+.reg tbody tr:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.mx tbody tr{transition:opacity .15s}}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="cvTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="cvTitle">CV-6 · Capability to Operational Activities Mapping</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Capability (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">Capability owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>Which capabilities carry out each operational activity, so every activity in OV-5 has a capability behind it and every capability does real work. Activities are the ones the OV-2 operational nodes perform; capabilities are the CV-2 level-2 parts.</p></div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="detail" id="detail" aria-live="polite"></div>
+
+      <div class="legend">
+        <span><b>●</b>performs the activity</span>
+        <span><b style="color:var(--muted)">○</b>supports it</span>
+        <span><b style="color:var(--review)">●</b>performs it, but the capability is partial or planned</span>
+        <span><span class="dot ok"></span>in topology <span class="dot part"></span>partial <span class="dot plan"></span>planned</span>
+        <span>Click a row or an activity to trace it. Esc clears.</span>
+      </div>
+      <div class="mwrap"><table class="mx" id="mx"></table></div>
+
+      <div class="findings">
+        <h2>What the mapping shows</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Activities from OV-5 / OV-2 · Capabilities from CV-2</span><span>CV-6 · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+// Capabilities from CV-2: level 1 [id, name, domain], level 2 [id, name, status]
+const L1=[['C1','Telemetry collection','collect'],['C2','Fleet configuration','collect'],['C3','Indexing and retention','index'],['C4','Search and analytics','search'],
+  ['C5','Threat detection','detect'],['C6','Automated response','detect'],['C7','Identity and access','govern'],['C8','Platform health and licence','index']];
+const L2=[['C1.1','Network and syslog collection','ok'],['C1.2','Endpoint collection','ok'],['C1.3','Cloud and API collection','ok'],['C1.4','Filtering and masking at source','plan'],
+  ['C2.1','Configuration as code','ok'],['C2.2','Forwarder fleet health','ok'],
+  ['C3.1','Event indexing','ok'],['C3.2','Retention management','ok'],['C3.3','Data replication','part'],
+  ['C4.1','Ad hoc investigation','ok'],['C4.2','Normalised data (CIM)','ok'],['C4.3','Search high availability','part'],
+  ['C5.1','Correlation detections','plan'],['C5.2','Risk-based alerting','plan'],
+  ['C6.1','Case management','ok'],['C6.2','Playbook automation','ok'],
+  ['C7.1','Single sign-on','ok'],['C7.2','Data access control','ok'],['C7.3','Access review','ok'],
+  ['C8.1','Licence management','ok'],['C8.2','Health monitoring','part'],['C8.3','Capacity planning','ok']];
+const ST={ok:'In topology',part:'Partial',plan:'Planned'};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const parentOf=id=>L1.find(p=>p[0]===id.split('.')[0]);
+
+// Operational activities, as named on the OV-2 operational nodes
+const ACT=[
+ ['A1','Generate security telemetry','Security sources','Sources produce events. Done by the systems being monitored, outside the platform.'],
+ ['A2','Collect, buffer and forward','Collection','Pick up events at the source or site and hold them until they can be sent.'],
+ ['A3','Forward and deliver events','Collection','Deliver events reliably and securely to the indexing tier.'],
+ ['A4','Process and route events','Processing','Parse, filter, mask and route events before they are stored.'],
+ ['A5','Index and replicate','Indexing','Store events, keep them for the set retention and protect them against loss.'],
+ ['A6','Search and detect','Search and detection','Find events and raise findings from them.'],
+ ['A7','Manage the platform','Management','Configure, monitor and licence the platform.'],
+ ['A8','Authenticate and investigate','People','Sign analysts in, control what they can see and support investigation.'],
+ ['A9','Coordinate response','Response','Turn findings into cases and act on them.']
+];
+// p = performs, s = supports
+const MAP={
+ 'C1.1':{A1:'s',A2:'p',A3:'s'},'C1.2':{A1:'s',A2:'p',A3:'p'},'C1.3':{A1:'s',A2:'p',A3:'s'},'C1.4':{A4:'p'},
+ 'C2.1':{A7:'p',A2:'s'},'C2.2':{A7:'p',A2:'s'},
+ 'C3.1':{A5:'p',A4:'s'},'C3.2':{A5:'p',A7:'s'},'C3.3':{A5:'p'},
+ 'C4.1':{A6:'p',A8:'s'},'C4.2':{A6:'p',A4:'s'},'C4.3':{A6:'p'},
+ 'C5.1':{A6:'p'},'C5.2':{A6:'p',A8:'s'},
+ 'C6.1':{A9:'p',A8:'s'},'C6.2':{A9:'p'},
+ 'C7.1':{A8:'p'},'C7.2':{A8:'p',A6:'s'},'C7.3':{A7:'s',A8:'s'},
+ 'C8.1':{A7:'p'},'C8.2':{A7:'p',A5:'s'},'C8.3':{A7:'p'}
+};
+const statusOf=id=>L2.find(x=>x[0]===id)[2];
+function coverage(a){const per=L2.filter(c=>MAP[c[0]][a]==='p'),sup=L2.filter(c=>MAP[c[0]][a]==='s'),live=per.filter(c=>c[2]==='ok');
+  const state=a==='A1'?'ext':live.length?'ok':per.length?'gap':'stop';return {per,sup,live,state}}
+const COVTXT={ok:'Covered',gap:'Gap',stop:'No capability',ext:'Outside platform'};
+
+// Summary
+const cov=ACT.map(a=>coverage(a[0]));
+const idle=L2.filter(c=>!Object.values(MAP[c[0]]).includes('p'));
+document.getElementById('summary').innerHTML=`<span><b>${ACT.length}</b>operational activities</span><span><b>${L2.length}</b>capabilities</span><span><b>${Object.values(MAP).reduce((n,m)=>n+Object.keys(m).length,0)}</b>mappings</span><span><b>${cov.filter(c=>c.state==='ok').length}</b>activities covered today</span><span class="rv"><b>${cov.filter(c=>c.state==='gap').length}</b>activity with a gap</span><span><b>1</b>outside the platform</span><span><b>${idle.length}</b>${idle.length===1?'capability that only supports':'capabilities that only support'}</span>`;
+
+// Matrix
+const mx=document.getElementById('mx');
+mx.innerHTML=`<thead><tr class="cols"><th class="rowh">Capability (CV-2)</th>${ACT.map(a=>`<th class="colh" data-a="${a[0]}"><button type="button" aria-pressed="false"><span class="cid">${a[0]}</span><span class="nm">${esc(a[1])}</span></button></th>`).join('')}<th class="st">Status</th></tr></thead>
+<tbody>${L1.map(p=>`<tr class="grp"><th><span class="sw" style="background:var(--d-${p[2]});margin-right:6px"></span>${p[0]} ${esc(p[1])}</th><td colspan="${ACT.length+1}"></td></tr>`+
+ L2.filter(c=>c[0].startsWith(p[0]+'.')).map(c=>`<tr data-c="${c[0]}"><th class="rowh" tabindex="0"><span class="cid">${c[0]}</span>${esc(c[1])}</th>${ACT.map(a=>{const v=MAP[c[0]][a[0]];
+   return `<td class="c ${v||''} ${v==='p'&&c[2]!=='ok'?'gap':''}" data-a="${a[0]}" title="${v?(v==='p'?'Performs':'Supports')+' '+esc(a[1]):''}">${v==='p'?'●':v==='s'?'○':''}</td>`}).join('')}<td class="st"><span class="dot ${c[2]}"></span> ${ST[c[2]]}</td></tr>`).join('')).join('')}</tbody>
+<tfoot><tr><th class="rowh">Activity coverage today</th>${cov.map(c=>`<td><span class="chip ${c.state}">${COVTXT[c.state]}</span><br>${c.per.length} ● · ${c.sup.length} ○</td>`).join('')}<td></td></tr></tfoot>`;
+
+// Detail
+const detail=document.getElementById('detail');
+function showAct(a){const act=ACT.find(x=>x[0]===a),c=coverage(a);
+  detail.innerHTML=`<div><span class="dom">Operational activity · ${esc(act[2])} node</span><h3>${a} · ${esc(act[1])}</h3><p>${esc(act[3])}</p></div>
+  <dl><dt>Performed by</dt><dd>${c.per.length?`<ul>${c.per.map(x=>`<li><span class="dot ${x[2]}"></span> ${x[0]} ${esc(x[1])}${x[2]!=='ok'?' <span class="chip '+x[2]+'">'+ST[x[2]]+'</span>':''}</li>`).join('')}</ul>`:'<span class="chip ext">None</span>'}</dd></dl>
+  <dl><dt>Supported by</dt><dd>${c.sup.length?`<ul>${c.sup.map(x=>`<li>${x[0]} ${esc(x[1])}</li>`).join('')}</ul>`:'—'}</dd><dt>Coverage today</dt><dd><span class="chip ${c.state}">${COVTXT[c.state]}</span></dd></dl>`}
+function showCap(id){const c=L2.find(x=>x[0]===id),p=parentOf(id),m=MAP[id];
+  const pe=ACT.filter(a=>m[a[0]]==='p'),su=ACT.filter(a=>m[a[0]]==='s');
+  detail.innerHTML=`<div><span class="dom" style="color:var(--d-${p[2]})">Capability · part of ${p[0]} ${esc(p[1])}</span><h3>${id} · ${esc(c[1])}</h3><p>Status in the Builder topology: <span class="chip ${c[2]}">${ST[c[2]]}</span></p></div>
+  <dl><dt>Performs</dt><dd>${pe.length?`<ul>${pe.map(a=>`<li>${a[0]} ${esc(a[1])}</li>`).join('')}</ul>`:'Nothing on its own'}</dd></dl>
+  <dl><dt>Supports</dt><dd>${su.length?`<ul>${su.map(a=>`<li>${a[0]} ${esc(a[1])}</li>`).join('')}</ul>`:'—'}</dd></dl>`}
+let current=null;
+function select(k){current=k;mx.classList.add('focused');
+  mx.querySelectorAll('tbody tr[data-c]').forEach(r=>r.classList.toggle('on',k[0]==='C'?r.dataset.c===k:!!MAP[r.dataset.c][k]));
+  mx.querySelectorAll('[data-a]').forEach(e=>{e.classList.toggle('col-on',e.dataset.a===k)});
+  mx.querySelectorAll('th.colh').forEach(h=>{h.classList.toggle('sel',h.dataset.a===k);h.querySelector('button').setAttribute('aria-pressed',String(h.dataset.a===k))});
+  k[0]==='C'?showCap(k):showAct(k)}
+function clear(){current=null;mx.classList.remove('focused');mx.querySelectorAll('.on,.col-on,.sel').forEach(e=>e.classList.remove('on','col-on','sel'));showAct('A4')}
+mx.querySelectorAll('th.colh button').forEach(b=>b.addEventListener('click',()=>{const a=b.parentElement.dataset.a;current===a?clear():select(a)}));
+mx.querySelectorAll('tbody tr[data-c] th.rowh').forEach(h=>{const c=h.parentElement.dataset.c;h.addEventListener('click',()=>current===c?clear():select(c));h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();current===c?clear():select(c)}})});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)clear()});
+
+// Findings
+document.getElementById('findings').innerHTML=[
+ ['gap','Gap','<b>A4 Process and route events</b> is performed only by C1.4 Filtering and masking at source, which is planned for Increment 3. Until then, parsing happens at index time (C3.1) and in CIM mapping (C4.2), and PII reaches the indexers unmasked.'],
+ ['ext','By design','<b>A1 Generate security telemetry</b> is done by the monitored systems. The collection capabilities only support it, by defining what each source must send.'],
+ ['part','Partial','<b>A6 Search and detect</b> is covered for search (C4.1, C4.2) but not for detection: C5.1 and C5.2 are planned until Enterprise Security is added to the topology.'],
+ ['part','Partial','<b>A5 Index and replicate</b> is covered for indexing and retention, but replication (C3.3) is partial: one indexer, no cluster.'],
+ ['ok','Check',`<b>${idle.map(c=>c[0]).join(', ')||'None'}</b> ${idle.length===1?'performs':'perform'} no activity on its own. C7.3 Access review supports A7 and A8; keep it, but give it an owner in A7 Manage the platform.`]
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+clear();
+</script>
+
+</body>
+</html>
