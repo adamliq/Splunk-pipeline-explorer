@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>OV-6a Operational Rules</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV, DIV, CV, SV and StdV mockups. Banners, title block, purpose, then
+   result tiles, a rules table filtered by type beside a detail panel with the check command, and findings. Amber marks planned or not set; red marks failures, data loss or blocked paths. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+.plane{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.model{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.model>*{min-width:0}
+@media (max-width:1150px){.model{grid-template-columns:1fr}}
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:9px;align-content:start}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:0;font:700 1.12rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.85rem}
+.detail dl{margin:0;display:grid;gap:7px}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.84rem}
+.detail ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:.84rem}
+.detail li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
+.detail code{font:500 .74rem var(--font-code);background:var(--zone);padding:1px 4px;border-radius:3px}
+.detail .hint{font-size:.78rem;color:var(--muted)}
+.headrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{font:600 .78rem var(--font-body);padding:6px 12px;border:0;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sheet)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg th.n,.reg td.n{text-align:right}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tbody tr:last-child td{border-bottom:0}
+.reg td.n{font:500 .76rem var(--font-code);font-variant-numeric:tabular-nums;white-space:nowrap}
+.reg tbody tr[data-k]{cursor:pointer}
+.reg tbody tr[data-k]:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+.filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.filters .lbl{font:600 .62rem var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.filters button{font:600 .74rem var(--font-body);padding:5px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.filters button[aria-pressed="true"]{border-color:var(--sel);color:var(--ink);background:color-mix(in srgb,var(--sel) 10%,var(--sheet))}
+.res{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.res{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.res button{all:unset;cursor:pointer;border:1px solid var(--rule);border-top:3px solid var(--rc);border-radius:4px;background:var(--sheet);padding:9px 12px;display:grid;gap:2px}
+.res button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--sel)}
+.res b{font:600 1.5rem/1 var(--font-title);font-variant-numeric:tabular-nums}
+.res span{font-size:.78rem;color:var(--ink-2)}
+.reg td.stmt{min-width:300px}
+.reg td.stmt b{font-weight:600}
+.type{font:600 .62rem var(--font-code);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap}
+.detail pre{margin:0;font:500 .72rem/1.45 var(--font-code);background:var(--zone);border:1px solid var(--rule);border-radius:3px;padding:8px;white-space:pre-wrap;overflow-wrap:anywhere}
+.empty{padding:16px;color:var(--muted)}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="sTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="sTitle">OV-6a · Operational Rules Model</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Operational (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">Accountable</span><span class="tb-v">Security telemetry service owner</span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>The rules the people and teams running the platform must follow: how sources are onboarded, how findings are handled, who may see PII and how long data is kept. Each rule names the activity and team it binds, where it comes from, how it is enforced and how to show it is being followed.</p></div>
+
+      <div class="res" id="res" role="group" aria-label="Filter by result"></div>
+
+      <div class="toolbar"><div class="filters" id="types"></div></div>
+
+      <div class="model">
+        <div class="tablewrap"><table class="reg" id="rules"></table></div>
+        <aside class="detail" id="detail" aria-live="polite"></aside>
+      </div>
+
+      <div class="findings">
+        <h2>What the rules show</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Accountable: security telemetry service owner · Activities from OV-5a; teams from OV-4</span><span>OV-6a · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// id, type, statement, applies to, source, check method ('builder' | 'btool' | 'search' | 'review'), check text, result, evidence
+const RULES=[
+ ['OR-01','Action','Every high or critical finding is triaged within 30 minutes, 24 hours a day.','A9 · SOC analysts','CV-1 G2','splunk','ES Incident Review: time from notable creation to status "In progress"\n`notable` | eval ttt=status_time-_time | stats p95(ttt) by urgency','na','No findings exist yet: correlation searches need Enterprise Security.'],
+ ['OR-02','Action','A log source is onboarded only through an approved request that names its owner and data classification.','A2 · Log onboarding team','Change management','procedure','Onboarding requests in the service desk, matched to new sourcetypes:\n| tstats earliest(_time) as first where index=* by sourcetype','warn','Windows Event Log 1 is in the topology without an owner or a request.'],
+ ['OR-03','Structural','Every log source has a named owning team.','A1 · Source owners','OV-4','procedure','Builder: the owner field on each source node.','fail','Windows Event Log 1 has no owner (OV-4).'],
+ ['OR-04','Action','Only incident responders may view PII, and only during an open investigation; every view is logged.','A8 · SOC, Identity team','Privacy Act APP 11','audit','index=_audit action=search info=granted search="*auth_pii*"\n| stats count by user roles','unknown','Roles are in place (soc_pii_reader); the audit search has not been run.'],
+ ['OR-05','Action','Logging on a source is disabled only through an approved change, and the SOC is told before it stops.','A1, A7 · Source owners, Platform','ISM system monitoring','procedure','Change records tagged "logging", matched to sources that went quiet.','unknown','No change records are linked to the topology.'],
+ ['OR-06','Derivation','A finding\'s priority is its severity combined with the criticality of the asset and identity involved.','A6 · Detection engineering','CV-2 C5.2','splunk','ES urgency matrix; asset and identity lookups.','na','Needs Enterprise Security and asset and identity lists.'],
+ ['OR-07','Action','A source that sends nothing for more than 4 hours is raised as an incident to its owner.','A7 · Splunk platform team','ISM system monitoring','splunk','| tstats latest(_time) as last where index=* by host\n| where last < relative_time(now(),"-4h")','fail','No missing-source alert exists. Melbourne syslog and AWS events have never arrived and nobody was told.'],
+ ['OR-08','Structural','Every operational activity has exactly one accountable team.','All activities','OV-4','review','OV-4 responsibility matrix: count of A per row.','fail','Three activities have no one accountable (OV-4).'],
+ ['OR-09','Action','Security telemetry stays searchable for 365 days and archived for 7 years.','A5 · Splunk platform team','Retention policy','splunk','| rest /services/data/indexes | eval days=frozenTimePeriodInSecs/86400\n| table title days coldToFrozenDir','fail','90 days searchable today; frozen buckets are deleted, not archived (DIV-3, SV-10b).'],
+ ['OR-10','Action','Detection content is peer-reviewed and tested before it goes to production.','A6 · Detection engineering','Change management','procedure','Pull requests on the detection repository; ES content management history.','unknown','No detection repository is recorded.'],
+ ['OR-11','Action','Containing a production host needs an analyst\'s approval in the playbook.','A9 · SOC','Operational risk','splunk','SOAR playbook prompt block before the containment action; SOAR audit log.','na','No playbooks yet.'],
+ ['OR-12','Action','Every case closes with a ticket reference in the service desk.','A9 · SOC, Service desk','Service management','procedure','SOAR container field "ticket_id" not empty at closure.','fail','No interface between SOAR and the ticketing system (RF-14).'],
+ ['OR-13','Derivation','Licence headroom is entitlement minus forecast ingest; a change adding more than 10 GB/day needs a licence check first.','A7 · Service owner, Platform','Licence agreement','splunk','index=_internal source=*license_usage.log type=RolloverSummary\n| eval pct=b/stacksz*100','warn','Over entitlement on 4 of the last 7 days (SV-7 M13); AWS onboarding adds about 22 GB/day.'],
+ ['OR-14','Structural','Every analyst account is personal; shared accounts only for break-glass.','A8 · Identity team','ISM access control','audit','| rest /services/authentication/users | table title type roles','pass','All sign-in is through SAML; break-glass tested.'],
+ ['OR-15','Action','Access to the platform is reviewed every quarter and leavers are removed.','A8 · Identity team, Service owner','ISM access control','review','Quarterly review record; _audit last sign-in per user.','fail','No access review on record (CV-2 C7.3 baseline is 0 a year).']
+];
+const RES={pass:['ok','Pass','var(--ok)'],fail:['stop','Fail','var(--stop)'],warn:['gap','Warning','var(--review)'],unknown:['ext','No evidence yet','var(--line)'],na:['ext','Not applicable yet','var(--rule)']};
+const METHOD={procedure:'Process record',splunk:'Enforced in Splunk or SOAR',audit:'Audit search',review:'Management review'};
+let fr=null,ft='all',current=null;
+function render(){const list=RULES.filter(r=>(!fr||r[7]===fr)&&(ft==='all'||r[1]===ft));
+  document.getElementById('rules').innerHTML=`<thead><tr><th>Rule</th><th>Type</th><th>Statement</th><th>Applies to</th><th>Checked by</th><th>Result</th></tr></thead><tbody>${list.length?list.map(r=>`<tr data-k="${r[0]}" tabindex="0"><td class="id">${r[0]}</td><td><span class="type">${r[1]}</span></td><td class="stmt">${esc(r[2])}</td><td>${esc(r[3])}</td><td>${METHOD[r[5]]}</td><td><span class="chip ${RES[r[7]][0]}">${RES[r[7]][1]}</span></td></tr>`).join(''):'<tr><td colspan="6" class="empty">No rules match these filters.</td></tr>'}</tbody>`;
+  document.querySelectorAll('#rules tbody tr[data-k]').forEach(t=>{t.classList.toggle('sel',t.dataset.k===current);t.addEventListener('click',()=>pick(t.dataset.k));t.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(t.dataset.k)}})});
+  document.querySelectorAll('#res button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.r===fr)));
+  document.querySelectorAll('#types button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.t===ft)))}
+document.getElementById('res').innerHTML=Object.entries(RES).map(([k,v])=>`<button type="button" data-r="${k}" style="--rc:${v[2]}" aria-pressed="false"><b>${RULES.filter(r=>r[7]===k).length}</b><span>${v[1]}</span></button>`).join('');
+document.querySelectorAll('#res button').forEach(b=>b.addEventListener('click',()=>{fr=fr===b.dataset.r?null:b.dataset.r;render()}));
+document.getElementById('types').innerHTML='<span class="lbl">Rule type</span>'+['all','Structural','Action','Derivation'].map(t=>`<button type="button" data-t="${t}">${t==='all'?'All':t} · ${t==='all'?RULES.length:RULES.filter(r=>r[1]===t).length}</button>`).join('');
+document.querySelectorAll('#types button').forEach(b=>b.addEventListener('click',()=>{ft=b.dataset.t;render()}));
+const detail=document.getElementById('detail');
+function show(k){const r=RULES.find(x=>x[0]===k);
+  detail.innerHTML=`<span class="dom">${r[1]} rule · from ${esc(r[4])}</span><h3>${r[0]}</h3><p>${esc(r[2])}</p>
+  <dl><dt>Applies to</dt><dd>${esc(r[3])}</dd><dt>Result on this topology</dt><dd><span class="chip ${RES[r[7]][0]}">${RES[r[7]][1]}</span> ${esc(r[8])}</dd><dt>Evidence · ${METHOD[r[5]]}</dt><dd><pre>${esc(r[6])}</pre></dd></dl>`}
+function intro(){const fails=RULES.filter(r=>r[7]==='fail'),out=RULES.filter(r=>r[7]==='unknown');
+  detail.innerHTML=`<span class="dom">Rule check</span><h3>${fails.length} rules not followed</h3><ul>${fails.map(r=>`<li><span class="chip stop">${r[0]}</span><span>${esc(r[8])}</span></li>`).join('')}</ul>
+  <p class="hint">${out.length} more have no evidence yet. Select a rule to see how to show it is followed. Esc clears.</p>`}
+function pick(k){current=current===k?null:k;current?show(k):intro();document.querySelectorAll('#rules tbody tr').forEach(t=>t.classList.toggle('sel',t.dataset.k===current))}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current){current=null;intro();render()}});
+const bc=RULES.filter(r=>r[5]==='builder');
+document.getElementById('findings').innerHTML=[
+ ['stop','Absence','<b>Nobody is told when a source goes quiet (OR-07).</b> Melbourne syslog and AWS events have never reached the indexer, and no rule or alert noticed. A missing-source search is the cheapest fix in the pack.'],
+ ['stop','Ownership','<b>Three rules fail on ownership</b>: a source with no owner (OR-03), activities with no accountable team (OR-08) and no access reviews (OR-15). They trace back to the empty owner fields in OV-4.'],
+ ['gap','Retention','<b>The retention rule (OR-09) fails twice</b>: 90 days instead of 365 searchable, and deletion instead of a 7-year archive.'],
+ ['ext','Waiting','<b>Three rules cannot apply until Enterprise Security and playbooks exist</b> (OR-01, OR-06, OR-11). Write their procedures now so the SLA timer and approvals are in place on day one.'],
+ ['ok','Access','<b>Personal accounts only (OR-14) is followed</b>, and the PII role is in place; OR-04 needs the audit search run to show it is used correctly.']
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+render();intro();
+</script>
+
+</body>
+</html>

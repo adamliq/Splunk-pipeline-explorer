@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>OV-6b Operational State Transitions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV, DIV, CV, SV and StdV mockups. Banners, title block, purpose, then
+   a state machine switch, the state diagram with instance badges beside a detail panel, the transition table, and findings. Amber marks planned or not set; red marks failures, data loss or blocked paths. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+.plane{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.model{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.model>*{min-width:0}
+@media (max-width:1150px){.model{grid-template-columns:1fr}}
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:9px;align-content:start}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:0;font:700 1.12rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.85rem}
+.detail dl{margin:0;display:grid;gap:7px}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.84rem}
+.detail ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:.84rem}
+.detail li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
+.detail code{font:500 .74rem var(--font-code);background:var(--zone);padding:1px 4px;border-radius:3px}
+.detail .hint{font-size:.78rem;color:var(--muted)}
+.headrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{font:600 .78rem var(--font-body);padding:6px 12px;border:0;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sheet)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg th.n,.reg td.n{text-align:right}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tbody tr:last-child td{border-bottom:0}
+.reg td.n{font:500 .76rem var(--font-code);font-variant-numeric:tabular-nums;white-space:nowrap}
+.reg tbody tr[data-k]{cursor:pointer}
+.reg tbody tr[data-k]:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+svg.sm{display:block;width:100%;min-width:860px;height:auto}
+.st{cursor:pointer}
+.st:focus{outline:none}
+.st rect{fill:var(--node);stroke:var(--line);stroke-width:1.3}
+.st.start rect{stroke-width:2.4}
+.st.bad rect{stroke:var(--stop);fill:color-mix(in srgb,var(--stop) 7%,var(--node))}
+.st .t{font:600 12.5px var(--font-title);fill:var(--ink)}
+.st .s{font:500 9.5px var(--font-code);fill:var(--muted)}
+.st .badge rect{fill:var(--sel);stroke:none}
+.st .badge text{font:600 9.5px var(--font-code);fill:var(--sheet)}
+.st .badge.warn rect{fill:var(--stop)}
+.st:focus-visible rect.box,.st.sel rect.box{stroke:var(--sel);stroke-width:2.6}
+.tr{cursor:pointer}
+.tr path.l{fill:none;stroke:var(--line);stroke-width:1.5}
+.tr .hd{fill:var(--line)}
+.tr text{font:500 10px var(--font-code);fill:var(--ink-2);paint-order:stroke;stroke:var(--zone);stroke-width:4px;stroke-linejoin:round}
+.tr .hit{fill:none;stroke:transparent;stroke-width:12}
+.dot0{fill:var(--ink)}
+svg.focused .st:not(.on){opacity:.3}
+svg.focused .tr:not(.on){opacity:.12}
+svg.focused .tr.on path.l{stroke:var(--sel);stroke-width:2.4}
+svg.focused .tr.on .hd{fill:var(--sel)}
+.inst{display:flex;flex-wrap:wrap;gap:8px}
+.inst span{border:1px solid var(--rule);border-radius:4px;padding:6px 9px;font-size:.8rem;background:var(--sheet)}
+.inst span b{font-weight:600}
+.inst span.bad{border-color:color-mix(in srgb,var(--stop) 55%,transparent);background:color-mix(in srgb,var(--stop) 6%,var(--sheet))}
+.ev{font:500 .74rem var(--font-code)}
+@media (prefers-reduced-motion:no-preference){.st,.tr{transition:opacity .15s}}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="sTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="sTitle">OV-6b · Operational State Transition Description</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Operational (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">Accountable</span><span class="tb-v">Security telemetry service owner</span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>How the things the teams manage move through their life: a finding from creation to closure, and a log source from request to retirement. Badges show where items in the current topology sit today.</p></div>
+
+      <div class="headrow">
+        <div class="seg" role="group" aria-label="State machine" id="machines"></div>
+        <span class="sub" style="margin:0" id="mnote"></span>
+      </div>
+
+      <div class="inst" id="inst"></div>
+
+      <div class="model">
+        <figure>
+          <div class="figscroll"><svg class="sm" id="sm" viewBox="0 0 1000 400" role="group"></svg></div>
+          <figcaption>
+            <span class="key"><svg width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="var(--ink)"/></svg>initial state</span>
+            <span class="key">Tags are transition IDs; the table below gives <span class="ev">event [guard] / action</span></span>
+            <span class="key"><svg width="22" height="14" aria-hidden="true"><rect x="1" y="2" width="20" height="10" rx="3" fill="color-mix(in srgb,var(--stop) 12%,transparent)" stroke="var(--stop)"/></svg>state to get out of quickly</span>
+            <span class="key">Click a state or a transition. Esc clears.</span>
+          </figcaption>
+        </figure>
+        <aside class="detail" id="detail" aria-live="polite"></aside>
+      </div>
+
+      <h2>Transition table</h2>
+      <div class="tablewrap"><table class="reg" id="trs"></table></div>
+
+      <div class="findings">
+        <h2>What the state models show</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Accountable: security telemetry service owner · Sources from the Builder reference topology</span><span>OV-6b · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// states: id, name, sub, x, y, bad; transitions: id, from, to, event, guard, action, bend
+const M={
+ finding:{name:'Finding and case',system:'SOC analysts and responders · ES Incident Review, SOAR',
+  note:'Targets from CV-1: triage within 30 minutes, contain high findings within 4 hours.',
+  start:'new',
+  states:[['new','New','notable created',40,60],['as','Assigned','owner set',250,60],['inv','Investigating','in progress',470,60],['con','Contained','threat stopped',740,60],['res','Resolved','root cause fixed',740,250],['clo','Closed','ticket reference',470,320],['fp','False positive','tuning request',220,230],['esc','Escalated','major incident',470,190,true]],
+  trs:[['F1','new','as','analyst takes it','within 30 min','set owner and urgency',0],['F2','as','inv','triage starts','','open SOAR case',0],['F3','inv','con','containment done','analyst approved (OR-11)','run playbook',0],['F4','con','res','fix confirmed','','record root cause',0],['F5','res','clo','case reviewed','ticket reference set (OR-12)','close case and ticket',0],['F6','inv','fp','not malicious','','request detection tuning',0],['F7','fp','clo','tuning logged','','close',0],['F8','inv','esc','impact high','major-incident criteria','page SOC manager',0],['F9','esc','con','contained','','',0]],
+  inst:[['Findings today','new','None: there are no correlation searches without Enterprise Security.',true]]},
+ source:{name:'Log source',system:'Source owners and the log onboarding team',
+  note:'Onboarding target: 10 business days from approval to live (OV-6c).',
+  start:'rq',
+  states:[['rq','Requested','owner, classification',40,170],['ap','Approved','service owner sign-off',250,170],['cf','Configuring','inputs, firewall rules',470,70],['va','Validating','events checked',740,70],['lv','Live','searchable, CIM-mapped',740,260],['dg','Degraded','no events for 4 h',470,260,true],['rt','Retired','source removed',470,345]],
+  trs:[['S1','rq','ap','request reviewed','owner and classification set (OR-02)','assign onboarding engineer',0],['S2','ap','cf','work starts','','raise firewall changes',0],['S3','cf','va','inputs deployed','','watch for first events',0],['S4','va','lv','events parsed and searchable','SOC sign-off','add to source inventory',0],['S5','va','cf','validation failed','','fix inputs or routing',-24],['S6','lv','dg','no events for 4 h','','raise incident to owner (OR-07)',14],['S7','dg','lv','events flowing again','','close incident',14],['S8','dg','rt','source decommissioned','','remove inputs',0],['S9','lv','rt','source decommissioned','change approved (OR-05)','remove inputs',0]],
+  inst:[['Firewalls and network devices','lv','Sydney syslog reaches Indexer 1.'],['Syslog Source 2 (Melbourne)','va','Configured, but nothing reaches the indexer (SI-13).',true],['AWS Lambda 1','cf','Increment 2: HEC ready, Heavy Forwarder output missing (SI-14).',true],['Windows Event Log 1','rq','No owner and no collector.',true]]}
+};
+const W=170,H=50;
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+const svg=document.getElementById('sm');let m='finding',current=null;
+function edge(s,t,bend,lf){lf=lf??0.5;const c1=[s[3]+W/2,s[4]+H/2],c2=[t[3]+W/2,t[4]+H/2],dx=c2[0]-c1[0],dy=c2[1]-c1[1],len=Math.hypot(dx,dy),nx=-dy/len,ny=dx/len;
+  const clip=(c,d)=>{const sx=d[0]?(W/2)/Math.abs(d[0]):Infinity,sy=d[1]?(H/2)/Math.abs(d[1]):Infinity,k=Math.min(sx,sy);return [c[0]+d[0]*k,c[1]+d[1]*k]};
+  const u=[dx/len,dy/len],p1=clip(c1,u),p2=clip(c2,[-u[0],-u[1]]);const o=[nx*bend,ny*bend];const a=[p1[0]+o[0],p1[1]+o[1]],b=[p2[0]+o[0],p2[1]+o[1]];
+  return {a,b,mid:[a[0]+(b[0]-a[0])*lf,a[1]+(b[1]-a[1])*lf],u}}
+function draw(){const M0=M[m];svg.innerHTML='';svg.classList.remove('focused');svg.setAttribute('aria-label',M0.name+' state machine');
+  const tG=el('g',{},svg),sG=el('g',{},svg);
+  const S=id=>M0.states.find(s=>s[0]===id);
+  M0.trs.forEach(tr=>{const e=edge(S(tr[1]),S(tr[2]),tr[6],tr[7]),g=el('g',{class:'tr'},tG);g.dataset.k=tr[0];
+    const end=[e.b[0]-e.u[0]*8,e.b[1]-e.u[1]*8];el('path',{class:'hit',d:`M${e.a.join(' ')} L${e.b.join(' ')}`},g);el('path',{class:'l',d:`M${e.a.join(' ')} L${end.join(' ')}`},g);
+    el('path',{class:'hd',d:`M${e.b[0]} ${e.b[1]} L${end[0]-e.u[1]*4.5} ${end[1]+e.u[0]*4.5} L${end[0]+e.u[1]*4.5} ${end[1]-e.u[0]*4.5}Z`},g);
+    const tw=tr[0].length*6.5+10;el('rect',{x:e.mid[0]-tw/2,y:e.mid[1]-8,width:tw,height:16,rx:8,style:'fill:var(--sheet);stroke:var(--line)'},g);el('text',{x:e.mid[0],y:e.mid[1]+3.5,'text-anchor':'middle',style:'stroke:none;font-weight:600'},g).textContent=tr[0];el('title',{},g).textContent=tr[0]+': '+tr[3]+(tr[4]?' ['+tr[4]+']':'')+(tr[5]?' / '+tr[5]:'');
+    g.addEventListener('click',()=>pick(tr[0]))});
+  const st0=S(M0.start);el('circle',{class:'dot0',cx:st0[3]+W/2,cy:st0[4]-24,r:7},sG);el('path',{d:`M${st0[3]+W/2} ${st0[4]-17} L${st0[3]+W/2} ${st0[4]-2}`,stroke:'var(--ink)','stroke-width':1.5},sG);
+  M0.states.forEach(s=>{const g=el('g',{class:'st'+(s[0]===M0.start?' start':'')+(s[5]?' bad':''),tabindex:0,role:'button','aria-label':s[1]},sG);g.dataset.k=s[0];
+    el('rect',{class:'box',x:s[3],y:s[4],width:W,height:H,rx:22},g);el('text',{class:'t',x:s[3]+W/2,y:s[4]+21,'text-anchor':'middle'},g).textContent=s[1];el('text',{class:'s',x:s[3]+W/2,y:s[4]+36,'text-anchor':'middle'},g).textContent=s[2];
+    const n=M0.inst.filter(i=>i[1]===s[0]);if(n.length){const bg=el('g',{class:'badge'+(n.some(i=>i[3])?' warn':'')},g);el('rect',{x:s[3]+W-26,y:s[4]-9,width:30,height:18,rx:9},bg);el('text',{x:s[3]+W-11,y:s[4]+4,'text-anchor':'middle'},bg).textContent=n.length}
+    g.addEventListener('click',()=>pick(s[0]));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(s[0])}})});
+  document.getElementById('mnote').textContent=M0.system+' · '+M0.note;
+  document.getElementById('inst').innerHTML=M0.inst.map(i=>`<span class="${i[3]?'bad':''}"><b>${esc(i[0])}</b> · ${esc(S(i[1])[1])}</span>`).join('');
+  document.getElementById('trs').innerHTML=`<thead><tr><th>ID</th><th>From</th><th>Event</th><th>Guard</th><th>Action</th><th>To</th></tr></thead><tbody>${M0.trs.map(t=>`<tr data-k="${t[0]}"><td class="id">${t[0]}</td><td>${esc(S(t[1])[1])}</td><td>${esc(t[3])}</td><td class="mono">${t[4]?esc(t[4]):'—'}</td><td>${t[5]?esc(t[5]):'—'}</td><td>${esc(S(t[2])[1])}</td></tr>`).join('')}</tbody>`;
+  document.querySelectorAll('#trs tbody tr').forEach(r=>r.addEventListener('click',()=>pick(r.dataset.k)));
+  document.querySelectorAll('#machines button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.m===m)));
+  current=null;intro()}
+const detail=document.getElementById('detail');
+function intro(){const M0=M[m];detail.innerHTML=`<span class="dom">${esc(M0.system)}</span><h3>${esc(M0.name)}</h3><p>${M0.states.length} states · ${M0.trs.length} transitions</p>
+  <dl><dt>Systems in this topology</dt><dd><ul>${M0.inst.map(i=>`<li><span class="chip ${i[3]?'stop':'ok'}">${esc(M0.states.find(s=>s[0]===i[1])[1])}</span><span><b>${esc(i[0])}</b> · ${esc(i[2])}</span></li>`).join('')}</ul></dd></dl><p class="hint">Select a state or transition. Esc clears.</p>`}
+function pick(k){const M0=M[m];if(current===k){current=null;svg.classList.remove('focused');svg.querySelectorAll('.on,.sel').forEach(e=>e.classList.remove('on','sel'));document.querySelectorAll('#trs tbody tr.sel').forEach(r=>r.classList.remove('sel'));intro();return}
+  current=k;svg.classList.add('focused');const tr=M0.trs.find(t=>t[0]===k);
+  const onS=new Set(tr?[tr[1],tr[2]]:[k]),onT=new Set(tr?[k]:M0.trs.filter(t=>t[1]===k||t[2]===k).map(t=>t[0]));if(!tr)M0.trs.filter(t=>t[1]===k||t[2]===k).forEach(t=>{onS.add(t[1]);onS.add(t[2])});
+  svg.querySelectorAll('.st').forEach(g=>{g.classList.toggle('on',onS.has(g.dataset.k));g.classList.toggle('sel',g.dataset.k===k)});
+  svg.querySelectorAll('.tr').forEach(g=>g.classList.toggle('on',onT.has(g.dataset.k)));
+  document.querySelectorAll('#trs tbody tr').forEach(r=>r.classList.toggle('sel',onT.has(r.dataset.k)));
+  const S=id=>M0.states.find(s=>s[0]===id);
+  if(tr)detail.innerHTML=`<span class="dom">Transition</span><h3>${tr[0]} · ${esc(S(tr[1])[1])} → ${esc(S(tr[2])[1])}</h3><dl><dt>Event</dt><dd>${esc(tr[3])}</dd><dt>Guard</dt><dd>${tr[4]?'<code>'+esc(tr[4])+'</code>':'—'}</dd><dt>Action</dt><dd>${tr[5]?esc(tr[5]):'—'}</dd></dl>`;
+  else{const s=S(k),here=M0.inst.filter(i=>i[1]===k);detail.innerHTML=`<span class="dom">State${s[5]?' · loses or stops data':''}</span><h3>${esc(s[1])}</h3><p>${esc(s[2])}</p><dl><dt>Leaves on</dt><dd><ul>${M0.trs.filter(t=>t[1]===k).map(t=>`<li><span class="id">${t[0]}</span><span>${esc(t[3])} → ${esc(S(t[2])[1])}</span></li>`).join('')||'<li><span></span><span>Final state</span></li>'}</ul></dd><dt>Systems here</dt><dd>${here.length?here.map(i=>`<b>${esc(i[0])}</b>: ${esc(i[2])}`).join('<br>'):'None'}</dd></dl>`}}
+document.getElementById('machines').innerHTML=Object.entries(M).map(([k,v])=>`<button type="button" data-m="${k}">${esc(v.name)}</button>`).join('');
+document.querySelectorAll('#machines button').forEach(b=>b.addEventListener('click',()=>{m=b.dataset.m;draw()}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)pick(current)});
+document.getElementById('findings').innerHTML=[
+ ['stop','Stuck','<b>Three of four sources are stuck before Live.</b> Melbourne syslog is stuck in Validating, AWS in Configuring and Windows in Requested. Each needs a different team: network, onboarding and an owner.'],
+ ['stop','Silent','<b>Validating has no exit when events never arrive.</b> S5 only fires if someone checks. With no missing-source alert (OV-6a OR-07), Melbourne has sat in Validating unnoticed.'],
+ ['gap','Findings','<b>The finding lifecycle is designed but unused.</b> Until Enterprise Security creates findings, F1 never fires and the 30-minute triage target cannot be measured.'],
+ ['ext','Guards','<b>Two guards are rules from OV-6a</b>: containment needs analyst approval (F3, OR-11) and closure needs a ticket reference (F5, OR-12). F5 cannot be met today because SOAR has no link to the service desk.']
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+draw();
+</script>
+
+</body>
+</html>
