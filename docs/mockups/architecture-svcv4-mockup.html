@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>SvcV-4 Services Functionality Description</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as every other view in the pack. Banners, title block, purpose, a thread
+   selector, the service function flow (SvcV-1 services as cards of functions, by layer left to right, platform services below)
+   joined by SvcV-6 flows, a detail strip, the function allocation table and findings. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+.plane{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.model{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.model>*{min-width:0}
+@media (max-width:1150px){.model{grid-template-columns:1fr}}
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:9px;align-content:start}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:0;font:700 1.12rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.85rem}
+.detail dl{margin:0;display:grid;gap:7px}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.84rem}
+.detail ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:.84rem}
+.detail li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
+.detail code{font:500 .74rem var(--font-code);background:var(--zone);padding:1px 4px;border-radius:3px}
+.detail .hint{font-size:.78rem;color:var(--muted)}
+.headrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{font:600 .78rem var(--font-body);padding:6px 12px;border:0;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sheet)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg th.n,.reg td.n{text-align:right}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tbody tr:last-child td{border-bottom:0}
+.reg td.n{font:500 .76rem var(--font-code);font-variant-numeric:tabular-nums;white-space:nowrap}
+.reg tbody tr[data-k]{cursor:pointer}
+.reg tbody tr[data-k]:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+.model.wide{grid-template-columns:1fr}
+.detail.row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:10px 22px;min-height:120px}
+@media (max-width:900px){.detail.row{grid-template-columns:1fr}}
+.detail li{display:flex;gap:8px;align-items:baseline}
+svg.v4{display:block;width:100%;min-width:1000px;height:auto}
+.band{font:600 9.5px var(--font-code);letter-spacing:.1em;text-transform:uppercase;fill:var(--muted)}
+.bandline{stroke:var(--rule);stroke-dasharray:4 4}
+.card rect.c{fill:var(--node);stroke:var(--rule)}
+.card rect.h{fill:var(--zone);stroke:none}
+.card.planned rect.c{stroke:var(--review);stroke-dasharray:4 3;fill:color-mix(in srgb,var(--review) 5%,var(--node))}
+.card.ext rect.c{fill:var(--zone);stroke:var(--line);stroke-dasharray:2 3}
+.card .ht{font:600 9.5px var(--font-code);fill:var(--ink-2)}
+.card.planned .ht{fill:var(--review)}
+.card .et{font:600 10.5px var(--font-title);fill:var(--ink-2)}
+.fn{cursor:pointer}
+.fn:focus{outline:none}
+.fn rect{fill:transparent}
+.fn:hover rect,.fn.sel rect{fill:var(--hi)}
+.fn:focus-visible rect{stroke:var(--sel);stroke-width:2}
+.fn text{font:500 10.5px var(--font-body);fill:var(--ink)}
+.fn circle.ok{fill:var(--ok)}
+.fn circle.partial{fill:var(--review)}
+.fn circle.planned{fill:var(--node);stroke:var(--review);stroke-width:1.5}
+.fn circle.none{fill:var(--stop)}
+.fn.none text{fill:var(--stop)}
+.lk path{fill:none;stroke:var(--line);stroke-width:1.6}
+.lk .hd{fill:var(--line);stroke:none}
+.lk.gap path{stroke:var(--review)}
+.lk.gap .hd{fill:var(--review)}
+.lk.planned path{stroke:var(--review);stroke-dasharray:4 3}
+.lk.planned .hd{fill:var(--review)}
+.lk.missing path{stroke:var(--stop);stroke-dasharray:6 4}
+.lk.missing .hd{fill:var(--stop)}
+.lk.platform path{stroke-width:1.2}
+.lk text{font:600 9px var(--font-code);fill:var(--ink-2);paint-order:stroke;stroke:var(--zone);stroke-width:4px;stroke-linejoin:round}
+svg.focused .lk:not(.on){opacity:.1}
+svg.focused .fn:not(.on){opacity:.3}
+svg.focused .card:not(.on) .ht,svg.focused .card:not(.on) .et{opacity:.4}
+svg.focused .lk.on:not(.missing):not(.planned):not(.gap) path{stroke:var(--sel);stroke-width:2.2}
+svg.focused .lk.on:not(.missing):not(.planned):not(.gap) .hd{fill:var(--sel)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.toolbar .note{font-size:.8rem;color:var(--ink-2)}
+table.al{border-collapse:separate;border-spacing:0;width:100%;font-size:.8rem}
+.al th,.al td{border-bottom:1px solid var(--rule);padding:6px 9px;text-align:left;vertical-align:top}
+.al thead th{background:var(--zone);font:600 .6rem/1.2 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.al tr.grp td{background:var(--zone);font:700 .78rem var(--font-title);padding:5px 9px}
+.al tbody tr[data-k]{cursor:pointer}
+.al tbody tr[data-k]:hover,.al tbody tr.sel{background:var(--hi)}
+.al td.fnn{min-width:190px}
+.al td .mono{font:500 .72rem var(--font-code);white-space:nowrap}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:0}
+.dot.ok{background:var(--ok)}.dot.partial{background:var(--review)}.dot.planned{border:1.5px solid var(--review)}.dot.none{background:var(--stop)}
+@media (prefers-reduced-motion:no-preference){.fn,.lk{transition:opacity .15s}}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="sTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="sTitle">SvcV-4 · Services Functionality Description</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Services (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">Service owner</span><span class="tb-v">Security telemetry service owner</span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>The functions each SvcV-1 service performs and how the SvcV-6 flows join them, function to function. It shows which function in each service sends or receives a flow, and which functions are missing.</p></div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="toolbar">
+        <div class="seg" role="group" aria-label="Thread">
+          <button type="button" data-t="all" aria-pressed="true">All flows</button>
+          <button type="button" data-t="in" aria-pressed="false">Telemetry in</button>
+          <button type="button" data-t="det" aria-pressed="false">Detect and respond</button>
+          <button type="button" data-t="plat" aria-pressed="false">Platform</button>
+        </div>
+        <span class="note" id="tNote"></span>
+      </div>
+
+      <div class="model wide">
+        <figure>
+          <div class="figscroll"><svg class="v4" id="v4" viewBox="0 0 1260 476" role="group" aria-label="Service functions by layer, joined by service flows"></svg></div>
+          <figcaption>
+            <span class="key"><span class="dot ok"></span>realised</span>
+            <span class="key"><span class="dot partial"></span>partly realised</span>
+            <span class="key"><span class="dot planned"></span>planned</span>
+            <span class="key"><span class="dot none"></span>needed, not realised</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--review)" stroke-width="1.6" stroke-dasharray="4 3"/></svg>planned or inferred flow</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--stop)" stroke-width="1.6" stroke-dasharray="6 4"/></svg>missing flow</span>
+            <span class="key">Labels are SvcV-6 flows. Platform flows join whole services.</span>
+          </figcaption>
+        </figure>
+        <aside class="detail row" id="detail" aria-live="polite"></aside>
+      </div>
+
+      <h2>Function allocation</h2>
+      <p class="sub">Every service function with the flows it receives and sends, the OV-5 activity it supports (SvcV-5) and how it is realised in Splunk.</p>
+      <div class="tablewrap"><table class="al" id="alloc"></table></div>
+
+      <div class="findings">
+        <h2>What the view shows</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Services from SvcV-1 · Flows from SvcV-6 · Activities from OV-5a and SvcV-5</span><span>SvcV-4 · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// Services: id, name, layer, deployed, column, y
+const SVC=[
+ ['S3','Syslog reception','Collection',1,1,40],['S4','HTTP Event Collector','Collection',1,1,160],
+ ['S1','Universal forwarding','Collection',1,2,40],['S2','Heavy forwarding and parsing','Collection',1,2,150],['S6','Edge pipelines','Collection',0,2,262],
+ ['S7','Indexing','Indexing',1,3,40],['S8','Index replication','Indexing',0,3,214],
+ ['S9','Search and REST API','Search',1,4,40],['S10','Data model acceleration','Search',1,4,170],['S11','Search head clustering','Search',0,4,256],
+ ['S12','Correlation and risk','Detection and response',0,5,150],['S13','Cases and playbooks','Detection and response',1,5,246],
+ ['S5','Deployment','Platform and access',1,2,388],['S15','Licence management','Platform and access',1,3,388],['S16','Platform monitoring','Platform and access',1,4,388],['S14','SAML sign-in','Platform and access',1,5,388]
+];
+const EXT=[['X:net','Network devices',0,58],['X:aws','AWS workloads',0,178],['X:soc','SOC analysts',6,80],['X:desk','Service desk',6,308]];
+// Functions: id, name, status (ok | partial | planned | none), OV-5 activity, how it is realised
+const FN=[
+ ['S3.1','Receive syslog','partial','A2','rsyslog or syslog-ng on 514/6514. Some devices still send UDP 514, so events and PII cross the LAN in clear text.'],
+ ['S3.2','Write host files','ok','A2','One file per sending host under /var/log/remote; log rotation keeps 2 days for the forwarder to read.'],
+ ['S4.1','Accept HEC events','ok','A2','HEC on 8088 over TLS with one token per source; indexer acknowledgement off for Lambda batches.'],
+ ['S4.2','Queue to parser','ok','A4','Events go straight into the parsing pipeline on the same heavy forwarder.'],
+ ['S1.1','Tail host files','ok','A2','inputs.conf [monitor://] on the syslog files; CRC salt per host.'],
+ ['S1.2','Forward raw (S2S)','partial','A3','outputs.conf tcpout with useACK. Universal Forwarder 2 has no output target (SI-13), so Melbourne events stay on disk.'],
+ ['S1.3','Read event logs','none','A2','[WinEventLog://] stanzas would read Windows Event Log 1, but no forwarder is attached to it.'],
+ ['S2.1','Parse, timestamp','ok','A4','LINE_BREAKER, TIME_FORMAT and TZ in props.conf on Heavy Forwarder 1.'],
+ ['S2.2','Mask PII','ok','A4','SEDCMD and index-time transforms mask account and email fields before forwarding.'],
+ ['S2.3','Forward cooked','none','A3','tcpout target group with no destination: SI-14 to Indexer 1 is missing, so the masked AWS events go nowhere.'],
+ ['S6.1','Filter at the edge','planned','A4','Edge Processor pipelines (SPL2) to drop and mask before the WAN. Increment 3.'],
+ ['S7.1','Receive S2S','partial','A3','splunktcp on 9997 with TLS. Receives Sydney only: SF-03 is half connected and SF-06 is missing.'],
+ ['S7.2','Parse raw, mask','ok','A4','Parses the raw syslog stream from the universal forwarders; masks PII with its own copy of the transforms.'],
+ ['S7.3','Write, roll buckets','ok','A5','Journal and tsidx; hot → warm → cold → frozen per indexes.conf (DIV-3 retention).'],
+ ['S7.4','Serve search','ok','A6','Runs the map phase of every search dispatched by Search Head 1.'],
+ ['S7.5','Store summaries','ok','A6','Holds data model acceleration summaries next to the buckets.'],
+ ['S7.6','Report licence use','partial','A7','license_usage.log to License Manager 1. The interface (SI-16) is inferred, not in the topology.'],
+ ['S8.1','Replicate buckets','planned','A5','Indexer cluster with replication factor 2. Increment 3.'],
+ ['S9.1','Dispatch, merge','ok','A6','Sends each search to the peers and merges the results (reduce).'],
+ ['S9.2','Serve dashboards','ok','A6','Dashboards, saved searches and the REST API for analysts; PII only for soc_pii_reader.'],
+ ['S9.3','Run schedules','planned','A6','The scheduler can run searches today, but the correlation searches it should feed to S12 do not exist.'],
+ ['S9.4','Check SAML session','ok','A8','Validates the signed assertion and maps SAML groups to Splunk roles.'],
+ ['S10.1','Build CIM summaries','ok','A6','Accelerated CIM data models (Authentication, Network Traffic, Endpoint).'],
+ ['S10.2','Serve tstats','planned','A6','tstats over the summaries for correlation searches. Nothing consumes it yet.'],
+ ['S11.1','Replicate config','planned','A6','Search head cluster captain replicates knowledge objects. Increment 3.'],
+ ['S12.1','Correlate events','none','A6','Enterprise Security correlation searches. No component exists in the topology.'],
+ ['S12.2','Raise risk findings','none','A9','Risk-based alerting and notable events sent to SOAR. Not realised.'],
+ ['S13.1','Ingest findings','none','A9','SOAR containers from Splunk findings. No producer exists, so nothing arrives.'],
+ ['S13.2','Run playbooks','partial','A9','Playbooks can be started by hand; none start automatically.'],
+ ['S13.3','Update tickets','none','A9','REST updates to the service desk. Not designed (RF-14).'],
+ ['S5.1','Serve app bundles','ok','A7','Server classes push inputs and outputs apps on phone-home every 60 s.'],
+ ['S14.1','Issue SAML assertion','ok','A8','Identity provider with MFA signs assertions for Search Head 1 and SOAR.'],
+ ['S15.1','Pool, enforce licence','partial','A7','One pool; over entitlement on 4 of 7 days (SV-7).'],
+ ['S16.1','Poll health (REST)','partial','A7','Monitoring Console polls Indexer 1 and Search Head 1. SI-17 is inferred.'],
+ ['S16.2','Alert on silence','none','A7','A forwarder-missing alert needs forwarder data in the Monitoring Console. None is sent.']
+];
+// Flows: id, from, to[], status, plane, label offset
+const FL=[
+ ['SF-01','X:net',['S3.1'],'gap','data'],['SF-02','S3.2',['S1.1'],'ok','data'],['SF-03','S1.2',['S7.1'],'gap','data'],
+ ['SF-04','X:aws',['S4.1'],'ok','data'],['SF-05','S4.2',['S2.1'],'ok','data'],['SF-06','S2.3',['S7.1'],'missing','data'],
+ ['SF-07','S7.4',['S9.1'],'ok','data'],['SF-08','S7.5',['S10.1'],'ok','data'],['SF-09','S9.3',['S12.1'],'planned','data'],
+ ['SF-10','S10.2',['S12.1'],'planned','data'],['SF-11','S12.2',['S13.1'],'planned','data'],['SF-12','S13.3',['X:desk'],'missing','data'],
+ ['SF-13','S9.2',['X:soc'],'ok','data'],
+ ['SF-14','S5.1',['S1','S2'],'ok','platform'],['SF-15','S14.1',['S9','S13'],'ok','platform'],['SF-16','S7.6',['S15'],'planned','platform'],['SF-17','S16.1',['S7','S9'],'planned','platform']
+];
+const SHORT={S4:'HEC',S1:'Universal fwd',S2:'Heavy fwd, parsing',S10:'Data models',S11:'SH clustering',S12:'Correlation, risk',S13:'Cases, playbooks',S16:'Monitoring',S15:'Licence mgmt'};
+// Platform flows: the function in each target service that receives them
+const PTF={'SF-14':{S1:'S1.1',S2:'S2.1'},'SF-15':{S9:'S9.4',S13:'S13.2'},'SF-16':{S15:'S15.1'},'SF-17':{S7:'S7.3',S9:'S9.2'}};
+const recv=(x,id)=>x[2].includes(id)||(PTF[x[0]]&&PTF[x[0]][svcOf(id)]===id);
+const THREAD={in:['SF-01','SF-02','SF-03','SF-04','SF-05','SF-06'],det:['SF-07','SF-08','SF-09','SF-10','SF-11','SF-12','SF-13'],plat:['SF-14','SF-15','SF-16','SF-17']};
+const TNOTE={in:'Two ways in: syslog through the universal forwarders, HEC through the heavy forwarder. Each ends at Indexing, one half-connected and one missing.',det:'Search works for analysts today; the chain to correlation, cases and tickets is planned or missing.',plat:'Deployment and sign-in work. Licence and monitoring flows are inferred and need adding to the topology.'};
+const ST={ok:['ok','Realised'],partial:['gap','Partly realised'],planned:['gap','Planned'],none:['stop','Not realised']};
+const FST={ok:['ok','In place'],gap:['gap','In place, gap'],planned:['gap','Planned or inferred'],missing:['stop','Missing']};
+const ACT={A2:'Collect, buffer and forward',A3:'Forward and deliver events',A4:'Process and route events',A5:'Index and replicate',A6:'Search and detect',A7:'Manage the platform',A8:'Authenticate and authorise',A9:'Coordinate response'};
+const svcOf=f=>f.split('.')[0];
+const fns=s=>FN.filter(f=>svcOf(f[0])===s);
+const fnById=id=>FN.find(f=>f[0]===id);
+const sv=id=>SVC.find(s=>s[0]===id);
+const name=id=>id.startsWith('X:')?EXT.find(e=>e[0]===id)[1]:fnById(id)?`${id} ${fnById(id)[1]}`:`${id} ${sv(id)[1]}`;
+
+// Geometry
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+const svg=document.getElementById('v4');
+const COLX=[16,156,352,548,744,940,1136],W=150,EW=108,HH=22,RH=22;
+const cardH=s=>HH+fns(s).length*RH+6;
+const box=id=>{if(id.startsWith('X:')){const e=EXT.find(x=>x[0]===id);return {x:COLX[e[2]],y:e[3],w:EW,h:30}}
+  if(fnById(id)){const s=sv(svcOf(id)),i=fns(s[0]).findIndex(f=>f[0]===id);return {x:COLX[s[4]]+3,y:s[5]+HH+i*RH,w:W-6,h:RH}}
+  const s=sv(id);return {x:COLX[s[4]],y:s[5],w:W,h:cardH(id)}};
+const LAYERS=[['Sources',0],['Receive',1],['Forward',2],['Index',3],['Search',4],['Detect and respond',5],['Consumers',6]];
+LAYERS.forEach(([n,c])=>el('text',{class:'band',x:COLX[c]+(c===0||c===6?EW:W)/2,y:24,'text-anchor':'middle'},svg).textContent=n);
+el('line',{class:'bandline',x1:16,x2:1244,y1:358,y2:358},svg);
+el('text',{class:'band',x:16,y:376},svg).textContent='Platform and access services';
+const lkG=el('g',{},svg),cdG=el('g',{},svg);
+// Links
+const lkEls=[];
+function arrow(g,d,end,dir){el('path',{d},g);const [x,y]=end,[dx,dy]=dir;el('path',{class:'hd',d:`M${x} ${y} L${x-dx*7-dy*4} ${y-dy*7+dx*4} L${x-dx*7+dy*4} ${y-dy*7-dx*4}Z`},g)}
+FL.forEach(f=>{f[2].forEach((to,n)=>{const g=el('g',{class:`lk ${f[3]} ${f[4]}`},lkG);g.dataset.f=f[0];g.dataset.ends=[f[1],to].join(' ');
+  const a=box(f[1]),b=box(to);
+  if(f[4]==='platform'){const src=f[1].startsWith('S7')?box('S7'):box(svcOf(f[1])),tgt=box(to),up=src.y>tgt.y;
+    const x1=src.x+src.w*(up?.35+n*.3:.85),y1=up?src.y:src.y+src.h,x2=tgt.x+tgt.w*(up?.3+n*.12:.5),y2=up?tgt.y+tgt.h:tgt.y,end=[x2,up?y2+1:y2-1];
+    arrow(g,`M${x1} ${y1} C${x1} ${(y1+y2)/2} ${x2} ${(y1+y2)/2} ${end[0]} ${end[1]+(up?7:-7)}`,end,[0,up?-1:1])}
+  else if(sv(svcOf(f[1]))&&sv(svcOf(to))&&sv(svcOf(f[1]))[4]===sv(svcOf(to))[4]){const s1=box(svcOf(f[1])),s2=box(svcOf(to)),x=s1.x+W/2;
+    arrow(g,`M${x} ${s1.y+s1.h} L${x} ${s2.y-8}`,[x,s2.y-1],[0,1]);el('text',{x:x+6,y:(s1.y+s1.h+s2.y)/2+3},g).textContent=f[0]}
+  else{const x1=a.x+a.w+(f[1].startsWith('X:')?0:3),y1=a.y+a.h/2,x2=b.x-(to.startsWith('X:')?0:3),y2=b.y+b.h/2,dx=Math.max(30,(x2-x1)/2);
+    arrow(g,`M${x1} ${y1} C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2-8} ${y2}`,[x2-1,y2],[1,0]);
+    const t=el('text',{x:(x1+x2)/2,y:(y1+y2)/2+3,'text-anchor':'middle'},g);t.textContent=f[0]}
+  lkEls.push(g)})});
+// Cards
+const fnEls={},cardEls={};
+SVC.forEach(s=>{const b=box(s[0]),g=el('g',{class:'card'+(s[3]?'':' planned')},cdG);g.dataset.s=s[0];cardEls[s[0]]=g;
+  el('rect',{class:'c',x:b.x,y:b.y,width:W,height:b.h,rx:4},g);el('rect',{class:'h',x:b.x+1,y:b.y+1,width:W-2,height:HH-2,rx:3},g);
+  el('text',{class:'ht',x:b.x+8,y:b.y+15},g).textContent=`${s[0]} · ${SHORT[s[0]]||s[1]}`;
+  fns(s[0]).forEach(f=>{const r=box(f[0]),fg=el('g',{class:'fn '+f[2],tabindex:0,role:'button','aria-label':`${f[0]} ${f[1]}, ${ST[f[2]][1]}`},g);fg.dataset.k=f[0];
+    el('rect',{x:r.x,y:r.y+1,width:r.w,height:r.h-2,rx:3},fg);el('circle',{class:f[2],cx:r.x+9,cy:r.y+r.h/2,r:3.6},fg);
+    el('text',{x:r.x+19,y:r.y+r.h/2+3.6},fg).textContent=f[1];fnEls[f[0]]=fg})});
+EXT.forEach(e=>{const b=box(e[0]),g=el('g',{class:'card ext'},cdG);g.dataset.s=e[0];cardEls[e[0]]=g;el('rect',{class:'c',x:b.x,y:b.y,width:EW,height:30,rx:4},g);el('text',{class:'et',x:b.x+EW/2,y:b.y+19,'text-anchor':'middle'},g).textContent=e[1]});
+
+// Selection
+const detail=document.getElementById('detail');
+const li=(c,cls,t)=>`<li><span class="chip ${cls}">${c}</span><span>${t}</span></li>`;
+const touches=(f,id)=>f[1]===id||recv(f,id);
+function showFn(id){const f=fnById(id),s=sv(svcOf(id)),ins=FL.filter(x=>recv(x,id)),outs=FL.filter(x=>x[1]===id);
+  detail.innerHTML=`<div><span class="dom">${s[0]} · ${esc(s[1])} · ${esc(s[2])}</span><h3>${id} · ${esc(f[1])}</h3><p><span class="chip ${ST[f[2]][0]}">${ST[f[2]][1]}</span> · supports ${f[3]} ${esc(ACT[f[3]])}</p><p>${esc(f[4])}</p></div>
+  <dl><dt>Receives</dt><dd>${ins.length?`<ul>${ins.map(x=>li(x[0],FST[x[3]][0],'from '+esc(name(x[1])))).join('')}</ul>`:'—'}</dd></dl>
+  <dl><dt>Sends</dt><dd>${outs.length?`<ul>${outs.map(x=>li(x[0],FST[x[3]][0],'to '+esc(x[2].map(name).join(', ')))).join('')}</ul>`:'—'}</dd></dl>`}
+function intro(){detail.innerHTML=`<div><span class="dom">Reading the view</span><h3>Functions inside services</h3><p>Each card is a SvcV-1 service and each line in it a function. Data flows join the function that sends to the function that receives; platform flows join whole services.</p><p class="hint">Select a function or a table row, or pick a thread. Esc clears.</p></div>
+  <dl><dt>Where telemetry stops</dt><dd><ul>${li('S1.2','gap','Universal Forwarder 2 forwards nothing')}${li('S2.3','stop','Heavy Forwarder 1 has no output')}</ul></dd></dl>
+  <dl><dt>Where response stops</dt><dd><ul>${li('S12','stop','No correlation service')}${li('S13.3','stop','No ticket updates')}</ul></dd></dl>`}
+let current=null,thread='all';
+function apply(){const focus=!!current||thread!=='all';svg.classList.toggle('focused',focus);
+  const fs=current?FL.filter(f=>touches(f,current)).map(f=>f[0]):thread==='all'?FL.map(f=>f[0]):THREAD[thread];
+  const onIds=new Set(current?[current]:[]);
+  lkEls.forEach(g=>{const on=fs.includes(g.dataset.f)&&(!current||(g.dataset.ends.split(' ')[0]===current||g.dataset.ends.split(' ')[1]===current||(PTF[g.dataset.f]&&PTF[g.dataset.f][g.dataset.ends.split(' ')[1]]===current)));g.classList.toggle('on',on);if(on){g.dataset.ends.split(' ').forEach(e=>onIds.add(e));const t=PTF[g.dataset.f],e=g.dataset.ends.split(' ')[1];if(t&&t[e])onIds.add(t[e])}});
+  Object.entries(fnEls).forEach(([k,g])=>{g.classList.toggle('on',onIds.has(k)||(!current&&thread==='plat'&&onIds.has(svcOf(k))));g.classList.toggle('sel',k===current)});
+  Object.entries(cardEls).forEach(([k,g])=>g.classList.toggle('on',onIds.has(k)||[...onIds].some(i=>svcOf(i)===k)));
+  document.querySelectorAll('#alloc tbody tr[data-k]').forEach(r=>r.classList.toggle('sel',r.dataset.k===current));
+  document.querySelectorAll('[data-t]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.t===thread)));
+  document.getElementById('tNote').textContent=thread==='all'?'':TNOTE[thread]}
+function pick(id){current=current===id?null:id;if(current)thread='all';current?showFn(id):intro();apply()}
+Object.values(fnEls).forEach(g=>{g.addEventListener('click',()=>pick(g.dataset.k));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(g.dataset.k)}})});
+document.querySelectorAll('[data-t]').forEach(b=>b.addEventListener('click',()=>{thread=b.dataset.t;current=null;intro();apply()}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(current||thread!=='all')){current=null;thread='all';intro();apply()}});
+
+// Allocation table
+const al=document.getElementById('alloc');
+const chips=list=>list.length?list.map(x=>`<span class="chip ${FST[x[3]][0]}">${x[0]}</span>`).join(' '):'—';
+const LAY=['Collection','Indexing','Search','Detection and response','Platform and access'];
+al.innerHTML=`<thead><tr><th>Function</th><th>Receives</th><th>Sends</th><th>OV-5</th><th>Status</th></tr></thead><tbody>${LAY.map(l=>`<tr class="grp"><td colspan="5">${esc(l)}</td></tr>`+SVC.filter(s=>s[2]===l).flatMap(s=>fns(s[0]).map(f=>{const s0=fns(s[0])[0][0]===f[0];
+  return `<tr data-k="${f[0]}"><td class="fnn"><span class="id">${f[0]}</span> ${esc(f[1])}<br><small style="color:var(--muted)">${esc(s[1])}</small></td><td>${chips(FL.filter(x=>recv(x,f[0])))}</td><td>${chips(FL.filter(x=>x[1]===f[0]))}</td><td class="mono">${f[3]}</td><td><span class="dot ${f[2]}"></span>${ST[f[2]][1]}</td></tr>`})).join('')).join('')}</tbody>`;
+al.querySelectorAll('tbody tr[data-k]').forEach(r=>r.addEventListener('click',()=>{pick(r.dataset.k);svg.scrollIntoView({block:'nearest'})}));
+
+const c=k=>FN.filter(f=>f[2]===k).length;
+document.getElementById('summary').innerHTML=`<span><b>${SVC.length}</b>services</span><span><b>${FN.length}</b>functions</span><span><b>${FL.length}</b>flows</span><span><b>${c('ok')}</b>realised</span><span class="rv"><b>${c('partial')}</b>partly</span><span class="rv"><b>${c('planned')}</b>planned</span><span class="rv"><b>${c('none')}</b>needed, not realised</span>`;
+document.getElementById('findings').innerHTML=[
+ ['stop','Response','<b>Four functions between search and the service desk are not realised.</b> Correlate (S12.1), raise findings (S12.2), ingest findings (S13.1) and update tickets (S13.3) are not realised, and scheduled searches (S9.3) have nothing to feed. Playbooks (S13.2) only run by hand.'],
+ ['stop','Dead ends','<b>Two forwarding functions send to nothing.</b> Heavy Forwarder 1 parses and masks AWS events (S2.1, S2.2) but forward cooked (S2.3) has no target. Forward raw (S1.2) works from Sydney only.'],
+ ['gap','Masking','<b>PII is masked by two functions with two copies of the rules:</b> S2.2 on the heavy forwarder and S7.2 on the indexer. Syslog reception (S3.1) still accepts clear text, so PII crosses the LAN before either runs.'],
+ ['gap','Blind spots','<b>Two functions would catch silent sources, and neither exists.</b> Read event logs (S1.3) has no forwarder for Windows Event Log 1. Alert on silence (S16.2) has no forwarder data to watch.'],
+ ['ok','Search','<b>Analysts can search today.</b> Dispatch (S9.1), dashboards (S9.2), CIM summaries (S10.1) and SAML sign-in (S9.4, S14.1) are all realised on indexed Sydney data.']
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+intro();apply();
+</script>
+
+</body>
+</html>
