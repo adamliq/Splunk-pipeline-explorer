@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>DIV-3 Physical Data Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV, DIV-1 and CV mockups. Banners, title block, purpose, a detail
+   strip for the selection, then the physical stores grouped by the Builder component that hosts them, the index catalogue with a today / target sizing switch, the store register, and findings.
+   Colour encodes the data domain; amber marks PII and anything not set. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.sw{width:12px;height:12px;border-radius:2px;display:inline-block;vertical-align:-1px}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+
+/* Hosts and stores */
+.hosts{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;align-items:stretch;background:var(--zone);border:1px solid var(--rule);border-radius:4px;padding:12px}
+@media (max-width:1180px){.hosts{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:700px){.hosts{grid-template-columns:minmax(0,1fr)}}
+.host{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);display:grid;align-content:start;gap:8px;padding:8px;min-width:0}
+.host.ext{border-style:dashed;background:transparent}
+.host.none{border-color:color-mix(in srgb,var(--review) 55%,transparent);background:color-mix(in srgb,var(--review) 6%,transparent)}
+.hh{display:grid;gap:2px;padding:0 2px 4px;border-bottom:1px solid var(--rule)}
+.hh .lvl{font:600 .58rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.hh b{font:700 .92rem/1.2 var(--font-title)}
+.store{border:1px solid var(--rule);border-left:3px solid var(--dc);border-radius:3px;background:var(--node);padding:6px 8px;display:grid;gap:4px;cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%}
+.store .sn{font:600 .8rem/1.2 var(--font-title)}
+.store .loc{font:500 .64rem/1.3 var(--font-code);color:var(--muted);overflow-wrap:anywhere}
+.ents{display:flex;flex-wrap:wrap;gap:3px}
+.ents span{font:600 .6rem/1 var(--font-code);padding:3px 4px;border-radius:2px;background:var(--zone);color:var(--ink-2)}
+.ents span.pii{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review)}
+.store .rest{font:600 .58rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase}
+.store .rest.gap{color:var(--review)}.store .rest.ok{color:var(--ok)}.store .rest.ext{color:var(--muted)}
+.store.sel{border-color:var(--sel);box-shadow:0 0 0 1.5px var(--sel)}
+.store.sel{border-left-color:var(--dc)}
+.hosts.focused .store:not(.sel){opacity:.35}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.78rem;color:var(--ink-2)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+
+/* Detail */
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr);gap:12px 22px}
+@media (max-width:960px){.detail{grid-template-columns:1fr}}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:4px 0 6px;font:700 1.16rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.86rem;line-height:1.5}
+.detail dl{margin:0;display:grid;gap:7px;align-content:start}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.84rem}
+.detail code{font:500 .74rem var(--font-code);background:var(--zone);padding:1px 4px;border-radius:3px;overflow-wrap:anywhere}
+
+/* Scenario switch + index catalogue */
+.headrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{font:600 .78rem var(--font-body);padding:6px 12px;border:0;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sheet)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg th.n,.reg td.n{text-align:right}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tbody tr:last-child td{border-bottom:0}
+.reg tfoot td{background:var(--zone);font-weight:600;border-top:1px solid var(--rule);padding:7px 10px}
+.reg td.n{font:500 .76rem var(--font-code);font-variant-numeric:tabular-nums;white-space:nowrap}
+.reg td.n.chg{color:var(--sel);font-weight:600}
+#stores tbody tr{cursor:pointer}
+#stores tbody tr:hover,#stores tbody tr.sel{background:var(--hi)}
+.bar{display:block;height:6px;border-radius:3px;background:var(--d-index);margin-top:4px;min-width:2px}
+.mono{font:500 .76rem var(--font-code)}
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.store{transition:opacity .15s}}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="dTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="dTitle">DIV-3 · Physical Data Model</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Data and Information (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">Data owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>Where each DIV-2 entity is physically stored in the Splunk deployment: on which Builder component, in which file, index or database, and how it is protected at rest. The index catalogue sizes the event store for today and for the Increment 2 target.</p></div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="detail" id="detail" aria-live="polite"></div>
+
+      <div class="legend">
+        <span><span class="ents"><span>Entity</span></span>DIV-2 entity held in the store</span>
+        <span><span class="ents"><span class="pii">Entity</span></span>holds PII</span>
+        <span>Dashed: outside the Splunk deployment · amber: no store</span>
+        <span>Click a store to trace it. Esc clears.</span>
+      </div>
+      <div class="hosts" id="hosts" role="group" aria-label="Physical stores by Builder component"></div>
+
+      <div class="headrow">
+        <h2>Index catalogue</h2>
+        <div class="seg" role="group" aria-label="Sizing scenario">
+          <button type="button" id="scToday" aria-pressed="true">Today</button>
+          <button type="button" id="scTarget" aria-pressed="false">Increment 2 target</button>
+        </div>
+      </div>
+      <p class="sub" id="scNote"></p>
+      <div class="tablewrap"><table class="reg" id="indexes"></table></div>
+
+      <h2>Store register</h2>
+      <p class="sub">Every DIV-2 entity, its physical store and where that store lives.</p>
+      <div class="tablewrap"><table class="reg" id="stores">
+        <thead><tr><th>Entity (DIV-2)</th><th>Store</th><th>Builder component</th><th>Location</th><th>Format</th><th>At rest</th><th>Protection</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+
+      <div class="findings">
+        <h2>What the model shows</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Data owner not set · Stores mapped to the Builder topology</span><span>DIV-3 · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+const PII=new Set(['SourceSystem','Event','Finding','User']);
+// Hosts are Builder components; stores: [id, name, location, format, entities, at rest, protection, domain]
+const HOSTS=[
+ {id:'idx',name:'Indexer',lvl:'Indexing tier',stores:[
+  ['ST1','Index buckets','$SPLUNK_DB/<index>/db · colddb · thaweddb','Journal (zstd) + tsidx',['Event','Bucket','Finding'],'gap','Replication factor 1 today; 2 multisite in Increment 3','index'],
+  ['ST2','indexes.conf','etc/system/local · cluster bundle','Splunk .conf',['Index','RetentionPolicy'],'ext','In the configuration repository (git)','index'],
+  ['ST3','Index-time parsing','props.conf · transforms.conf','Splunk .conf',['Sourcetype'],'ext','In the configuration repository (git)','index']]},
+ {id:'search',name:'Search Head',lvl:'Search tier',stores:[
+  ['ST4','Saved searches','savedsearches.conf (app context)','Splunk .conf',['Search','CorrelationSearch'],'ext','Search head backup; no cluster until Increment 3','search'],
+  ['ST5','Knowledge objects','datamodels.conf · props/transforms (search-time)','Splunk .conf',['DataModel','Field'],'ext','In the configuration repository (git)','search'],
+  ['ST6','KV store and lookups','KV store (port 8191) · lookups/*.csv','MongoDB collections · CSV',['Lookup','SourceSystem'],'gap','KV store backup: Not set','search'],
+  ['ST7','Roles','authorize.conf','Splunk .conf',['Role','RoleIndex'],'ext','In the configuration repository (git)','govern']]},
+ {id:'ds',name:'Deployment Server',lvl:'Management',stores:[
+  ['ST8','Server classes','serverclass.conf','Splunk .conf',['ServerClass','ServerClassApp'],'ext','In the configuration repository (git)','collect'],
+  ['ST9','Deployment apps','etc/deployment-apps/<app>/local/inputs.conf','App directories',['DeploymentApp','DataInput'],'ext','In the configuration repository (git)','collect']]},
+ {id:'lm',name:'License Manager',lvl:'Management',stores:[
+  ['ST10','Licence usage log','var/log/splunk/license_usage.log → _internal','Log events',['LicenseUsage'],'gap','_internal kept 30 days; summarised daily','index']]},
+ {id:'soar',name:'Splunk SOAR',lvl:'Response',stores:[
+  ['ST11','SOAR database','PostgreSQL on the SOAR server','Relational tables',['SOARContainer','PlaybookRun'],'gap','Nightly SOAR backup','detect'],
+  ['ST12','Playbook repository','Git repository linked to SOAR','Python playbooks',['Playbook'],'ext','Git history','detect']]},
+ {id:'ext',name:'Identity provider',lvl:'External · not in Splunk',ext:true,stores:[
+  ['ST13','Directory and SAML assertions','Corporate identity provider · authentication.conf roleMap_SAML','Directory groups',['User','UserRole'],'ext','Owned by the identity team','govern']]},
+];
+const NOSTORE=['DataClassification'];
+// Index catalogue: name, classification, sourcetypes, GB/day today, GB/day target, compression ratio, days today, days target, roles
+const IDX=[
+ ['wineventlog','Security telemetry + PII','WinEventLog:Security, XmlWinEventLog',62,74,0.45,90,365,'soc_analyst, soc_admin'],
+ ['network_syslog','Security telemetry','cisco:asa, pan:traffic, syslog',48,55,0.5,90,365,'soc_analyst, soc_admin'],
+ ['aws_cloud','Security telemetry','aws:cloudtrail, aws:lambda',0,22,0.4,0,365,'soc_analyst, cloud_ops'],
+ ['auth_pii','Security telemetry + PII','okta:im, azure:aad:signin',9,9,0.5,90,365,'soc_pii_reader'],
+ ['notable','Security telemetry + PII','stash (ES findings)',0,0.6,0.6,0,1095,'soc_analyst'],
+ ['_internal','Platform','splunkd, license_usage',18,20,0.5,30,30,'admin'],
+ ['_audit','Platform · audit','audittrail',2,2.5,0.5,365,365,'admin, soc_auditor']
+];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const REST={gap:'At rest: Not set',ok:'Encrypted',ext:'No PII · n/a'};
+const allStores=HOSTS.flatMap(h=>h.stores.map(s=>({h,s})));
+const storeOf=e=>allStores.find(x=>x.s[4].includes(e));
+let scenario='today';
+const disk=(r,sc)=>{const gb=sc==='today'?r[3]:r[4],d=sc==='today'?r[6]:r[7];return gb*r[5]*d};
+const total=sc=>IDX.reduce((n,r)=>n+disk(r,sc),0);
+const fmt=n=>n>=1000?(n/1000).toFixed(1)+' TB':Math.round(n)+' GB';
+
+function summary(){const piiNoEnc=allStores.filter(x=>x.s[5]==='gap'&&x.s[4].some(e=>PII.has(e)));
+  document.getElementById('summary').innerHTML=`<span><b>${allStores.length}</b>physical stores</span><span><b>${HOSTS.length}</b>hosts</span><span><b>${IDX.length}</b>indexes</span><span><b>${fmt(total('today'))}</b>indexed disk today</span><span><b>${fmt(total('target'))}</b>at the Increment 2 target</span><span class="rv"><b>${piiNoEnc.length}</b>PII stores with encryption at rest not set</span><span class="rv"><b>${NOSTORE.length}</b>entity with no store</span>`}
+
+const hosts=document.getElementById('hosts');
+hosts.innerHTML=HOSTS.map(h=>`<div class="host${h.ext?' ext':''}"><div class="hh"><span class="lvl">${esc(h.lvl)}</span><b>${esc(h.name)}</b></div>${h.stores.map(s=>`<button type="button" class="store" data-s="${s[0]}" style="--dc:var(--d-${s[7]})" aria-pressed="false"><span class="sn">${esc(s[1])}</span><span class="loc">${esc(s[2])}</span><span class="ents">${s[4].map(e=>`<span class="${PII.has(e)?'pii':''}">${e}</span>`).join('')}</span><span class="rest ${s[5]}">${s[4].some(e=>PII.has(e))||s[5]!=='ext'?REST[s[5]]:REST.ext}</span></button>`).join('')}</div>`).join('')+
+ `<div class="host none" style="grid-column:1/-1"><div class="hh"><span class="lvl">No physical store</span><b>${NOSTORE.join(', ')}</b></div><span style="font-size:.8rem;color:var(--ink-2)">Exists only as an index naming convention and the classification banner. No Splunk object records which classification an index carries.</span></div>`;
+
+const detail=document.getElementById('detail');
+function show(id){const {h,s}=allStores.find(x=>x.s[0]===id);
+  detail.innerHTML=`<div><span class="dom">${esc(h.name)} · ${esc(h.lvl)}</span><h3>${id} · ${esc(s[1])}</h3><p><code>${esc(s[2])}</code></p></div>
+  <dl><dt>Holds (DIV-2)</dt><dd>${s[4].map(e=>e+(PII.has(e)?' <span class="chip gap">PII</span>':'')).join(', ')}</dd><dt>Format</dt><dd>${esc(s[3])}</dd></dl>
+  <dl><dt>At rest</dt><dd><span class="chip ${s[5]}">${s[5]==='gap'?'Not set':s[5]==='ok'?'Encrypted':'n/a'}</span></dd><dt>Protection</dt><dd>${esc(s[6])}</dd></dl>`}
+let current=null;
+function select(id){current=id;hosts.classList.add('focused');hosts.querySelectorAll('.store').forEach(b=>{b.classList.toggle('sel',b.dataset.s===id);b.setAttribute('aria-pressed',String(b.dataset.s===id))});
+  document.querySelectorAll('#stores tbody tr').forEach(r=>r.classList.toggle('sel',r.dataset.s===id));show(id)}
+function clear(){current=null;hosts.classList.remove('focused');hosts.querySelectorAll('.sel').forEach(b=>b.classList.remove('sel'));document.querySelectorAll('#stores tbody tr.sel').forEach(r=>r.classList.remove('sel'));show('ST1');hosts.querySelector('[data-s="ST1"]').classList.add('sel')}
+hosts.querySelectorAll('.store').forEach(b=>b.addEventListener('click',()=>current===b.dataset.s?clear():select(b.dataset.s)));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)clear()});
+
+// Store register: every entity
+const ENTS=['ServerClass','ServerClassApp','DeploymentApp','DataInput','SourceSystem','Sourcetype','Index','Event','Bucket','LicenseUsage','DataModel','Field','Lookup','Search','CorrelationSearch','Finding','SOARContainer','Playbook','PlaybookRun','DataClassification','RetentionPolicy','Role','RoleIndex','User','UserRole'];
+document.querySelector('#stores tbody').innerHTML=ENTS.map(e=>{const x=storeOf(e);if(!x)return `<tr><td><b>${e}</b></td><td colspan="6"><span class="chip gap">No store</span> Only an index naming convention (for example <code>auth_pii</code>) and the page banner</td></tr>`;
+  const rest=PII.has(e)?(x.s[5]==='gap'?'<span class="chip gap">Not set</span>':x.s[5]==='ext'?'<span class="chip ext">External</span>':'<span class="chip ok">Encrypted</span>'):'<span class="chip ext">No PII</span>';
+  return `<tr data-s="${x.s[0]}"><td><b>${e}</b>${PII.has(e)?' <span class="chip gap">PII</span>':''}</td><td>${x.s[0]} ${esc(x.s[1])}</td><td>${esc(x.h.name)}</td><td class="mono">${esc(x.s[2])}</td><td>${esc(x.s[3])}</td><td>${rest}</td><td>${esc(x.s[6])}</td></tr>`}).join('');
+document.querySelectorAll('#stores tbody tr[data-s]').forEach(r=>r.addEventListener('click',()=>select(r.dataset.s)));
+
+// Index catalogue with scenario
+function renderIdx(){const sc=scenario,max=Math.max(...IDX.map(r=>disk(r,'target')));
+  document.getElementById('scNote').textContent=sc==='today'?'Today: 90 days searchable for security indexes; AWS not onboarded; ES not deployed. Disk = GB/day × compression × days, replication factor 1.':'Increment 2 target: 365 days searchable (G3, C3.2), AWS onboarded (C1.3), ES findings in notable kept 3 years. Replication factor still 1 until Increment 3. Changed values are highlighted.';
+  const ch=(a,b)=>sc==='target'&&a!==b?' chg':'';
+  document.getElementById('indexes').innerHTML=`<thead><tr><th>Index</th><th>Classification</th><th>Sourcetypes</th><th class="n">GB/day</th><th class="n">Compression</th><th class="n">Searchable days</th><th class="n">Indexed disk</th><th>Roles allowed (RoleIndex)</th></tr></thead>
+  <tbody>${IDX.map(r=>{const gb=sc==='today'?r[3]:r[4],d=sc==='today'?r[6]:r[7],v=disk(r,sc);return `<tr><td class="mono"><b>${r[0]}</b></td><td>${r[1].includes('PII')?'<span class="chip gap">'+esc(r[1])+'</span>':esc(r[1])}</td><td class="mono">${esc(r[2])}</td><td class="n${ch(r[3],r[4])}">${gb||'—'}</td><td class="n">${Math.round(r[5]*100)}%</td><td class="n${ch(r[6],r[7])}">${d||'—'}</td><td class="n${ch(disk(r,'today'),disk(r,'target'))}">${v?fmt(v):'—'}<span class="bar" style="width:${Math.max(1,v/max*100)}%"></span></td><td class="mono">${esc(r[8])}</td></tr>`}).join('')}</tbody>
+  <tfoot><tr><td colspan="3">Total</td><td class="n">${IDX.reduce((n,r)=>n+(sc==='today'?r[3]:r[4]),0).toFixed(1).replace(/\.0$/,'')}</td><td></td><td></td><td class="n">${fmt(total(sc))}</td><td></td></tr></tfoot>`;
+  document.getElementById('scToday').setAttribute('aria-pressed',String(sc==='today'));document.getElementById('scTarget').setAttribute('aria-pressed',String(sc==='target'))}
+document.getElementById('scToday').onclick=()=>{scenario='today';renderIdx()};
+document.getElementById('scTarget').onclick=()=>{scenario='target';renderIdx()};
+
+document.getElementById('findings').innerHTML=[
+ ['stop','PII at rest',`<b>Index buckets and the KV store hold PII</b> (Event._raw and Finding.src_user in buckets, SourceSystem.ip_address in the assets lookup), and encryption at rest is not set for either. Splunk does not encrypt buckets itself; it needs volume encryption on the indexer and search head disks. The SOAR database copies the same fields into case artifacts, so set it there too.`],
+ ['gap','Growth',`<b>Indexed disk grows from ${fmt(total('today'))} to ${fmt(total('target'))}</b> at the Increment 2 target, mostly from 365-day retention on wineventlog and network_syslog. Replication factor 2 in Increment 3 doubles it again. Size the cold volume for this, not today's figure.`],
+ ['gap','No store','<b>DataClassification has no physical store.</b> Classification is implied by index names such as <code>auth_pii</code>. Record it in indexes.conf as a custom setting or in a KV store collection so access reviews (C7.3) can query it.'],
+ ['ok','Config as code','<b>Seven of the thirteen stores are .conf files or app directories</b> held in the configuration repository, so they are rebuilt from git rather than backed up.'],
+ ['ext','External','<b>User and UserRole live in the identity provider.</b> Splunk keeps only what each SAML assertion carries at sign-in; leavers disappear from Splunk when the directory removes them.']
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+summary();renderIdx();clear();
+</script>
+
+</body>
+</html>

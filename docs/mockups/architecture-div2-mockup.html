@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>DIV-2 Logical Data Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV, DIV-1 and CV mockups. Banners, title block, purpose, a detail
+   strip for the selection, then the entity board (one column per DIV-1 domain; each card lists attributes with keys and PII), the relationship register tracing DIV-1, and findings.
+   Colour encodes the data domain; amber marks PII and anything not set. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.sw{width:12px;height:12px;border-radius:2px;display:inline-block;vertical-align:-1px}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+
+/* Entity board: one column per domain */
+.board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:start;background:var(--zone);border:1px solid var(--rule);border-radius:4px;padding:12px}
+@media (max-width:1180px){.board{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:760px){.board{grid-template-columns:minmax(0,1fr)}}
+.col{display:grid;gap:10px;align-content:start;min-width:0}
+.colh{font:600 .62rem/1.2 var(--font-code);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;gap:6px;align-items:center;padding:2px 2px 0}
+.ent{border:1px solid var(--rule);border-top:3px solid var(--dc);border-radius:4px;background:var(--node);cursor:pointer;text-align:left;font:inherit;color:inherit;padding:0;width:100%;display:block}
+.ent .eh{display:flex;justify-content:space-between;gap:8px;align-items:baseline;padding:6px 9px 5px;border-bottom:1px solid var(--rule)}
+.ent .en{font:700 .88rem/1.2 var(--font-title)}
+.ent .ek{font:600 .58rem/1 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.ent ul{list-style:none;margin:0;padding:4px 0}
+.ent li{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:4px;align-items:baseline;padding:2px 9px;font:500 .72rem/1.35 var(--font-code)}
+.ent li .k{font-size:.58rem;font-weight:600;color:var(--muted)}
+.ent li .k.pk{color:var(--ink)}
+.ent li .a{overflow-wrap:anywhere}
+.ent li .t{color:var(--muted);font-size:.66rem;white-space:nowrap}
+.ent li.pii .a::after{content:"PII";margin-left:5px;font-size:.56rem;font-weight:600;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 50%,transparent);border-radius:2px;padding:0 3px}
+.ent.assoc{border-style:dashed;border-top-style:solid}
+.ent.sel{border-color:var(--sel);box-shadow:0 0 0 1.5px var(--sel)}
+.ent.sel{border-top-color:var(--dc)}
+.board.focused .ent:not(.on):not(.sel){opacity:.3}
+.board.focused .ent li.link{background:color-mix(in srgb,var(--sel) 12%,transparent)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.78rem;color:var(--ink-2)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend code{font:600 .66rem var(--font-code)}
+
+/* Detail */
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) minmax(0,1fr);gap:12px 22px}
+@media (max-width:960px){.detail{grid-template-columns:1fr}}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase}
+.detail h3{margin:4px 0 6px;font:700 1.16rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.86rem;line-height:1.5}
+.detail dl{margin:0;display:grid;gap:7px;align-content:start}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.84rem}
+.detail ul{margin:2px 0 0;padding:0;list-style:none;display:grid;gap:4px}
+.detail code{font:500 .74rem var(--font-code);background:var(--zone);padding:1px 4px;border-radius:3px}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tr:last-child td{border-bottom:0}
+.reg tbody tr{cursor:pointer}
+.reg tbody tr:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.ent{transition:opacity .15s}}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="dTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="dTitle">DIV-2 · Logical Data Model</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Data and Information (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">Data owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>The DIV-1 concepts as entities with attributes, keys and PII markings. Many-to-many relationships are resolved into link entities. Nothing here depends on where the data is stored; DIV-3 maps each entity to its Splunk store.</p></div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="detail" id="detail" aria-live="polite"></div>
+
+      <div class="legend">
+        <span><code>PK</code>primary key</span><span><code>FK</code>foreign key</span><span><code>PK·FK</code>key part that is also a foreign key</span>
+        <span><span class="chip gap" style="padding:1px 4px">PII</span>personal information</span>
+        <span>Dashed card: link entity that resolves a many-to-many</span>
+        <span>Click an entity to see what it links to. Esc clears.</span>
+      </div>
+      <div class="board" id="board" role="group" aria-label="Logical entities by domain"></div>
+
+      <h2>Relationship register</h2>
+      <p class="sub">How each DIV-1 relationship is carried in the logical model: the foreign key, its cardinality, and any relationship that is not held as a key.</p>
+      <div class="tablewrap"><table class="reg" id="rels">
+        <thead><tr><th>DIV-1</th><th>Relationship</th><th>Child entity · foreign key</th><th>Parent entity · key</th><th>Cardinality</th><th>Carried as</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+
+      <div class="findings">
+        <h2>What the model shows</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Data owner not set · Entities from DIV-1 concepts</span><span>DIV-2 · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+const DOM={collect:'Collection and configuration',index:'Indexing and storage',search:'Search and knowledge',detect:'Detection and response',govern:'Governance and access'};
+// attrs: [name, type, key ('PK' | 'FK' | 'PK·FK' | ''), fk target entity, pii]
+const ENT=[
+ {id:'ServerClass',d:'collect',def:'A rule that selects which forwarders receive which apps.',a:[['server_class_name','string','PK'],['whitelist','pattern list',''],['blacklist','pattern list',''],['restart_splunkd','boolean','']]},
+ {id:'ServerClassApp',d:'collect',assoc:true,def:'Resolves the many-to-many between server classes and apps (R1).',a:[['server_class_name','string','PK·FK','ServerClass'],['app_name','string','PK·FK','DeploymentApp']]},
+ {id:'DeploymentApp',d:'collect',def:'A versioned bundle of configuration.',a:[['app_name','string','PK'],['version','semver',''],['checksum','sha256','']]},
+ {id:'DataInput',d:'collect',def:'One configured input stanza.',a:[['input_stanza','string','PK'],['input_type','enum: monitor, udp, tcp, http, script, wineventlog',''],['app_name','string','FK','DeploymentApp'],['host','string','FK','SourceSystem'],['sourcetype','string','FK','Sourcetype'],['index_name','string','FK','Index']]},
+ {id:'SourceSystem',d:'collect',def:'A device or service that sends telemetry.',a:[['host','string','PK'],['ip_address','ipv4/ipv6','',null,true],['site','enum: Sydney, Melbourne, AWS',''],['system_owner','string','',null,true]]},
+
+ {id:'Sourcetype',d:'index',def:'The format of a set of events and its parsing rules.',a:[['sourcetype','string','PK'],['line_breaker','regex',''],['time_format','strptime',''],['truncate','integer',''],['cim_compliant','boolean','']]},
+ {id:'Index',d:'index',def:'A named store with its own access and retention.',a:[['index_name','string','PK'],['datatype','enum: event, metric',''],['classification_code','string','FK','DataClassification'],['policy_id','string','FK','RetentionPolicy']]},
+ {id:'Event',d:'index',def:'One timestamped record of raw data.',a:[['index_name','string','PK·FK','Index'],['_cd','bucket:offset','PK'],['_time','timestamp',''],['_raw','text','',null,true],['host','string','FK','SourceSystem'],['source','string',''],['sourcetype','string','FK','Sourcetype']]},
+ {id:'Bucket',d:'index',def:'A time-bounded part of an index.',a:[['index_name','string','PK·FK','Index'],['bucket_id','integer','PK'],['state','enum: hot, warm, cold, frozen',''],['earliest_time','timestamp',''],['latest_time','timestamp',''],['size_mb','integer','']]},
+ {id:'LicenseUsage',d:'index',def:'Daily ingest volume per index, sourcetype and host.',a:[['usage_date','date','PK'],['index_name','string','PK·FK','Index'],['sourcetype','string','PK·FK','Sourcetype'],['host','string','PK·FK','SourceSystem'],['bytes','integer','']]},
+
+ {id:'DataModel',d:'search',def:'A normalised schema (CIM) over many sourcetypes.',a:[['model_name','string','PK'],['cim_version','semver',''],['accelerated','boolean',''],['summary_range_days','integer','']]},
+ {id:'Field',d:'search',def:'A named value extracted from events of one sourcetype.',a:[['sourcetype','string','PK·FK','Sourcetype'],['field_name','string','PK'],['extraction','enum: index-time, search-time',''],['model_name','string','FK','DataModel'],['cim_field','string',''],['pii','boolean','']]},
+ {id:'Lookup',d:'search',def:'A reference table that enriches events.',a:[['lookup_name','string','PK'],['lookup_type','enum: csv, kvstore',''],['key_sourcetype','string','FK','Field'],['key_field','string','FK','Field'],['row_count','integer','']]},
+ {id:'Search',d:'search',def:'A saved query, run ad hoc or on a schedule.',a:[['search_name','string','PK'],['app','string',''],['owner','string','FK','User'],['cron_schedule','cron',''],['spl','text','']]},
+
+ {id:'CorrelationSearch',d:'detect',def:'A Search subtype that raises findings (R17).',a:[['search_name','string','PK·FK','Search'],['severity','enum: low … critical',''],['mitre_technique','string',''],['risk_score','integer',''],['throttle_window','duration','']]},
+ {id:'Finding',d:'detect',def:'A detection recorded for triage.',a:[['finding_id','event id','PK'],['search_name','string','FK','CorrelationSearch'],['_time','timestamp',''],['status','enum: new, in progress, closed',''],['owner','string','FK','User'],['src_user','string','',null,true],['dest','string','',null,true]]},
+ {id:'SOARContainer',d:'detect',def:'A SOAR case built from one finding.',a:[['container_id','integer','PK'],['finding_id','event id','FK','Finding'],['label','string',''],['severity','enum',''],['status','enum',''],['owner','string','FK','User']]},
+ {id:'Playbook',d:'detect',def:'An automated response workflow.',a:[['playbook_name','string','PK'],['repo','string',''],['active','boolean','']]},
+ {id:'PlaybookRun',d:'detect',assoc:true,def:'Resolves the many-to-many between playbooks and containers (R20).',a:[['run_id','integer','PK'],['playbook_name','string','FK','Playbook'],['container_id','integer','FK','SOARContainer'],['started','timestamp',''],['result','enum: success, failed','']]},
+
+ {id:'DataClassification',d:'govern',def:'The sensitivity label data carries.',a:[['classification_code','string','PK'],['name','string',''],['handling_rule','text','']]},
+ {id:'RetentionPolicy',d:'govern',def:'How long data stays searchable.',a:[['policy_id','string','PK'],['searchable_days','integer',''],['frozen_action','enum: delete, archive',''],['max_size_gb','integer','']]},
+ {id:'Role',d:'govern',def:'A named set of capabilities.',a:[['role_name','string','PK'],['imported_roles','list',''],['search_time_limit','duration','']]},
+ {id:'RoleIndex',d:'govern',assoc:true,def:'Resolves which roles may search which indexes (R21).',a:[['role_name','string','PK·FK','Role'],['index_name','string','PK·FK','Index']]},
+ {id:'User',d:'govern',def:'A person or service account.',a:[['user_name','string','PK',null,true],['saml_subject','string','',null,true],['email','string','',null,true],['default_app','string','']]},
+ {id:'UserRole',d:'govern',assoc:true,def:'Resolves which users hold which roles (R22), from SAML group mapping.',a:[['user_name','string','PK·FK','User'],['role_name','string','PK·FK','Role']]}
+];
+// DIV-1 relationship trace: [R, text, child, fk attrs, parent, key, cardinality, carried as]
+const RELS=[
+ ['R1','Server Class assigns Deployment App','ServerClassApp','server_class_name, app_name','ServerClass · DeploymentApp','PKs','M:N','Link entity'],
+ ['R2','Deployment App defines Data Input','DataInput','app_name','DeploymentApp','app_name','1 : 0..*','Foreign key'],
+ ['R3','Data Input reads from Source System','DataInput','host','SourceSystem','host','0..* : 1','Foreign key'],
+ ['R4','Data Input collects Event','Event','source','DataInput','input_stanza','1 : 0..*','Not a key: source holds the file path or port, not the stanza name'],
+ ['R5','Source System produces Event','Event','host','SourceSystem','host','1 : 0..*','Foreign key'],
+ ['R6','Sourcetype describes Event','Event','sourcetype','Sourcetype','sourcetype','1 : 0..*','Foreign key'],
+ ['R7','Index stores Event','Event','index_name','Index','index_name','1 : 0..*','Identifying key'],
+ ['R8','Index is partitioned into Bucket','Bucket','index_name','Index','index_name','1 : 0..*','Identifying key'],
+ ['R9','Data Classification applies to Index','Index','classification_code','DataClassification','classification_code','1 : 0..*','Foreign key'],
+ ['R10','Retention Policy governs Bucket','Index','policy_id','RetentionPolicy','policy_id','1 : 0..*','Foreign key on Index; buckets inherit it'],
+ ['R11','Event has Field','Field','sourcetype','Sourcetype','sourcetype','1 : 0..*','Through Sourcetype: fields are defined per sourcetype'],
+ ['R12','Data Model normalises Field','Field','model_name','DataModel','model_name','0..* : 1..*','Foreign key'],
+ ['R13','Lookup enriches Field','Lookup','key_sourcetype, key_field','Field','sourcetype, field_name','0..* : 0..*','Foreign key'],
+ ['R14','License Usage is measured per Sourcetype','LicenseUsage','sourcetype','Sourcetype','sourcetype','0..* : 1','Identifying key'],
+ ['R15','Search reads Index','Search','—','Index','—','0..* : 1..*','Not a key: the index is named inside the SPL'],
+ ['R16','Search uses Data Model','Search','—','DataModel','—','0..* : 0..*','Not a key: the data model is named inside the SPL'],
+ ['R17','Correlation Search is a kind of Search','CorrelationSearch','search_name','Search','search_name','1 : 0..1','Subtype (shared key)'],
+ ['R18','Correlation Search creates Finding','Finding','search_name','CorrelationSearch','search_name','1 : 0..*','Foreign key'],
+ ['R19','Finding is sent as SOAR Container','SOARContainer','finding_id','Finding','finding_id','1 : 0..1','Foreign key, unique'],
+ ['R20','Playbook acts on SOAR Container','PlaybookRun','playbook_name, container_id','Playbook · SOARContainer','PKs','M:N','Link entity'],
+ ['R21','Role grants access to Index','RoleIndex','role_name, index_name','Role · Index','PKs','M:N','Link entity'],
+ ['R22','User holds Role','UserRole','user_name, role_name','User · Role','PKs','M:N','Link entity']
+];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ent=id=>ENT.find(e=>e.id===id);
+const refsOut=e=>[...new Set(e.a.filter(a=>a[3]).map(a=>a[3]))].filter(t=>t!==e.id);
+const refsIn=e=>ENT.filter(x=>x.a.some(a=>a[3]===e.id)&&x.id!==e.id).map(x=>x.id);
+const pii=ENT.flatMap(e=>e.a.filter(a=>a[4]).map(a=>[e.id,a[0]]));
+const attrs=ENT.reduce((n,e)=>n+e.a.length,0);
+const notKey=RELS.filter(r=>r[7].startsWith('Not a key'));
+document.getElementById('summary').innerHTML=`<span><b>${ENT.length}</b>entities</span><span><b>${ENT.filter(e=>e.assoc).length}</b>link entities</span><span><b>${attrs}</b>attributes</span><span><b>${ENT.reduce((n,e)=>n+e.a.filter(a=>a[2].includes('FK')).length,0)}</b>foreign keys</span><span class="rv"><b>${pii.length}</b>PII attributes</span><span><b>${RELS.length}</b>DIV-1 relationships traced</span><span class="rv"><b>${notKey.length}</b>not held as keys</span>`;
+
+const board=document.getElementById('board');
+board.innerHTML=Object.entries(DOM).map(([d,name])=>`<div class="col"><div class="colh"><span class="sw" style="background:var(--d-${d})"></span>${esc(name)}</div>`+
+ ENT.filter(e=>e.d===d).map(e=>`<button type="button" class="ent${e.assoc?' assoc':''}" data-e="${e.id}" style="--dc:var(--d-${d})" aria-pressed="false"><span class="eh"><span class="en">${e.id}</span><span class="ek">${e.assoc?'link':e.a.filter(a=>a[2].startsWith('PK')).length>1?'composite key':''}</span></span>
+ <ul>${e.a.map(a=>`<li class="${a[4]?'pii':''}" data-fk="${a[3]||''}"><span class="k ${a[2].startsWith('PK')?'pk':''}">${a[2]}</span><span class="a">${a[0]}</span><span class="t">${esc(a[1].split(':')[0])}</span></li>`).join('')}</ul></button>`).join('')+'</div>').join('');
+
+const detail=document.getElementById('detail');
+function show(id){const e=ent(id),o=refsOut(e),i=refsIn(e),r=RELS.filter(x=>x[2]===id||x[4].split(' · ').includes(id));
+  detail.innerHTML=`<div><span class="dom" style="color:var(--d-${e.d})">${DOM[e.d]}${e.assoc?' · link entity':''}</span><h3>${id}</h3><p>${esc(e.def)}</p></div>
+  <dl><dt>Attributes</dt><dd><ul>${e.a.map(a=>`<li><code>${a[2]||'—'}</code> ${a[0]} <span style="color:var(--muted)">${esc(a[1])}</span>${a[3]?' → '+a[3]:''}${a[4]?' <span class="chip gap">PII</span>':''}</li>`).join('')}</ul></dd></dl>
+  <dl><dt>References</dt><dd>${o.length?o.join(', '):'—'}</dd><dt>Referenced by</dt><dd>${i.length?i.join(', '):'—'}</dd><dt>DIV-1 relationships</dt><dd>${r.length?r.map(x=>x[0]).join(', '):'—'}</dd></dl>`}
+let current=null;
+function select(id){current=id;board.classList.add('focused');const e=ent(id),rel=new Set([...refsOut(e),...refsIn(e)]);
+  board.querySelectorAll('.ent').forEach(b=>{const k=b.dataset.e;b.classList.toggle('sel',k===id);b.classList.toggle('on',rel.has(k));b.setAttribute('aria-pressed',String(k===id));
+    b.querySelectorAll('li').forEach(li=>li.classList.toggle('link',(k===id&&!!li.dataset.fk&&rel.has(li.dataset.fk))||(rel.has(k)&&li.dataset.fk===id)))});
+  document.querySelectorAll('#rels tbody tr').forEach(r=>r.classList.toggle('sel',r.dataset.c===id||r.dataset.p.split(' · ').includes(id)));
+  show(id)}
+function clear(){current=null;board.classList.remove('focused');board.querySelectorAll('.sel,.on,.link').forEach(x=>x.classList.remove('sel','on','link'));board.querySelectorAll('[aria-pressed]').forEach(x=>x.setAttribute('aria-pressed','false'));
+  document.querySelectorAll('#rels tbody tr.sel').forEach(r=>r.classList.remove('sel'));show('Event');board.querySelector('[data-e="Event"]').classList.add('sel')}
+board.querySelectorAll('.ent').forEach(b=>b.addEventListener('click',()=>current===b.dataset.e?clear():select(b.dataset.e)));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)clear()});
+
+document.querySelector('#rels tbody').innerHTML=RELS.map(r=>`<tr data-c="${r[2]}" data-p="${r[4]}"><td class="id">${r[0]}</td><td>${esc(r[1])}</td><td><b>${r[2]}</b> <span class="mono">${esc(r[3])}</span></td><td>${esc(r[4])} <span class="mono">${esc(r[5])}</span></td><td class="mono">${esc(r[6])}</td><td>${r[7].startsWith('Not a key')?'<span class="chip gap">Not a key</span> '+esc(r[7].split(': ')[1]):esc(r[7])}</td></tr>`).join('');
+document.querySelectorAll('#rels tbody tr').forEach(r=>r.addEventListener('click',()=>select(r.dataset.c)));
+
+document.getElementById('findings').innerHTML=[
+ ['gap','PII',`<b>${pii.length} attributes carry PII</b>: ${pii.map(p=>p[0]+'.'+p[1]).join(', ')}. Event._raw is the widest: every index that stores raw events holds PII unless C1.4 masks it at source. RoleIndex is the only control on who reads it.`],
+ ['gap','Not a key',`<b>${notKey.map(r=>r[0]).join(', ')}</b> are not held as keys. Splunk records the input's file path or port in <code>source</code>, and searches name indexes and data models inside the SPL. Tracing them needs search-time parsing of saved searches.`],
+ ['ok','Resolved','<b>Four many-to-many relationships</b> (R1, R20, R21, R22) are resolved into link entities. UserRole is not stored in Splunk: it is rebuilt at each sign-in from SAML group mapping.'],
+ ['ext','Identity','<b>Event has no natural key.</b> Its identity is the index plus <code>_cd</code> (bucket and offset), so events cannot be referenced across a re-index. Finding uses the notable event id for the same reason.'],
+ ['gap','Owner','<b>DataClassification</b> is a logical entity with no Splunk object behind it. DIV-3 shows it only exists as an index naming convention.']
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+clear();
+</script>
+
+</body>
+</html>
