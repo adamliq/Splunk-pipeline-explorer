@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>CV-4 Capability Dependencies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV, DIV-1, CV-1 and CV-2 mockups. Banners, title block,
+   purpose, then the dependency diagram (the telemetry chain left to right, access above, platform below) beside an impact
+   panel, the dependency register, the matrix and delivery-order check, and external dependencies.
+   Line style encodes the dependency type, line weight its strength; red marks what stops, amber what degrades. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+/* Purpose */
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+
+/* Dependency diagram + impact panel */
+.model{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:14px;align-items:start}
+.model>*{min-width:0}
+@media (max-width:1100px){.model{grid-template-columns:1fr}}
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+svg.cv4{display:block;width:100%;min-width:900px;height:auto}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:2px;display:inline-block}
+.cap{cursor:pointer}
+.cap:focus{outline:none}
+.cap rect.box{fill:var(--node);stroke:var(--rule);stroke-width:1}
+.cap:focus-visible rect.box,.cap.sel rect.box{stroke:var(--sel);stroke-width:2.5}
+.cap .cid{font:600 10.5px var(--font-code);fill:var(--muted);letter-spacing:.06em}
+.cap .t{font:600 13.5px var(--font-title);fill:var(--ink)}
+.dep path.ln{fill:none;stroke:var(--line)}
+.dep.hard path.ln{stroke-width:2.4}
+.dep.soft path.ln{stroke-width:1.4}
+.dep.configuration path.ln{stroke-dasharray:7 4}
+.dep.identity path.ln{stroke-dasharray:2 4;stroke-linecap:round}
+.dep.platform path.ln{stroke-dasharray:9 3 2 3}
+.dep .head{fill:var(--line)}
+.dep circle{fill:var(--sheet);stroke:var(--line);stroke-width:1.2}
+.dep text{font:600 9.5px var(--font-code);fill:var(--ink-2)}
+.rowlabel{font:600 10.5px var(--font-code);letter-spacing:.12em;text-transform:uppercase;fill:var(--muted)}
+svg.focused .cap:not(.up):not(.down):not(.sel){opacity:.28}
+svg.focused .dep:not(.on){opacity:.12}
+svg.focused .cap.up rect.box{stroke:var(--up);stroke-width:2}
+svg.focused .cap.down.stop rect.box{stroke:var(--stop);stroke-width:2}
+svg.focused .cap.down.degr rect.box{stroke:var(--review);stroke-width:2}
+svg.focused .dep.on.upl path.ln{stroke:var(--up)}
+svg.focused .dep.on.upl .head{fill:var(--up)}
+svg.focused .dep.on.downl path.ln{stroke:var(--sel)}
+svg.focused .dep.on.downl .head{fill:var(--sel)}
+
+.impact{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:10px;align-content:start}
+.impact .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.impact h3{margin:0;font:700 1.12rem/1.2 var(--font-title)}
+.impact h4{margin:0;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.impact ul{margin:0;padding:0;list-style:none;display:grid;gap:6px;font-size:.84rem}
+.impact li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
+.impact .none{color:var(--muted);font-size:.84rem;margin:0}
+.impact .hint{font-size:.78rem;color:var(--muted);margin:0}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.degr,.chip.seq{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.up{color:var(--up);background:color-mix(in srgb,var(--up) 14%,transparent)}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+
+/* Tables */
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:0}
+#deps tbody tr{cursor:pointer}
+#deps tbody tr:hover,#deps tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code);white-space:nowrap}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:14px;align-items:start}
+@media (max-width:1000px){.two{grid-template-columns:1fr}}
+.two>div{display:grid;gap:14px;min-width:0}
+table.matrix{font:600 .74rem var(--font-code);text-align:center}
+.matrix th{text-align:center;padding:7px 6px}
+.matrix th.rh{text-align:left;white-space:nowrap}
+.matrix td{padding:6px;border-left:1px solid var(--rule);min-width:34px}
+.matrix td.self{background:var(--zone)}
+.matrix td.h{background:color-mix(in srgb,var(--line) 22%,transparent);color:var(--ink)}
+.matrix td.s{color:var(--ink-2)}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.cap,.dep{transition:opacity .15s}}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="cvTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="cvTitle">CV-4 · Capability Dependencies</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Capability (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">Capability owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>Which capabilities need which others to work, what passes between them, and what stops or degrades when one fails. Read with CV-2 for the capability parts and CV-1 for the delivery increments.</p></div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="model">
+        <figure>
+          <div class="figscroll">
+            <svg class="cv4" id="cv4" viewBox="0 0 1160 360" role="group" aria-label="Capability dependency diagram: eight capabilities and ten dependencies"></svg>
+          </div>
+          <figcaption>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--line)" stroke-width="2.4"/></svg>data</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--line)" stroke-width="1.4" stroke-dasharray="7 4"/></svg>configuration</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M2 5h30" stroke="var(--line)" stroke-width="2.4" stroke-dasharray="2 4" stroke-linecap="round"/></svg>identity</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--line)" stroke-width="1.4" stroke-dasharray="9 3 2 3"/></svg>platform</span>
+            <span class="key">Thick: hard, the capability stops without it · thin: soft, it degrades</span>
+            <span class="key">Arrows point from the provider to the capability that needs it</span>
+          </figcaption>
+        </figure>
+        <aside class="impact" id="impact" aria-live="polite"></aside>
+      </div>
+
+      <h2>Dependency register</h2>
+      <p class="sub">Each dependency, what the provider supplies, and what happens to the dependent capability when the provider is lost.</p>
+      <div class="tablewrap"><table id="deps">
+        <thead><tr><th>ID</th><th>Needs</th><th>Provided by</th><th>Type</th><th>Strength</th><th>What is provided</th><th>If the provider is lost</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+
+      <div class="two">
+        <div>
+          <h2>Dependency matrix</h2>
+          <p class="sub">Rows need columns. H hard, S soft.</p>
+          <div class="tablewrap"><table class="matrix" id="matrix"></table></div>
+        </div>
+        <div>
+          <h2>Delivery order (CV-2 parts)</h2>
+          <p class="sub">A part can only reach its target once the part it needs has. Same-increment pairs must be sequenced inside the increment.</p>
+          <div class="tablewrap"><table id="order">
+            <thead><tr><th>Part</th><th>Needs</th><th>Increments</th><th>Check</th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <h2>External dependencies</h2>
+      <p class="sub">Services outside this architecture that capabilities rely on. They have no Splunk component in the Builder topology.</p>
+      <div class="tablewrap"><table id="ext">
+        <thead><tr><th>External service</th><th>Needed by</th><th>Strength</th><th>If unavailable</th><th>Owner</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Capability owner not set · Dependencies derived from the Builder topology connections</span><span>CV-4 · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+const CAPS={C1:['Telemetry collection','collect'],C2:['Fleet configuration','collect'],C3:['Indexing and retention','index'],C4:['Search and analytics','search'],
+  C5:['Threat detection','detect'],C6:['Automated response','detect'],C7:['Identity and access','govern'],C8:['Platform health and licence','index']};
+// id, provider, dependent, type, hard, provided, if lost
+const DEPS=[
+ ['D1','C2','C1','configuration',false,'Inputs, outputs and server classes, delivered as apps on phone-home (8089 · TLS)','Forwarders keep their last configuration; no new sources or changes'],
+ ['D2','C1','C3','data',true,'Events over S2S (9997 · TLS) and HEC (8088 · TLS)','No new events are indexed; forwarders queue until their persistent queues fill'],
+ ['D3','C3','C4','data',true,'Indexed events in hot, warm and cold buckets','Searches return no results or partial results'],
+ ['D4','C4','C5','data',true,'Scheduled searches over accelerated CIM data models','Correlation searches stop; no new findings'],
+ ['D5','C5','C6','data',true,'Findings sent to SOAR as containers','No new cases; response falls back to manual triage'],
+ ['D6','C4','C6','data',false,'Enrichment searches from playbooks over REST (8089 · TLS)','Playbooks run without Splunk context'],
+ ['D7','C7','C4','identity',true,'SAML sign-in and group-to-role mapping','No analyst can sign in to search (break-glass admin only)'],
+ ['D8','C7','C6','identity',true,'SAML sign-in for SOAR analysts','Analysts cannot open or work cases'],
+ ['D9','C8','C3','platform',false,'Indexer queue, disk and bucket health alerts','Indexer problems are found late, after data is delayed'],
+ ['D10','C8','C4','platform',false,'Licence; search is blocked after repeated licence violations','Search may be blocked until the violation window clears']
+];
+const ORDER=[
+ ['C1.4 Filtering and masking at source',3,'C2.1 Configuration as code',1],
+ ['C3.3 Data replication',3,'C8.1 Licence management',1],
+ ['C7.2 Data access control',2,'C3.2 Retention management (index per classification)',2],
+ ['C5.1 Correlation detections',2,'C4.2 Normalised data (CIM)',2],
+ ['C6.1 Case management',2,'C5.1 Correlation detections',2],
+ ['C5.2 Risk-based alerting',3,'C5.1 Correlation detections',2],
+ ['C6.2 Playbook automation',3,'C6.1 Case management',2],
+ ['C4.3 Search high availability',3,'C3.3 Data replication',3]
+];
+const EXT=[
+ ['Inter-site WAN (Sydney ↔ Melbourne)','C1, C3',true,'Forwarders at the cut-off site queue locally; cross-site replication stops','Network team'],
+ ['Corporate identity provider','C7 → C4, C6',true,'No single sign-on; only the break-glass admin can sign in','Identity team'],
+ ['Public key infrastructure (TLS certificates)','C1, C3, C7',true,'Expired certificates break S2S, HEC and SAML connections','Not set'],
+ ['Time synchronisation (NTP)','C3, C5',false,'Wrong event times; correlations across sources are missed','Infrastructure team'],
+ ['AWS accounts and IAM roles','C1.3',true,'Cloud sources stop sending to HEC','Cloud team'],
+ ['IT service management (ticketing)','C6',false,'Cases are not synced to tickets; analysts update both by hand','Service desk']
+];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const NS='http://www.w3.org/2000/svg';
+function el(tag,a,p){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+
+// Summary
+const hard=DEPS.filter(d=>d[4]).length,seq=ORDER.filter(o=>o[1]===o[3]).length;
+document.getElementById('summary').innerHTML=`<span><b>8</b>capabilities</span><span><b>${DEPS.length}</b>dependencies</span><span><b>${hard}</b>hard</span><span><b>${DEPS.length-hard}</b>soft</span><span><b>${EXT.length}</b>external services</span><span class="rv"><b>${seq}</b>same-increment pairs to sequence</span><span class="rv"><b>1</b>external owner not set</span>`;
+
+// Layout: main chain left to right on one row; identity above, platform below
+const BW=150,BH=64,col=i=>30+i*190,ROW=148;
+const POS={C2:[col(0),ROW],C1:[col(1),ROW],C3:[col(2),ROW],C4:[col(3),ROW],C5:[col(4),ROW],C6:[col(5),ROW],C7:[col(4),24],C8:[col(2),272]};
+const svg=document.getElementById('cv4');
+const depG=el('g',{},svg),capG=el('g',{},svg);
+const cx=id=>POS[id][0]+BW/2, tp=id=>POS[id][1], bot=id=>POS[id][1]+BH, L=id=>POS[id][0], R=id=>POS[id][0]+BW, mid=id=>POS[id][1]+BH/2;
+// route points per dependency (provider → dependent), arrow ends at the last point; marker position m
+const ROUTES={
+ D1:[[R('C2'),mid('C2')],[L('C1'),mid('C1')]],
+ D2:[[R('C1'),mid('C1')],[L('C3'),mid('C3')]],
+ D3:[[R('C3'),mid('C3')],[L('C4'),mid('C4')]],
+ D4:[[R('C4'),mid('C4')],[L('C5'),mid('C5')]],
+ D5:[[R('C5'),mid('C5')],[L('C6'),mid('C6')]],
+ D6:[[cx('C4')+30,bot('C4')],[cx('C4')+30,bot('C4')+34],[cx('C6'),bot('C4')+34],[cx('C6'),bot('C6')]],
+ D7:[[L('C7'),mid('C7')],[cx('C4'),mid('C7')],[cx('C4'),tp('C4')]],
+ D8:[[R('C7'),mid('C7')],[cx('C6'),mid('C7')],[cx('C6'),tp('C6')]],
+ D9:[[cx('C8'),tp('C8')],[cx('C3'),bot('C3')]],
+ D10:[[R('C8'),mid('C8')],[cx('C4')-30,mid('C8')],[cx('C4')-30,bot('C4')]]
+};
+const MARK={D6:1,D7:0,D8:0,D10:0};// which segment carries the ID marker (default: first)
+const depEls={};
+DEPS.forEach(([id,from,to,type,isHard])=>{
+  const pts=ROUTES[id],g=el('g',{class:`dep ${type} ${isHard?'hard':'soft'}`},depG);g.dataset.id=id;g.dataset.from=from;g.dataset.to=to;
+  const last=pts[pts.length-1],prev=pts[pts.length-2],dx=Math.sign(last[0]-prev[0]),dy=Math.sign(last[1]-prev[1]),ah=9;
+  const end=[last[0]-dx*ah,last[1]-dy*ah];
+  el('path',{class:'ln',d:'M'+pts.slice(0,-1).map(p=>p.join(' ')).join(' L')+' L'+end.join(' ')},g);
+  const px=-dy,py=dx;el('path',{class:'head',d:`M${last[0]} ${last[1]} L${end[0]+px*5} ${end[1]+py*5} L${end[0]-px*5} ${end[1]-py*5}Z`},g);
+  const s=MARK[id]??0,a=pts[s],b=pts[s+1],m=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+  el('circle',{cx:m[0],cy:m[1],r:11},g);
+  el('text',{x:m[0],y:m[1]+3.5,'text-anchor':'middle'},g).textContent=id;
+  depEls[id]=g});
+el('text',{x:30,y:44,class:'rowlabel'},svg).textContent='Access';
+el('text',{x:30,y:ROW-12,class:'rowlabel'},svg).textContent='Telemetry chain';
+el('text',{x:30,y:292,class:'rowlabel'},svg).textContent='Platform';
+const capEls={};
+Object.entries(CAPS).forEach(([id,[name,d]])=>{const [x,y]=POS[id],g=el('g',{class:'cap',tabindex:0,role:'button','aria-pressed':'false','aria-label':`${id} ${name}`},capG);
+  el('rect',{x,y,width:BW,height:BH,rx:4,class:'box'},g);
+  el('rect',{x,y,width:5,height:BH,rx:2,fill:`var(--d-${d})`},g);
+  el('text',{x:x+14,y:y+20,class:'cid'},g).textContent=id;
+  const words=name.split(' '),lines=[];let cur='';words.forEach(w=>{if((cur+" "+w).trim().length>15&&cur){lines.push(cur);cur=w}else cur=(cur+' '+w).trim()});lines.push(cur);
+  lines.forEach((t,i)=>el('text',{x:x+14,y:y+38+i*16,class:'t'},g).textContent=t);
+  g.dataset.id=id;capEls[id]=g});
+
+// Impact analysis
+const out=id=>DEPS.filter(d=>d[1]===id), inn=id=>DEPS.filter(d=>d[2]===id);
+function downstream(id){const res={};const walk=(n,allHard,path)=>{out(n).forEach(d=>{const h=allHard&&d[4],k=d[2];if(path.includes(k))return;
+  const lvl=h?'stop':'degr';if(!res[k]||(res[k]==='degr'&&lvl==='stop'))res[k]=lvl;walk(k,h,[...path,k])})};walk(id,true,[id]);return res}
+function upstream(id){const res=new Set();const walk=n=>inn(n).forEach(d=>{if(!res.has(d[1])){res.add(d[1]);walk(d[1])}});walk(id);return res}
+function downEdges(id){const s=new Set(),seen=new Set([id]),q=[id];while(q.length){const n=q.shift();out(n).forEach(d=>{s.add(d[0]);if(!seen.has(d[2])){seen.add(d[2]);q.push(d[2])}})}return s}
+function upEdges(id){const s=new Set(),seen=new Set([id]),q=[id];while(q.length){const n=q.shift();inn(n).forEach(d=>{s.add(d[0]);if(!seen.has(d[1])){seen.add(d[1]);q.push(d[1])}})}return s}
+const impact=document.getElementById('impact');
+function showCap(id){
+  const dn=downstream(id),up=upstream(id),de=downEdges(id),ue=upEdges(id);
+  svg.classList.add('focused');
+  Object.entries(capEls).forEach(([k,g])=>{g.classList.toggle('sel',k===id);g.setAttribute('aria-pressed',String(k===id));g.classList.toggle('up',up.has(k));g.classList.toggle('down',!!dn[k]);g.classList.toggle('stop',dn[k]==='stop');g.classList.toggle('degr',dn[k]==='degr')});
+  Object.entries(depEls).forEach(([k,g])=>{g.classList.toggle('on',de.has(k)||ue.has(k));g.classList.toggle('downl',de.has(k));g.classList.toggle('upl',ue.has(k))});
+  document.querySelectorAll('#deps tbody tr').forEach(r=>r.classList.toggle('sel',de.has(r.dataset.k)||ue.has(r.dataset.k)));
+  const ext=EXT.filter(e=>e[1].includes(id));
+  const dl=Object.entries(dn).sort((a,b)=>a[1]===b[1]?a[0].localeCompare(b[0]):a[1]==='stop'?-1:1);
+  impact.innerHTML=`<span class="dom">Impact if lost</span><h3>${id} · ${esc(CAPS[id][0])}</h3>
+  <h4>Stops or degrades</h4>${dl.length?`<ul>${dl.map(([k,l])=>`<li><span class="chip ${l}">${l==='stop'?'Stops':'Degrades'}</span><span>${k} ${esc(CAPS[k][0])}</span></li>`).join('')}</ul>`:'<p class="none">Nothing else depends on it.</p>'}
+  <h4>Needs</h4>${inn(id).length?`<ul>${inn(id).map(d=>`<li><span class="chip up">${d[4]?'Hard':'Soft'}</span><span>${d[1]} ${esc(CAPS[d[1]][0])} <span class="id">${d[0]}</span></span></li>`).join('')}</ul>`:'<p class="none">No capability dependencies.</p>'}
+  ${ext.length?`<h4>External services</h4><ul>${ext.map(e=>`<li><span class="chip ${e[2]?'stop':'degr'}">${e[2]?'Hard':'Soft'}</span><span>${esc(e[0])}</span></li>`).join('')}</ul>`:''}
+  <p class="hint">“Stops” means every path from ${id} is a hard dependency. Esc clears.</p>`}
+function showDep(k){const d=DEPS.find(x=>x[0]===k);svg.classList.add('focused');
+  Object.entries(capEls).forEach(([id,g])=>{g.classList.remove('sel','down','stop','degr');g.classList.toggle('up',id===d[1]);g.classList.toggle('sel',id===d[2])});
+  Object.entries(depEls).forEach(([id,g])=>{g.classList.toggle('on',id===k);g.classList.toggle('downl',id===k);g.classList.remove('upl')});
+  document.querySelectorAll('#deps tbody tr').forEach(r=>r.classList.toggle('sel',r.dataset.k===k));
+  impact.innerHTML=`<span class="dom">Dependency ${k} · ${d[3]} · ${d[4]?'hard':'soft'}</span><h3>${d[2]} ${esc(CAPS[d[2]][0])} needs ${d[1]} ${esc(CAPS[d[1]][0])}</h3>
+  <h4>What is provided</h4><p class="none" style="color:var(--ink)">${esc(d[5])}</p><h4>If the provider is lost</h4><p class="none" style="color:var(--ink)">${esc(d[6])}</p><p class="hint">Esc clears.</p>`}
+function intro(){svg.classList.remove('focused');Object.values(capEls).forEach(g=>{g.classList.remove('sel','up','down','stop','degr');g.setAttribute('aria-pressed','false')});Object.values(depEls).forEach(g=>g.classList.remove('on','upl','downl'));
+  document.querySelectorAll('#deps tbody tr').forEach(r=>r.classList.remove('sel'));
+  const worst=Object.keys(CAPS).map(id=>[id,Object.values(downstream(id)).filter(v=>v==='stop').length]).sort((a,b)=>b[1]-a[1]);
+  impact.innerHTML=`<span class="dom">Single points of failure</span><h3>Capabilities that stop the most others</h3><ul>${worst.filter(w=>w[1]).map(([id,n])=>`<li><span class="chip stop">${n} stop</span><span>${id} ${esc(CAPS[id][0])}</span></li>`).join('')}</ul>
+  <p class="hint">C1, C3 and C7 sit on every path to detection and response. Select a capability or a dependency to trace its impact.</p>`}
+let current=null;
+function pick(k){if(current===k){current=null;intro();return}current=k;k[0]==='C'?showCap(k):showDep(k)}
+Object.entries(capEls).forEach(([id,g])=>{g.addEventListener('click',()=>pick(id));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(id)}})});
+Object.entries(depEls).forEach(([id,g])=>{g.style.cursor='pointer';g.addEventListener('click',()=>pick(id))});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current){current=null;intro()}});
+
+// Tables
+const sw=id=>`<span class="sw" style="background:var(--d-${CAPS[id][1]});margin-right:6px;vertical-align:-1px"></span>`;
+document.querySelector('#deps tbody').innerHTML=DEPS.map(d=>`<tr data-k="${d[0]}" tabindex="0"><td class="id">${d[0]}</td><td style="white-space:nowrap">${sw(d[2])}${d[2]} ${esc(CAPS[d[2]][0])}</td><td style="white-space:nowrap">${sw(d[1])}${d[1]} ${esc(CAPS[d[1]][0])}</td><td>${d[3]}</td><td><span class="chip ${d[4]?'stop':'degr'}">${d[4]?'Hard':'Soft'}</span></td><td>${esc(d[5])}</td><td>${esc(d[6])}</td></tr>`).join('');
+document.querySelectorAll('#deps tbody tr').forEach(r=>{r.addEventListener('click',()=>pick(r.dataset.k));r.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(r.dataset.k)}})});
+const ids=Object.keys(CAPS);
+document.getElementById('matrix').innerHTML=`<thead><tr><th class="rh">Needs ↓ · provider →</th>${ids.map(i=>`<th>${i}</th>`).join('')}</tr></thead><tbody>${ids.map(r=>`<tr><th class="rh">${sw(r)}${r} ${esc(CAPS[r][0])}</th>${ids.map(c=>{if(r===c)return'<td class="self"></td>';const d=DEPS.find(x=>x[2]===r&&x[1]===c);return d?`<td class="${d[4]?'h':'s'}" title="${d[0]}">${d[4]?'H':'S'}</td>`:'<td></td>'}).join('')}</tr>`).join('')}</tbody>`;
+document.querySelector('#order tbody').innerHTML=ORDER.map(o=>{const st=o[3]<o[1]?['ok','In order']:o[3]===o[1]?['seq','Sequence inside Inc '+o[1]]:['stop','Conflict'];
+  return `<tr><td>${esc(o[0])}</td><td>${esc(o[2])}</td><td class="mono">Inc ${o[3]} → Inc ${o[1]}</td><td><span class="chip ${st[0]}">${st[1]}</span></td></tr>`}).join('');
+document.querySelector('#ext tbody').innerHTML=EXT.map(e=>`<tr><td>${esc(e[0])}</td><td class="mono">${esc(e[1])}</td><td><span class="chip ${e[2]?'stop':'degr'}">${e[2]?'Hard':'Soft'}</span></td><td>${esc(e[3])}</td><td>${e[4]==='Not set'?'<span class="notset">Not set</span>':esc(e[4])}</td></tr>`).join('');
+intro();
+</script>
+
+</body>
+</html>
