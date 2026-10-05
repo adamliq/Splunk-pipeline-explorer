@@ -1,7 +1,7 @@
 # Builder handoff: add SvcV-6 (Services Resource Flow Matrix)
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
-**Start from:** Build 170 (`builder-cv1-v170`). Add one new block, `<script id="builder-svcv6-v1xx">`. Use wrappers only.
+**Start from:** the build that adds SvcV-1 and SvcV-2 ([`builder-handoff-svcv1-svcv2.md`](builder-handoff-svcv1-svcv2.md)), which implements sections 1–3 below as shared helpers. If SvcV-6 is built first, implement them here instead. Add one new block, `<script id="builder-svcv6-v1xx">`. Use wrappers only.
 **Mockup (the target):** [`docs/mockups/architecture-svcv6-mockup.html`](mockups/architecture-svcv6-mockup.html), screenshot `docs/mockups/compare/svcv6-mockup.png`. The column groups, filters, row detail and "Carried by" grid all work in it.
 **Test topology:** `docs/mockups/ov1-reference-topology.json` (load with `loadTopologyDocument`).
 
@@ -31,7 +31,7 @@ Follow the CV-1 pattern (`builder-cv1-v170`):
 | Step | SvcV-6 |
 |---|---|
 | Section | Wrap `builderOvSections135` again and add `svcv6: [builderSvcv6Page1xx(true)]` |
-| Tab | "SvcV-6 · Service flows", after the last CV tab. Later services tabs go next to it |
+| Tab | "SvcV-6 · Flow matrix", last in the Services viewpoint (order: SvcV-1, SvcV-2, SvcV-3a, SvcV-3b, SvcV-4, SvcV-6) |
 | Active key | Add `'svcv6'` to `builderOvShow135` (keep every existing key) |
 | Save / load | `doc.serviceFlowAttributes` ↔ `state.builderSvcv6`, through `builderSvcv6Clean1xx(raw)`. Wrap `topologyDocument` and `loadTopologyDocument` as CV-1 does |
 | Pack | `state.builderExport.sections.svcv6` / `exportPreferences.packSections.svcv6`, default `true`; read-only in the pack and Print / PDF |

@@ -24,7 +24,7 @@ Both are summaries. Every value is **derived** from the topology through the Svc
 |---|---|---|
 | Section | Wrap `builderOvSections135` once and add `svcv3a: [builderSvcv3aPage1xx(true)]` and `svcv3b: [builderSvcv3bPage1xx(true)]` | |
 | Tab | "SvcV-3a · Systems × services" | "SvcV-3b · Services × services" |
-| Tab order | SvcV-3a, SvcV-3b, SvcV-4, SvcV-6 | |
+| Tab order | SvcV-1, SvcV-2, SvcV-3a, SvcV-3b, SvcV-4, SvcV-6 | |
 | Active key | Add `'svcv3a'` and `'svcv3b'` to `builderOvShow135` (keep every existing key) | |
 | Pack | `sections.svcv3a` / `packSections.svcv3a`, default `true` | `sections.svcv3b` / `packSections.svcv3b`, default `true` |
 
