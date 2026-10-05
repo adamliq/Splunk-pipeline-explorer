@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>CV-2 Capability Taxonomy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV, DIV-1 and CV-1 mockups. Banners, title block, purpose,
+   the capability tree (root → eight level-1 capabilities from CV-1 → level-2 parts), a detail strip for the selected
+   capability with its measure, then the measures register and the conditions the measures assume.
+   Colour encodes the capability domain; amber marks anything partial, planned or not measured. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+/* Purpose line */
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+
+/* Taxonomy tree: root, then one column per level-1 capability, level-2 capabilities hang off a spine */
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+.treewrap{min-width:1120px;padding:16px 16px 18px;display:grid;gap:0}
+.lvl{font:600 .62rem/1 var(--font-code);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.root{justify-self:center;display:grid;gap:3px;text-align:center;background:var(--node);border:1px solid var(--rule);border-radius:4px;padding:9px 22px;margin-top:6px}
+.root b{font:700 1.02rem/1.2 var(--font-title)}
+.root span{font-size:.76rem;color:var(--muted)}
+.stem{justify-self:center;width:1.5px;height:16px;background:var(--line)}
+.tree{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:12px;position:relative;padding-top:16px}
+.tree::before{content:"";position:absolute;top:0;left:calc((100% - 84px)/16);right:calc((100% - 84px)/16);border-top:1.5px solid var(--line)}
+.branch{position:relative;display:grid;gap:8px;align-content:start;min-width:0}
+.branch::before{content:"";position:absolute;top:-16px;left:50%;height:16px;border-left:1.5px solid var(--line)}
+.l1{border:1px solid var(--rule);border-top:4px solid var(--dc);border-radius:4px;background:var(--node);padding:7px 9px 8px;display:grid;gap:2px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.l1 .cid{font:600 .66rem/1 var(--font-code);color:var(--muted);letter-spacing:.06em}
+.l1 b{font:700 .9rem/1.15 var(--font-title);text-wrap:balance}
+.l1 .g{font:500 .68rem/1.2 var(--font-code);color:var(--muted)}
+.subs{list-style:none;margin:0 0 0 10px;padding:0 0 0 10px;border-left:1.5px solid var(--line);display:grid;gap:7px}
+.subs li{position:relative}
+.subs li::before{content:"";position:absolute;left:-10px;top:17px;width:10px;border-top:1.5px solid var(--line)}
+.subs li:last-child::after{content:"";position:absolute;left:-12px;top:18px;bottom:-2px;width:4px;background:var(--zone)}
+.l2{width:100%;border:1px solid var(--rule);border-radius:4px;background:var(--node);padding:6px 8px;display:grid;gap:3px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.l2 .cid{font:600 .62rem/1 var(--font-code);color:var(--muted)}
+.l2 b{font:600 .8rem/1.15 var(--font-title)}
+.l2 .mv{font:500 .66rem/1.2 var(--font-code);color:var(--ink-2);font-variant-numeric:tabular-nums}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;vertical-align:1px}
+.dot.ok{background:var(--ok)}.dot.part{background:var(--review)}.dot.plan{border:1.5px solid var(--review)}
+.l1.sel,.l2.sel{border-color:var(--sel);box-shadow:0 0 0 1.5px var(--sel)}
+.l1.sel{border-top-color:var(--dc)}
+.treewrap.focused .branch:not(.on){opacity:.35}
+.treewrap.focused .branch.on .l2:not(.on){opacity:.45}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:2px;display:inline-block}
+
+/* Detail */
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px 16px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr) minmax(0,1fr);gap:12px 22px}
+@media (max-width:960px){.detail{grid-template-columns:1fr}}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase}
+.detail h3{margin:4px 0 6px;font:700 1.2rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.86rem;line-height:1.5}
+.detail dl{margin:0;display:grid;gap:8px;align-content:start}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.85rem}
+.detail code{font:500 .76rem var(--font-code);background:var(--zone);padding:1px 5px;border-radius:3px;overflow-wrap:anywhere}
+.gauge{display:grid;gap:4px}
+.bar{position:relative;height:10px;border-radius:5px;background:var(--zone);border:1px solid var(--rule)}
+.bar i{position:absolute;top:-1px;bottom:-1px;left:0;border-radius:5px;background:var(--dc)}
+.bar u{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink)}
+.gl{display:flex;justify-content:space-between;font:500 .72rem var(--font-code);color:var(--muted);font-variant-numeric:tabular-nums}
+.gl b{color:var(--ink)}
+
+/* Register */
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tbody tr{cursor:pointer}
+tbody tr:hover,tbody tr.sel{background:var(--hi)}
+tr.grp td{background:var(--zone);font:700 .8rem var(--font-title);cursor:pointer}
+td.num{font:500 .76rem var(--font-code);white-space:nowrap;font-variant-numeric:tabular-nums}
+td.src{font:500 .74rem var(--font-code);color:var(--ink-2)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.part,.chip.plan{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.conds{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.conds ul{margin:0;padding-left:18px;display:grid;gap:5px;font-size:.84rem}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.branch,.l2{transition:opacity .15s}}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="cvTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="cvTitle">CV-2 · Capability Taxonomy</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Capability (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">Capability owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>The capabilities in the CV-1 vision, broken down into the parts we can build, measure and assign. Each level-2 capability is part of its level-1 parent and has one measure with a current value, a target and the Splunk source the value comes from.</p></div>
+
+      <div class="summary" id="summary"></div>
+
+      <figure>
+        <div class="figscroll">
+          <div class="treewrap" id="tree" role="group" aria-label="Capability taxonomy: one root, eight level-1 capabilities and their level-2 parts">
+            <span class="lvl">Level 0 · Capability</span>
+            <div class="root"><b>Security telemetry operations</b><span>Collect, keep, search and act on security telemetry · CV-1 vision</span></div>
+            <div class="stem"></div>
+            <div class="tree" id="branches"></div>
+          </div>
+        </div>
+        <figcaption>
+          <span class="key"><span class="sw" style="background:var(--d-collect)"></span>Collection</span>
+          <span class="key"><span class="sw" style="background:var(--d-index)"></span>Indexing and platform</span>
+          <span class="key"><span class="sw" style="background:var(--d-search)"></span>Search</span>
+          <span class="key"><span class="sw" style="background:var(--d-detect)"></span>Detection and response</span>
+          <span class="key"><span class="sw" style="background:var(--d-govern)"></span>Governance and access</span>
+          <span class="key"><span class="dot ok"></span>in topology</span>
+          <span class="key"><span class="dot part"></span>partial</span>
+          <span class="key"><span class="dot plan"></span>planned</span>
+          <span class="key">Lines read "is part of". Click a capability to see its measure.</span>
+        </figcaption>
+      </figure>
+
+      <div class="detail" id="detail" aria-live="polite"></div>
+
+      <h2>Capability measures</h2>
+      <p class="sub">One measure per level-2 capability. Targets are due by the end of the increment shown (CV-1 roadmap).</p>
+      <div class="tablewrap"><table id="register">
+        <thead><tr><th>ID</th><th>Capability</th><th>Measure</th><th>Current</th><th>Target</th><th>By</th><th>Measured from</th><th>In topology</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+
+      <div class="conds">
+        <h2>Conditions the measures assume</h2>
+        <ul>
+          <li><b>Load:</b> normal ingest 180 GB/day; incident peaks at 2× for up to 6 hours.</li>
+          <li><b>Sites:</b> Sydney and Melbourne both up, except for the C3.3 and C4.3 measures, which are taken with one site down.</li>
+          <li><b>Search window:</b> response times are for a 24-hour search across all security indexes.</li>
+          <li><b>Population:</b> 1,850 Windows servers and workstations, 6 AWS accounts, 14 network sites.</li>
+        </ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Capability owner not set · Read with CV-1 (vision) and DIV-1 (data concepts)</span><span>CV-2 · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+// L1 capabilities from CV-1; each sub: [id, name, definition, measure, current, target, unit-free target bar {cur,tgt,max} or null, increment, source, status, realised by]
+const CAPS=[
+ {id:'C1',name:'Telemetry collection',d:'collect',g:'G1',subs:[
+  ['C1.1','Network and syslog collection','Receive syslog from network devices and appliances at each site without loss.','Syslog messages dropped',null,'< 0.1%',null,1,'_internal metrics.log on Syslog Servers','ok','Syslog Server, Syslog Source'],
+  ['C1.2','Endpoint collection','Collect Windows event logs and files from every in-scope host.','In-scope hosts forwarding','78%','100%',{c:78,t:100,m:100},1,'Monitoring Console · Forwarders: Deployment','ok','Universal Forwarder'],
+  ['C1.3','Cloud and API collection','Receive events from AWS workloads and SaaS APIs over HEC.','AWS accounts onboarded','0 of 6','6 of 6',{c:0,t:6,m:6},2,'HEC token usage in _introspection','ok','Heavy Forwarder, HEC Endpoint, AWS Lambda'],
+  ['C1.4','Filtering and masking at source','Drop noise and mask PII fields before data leaves the site.','Defined PII fields masked at source','0%','100%',{c:0,t:100,m:100},3,'Edge Processor pipeline metrics','plan','Edge Processor (not in topology)']]},
+ {id:'C2',name:'Fleet configuration',d:'collect',g:'G1',subs:[
+  ['C2.1','Configuration as code','Every input is defined in a versioned deployment app.','Inputs managed in apps','70%','100%',{c:70,t:100,m:100},1,'btool output compared with app repository','ok','Deployment Server, server classes'],
+  ['C2.2','Forwarder fleet health','Every forwarder phones home and runs the current apps.','Forwarders phoned home in 24 h','96%','≥ 99%',{c:96,t:99,m:100},2,'Deployment Server client list','ok','Deployment Server']]},
+ {id:'C3',name:'Indexing and retention',d:'index',g:'G4',subs:[
+  ['C3.1','Event indexing','Parse and store events at the daily volume with headroom.','Sustained ingest capacity','180 GB/day','300 GB/day',{c:180,t:300,m:320},1,'license_usage.log and indexer queue fill','ok','Indexer'],
+  ['C3.2','Retention management','Keep each class of data searchable for as long as policy says, then freeze it.','Searchable retention, security indexes','90 days','365 days',{c:90,t:365,m:400},2,'indexes.conf frozenTimePeriodInSecs','ok','Indexer, indexes.conf'],
+  ['C3.3','Data replication','Keep indexed data available when one site is lost.','Replication / search factor','1 / 1','2 / 2 multisite',{c:1,t:2,m:2},3,'Cluster Manager status','part','Indexer Cluster (not in topology)']]},
+ {id:'C4',name:'Search and analytics',d:'search',g:'G2',subs:[
+  ['C4.1','Ad hoc investigation','Analysts search all security data from one place.','Search time, 24 h window, p95',null,'≤ 30 s',null,1,'_audit search_et / total_run_time','ok','Search Head'],
+  ['C4.2','Normalised data (CIM)','Map sourcetypes to Common Information Model fields so detections work across vendors.','Sourcetypes CIM-compliant','35%','90%',{c:35,t:90,m:100},2,'CIM Validator · data model audit','ok','Search Head, data models'],
+  ['C4.3','Search high availability','Search keeps working when one search head or site fails.','Search heads in cluster','1','3',{c:1,t:3,m:3},3,'Search Head Cluster status','part','Search Head Cluster (not in topology)']]},
+ {id:'C5',name:'Threat detection',d:'detect',g:'G2',subs:[
+  ['C5.1','Correlation detections','Scheduled searches that raise findings for known attacker behaviour.','MITRE ATT&CK techniques covered','12','60',{c:12,t:60,m:70},2,'ES content coverage report','plan','Enterprise Security (not in topology)'],
+  ['C5.2','Risk-based alerting','Combine low-level signals into risk scores so analysts see fewer, better alerts.','Alerts per analyst per day','140','≤ 25',{c:140,t:25,m:150,lower:true},3,'ES risk index and notable volume','plan','Enterprise Security (not in topology)']]},
+ {id:'C6',name:'Automated response',d:'detect',g:'G2',subs:[
+  ['C6.1','Case management','Every high-severity finding becomes a tracked case.','High findings with a SOAR case','20%','100%',{c:20,t:100,m:100},2,'SOAR container report','ok','Splunk SOAR'],
+  ['C6.2','Playbook automation','Enrich and contain common incidents without manual steps.','Playbooks in production','0','10',{c:0,t:10,m:12},3,'SOAR playbook run history','ok','Splunk SOAR Playbook']]},
+ {id:'C7',name:'Identity and access',d:'govern',g:'G3',subs:[
+  ['C7.1','Single sign-on','Users sign in with the corporate identity provider.','Users signing in with SAML','60%','100%',{c:60,t:100,m:100},1,'_audit login events by method','ok','Authentication Provider (SAML)'],
+  ['C7.2','Data access control','Only named roles can search PII indexes.','PII indexes role-restricted','0 of 3','3 of 3',{c:0,t:3,m:3},2,'authorize.conf srchIndexesAllowed','ok','Search Head, roles'],
+  ['C7.3','Access review','Review who can read what, from audit evidence.','Access reviews per year','0','4',{c:0,t:4,m:4},3,'_audit search activity by role','ok','Search Head']]},
+ {id:'C8',name:'Platform health and licence',d:'index',g:'G4',subs:[
+  ['C8.1','Licence management','Keep daily ingest within the licence.','Peak daily licence use','104%','≤ 85%',{c:104,t:85,m:110,lower:true},1,'License Manager · license_usage.log','ok','License Manager'],
+  ['C8.2','Health monitoring','See platform problems before users do.','Health checks passing',null,'100%',null,2,'Monitoring Console health check','part','Monitoring Console (not in topology)'],
+  ['C8.3','Capacity planning','Forecast storage and licence need per index.','Forecast horizon','None','6 months',null,3,'Saved forecast search on license_usage.log','ok','License Manager, Search Head']]}
+];
+const ST={ok:'In topology',part:'Partial',plan:'Planned'};
+const INC={1:'Increment 1 · Dec 2026',2:'Increment 2 · Jun 2027',3:'Increment 3 · Dec 2027'};
+const DOM={collect:'Collection',index:'Indexing and platform',search:'Search',detect:'Detection and response',govern:'Governance and access'};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const SUBS=[];CAPS.forEach(c=>c.subs.forEach(s=>SUBS.push({p:c,id:s[0],name:s[1],def:s[2],m:s[3],cur:s[4],tgt:s[5],bar:s[6],inc:s[7],src:s[8],st:s[9],by:s[10]})));
+const notset='<span class="notset">Not measured</span>';
+
+const counts={ok:0,part:0,plan:0};SUBS.forEach(s=>counts[s.st]++);
+document.getElementById('summary').innerHTML=`<span><b>1</b>root</span><span><b>${CAPS.length}</b>level-1 capabilities</span><span><b>${SUBS.length}</b>level-2 capabilities</span><span><b>${SUBS.length}</b>measures</span><span><b>${counts.ok}</b>realised in the topology</span><span class="rv"><b>${counts.part+counts.plan}</b>partial or planned</span><span class="rv"><b>${SUBS.filter(s=>!s.cur).length}</b>not measured yet</span>`;
+
+document.getElementById('branches').innerHTML=CAPS.map(c=>`<div class="branch" data-k="${c.id}" style="--dc:var(--d-${c.d})">
+  <button type="button" class="l1" data-k="${c.id}" aria-pressed="false"><span class="cid">${c.id} · LEVEL 1</span><b>${esc(c.name)}</b><span class="g">Serves ${c.g}</span></button>
+  <ul class="subs">${c.subs.map(s=>{const x=SUBS.find(y=>y.id===s[0]);return `<li><button type="button" class="l2" data-k="${x.id}" aria-pressed="false"><span class="cid"><span class="dot ${x.st}" title="${ST[x.st]}"></span>${x.id}</span><b>${esc(x.name)}</b><span class="mv">${x.cur?esc(x.cur):'—'} → ${esc(x.tgt)}</span></button></li>`}).join('')}</ul></div>`).join('');
+
+document.querySelector('#register tbody').innerHTML=CAPS.map(c=>`<tr class="grp" data-k="${c.id}"><td class="id">${c.id}</td><td colspan="7"><span class="sw" style="background:var(--d-${c.d});margin-right:6px;vertical-align:-1px"></span>${esc(c.name)} <span class="id">· serves ${c.g}</span></td></tr>`+
+  SUBS.filter(s=>s.p===c).map(s=>`<tr data-k="${s.id}" tabindex="0"><td class="id">${s.id}</td><td>${esc(s.name)}</td><td>${esc(s.m)}</td><td class="num">${s.cur?esc(s.cur):notset}</td><td class="num"><b>${esc(s.tgt)}</b></td><td class="num">Inc ${s.inc}</td><td class="src">${esc(s.src)}</td><td><span class="chip ${s.st}">${ST[s.st]}</span></td></tr>`).join('')).join('');
+
+function gauge(s){if(!s.bar)return `<p class="gl"><span>Current ${s.cur?'<b>'+esc(s.cur)+'</b>':notset}</span><span>Target <b>${esc(s.tgt)}</b></span></p>`;
+  const b=s.bar,pc=v=>Math.max(0,Math.min(100,v/b.m*100));
+  return `<div class="gauge" style="--dc:var(--d-${s.p.d})"><div class="bar" role="img" aria-label="Current ${esc(s.cur)}, target ${esc(s.tgt)}"><i style="width:${pc(b.c)}%"></i><u style="left:calc(${pc(b.t)}% - 1px)"></u></div>
+  <div class="gl"><span>Current <b>${esc(s.cur)}</b></span><span>Target <b>${esc(s.tgt)}</b>${b.lower?' (lower is better)':''}</span></div></div>`}
+function detail(k){const box=document.getElementById('detail');
+  const c=CAPS.find(x=>x.id===k);
+  if(c){const subs=SUBS.filter(s=>s.p===c);box.style.setProperty('--dc',`var(--d-${c.d})`);
+    box.innerHTML=`<div><span class="dom" style="color:var(--d-${c.d})">${DOM[c.d]} · level 1</span><h3>${c.id} · ${esc(c.name)}</h3><p>Serves CV-1 goal ${c.g}. Made of ${subs.length} level-2 capabilities.</p></div>
+    <dl><dt>Parts</dt><dd>${subs.map(s=>`<div><span class="dot ${s.st}"></span>${s.id} ${esc(s.name)}</div>`).join('')}</dd></dl>
+    <dl><dt>Status</dt><dd>${subs.filter(s=>s.st==='ok').length} of ${subs.length} realised in the topology</dd><dt>Done by</dt><dd>${INC[Math.max(...subs.map(s=>s.inc))]}</dd></dl>`;return}
+  const s=SUBS.find(x=>x.id===k);
+  box.innerHTML=`<div><span class="dom" style="color:var(--d-${s.p.d})">${DOM[s.p.d]} · part of ${s.p.id} ${esc(s.p.name)}</span><h3>${s.id} · ${esc(s.name)}</h3><p>${esc(s.def)}</p></div>
+  <dl><dt>Measure</dt><dd>${esc(s.m)}</dd><dd>${gauge(s)}</dd><dt>Measured from</dt><dd><code>${esc(s.src)}</code></dd></dl>
+  <dl><dt>Target by</dt><dd>${INC[s.inc]}</dd><dt>Realised by</dt><dd>${esc(s.by)}</dd><dt>In topology</dt><dd><span class="chip ${s.st}">${ST[s.st]}</span></dd><dt>Serves</dt><dd>CV-1 goal ${s.p.g}</dd></dl>`}
+
+const tree=document.getElementById('tree');let current=null;
+function select(k){current=k;const parent=k.includes('.')?k.split('.')[0]:k;
+  tree.classList.add('focused');
+  document.querySelectorAll('.branch').forEach(b=>b.classList.toggle('on',b.dataset.k===parent));
+  document.querySelectorAll('.l2').forEach(e=>e.classList.toggle('on',!k.includes('.')||e.dataset.k===k));
+  document.querySelectorAll('.l1,.l2').forEach(e=>{e.classList.toggle('sel',e.dataset.k===k);e.setAttribute('aria-pressed',String(e.dataset.k===k))});
+  document.querySelectorAll('#register tbody tr').forEach(r=>r.classList.toggle('sel',r.dataset.k===k));
+  detail(k)}
+function clear(){current=null;tree.classList.remove('focused');document.querySelectorAll('.sel').forEach(e=>e.classList.remove('sel'));document.querySelectorAll('[aria-pressed]').forEach(e=>e.setAttribute('aria-pressed','false'));detail('C1.2');document.querySelectorAll('[data-k="C1.2"]').forEach(e=>e.classList.add('sel'))}
+document.querySelectorAll('.l1,.l2').forEach(b=>b.addEventListener('click',()=>current===b.dataset.k?clear():select(b.dataset.k)));
+document.querySelectorAll('#register tbody tr').forEach(r=>{r.addEventListener('click',()=>select(r.dataset.k));r.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(r.dataset.k)}})});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)clear()});
+clear();
+</script>
+
+</body>
+</html>
