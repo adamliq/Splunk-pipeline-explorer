@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>StdV-1 Standards Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as the OV, DIV, CV and SV mockups. Banners, title block, purpose,
+   compliance tiles and category filters, then the standards table (grouped by category) beside a detail panel with the
+   requirement and evidence, and findings. Compliance always pairs a word with its colour. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+.plane{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.model{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.model>*{min-width:0}
+@media (max-width:1150px){.model{grid-template-columns:1fr}}
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:9px;align-content:start}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:0;font:700 1.12rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.85rem}
+.detail dl{margin:0;display:grid;gap:7px}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.84rem}
+.detail ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:.84rem}
+.detail li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
+.detail code{font:500 .74rem var(--font-code);background:var(--zone);padding:1px 4px;border-radius:3px}
+.detail .hint{font-size:.78rem;color:var(--muted)}
+.headrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{font:600 .78rem var(--font-body);padding:6px 12px;border:0;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sheet)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg th.n,.reg td.n{text-align:right}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tbody tr:last-child td{border-bottom:0}
+.reg td.n{font:500 .76rem var(--font-code);font-variant-numeric:tabular-nums;white-space:nowrap}
+.reg tbody tr[data-k]{cursor:pointer}
+.reg tbody tr[data-k]:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tiles button{all:unset;cursor:pointer;border:1px solid var(--rule);border-top:3px solid var(--tc);border-radius:4px;background:var(--sheet);padding:9px 12px;display:grid;gap:3px}
+.tiles button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--sel)}
+.tiles b{font:600 1.5rem/1 var(--font-title);font-variant-numeric:tabular-nums}
+.tiles span{font-size:.78rem;color:var(--ink-2)}
+.filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.filters .lbl{font:600 .62rem var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.filters button{font:600 .74rem var(--font-body);padding:5px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.filters button[aria-pressed="true"]{border-color:var(--sel);color:var(--ink);background:color-mix(in srgb,var(--sel) 10%,var(--sheet))}
+.reg td.std b{font-weight:600}
+.reg td.std small{display:block;font:500 .72rem var(--font-code);color:var(--muted);margin-top:2px}
+.reg tr.grp td{background:var(--zone);font:700 .78rem var(--font-title);padding:5px 10px;cursor:default}
+.life{font:600 .62rem var(--font-code);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;color:var(--ink-2)}
+.life.retire{color:var(--stop)}.life.emerging{color:var(--sel)}
+.si{display:flex;flex-wrap:wrap;gap:3px}
+.si span{font:600 .62rem/1 var(--font-code);padding:3px 4px;border-radius:2px;background:var(--zone);color:var(--ink-2);white-space:nowrap}
+.cmp{display:inline-flex;gap:5px;align-items:center;font:600 .64rem/1 var(--font-code);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;padding:4px 6px;border-radius:3px}
+.cmp.met{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.cmp.partial{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.cmp.not{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.cmp.unknown{color:var(--muted);background:var(--zone)}
+.cmp.planned{color:var(--sel);background:color-mix(in srgb,var(--sel) 12%,transparent)}
+.empty{padding:16px;color:var(--muted)}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="sTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="sTitle">StdV-1 · Standards Profile</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Standards (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">Standards owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>The technical standards, vendor specifications and policies this architecture must follow, where each applies (SV-1 interfaces and systems), its status in the standards lifecycle, and whether the current topology complies.</p></div>
+
+      <div class="tiles" id="tiles" role="group" aria-label="Filter by compliance"></div>
+      <div class="filters" id="cats"></div>
+
+      <div class="model">
+        <div class="tablewrap"><table class="reg" id="stds"></table></div>
+        <aside class="detail" id="detail" aria-live="polite"></aside>
+      </div>
+
+      <div class="findings">
+        <h2>What the profile shows</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Standards owner not set · Compliance assessed against the Builder reference topology</span><span>StdV-1 · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// id, category, standard, reference, body, lifecycle (mandated|preferred|emerging|retire), applies to [], compliance, requires, evidence, related view
+const STD=[
+ ['S-01','Transport and security','Transport Layer Security 1.2 and 1.3','RFC 5246 · RFC 8446','IETF','mandated',['SI-3','SI-6','SI-7','SI-8','SI-9','SI-10','SI-11','SI-12','SI-13','SI-14','SI-15','SI-16','SI-17'],'met','TLS 1.2 or later on every network interface; earlier versions disabled (sslVersions = tls1.2).','All 13 Splunk, HEC and SAML interfaces require TLS.','SV-6, SV-10a R-04'],
+ ['S-02','Transport and security','X.509 certificates and path validation','RFC 5280','IETF','mandated',['SI-3','SI-8','SI-9','SI-10','SI-13','SI-14'],'unknown','Peers verify the certificate chain and name of the server they connect to.','sslVerifyServerCert is not recorded in the topology; SV-6 lists authentication as not set on six flows.','SV-10a R-05, SV-10b T2'],
+ ['S-03','Transport and security','Syslog over TLS','RFC 5425 (port 6514)','IETF','preferred',['SI-1','SI-4'],'not','Syslog that carries PII uses TCP with TLS.','Both syslog interfaces allow UDP 514 without TLS.','SV-10a R-06'],
+ ['S-04','Transport and security','Syslog over UDP','RFC 5426 (port 514)','IETF','retire',['SI-1','SI-4'],'partial','Retire for PII. Keep only for devices that cannot send TCP.','Still the default on both sites.','SV-2, SV-6'],
+ ['S-05','Transport and security','Australian Government ISM · Guidelines for Cryptography','ASD-approved cryptographic protocols','ASD','mandated',['All network interfaces'],'partial','Data in transit and at rest is protected with approved protocols and algorithms.','In transit: met except syslog. At rest: encryption not set for index buckets, KV store or the SOAR database (DIV-3).','DIV-3, SV-6'],
+ ['S-06','Data formats','The Syslog Protocol','RFC 5424','IETF','preferred',['SI-1','SI-4'],'partial','Structured header with a full timestamp including year and offset.','Most devices still send the older BSD format.','SV-4 F2.3'],
+ ['S-07','Data formats','BSD Syslog Protocol','RFC 3164','IETF','retire',['SI-1','SI-4'],'partial','Retire. Timestamps have no year or time zone, so TZ must be set per sourcetype on the indexers.','In use on both sites.','SV-4 timezone finding'],
+ ['S-08','Data formats','Date and time on the internet','RFC 3339 (ISO 8601 profile)','IETF','mandated',['Event','Finding'],'partial','Event times carry an explicit offset; _time is stored in UTC.','Met for HEC JSON and Windows XML; not for BSD syslog (S-07).','SV-4 F2.3'],
+ ['S-09','Data formats','JSON data interchange','RFC 8259','IETF','mandated',['SI-6','SI-15'],'met','HEC events and SOAR REST payloads are valid JSON.','HEC and SOAR REST interfaces declared.','SV-6'],
+ ['S-10','Data formats','Windows Event Log schema','Microsoft event XML schema','Microsoft','preferred',['Windows Event Log 1'],'not','Windows events collected as XML (renderXml = true) for full field fidelity.','Windows Event Log 1 is not connected to any forwarder.','SV-1, SV-5b'],
+ ['S-11','Data formats','AWS CloudTrail record format','CloudTrail event version 1.x','AWS','preferred',['SI-6'],'planned','CloudTrail and GuardDuty records forwarded unchanged over HEC.','AWS onboarding is Increment 2; HEC output (SI-14) missing.','CV-1, SV-2'],
+ ['S-12','Splunk platform','Splunk-to-Splunk protocol','Splunk Enterprise 9.x forwarding','Splunk','mandated',['SI-3','SI-13','SI-14'],'partial','Forwarders send to indexers over S2S with acknowledgement.','SI-3 met; SI-13 and SI-14 missing in the topology.','SV-10b'],
+ ['S-13','Splunk platform','HTTP Event Collector','Splunk HEC (services/collector)','Splunk','mandated',['SI-6'],'met','Tokens per source, scoped to named indexes, acknowledgement on.','Declared on Heavy Forwarder 1 with TLS. Token scoping needs a check (SV-10a R-12).','SV-10a R-12'],
+ ['S-14','Splunk platform','Splunk Common Information Model','CIM 5.x','Splunk','mandated',['C4.2','Search Head 1'],'partial','Sourcetypes map to CIM data models so detections work across vendors.','35% of sourcetypes CIM-compliant today; target 90% at Increment 2 (CV-2 C4.2).','CV-2'],
+ ['S-15','Identity and access','Security Assertion Markup Language','SAML 2.0','OASIS','mandated',['SI-11','SI-12'],'met','Signed assertions; roles mapped from directory groups.','Authentication Provider · Cloud 1 to Search Head 1 declared.','SV-10c sign-in'],
+ ['S-16','Identity and access','Multi-factor authentication for privileged users','ISM · multi-factor authentication controls','ASD','mandated',['Administrator 1','SI-11'],'met','MFA for every administrative sign-in.','MFA enforced at the identity provider.','SV-6'],
+ ['S-17','Detection content','MITRE ATT&CK for Enterprise','Current release','MITRE','preferred',['C5.1','C5.2'],'planned','Every correlation search is tagged with the techniques it detects.','No Enterprise Security component yet; 12 techniques covered by ad hoc searches.','CV-2 C5.1'],
+ ['S-18','Operations','Network Time Protocol','RFC 5905','IETF','mandated',['All systems'],'unknown','Every system synchronises to the same time source.','External dependency (CV-4); not recorded in the topology.','CV-4'],
+ ['S-19','Policy','Australian Government ISM · Guidelines for System Monitoring','Event logging and monitoring','ASD','mandated',['Whole architecture'],'partial','Security-relevant events are centrally logged, protected and retained, and analysed in a timely way.','Central logging partly met: Windows and Melbourne events never reach the indexer; retention is 90 days today.','SV-5b, DIV-3'],
+ ['S-20','Policy','Privacy Act 1988 · APP 11 security of personal information','Australian Privacy Principles','OAIC','mandated',['Event','Finding','User'],'partial','Personal information is protected from misuse and destroyed when no longer needed.','PII masked only at the indexer on the syslog path; encryption at rest not set; frozen data is deleted on schedule.','DIV-2, SV-4']
+];
+const CMP={met:['met','Compliant','var(--ok)'],partial:['partial','Partial','var(--review)'],not:['not','Not met','var(--stop)'],unknown:['unknown','Unknown','var(--line)'],planned:['planned','Planned','var(--sel)']};
+const LIFE={mandated:'Mandated',preferred:'Preferred',emerging:'Emerging',retire:'Retire'};
+let fc=null,fcat='all',current=null;
+const cats=[...new Set(STD.map(s=>s[1]))];
+function render(){const list=STD.filter(s=>(!fc||s[7]===fc)&&(fcat==='all'||s[1]===fcat)),groups=cats.filter(c=>list.some(s=>s[1]===c));
+  document.getElementById('stds').innerHTML=`<thead><tr><th>ID</th><th>Standard</th><th>Body</th><th>Lifecycle</th><th>Applies to</th><th>Compliance</th></tr></thead><tbody>${list.length?groups.map(g=>`<tr class="grp"><td colspan="6">${esc(g)}</td></tr>`+list.filter(s=>s[1]===g).map(s=>`<tr data-k="${s[0]}" tabindex="0"><td class="id">${s[0]}</td><td class="std"><b>${esc(s[2])}</b><small>${esc(s[3])}</small></td><td>${esc(s[4])}</td><td><span class="life ${s[5]}">${LIFE[s[5]]}</span></td><td><span class="si">${s[6].slice(0,6).map(x=>`<span>${esc(x)}</span>`).join('')}${s[6].length>6?`<span>+${s[6].length-6}</span>`:''}</span></td><td><span class="cmp ${s[7]}">${CMP[s[7]][1]}</span></td></tr>`).join('')).join(''):'<tr><td colspan="6" class="empty">No standards match these filters.</td></tr>'}</tbody>`;
+  document.querySelectorAll('#stds tbody tr[data-k]').forEach(r=>{r.classList.toggle('sel',r.dataset.k===current);r.addEventListener('click',()=>pick(r.dataset.k));r.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(r.dataset.k)}})});
+  document.querySelectorAll('#tiles button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.c===fc)));
+  document.querySelectorAll('#cats button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.t===fcat)))}
+document.getElementById('tiles').innerHTML=Object.entries(CMP).map(([k,v])=>`<button type="button" data-c="${k}" style="--tc:${v[2]}"><b>${STD.filter(s=>s[7]===k).length}</b><span>${v[1]}</span></button>`).join('');
+document.querySelectorAll('#tiles button').forEach(b=>b.addEventListener('click',()=>{fc=fc===b.dataset.c?null:b.dataset.c;render()}));
+document.getElementById('cats').innerHTML='<span class="lbl">Category</span>'+['all',...cats].map(c=>`<button type="button" data-t="${esc(c)}">${c==='all'?'All':esc(c)}</button>`).join('');
+document.querySelectorAll('#cats button').forEach(b=>b.addEventListener('click',()=>{fcat=b.dataset.t;render()}));
+const detail=document.getElementById('detail');
+function show(k){const s=STD.find(x=>x[0]===k);
+  detail.innerHTML=`<span class="dom">${esc(s[1])} · ${esc(s[4])} · ${LIFE[s[5]]}</span><h3>${s[0]} · ${esc(s[2])}</h3><p class="mono">${esc(s[3])}</p>
+  <dl><dt>Requires</dt><dd>${esc(s[8])}</dd><dt>Applies to</dt><dd><span class="si">${s[6].map(x=>`<span>${esc(x)}</span>`).join('')}</span></dd><dt>Compliance on this topology</dt><dd><span class="cmp ${s[7]}">${CMP[s[7]][1]}</span> ${esc(s[9])}</dd><dt>See</dt><dd>${esc(s[10])}</dd></dl>`}
+function intro(){const bad=STD.filter(s=>s[7]==='not'||s[7]==='partial');
+  detail.innerHTML=`<span class="dom">Compliance gaps</span><h3>${STD.filter(s=>s[7]==='not').length} not met, ${STD.filter(s=>s[7]==='partial').length} partial</h3><ul>${bad.map(s=>`<li><span class="cmp ${s[7]}">${s[0]}</span><span>${esc(s[2])}</span></li>`).join('')}</ul><p class="hint">Select a standard for what it requires and the evidence. Esc clears.</p>`}
+function pick(k){current=current===k?null:k;current?show(k):intro();document.querySelectorAll('#stds tbody tr').forEach(r=>r.classList.toggle('sel',r.dataset.k===current))}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current){current=null;intro();render()}});
+document.getElementById('findings').innerHTML=[
+ ['stop','Syslog','<b>Syslog is the weakest point against the profile.</b> Both sites send BSD syslog (S-07) over UDP (S-04), so S-03 TLS transport is not met, S-06 is only partial and timestamps have no year or time zone (S-08). Moving capable devices to RFC 5424 over TLS on 6514 closes four rows at once.'],
+ ['gap','ISM','<b>Both ISM rows are partial.</b> Cryptography (S-05) fails on data at rest, not in transit; system monitoring (S-19) fails because Windows and Melbourne events never reach the indexer.'],
+ ['gap','Privacy','<b>APP 11 (S-20) is partial</b> for the same reasons DIV-3 and SV-4 flag: PII masked late, no encryption at rest, and no archive before deletion.'],
+ ['ext','Unknown','<b>Certificate validation (S-02) and time synchronisation (S-18) cannot be assessed from the topology.</b> Both underpin other rows: without them, TLS (S-01) and timestamps (S-08) are weaker than they look.'],
+ ['ok','Met','<b>TLS on Splunk interfaces, HEC, JSON, SAML and MFA are compliant.</b> The platform\'s own interfaces meet the profile; the gaps are at the edges, in sources and stores.']
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+render();intro();
+</script>
+
+</body>
+</html>
