@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>SvcV-2 Services Resource Flows</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one architecture-pack sheet in the same family as every other view in the pack. Banners, title block, purpose, then the
+   service data-flow diagram (Sydney and Melbourne path, AWS path), platform flow cards, a detail panel, the flow table with
+   filters, and findings. Amber marks gaps or planned flows; red marks missing flows. */
+:root{
+  --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
+  --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
+  --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
+  --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
+.page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
+.page>*,.inner>*,.sheet>*{min-width:0}
+.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
+.banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
+.banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
+.inner{padding:18px 22px 20px;display:grid;gap:18px}
+.titleblock{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
+.titleblock>div{padding:8px 10px;border-left:1px solid var(--rule);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
+.tb-v.big{font-size:1.25rem;text-wrap:balance}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+@media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
+.summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.summary .rv b{color:var(--review)}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose .tb-k{white-space:nowrap}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+@media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
+h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
+.chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.chip.ext{color:var(--muted);background:var(--zone)}
+.plane{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.model{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.model>*{min-width:0}
+@media (max-width:1150px){.model{grid-template-columns:1fr}}
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:9px;align-content:start}
+.detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail h3{margin:0;font:700 1.12rem/1.2 var(--font-title)}
+.detail p{margin:0;font-size:.85rem}
+.detail dl{margin:0;display:grid;gap:7px}
+.detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.detail dd{margin:2px 0 0;font-size:.84rem}
+.detail ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:.84rem}
+.detail li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
+.detail code{font:500 .74rem var(--font-code);background:var(--zone);padding:1px 4px;border-radius:3px}
+.detail .hint{font-size:.78rem;color:var(--muted)}
+.headrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{font:600 .78rem var(--font-body);padding:6px 12px;border:0;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sheet)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
+.reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg th.n,.reg td.n{text-align:right}
+.reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.reg tbody tr:last-child td{border-bottom:0}
+.reg td.n{font:500 .76rem var(--font-code);font-variant-numeric:tabular-nums;white-space:nowrap}
+.reg tbody tr[data-k]{cursor:pointer}
+.reg tbody tr[data-k]:hover,.reg tbody tr.sel{background:var(--hi)}
+.id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
+.mono{font:500 .76rem var(--font-code)}
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+.purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
+.purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
+svg.sf{display:block;width:100%;min-width:980px;height:auto}
+.row rect{fill:var(--sheet);stroke:var(--rule)}
+.row text{font:600 10px var(--font-code);letter-spacing:.1em;text-transform:uppercase;fill:var(--muted)}
+.nd{cursor:pointer}
+.nd rect.box{fill:var(--node);stroke:var(--line);stroke-width:1.2}
+.nd.actor rect.box{fill:transparent;stroke-dasharray:2 3}
+.nd.off rect.box{stroke:var(--review);stroke-dasharray:5 3;fill:color-mix(in srgb,var(--review) 6%,var(--node))}
+.nd rect.bar{stroke:none}
+.nd .id{font:600 9.5px var(--font-code);fill:var(--muted)}
+.nd .t{font:600 11px var(--font-title);fill:var(--ink)}
+.nd.off .t{fill:var(--review)}
+.nd.sel rect.box{stroke:var(--sel);stroke-width:2.6}
+.fl{cursor:pointer}
+.fl path.l{fill:none;stroke:var(--line);stroke-width:1.8}
+.fl .hd{fill:var(--line)}
+.fl.gap path.l{stroke:var(--review);stroke-dasharray:6 3}.fl.gap .hd{fill:var(--review)}
+.fl.planned path.l{stroke:var(--review);stroke-dasharray:2 3}.fl.planned .hd{fill:var(--review)}
+.fl.missing path.l{stroke:var(--stop);stroke-dasharray:6 4}.fl.missing .hd{fill:var(--stop)}
+.fl rect.tag{fill:var(--sheet);stroke:var(--line)}
+.fl.gap rect.tag,.fl.planned rect.tag{stroke:var(--review)}.fl.missing rect.tag{stroke:var(--stop)}
+.fl text{font:600 9px var(--font-code);fill:var(--ink-2)}
+.fl .hit{fill:none;stroke:transparent;stroke-width:12}
+svg.focused .nd:not(.on){opacity:.25}
+svg.focused .fl:not(.on){opacity:.12}
+svg.focused .fl.on path.l{stroke-width:2.6}
+.plat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:900px){.plat{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.plat{grid-template-columns:1fr}}
+.pc{all:unset;cursor:pointer;border:1px solid var(--rule);border-left:4px solid var(--pc);border-radius:4px;background:var(--sheet);padding:8px 10px;display:grid;gap:3px}
+.pc.sel{box-shadow:0 0 0 2px var(--sel)}
+.pc b{font:600 .84rem var(--font-title)}
+.pc span{font-size:.78rem;color:var(--ink-2)}
+.pc .id{font:600 .66rem var(--font-code);color:var(--muted)}
+.filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.filters .lbl{font:600 .62rem var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.filters button{font:600 .74rem var(--font-body);padding:5px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.filters button[aria-pressed="true"]{border-color:var(--sel);color:var(--ink);background:color-mix(in srgb,var(--sel) 10%,var(--sheet))}
+.reg td .bad{color:var(--stop);font-weight:600}
+.model.wide{grid-template-columns:1fr}
+.empty{padding:16px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.nd,.fl{transition:opacity .15s}}
+</style>
+
+<div class="page">
+  <span class="example">Example content · reference topology</span>
+  <section class="sheet" aria-labelledby="sTitle">
+    <div class="banner top">Security telemetry + PII</div>
+    <div class="inner">
+      <div class="titleblock">
+        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="sTitle">SvcV-2 · Services Resource Flow Description</span></div>
+        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
+        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Services (DoDAF V2.0)</span></div>
+        <div><span class="tb-k">Service owner</span><span class="tb-v">Security telemetry service owner</span></div>
+        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
+      </div>
+
+      <div class="purpose"><span class="tb-k">Purpose</span><p>The data each service passes to the next, end to end: what is exchanged, on which interface, how much, how fast and how it is protected. Each service flow (SF-n) is implemented by one or more SV-1 system interfaces and traces to an OV-3 resource flow.</p></div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="model wide">
+        <figure>
+          <div class="figscroll"><svg class="sf" id="sf" viewBox="0 0 1200 270" role="group" aria-label="Service data flows from sources to response"></svg></div>
+          <figcaption>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--line)" stroke-width="1.8"/></svg>in place</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--review)" stroke-width="1.8" stroke-dasharray="6 3"/></svg>in place with a gap</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--review)" stroke-width="1.8" stroke-dasharray="2 3"/></svg>planned or inferred</span>
+            <span class="key"><svg width="34" height="10" aria-hidden="true"><path d="M1 5h32" stroke="var(--stop)" stroke-width="1.8" stroke-dasharray="6 4"/></svg>missing</span>
+            <span class="key">Data flows only; platform flows are listed below. Click a service or a tag.</span>
+          </figcaption>
+        </figure>
+      </div>
+
+      <h2>Platform flows</h2>
+      <p class="sub">Configuration, sign-in, licence and monitoring flows that support the data path.</p>
+      <div class="plat" id="plat"></div>
+
+      <div class="detail" id="detail" aria-live="polite"></div>
+
+      <div class="filters" id="ff"></div>
+      <div class="tablewrap"><table class="reg" id="flows"></table></div>
+
+      <div class="findings">
+        <h2>What the view shows</h2>
+        <ul id="findings"></ul>
+      </div>
+
+      <div class="foot"><span>Splunk security telemetry architecture · Services from SvcV-1 · Interfaces from SV-1 · Volumes from SV-2 and SV-6</span><span>SvcV-2 · 1 of 1 · Build 167</span></div>
+    </div>
+    <div class="banner bottom">Security telemetry + PII</div>
+  </section>
+</div>
+
+<script>
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// nodes: id, name, col, row (A|B), deployed, actor, domain
+const N=[['NET','Network devices',0,'A',true,true,'collect'],['S3','Syslog reception',1,'A',true,false,'collect'],['S1','Universal forwarding',2,'A',true,false,'collect'],['S7','Indexing',3,'A',true,false,'index'],['S9','Search and REST API',4,'A',true,false,'search'],['S12','Correlation and risk',5,'A',false,false,'detect'],['S13','Cases and playbooks',6,'A',true,false,'detect'],['SD','Service desk',7,'A',true,true,'govern'],
+ ['AWS','AWS workloads',0,'B',true,true,'collect'],['S4','HTTP Event Collector',1,'B',true,false,'collect'],['S2','Heavy forwarding and parsing',2,'B',true,false,'collect'],['SOC','SOC analysts',4,'B',true,true,'detect'],['S10','Data model acceleration',5,'B',true,false,'search']];
+const X=c=>20+c*150,W=118,H=54,Y=r=>r==='A'?40:150,CY=r=>Y(r)+H/2;
+const nd=id=>N.find(n=>n[0]===id);
+// flows: id, from, to, data, protocol, today, target GB/day, latency, security, implements, plane, status (ok|gap|planned|missing), note, points
+const F=[
+ ['SF-01','NET','S3','Firewall and appliance syslog','Syslog UDP/TCP 514',48,55,'≤ 5 s','None','SI-1, SI-4 · RF-02, RF-04','data','gap','UDP without TLS carries PII.'],
+ ['SF-02','S3','S1','Per-host log files','Local file tail',48,55,'≤ 5 s','Local file permissions','SI-2, SI-5 · RF-02, RF-04','data','ok',''],
+ ['SF-03','S1','S7','Raw event stream','S2S 9997 · TLS',30,34,'≤ 60 s','TLS, indexer acknowledgement','SI-3, SI-13 · RF-06, RF-07','data','gap','Only Sydney arrives: Universal Forwarder 2 has no output (SI-13), so 18 GB/day of Melbourne syslog is lost.'],
+ ['SF-04','AWS','S4','CloudTrail and GuardDuty JSON','HEC HTTPS 8088 · TLS',0,22,'≤ 60 s','TLS, HEC token','SI-6 · RF-05','data','ok','Volume arrives at Increment 2.'],
+ ['SF-05','S4','S2','HEC events to parsing','Internal pipeline',0,22,'< 1 s','Same instance','— · RF-05','data','ok',''],
+ ['SF-06','S2','S7','Parsed events, PII masked','S2S 9997 · TLS',0,22,'≤ 60 s','TLS, indexer acknowledgement','SI-14 · RF-08','data','missing','No output from Heavy Forwarder 1.'],
+ ['SF-07','S7','S9','Search results','REST 8089 · TLS',5,12,'≤ 30 s p95','TLS, pass4SymmKey','SI-7 · RF-09','data','ok',''],
+ ['SF-08','S7','S10','Data model summaries','Internal (tsidx)',1,3,'5 min','Indexer storage','— · RF-09','data','ok',''],
+ ['SF-09','S9','S12','Scheduled correlation searches','Internal',0,0,'5 min','Role-based','— · RF-10','data','planned','Needs Enterprise Security.'],
+ ['SF-10','S10','S12','CIM data models','Internal',0,0,'5 min','Role-based','— · RF-10','data','planned',''],
+ ['SF-11','S12','S13','Findings for playbooks','SOAR REST 443 · TLS',0,0.6,'≤ 60 s','TLS, automation token','SI-15 · RF-11','data','planned','Inferred in SV-1; not in the topology.'],
+ ['SF-12','S13','SD','Cases and ticket updates','REST 443 · TLS',0,0.1,'≤ 5 min','Not set','— · RF-14','data','missing','No interface to the ticketing system.'],
+ ['SF-13','S9','SOC','Dashboards and investigation','HTTPS 8000 · TLS',0.5,1,'≤ 30 s p95','SAML session, roles','SI-12 · RF-10','data','ok',''],
+ ['SF-14','S5','S1, S2','App and configuration bundles','Phone-home 8089 · TLS',0.05,0.05,'≤ 30 s','TLS; certificate check not set','SI-8, SI-9, SI-10 · RF-12','platform','ok',''],
+ ['SF-15','S14','S9, S13','SAML assertions','SAML 2.0 · HTTPS',0.01,0.01,'≤ 30 s','Signed assertion, MFA','SI-11, SI-12 · RF-13','platform','ok','SOAR sign-in is not in the topology.'],
+ ['SF-16','S7','S15','Licence usage','REST 8089 · TLS',0.01,0.01,'Every 60 s','TLS, pass4SymmKey','SI-16 · RF-15','platform','planned','Inferred, not in the topology.'],
+ ['SF-17','S16','S7, S9','Health metrics','REST 8089 · TLS',0.2,0.2,'Every 5 min','TLS','SI-17 · RF-15','platform','planned','Inferred, not in the topology.']
+];
+const PNAME={S5:'Deployment',S14:'SAML sign-in',S15:'Licence management',S16:'Platform monitoring'};
+const ROUTES={
+ 'SF-06':()=>[[X(2)+W,CY('B')],[X(3)+40,CY('B')],[X(3)+40,Y('A')+H]],
+ 'SF-08':()=>[[X(3)+80,Y('A')+H],[X(3)+80,Y('B')+H+24],[X(5)+59,Y('B')+H+24],[X(5)+59,Y('B')+H]],
+ 'SF-10':()=>[[X(5)+59,Y('B')],[X(5)+59,Y('A')+H]],
+ 'SF-13':()=>[[X(4)+59,Y('A')+H],[X(4)+59,Y('B')]]
+};
+const route=f=>ROUTES[f[0]]?ROUTES[f[0]]():(()=>{const a=nd(f[1]),b=nd(f[2]);return [[X(a[2])+W,CY(a[3])],[X(b[2]),CY(b[3])]]})();
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+const svg=document.getElementById('sf');
+[['A','Sydney and Melbourne path'],['B','AWS path and consumers']].forEach(([r,n])=>{const g=el('g',{class:'row'},svg);el('rect',{x:10,y:Y(r)-24,width:1180,height:r==='A'?100:110},g);el('text',{x:20,y:Y(r)-10},g).textContent=n});
+const fG=el('g',{},svg),nG=el('g',{},svg),tG=el('g',{},svg);const flEls={};
+F.filter(f=>f[10]==='data').forEach(f=>{const pts=route(f),g=el('g',{class:'fl '+f[11]},fG);g.dataset.k=f[0];
+  const last=pts[pts.length-1],prev=pts[pts.length-2],dx=Math.sign(last[0]-prev[0]),dy=Math.sign(last[1]-prev[1]),end=[last[0]-dx*8,last[1]-dy*8];
+  el('path',{class:'hit',d:'M'+pts.map(p=>p.join(' ')).join(' L')},g);el('path',{class:'l',d:'M'+pts.slice(0,-1).map(p=>p.join(' ')).join(' L')+' L'+end.join(' ')},g);
+  el('path',{class:'hd',d:`M${last[0]} ${last[1]} L${end[0]-dy*4.5} ${end[1]+dx*4.5} L${end[0]+dy*4.5} ${end[1]-dx*4.5}Z`},g);
+  let seg=0,best=0;for(let i=0;i<pts.length-1;i++){const L=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1]);if(L>best){best=L;seg=i}}
+  const horiz=pts[seg][1]===pts[seg+1][1],m=[(pts[seg][0]+pts[seg+1][0])/2,(pts[seg][1]+pts[seg+1][1])/2],tg=el('g',{class:'fl '+f[11]},tG);tg.dataset.k=f[0];
+  el('rect',{class:'tag',x:m[0]-12,y:m[1]-8,width:24,height:16,rx:8},tg);el('text',{x:m[0],y:m[1]+3,'text-anchor':'middle'},tg).textContent=f[0].replace('SF-','');
+  [g,tg].forEach(x=>x.addEventListener('click',()=>pick(f[0])));flEls[f[0]]=[g,tg]});
+const ndEls={};
+N.forEach(n=>{const g=el('g',{class:'nd'+(n[5]?' actor':'')+(n[4]?'':' off'),tabindex:0,role:'button','aria-label':n[1]},nG);g.dataset.k=n[0];const x=X(n[2]),y=Y(n[3]);
+  el('rect',{class:'box',x,y,width:W,height:H,rx:n[5]?22:5},g);if(!n[5])el('rect',{class:'bar',x,y,width:W,height:4,rx:2,fill:`var(--d-${n[6]})`},g);
+  el('text',{class:'id',x:x+10,y:y+15},g).textContent=n[5]?'consumer / source':n[0]+(n[4]?'':' · not deployed');
+  const words=n[1].split(' '),lines=[];let cur='';words.forEach(w=>{if((cur+' '+w).trim().length>13&&cur){lines.push(cur);cur=w}else cur=(cur+' '+w).trim()});lines.push(cur);
+  lines.slice(0,3).forEach((t,i)=>el('text',{class:'t',x:x+10,y:y+28+i*11.5},g).textContent=t);
+  g.addEventListener('click',()=>pick(n[0]));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(n[0])}});ndEls[n[0]]=g});
+document.getElementById('plat').innerHTML=F.filter(f=>f[10]==='platform').map(f=>`<button type="button" class="pc" data-k="${f[0]}" style="--pc:${f[11]==='ok'?'var(--d-govern)':'var(--review)'}"><span class="id">${f[0]} · ${f[1]} ${PNAME[f[1]]||esc(nd(f[1])?nd(f[1])[1]:f[1])} → ${esc(f[2])}</span><b>${esc(f[3])}</b><span>${esc(f[4])} · ${f[11]==='ok'?'in place':'planned or inferred'}</span></button>`).join('');
+document.querySelectorAll('.pc').forEach(b=>b.addEventListener('click',()=>pick(b.dataset.k)));
+
+const STF={ok:['ok','In place'],gap:['gap','In place, gap'],planned:['gap','Planned or inferred'],missing:['stop','Missing']};
+let filt='all',current=null;
+const att=f=>f[11]!=='ok'||/None|Not set/.test(f[8]);
+function renderTable(){const list=F.filter(f=>filt==='all'||(filt==='att'?att(f):f[10]===filt));
+  document.getElementById('flows').innerHTML=`<thead><tr><th>Flow</th><th>From → to</th><th>Data</th><th>Protocol · port</th><th class="n">GB/day today → target</th><th>Latency</th><th>Security</th><th>Implements (SV-1 · OV-3)</th><th>Status</th></tr></thead><tbody>${list.length?list.map(f=>{const nm=id=>id.split(', ').map(x=>nd(x)?nd(x)[1]:(PNAME[x]||x)).join(', ');
+   return `<tr data-k="${f[0]}"><td class="id">${f[0]}</td><td>${esc(nm(f[1]))} → ${esc(nm(f[2]))}</td><td>${esc(f[3])}</td><td class="mono">${esc(f[4])}</td><td class="n">${f[5]||'—'} → ${f[6]||'—'}</td><td class="mono">${esc(f[7])}</td><td>${/None|Not set/.test(f[8])?'<span class="bad">'+esc(f[8])+'</span>':esc(f[8])}</td><td class="mono">${esc(f[9])}</td><td><span class="chip ${STF[f[11]][0]}">${STF[f[11]][1]}</span></td></tr>`}).join(''):'<tr><td colspan="9" class="empty">No flows match.</td></tr>'}</tbody>`;
+  document.querySelectorAll('#flows tbody tr[data-k]').forEach(r=>{r.classList.toggle('sel',r.dataset.k===current);r.addEventListener('click',()=>pick(r.dataset.k))});
+  document.querySelectorAll('#ff button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.f===filt)))}
+document.getElementById('ff').innerHTML='<span class="lbl">Show</span>'+[['all','All flows'],['data','Data'],['platform','Platform'],['att','Needs attention']].map(([k,n])=>`<button type="button" data-f="${k}">${n} · ${F.filter(f=>k==='all'||(k==='att'?att(f):f[10]===k)).length}</button>`).join('');
+document.querySelectorAll('#ff button').forEach(b=>b.addEventListener('click',()=>{filt=b.dataset.f;renderTable()}));
+
+const detail=document.getElementById('detail');
+function intro(){const lost=F.filter(f=>f[11]==='missing'||f[11]==='gap');detail.innerHTML=`<span class="dom">Flow health</span><h3>${F.filter(f=>f[11]==='ok').length} of ${F.length} service flows in place</h3><p>${lost.length} carry data with a gap or are missing: ${lost.map(f=>f[0]).join(', ')}. Select a service, a tag or a row. Esc clears.</p>`}
+function showFlow(k){const f=F.find(x=>x[0]===k),nm=id=>id.split(', ').map(x=>nd(x)?nd(x)[1]:(PNAME[x]||x)).join(', ');
+  detail.innerHTML=`<span class="dom">Service flow · ${f[10]}</span><h3>${k} · ${esc(nm(f[1]))} → ${esc(nm(f[2]))}</h3><p>${esc(f[3])} · <code>${esc(f[4])}</code> · <span class="chip ${STF[f[11]][0]}">${STF[f[11]][1]}</span></p>
+  <dl><dt>Volume</dt><dd>${f[5]||0} GB/day today, ${f[6]} at the Increment 2 target · latency ${esc(f[7])}</dd><dt>Security</dt><dd>${esc(f[8])}</dd><dt>Implemented by</dt><dd>${esc(f[9])}</dd>${f[12]?`<dt>Note</dt><dd>${esc(f[12])}</dd>`:''}</dl>`}
+function showNode(id){const n=nd(id),ins=F.filter(f=>f[2].split(', ').includes(id)),outs=F.filter(f=>f[1]===id);
+  detail.innerHTML=`<span class="dom">${n[5]?'Consumer or source':'Service'}</span><h3>${n[5]?'':id+' · '}${esc(n[1])}</h3>${n[4]?'':'<p><span class="chip gap">Not deployed</span></p>'}<dl><dt>Receives</dt><dd>${ins.map(f=>`${f[0]} ${esc(f[3])} <span class="chip ${STF[f[11]][0]}">${STF[f[11]][1]}</span>`).join('<br>')||'—'}</dd><dt>Sends</dt><dd>${outs.map(f=>`${f[0]} ${esc(f[3])} <span class="chip ${STF[f[11]][0]}">${STF[f[11]][1]}</span>`).join('<br>')||'—'}</dd></dl>`}
+function pick(k){if(current===k){current=null;svg.classList.remove('focused');document.querySelectorAll('.on,.sel').forEach(e=>e.classList.remove('on','sel'));intro();renderTable();return}
+  current=k;svg.classList.add('focused');const isF=k.startsWith('SF-'),onF=new Set(isF?[k]:F.filter(f=>f[1]===k||f[2].split(', ').includes(k)).map(f=>f[0])),onN=new Set(isF?[F.find(f=>f[0]===k)[1],...F.find(f=>f[0]===k)[2].split(', ')]:[k]);
+  if(!isF)F.filter(f=>onF.has(f[0])).forEach(f=>{onN.add(f[1]);f[2].split(', ').forEach(x=>onN.add(x))});
+  Object.entries(ndEls).forEach(([id,g])=>{g.classList.toggle('on',onN.has(id));g.classList.toggle('sel',id===k)});Object.entries(flEls).forEach(([id,gs])=>gs.forEach(g=>g.classList.toggle('on',onF.has(id))));
+  document.querySelectorAll('.pc').forEach(b=>b.classList.toggle('sel',onF.has(b.dataset.k)));renderTable();isF?showFlow(k):showNode(k)}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)pick(current)});
+
+const sum=(i,ok)=>F.filter(f=>f[10]==='data'&&(ok?f[11]!=='missing':true)).reduce((n,f)=>n+(f[1]==='NET'||f[1]==='AWS'?f[i]:0),0);
+document.getElementById('summary').innerHTML=`<span><b>${F.length}</b>service flows</span><span><b>${F.filter(f=>f[10]==='data').length}</b>data</span><span><b>${F.filter(f=>f[10]==='platform').length}</b>platform</span><span><b>${F.filter(f=>f[11]==='ok').length}</b>in place</span><span class="rv"><b>${F.filter(f=>f[11]==='gap').length}</b>with a gap</span><span class="rv"><b>${F.filter(f=>f[11]==='planned').length}</b>planned or inferred</span><span class="rv"><b>${F.filter(f=>f[11]==='missing').length}</b>missing</span>`;
+document.getElementById('findings').innerHTML=[
+ ['stop','Volume lost','<b>Only 30 of 48 GB/day of syslog reaches Indexing today (SF-03)</b>, and none of the 22 GB/day of AWS events will at the target (SF-06). About 40 GB/day, a third of the target ingest, stops before the index.'],
+ ['stop','Response','<b>The response half of the chain does not exist yet.</b> SF-09 to SF-11 need Enterprise Security and the SOAR link; SF-12 to the service desk has no interface at all and its security is not set.'],
+ ['gap','Protection','<b>SF-01 is the only data flow with no protection</b>: syslog over UDP carries PII from devices to the syslog servers.'],
+ ['ext','Platform','<b>Two of four platform flows are only inferred</b> (licence and monitoring, SF-16 and SF-17). Add them to the topology so their TLS and frequency can be checked.'],
+ ['ok','Search','<b>Search to analysts (SF-07, SF-13) is in place</b> and well inside its 30-second p95 target.']
+].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
+renderTable();intro();
+</script>
+
+</body>
+</html>
