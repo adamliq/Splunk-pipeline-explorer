@@ -1,7 +1,8 @@
-# Builder handoff: Build 180 recheck (ES search head review)
+# Builder handoff: Build 180 recheck (ES search head review and the services fixes)
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
-**Baseline:** Build 180 (`builder-es-review-v180`). Add one block, `builder-es-findings-v181`, with wrappers only.
+**Baseline:** Build 180 (`builder-es-review-v180`). Add one block, `builder-review-v181`, with wrappers only.
+**Scope:** fixes 1 and 2 come from this recheck. Fixes 3–8 are the Build 175 services fixes, which are still not in. They're carried here and re-measured on Build 180, so all of them go into one build.
 **Tested with:** at 1600px, on:
 - the ES acceptance topology in [`builder-handoff-cloud-es-search-head.md`](builder-handoff-cloud-es-search-head.md);
 - the managed acceptance topology with one playbook;
@@ -93,18 +94,116 @@ The tooltip and accessible name keep the full name, and the inspector shows the 
 
 **Check:** no child of any managed card ends below the card's edge at 100%, 77% or 60%, with stack and tenant names up to 20 characters. Test `acme`, `acme-production` and `globex-production01x` on all five managed card types.
 
-## Still open from Build 175
+---
 
-The fixes in [`builder-handoff-build175.md`](builder-handoff-build175.md) are still not in. On the reference topology:
-- SF-01 shows "322 → 55" GB/day;
-- all 17 flows are flagged as needing attention (expected 9);
-- 38 commitment attributes are "Not set" (43 once fix 1 makes the defaulted targets "Not set").
+## Services fixes carried from Build 175
+
+These are the fixes in [`builder-handoff-build175.md`](builder-handoff-build175.md). Builds 176–180 haven't touched them. Every value below was measured on Build 180 with the reference topology (`docs/mockups/ov1-reference-topology.json`) at 1280px, unless a fix says otherwise.
+
+### 3. Volume: today and target come from different sources (SvcV-6, SvcV-2), P1
+
+**What happens:** GB/day today comes from the topology's capacity figures, but GB/day target falls back to the mockup's example value. The target ends up far below today:
+
+| Flow | Today → target |
+|---|---|
+| SF-01 | 322 → 55 |
+| SF-02 | 322 → 55 |
+| SF-03 | 230 → 34 |
+
+The SvcV-2 "Volume lost" finding reads "Entering 322.00 → 77.00 GB/day; reaching Indexing 230.00 → 34.00 GB/day."
+
+**Rule:**
+- **Target:** when today is a GB/day figure computed from the topology (0 included) and the target hasn't been edited, show the target as "Not set". When today is "Not set" or an example value, the example target stays, marked "(default)". On the reference topology, this changes the target of SF-01 to SF-05 only.
+- **Formatting:** format GB/day the same way in tables and findings: whole numbers from 10 up with no decimals, and values under 10 with one decimal. Never "322.00".
+
+**Check:**
+- SF-01 shows "322 → Not set" until a target is edited. SF-07 keeps "Not set → 12 (default)".
+- The finding reads "Entering 322 GB/day; reaching Indexing 230 GB/day". It mentions targets only when every target it adds up has been edited.
+- On the ES acceptance topology after fix 1, SF-11 shows "Not set → 0.6 (default)".
+
+### 4. "Attributes not set" counts derived and trace fields (SvcV-6), P1
+
+**What happens:** the SvcV-6 summary reads "78 attributes not set". That count includes:
+- Events/s today and target, which are derived from GB/day and average bytes;
+- the OV-3 column, which is a trace, not an attribute;
+- Average bytes, which is a sizing assumption.
+
+**Rule:**
+- Count only these 12 commitment attributes: data, format, frequency, GB/day today, GB/day target, latency, service level, classification, confidentiality, integrity, authentication, handling.
+- The OV-3 column shows "—" when a flow has no RF ID, not "Not set".
+- The detail list stops showing Events/s, Average bytes and OV-3.
+
+**Check:** **43 attributes not set** once fix 3 is in (38 before it):
+
+| Attribute | Not set |
+|---|---|
+| Authentication | 12 |
+| GB/day target | 9 (SF-01 to SF-05, and SF-14 to SF-17) |
+| Service level | 7 |
+| GB/day today | 7 |
+| Integrity | 4 |
+| Latency | 2 |
+| Confidentiality | 1 |
+| Handling | 1 |
+
+### 5. "Needs attention" flags every flow (SvcV-2, SvcV-6), P1
+
+**What happens:** the SvcV-2 filter reads "Needs attention (17)". Any attribute that isn't set flags a flow, and 12 flows have no authentication.
+
+**Rule:** a flow needs attention when any of these holds:
+- its status isn't In place;
+- confidentiality is "None…" or "Not set";
+- service level is "Not set" on a **data** flow;
+- handling is "Not set" on a flow that carries PII.
+
+The same rule drives SvcV-6's "Needs attention only" toggle.
+
+**Check:** **9 flows**: SF-01, 03, 06, 09, 10, 11, 12, 16 and 17. This list is the rule applied to Build 180's attributes.
+
+### 6. The default selection dims the matrix on load (SvcV-3a, SvcV-3b), P2
+
+**What happens:**
+- SvcV-3a opens with Heavy Forwarder 1 selected and 16 rows dimmed.
+- SvcV-3b opens with S12 selected and 13 rows dimmed.
+
+In the mockups, the default only fills the detail strip.
+
+**Rule:**
+- On load and after Esc, show the default item's detail **without** the `focused` dimming and without the selected-row marker.
+- Dim only after the user selects something.
+
+**Check:**
+- On load, both views show the default detail with no dimmed rows.
+- Clicking a row dims the others.
+- Esc returns to the undimmed default.
+
+### 7. Wording, P2
+
+| Where | Build 180 text | Should read |
+|---|---|---|
+| SvcV-1 "Most used" | "S7 Indexing has 4 consumers and 1 providers." | "… and 1 provider." |
+| SvcV-3a summary | "1 systems unconnected" | "1 system unconnected" |
+| SvcV-3a "Single provider", when only one service is listed | "S7 · Indexing each have one provider." (the code always writes "each have") | "S7 · Indexing has one provider." |
+| SvcV-6 "Internal flows" | "9 flows have no real edge: 2 internal, 3 inferred, 4 not designed." | "… 2 internal, 3 inferred, 1 missing output, 3 not designed." SF-06 has a missing output; it isn't undesigned |
+
+- **Plurals:** use one plural helper for all generated text.
+- **SvcV-6 "Handling":** the finding fires on example text alone. On the **default** topology it reads "PII handling differs across the collection flows: Raw; no masking; Masked at the indexer (SEDCMD)."
+  - **Rule:** compare only handling values that were edited or come from the pack caveat, not defaults.
+  - **Check:** the default topology shows no Handling finding.
+
+### 8. Heading spacing, P3
+
+Two headings touch what's above them (0px gap):
+- SvcV-2: "Flow register" sits right under the filter buttons.
+- SvcV-6: "Carried by system interfaces" sits right under the matrix.
+
+**Rule:** give section headings that follow a control row or a table a 16px top margin.
 
 ## Check before uploading
 
 1. **Regression:**
    - 0 `pageerror` events.
    - Everything under "What passes" unchanged.
-   - The default and reference topologies unchanged: neither has an ES → SOAR link.
-2. **Fixes 1 and 2:** the checks in each item.
-3. **Records:** a `changeRegister` entry ("ES findings link: operational wording and no event volume; card clamp at low zoom") and the build stamp.
+   - The default and reference topologies are unchanged, apart from what fixes 3–8 change: the SF-01 to SF-05 targets, the not-set total (78 → 43), the attention count (17 → 9), the undimmed default selection and the wording.
+2. **Fixes 1–8:** the checks in each item.
+3. **Records:** a `changeRegister` entry ("Review: ES findings link, card clamp at low zoom, services volume targets, not-set count, attention rule, default selection, wording and spacing") and the build stamp.

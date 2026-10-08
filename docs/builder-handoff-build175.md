@@ -1,5 +1,7 @@
 # Builder handoff: Build 175 recheck (CV-2 and the Services views)
 
+> **Moved:** these fixes were still not in Build 180. They're now fixes 3–8 in [`builder-handoff-build180.md`](builder-handoff-build180.md), re-measured on Build 180. Work from that handoff.
+
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Baseline:** Build 175 (`builder-cv2-v171`, `builder-svcv6-v172`, `builder-svcv4-v173`, `builder-svcv3-v174`, `builder-svcv12-v175`). Add one block, `builder-services-review-v176`, with wrappers only.
 **Tested with:** `docs/mockups/ov1-reference-topology.json` and the default topology, at 1280px and 400px.
