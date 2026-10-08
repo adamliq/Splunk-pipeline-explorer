@@ -59,8 +59,8 @@ button,input,select{font:inherit;color:inherit}
 
 /* Canvas */
 .canvasWrap{border:1px solid var(--rule);border-radius:10px;background:var(--canvas) radial-gradient(var(--dot) 1px,transparent 1px) 0 0/22px 22px;overflow-x:auto}
-.world{position:relative;width:818px;height:532px}
-svg.wires{position:absolute;inset:0;width:818px;height:532px;overflow:visible}
+.world{position:relative;width:818px;height:800px}
+svg.wires{position:absolute;inset:0;width:818px;height:800px;overflow:visible}
 .wire{fill:none;stroke-width:2}
 .wire.data{stroke:var(--data)}
 .wl rect{fill:var(--canvas);stroke:var(--ink-2);stroke-width:1}
@@ -78,6 +78,8 @@ svg.wires{position:absolute;inset:0;width:818px;height:532px;overflow:visible}
 .node.managed{background:linear-gradient(180deg,var(--cloud-tint),var(--card) 46%);border:1.5px solid var(--cloud)}
 .node.managed .tier{color:var(--cloud-ink)}
 .node .badge{align-self:flex-start;font:800 .6rem/1 var(--mono);letter-spacing:.08em;color:var(--page);background:var(--cloud);border-radius:4px;padding:4px 6px}
+.node .badges{display:flex;flex-wrap:wrap;align-items:center;gap:5px}
+.node .edition{font:700 .58rem/1 var(--mono);letter-spacing:.06em;color:var(--cloud-ink);border:1px solid var(--cloud-line);border-radius:4px;padding:3px 5px}
 .node .fqdn{font:500 .68rem/1.3 var(--mono);color:var(--cloud-ink);overflow-wrap:anywhere}
 .node .facts{display:grid;gap:2px;font-size:.66rem;line-height:1.35;color:var(--ink-2)}
 .node .facts .rv{color:var(--warn)}
@@ -117,6 +119,14 @@ svg.wires{position:absolute;inset:0;width:818px;height:532px;overflow:visible}
 .k.mgmt{color:var(--mgmt);border:1px solid rgba(45,212,191,.45)}
 .k.none{color:var(--muted);border:1px solid var(--rule)}
 .hintline{margin:0;font-size:.72rem;color:var(--muted)}
+.incl{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:.74rem;color:var(--ink-2)}
+.incl li{display:grid;grid-template-columns:14px minmax(0,1fr);gap:5px}
+.incl i{font-style:normal;font-weight:700}
+.incl .y i{color:var(--ok)}
+.incl .n{color:var(--muted)}
+.incl b{color:var(--ink);font-weight:600}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+[hidden]{display:none!important}
 
 /* Tables */
 .panel{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px;display:grid;gap:10px}
@@ -139,9 +149,9 @@ code{font:500 .78em var(--mono);color:var(--cloud-ink)}
 </style>
 
 <div class="page">
-  <span class="tag">Mockup · Build 176 target · example topology</span>
+  <span class="tag">Mockup · Build 176 target, plus the ES search head · example topology</span>
   <h1>Splunk-managed components</h1>
-  <p class="lede">Splunk Cloud Search, Ingest Processor and Splunk SOAR · Cloud get the same managed treatment as Splunk Cloud indexing: a managed card, the Splunk Cloud provider as owner, their own Splunk Cloud security zone, and no customer host or management roles. Select a card to see its inspector. Esc returns to Splunk Cloud Search.</p>
+  <p class="lede">Splunk Cloud Search, Ingest Processor and Splunk SOAR · Cloud get the same managed treatment as Splunk Cloud indexing: a managed card, the Splunk Cloud provider as owner, their own Splunk Cloud security zone, and no customer host or management roles. A stack can also have a second managed search head, the <b>ES search head</b>: a premium search head for Enterprise Security, licensed as ES Premier, which includes UEBA and SOAR. Select a card to see its inspector. Esc returns to the ES search head.</p>
 
   <div class="work">
     <aside class="palette" aria-label="Palette">
@@ -151,6 +161,7 @@ code{font:500 .78em var(--mono);color:var(--cloud-ink)}
         <div class="pitems">
           <div class="pitem"><span class="ic">SC</span><span><b>Splunk Cloud indexing</b><small>Stack indexing · S2S and HEC receiving</small></span><span class="pill">MANAGED</span></div>
           <div class="pitem"><span class="ic">CS</span><span><b>Splunk Cloud Search</b><small>Stack search tier · federated S3</small></span><span class="pill">MANAGED</span></div>
+          <div class="pitem"><span class="ic">ES</span><span><b>Splunk Cloud ES search head</b><small>Premium search head · ES Premier</small></span><span class="pill">MANAGED</span></div>
           <div class="pitem"><span class="ic">IP</span><span><b>Ingest Processor</b><small>SPL2 pipelines in your stack</small></span><span class="pill">MANAGED</span></div>
           <div class="pitem"><span class="ic">SOAR</span><span><b>Splunk SOAR · Cloud</b><small>Splunk-hosted SOAR tenant</small></span><span class="pill">MANAGED</span></div>
         </div>
@@ -174,7 +185,7 @@ code{font:500 .78em var(--mono);color:var(--cloud-ink)}
     <section aria-label="Canvas">
       <div class="canvasWrap">
         <div class="world" id="world">
-          <svg class="wires" id="wires" viewBox="0 0 818 532" aria-hidden="true"></svg>
+          <svg class="wires" id="wires" viewBox="0 0 818 800" aria-hidden="true"></svg>
         </div>
       </div>
       <div class="legend">
@@ -187,6 +198,31 @@ code{font:500 .78em var(--mono);color:var(--cloud-ink)}
     <aside class="inspector" id="insp" aria-live="polite" aria-label="Inspector"></aside>
   </div>
 
+  <section class="panel" aria-labelledby="esT">
+    <h2 id="esT">Splunk Cloud ES search head</h2>
+    <p>Splunk Cloud runs Enterprise Security on its own premium search head on the stack, next to Splunk Cloud Search. Splunk manages it like the other stack services. Its licence edition decides what it includes; Premier is the default.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Included</th><th>ES Premier (default)</th><th>ES Essentials</th></tr></thead>
+      <tbody>
+        <tr><td>Enterprise Security</td><td>Yes: detections, risk-based alerting, findings and investigations</td><td>Yes</td></tr>
+        <tr><td>UEBA</td><td>Yes, on by default. It needs asset and identity data</td><td>No. UEBA is Premier only</td></tr>
+        <tr><td>SOAR</td><td>Yes: actions and playbooks run from ES once it's paired with a Splunk SOAR tenant</td><td>No</td></tr>
+      </tbody>
+    </table></div>
+    <div class="cols">
+      <ul>
+        <li><b>Search link:</b> Splunk Cloud indexing → ES search head on the same stack, labelled "Splunk Cloud search". Nothing else can send to it.</li>
+        <li><b>Findings link:</b> ES search head → Splunk SOAR (Cloud or on-premises). This is the ES–SOAR pairing over HTTPS 443, with the allow lists recorded. SOAR still has no event-data parent.</li>
+        <li><b>Sign-in:</b> users and identity providers can sign in to it with SAML.</li>
+      </ul>
+      <ul>
+        <li><b>Views:</b> S12 Correlation and risk is deployed, and SF-09, SF-10 and SF-11 can be In place. CV-1 C5 and CV-2 C5.1 and C5.2 are no longer Planned. A new UEBA part (C5.3, S12.3) is realised with Premier.</li>
+        <li><b>OV-2:</b> it joins "Search and detection (Splunk Cloud)" with Splunk Cloud Search.</li>
+        <li><b>New rules:</b> PR-CLOUD-19 (it has a search link), PR-CLOUD-20 (Premier is paired with SOAR) and PR-CLOUD-21 (UEBA has asset and identity data).</li>
+      </ul>
+    </div>
+  </section>
+
   <section class="panel" aria-labelledby="chgT">
     <h2 id="chgT">What changes for each managed component</h2>
     <p>Build 175 already treats Splunk Cloud indexing as managed. The other three Splunk Cloud services look and behave like customer servers today.</p>
@@ -196,7 +232,8 @@ code{font:500 .78em var(--mono);color:var(--cloud-ink)}
         <tr><td>Splunk Cloud indexing</td><td class="was">Managed card, but its facts and footer spill past the 224px card. Shares the "Splunk processing environment" zone with self-managed Indexers. Can be put on a customer host. Users can sign in to it.</td><td>Compact managed card that fits. Splunk Cloud zone, marked provider managed in the threat model. No customer host. Users sign in through Splunk Cloud Search.</td></tr>
         <tr><td>Splunk Cloud Search</td><td class="was">Plain card under S3 federated search. Owner "Splunk Cloud service team", which isn't a listed party. Inventory says Self-managed. Can't take a link from Splunk Cloud indexing.</td><td>Managed card in the Splunk Cloud group, on the same stack as the indexing. Owner Splunk Cloud provider. Hosting "Splunk Cloud · acme". Splunk Cloud indexing can connect to it as its search tier.</td></tr>
         <tr><td>Ingest Processor</td><td class="was">"Edge processing tier" card under Processing. Owner Splunk platform team. Inventory says Self-managed. Inbound links get no Splunk Cloud defaults.</td><td>Managed card on the stack. Inbound links get the stack defaults: TLS required, S2S 9997 or HEC 443, endpoints from the stack name.</td></tr>
-        <tr><td>Splunk SOAR · Cloud</td><td class="was">Plain card. Owner "Security operations team", which isn't a listed party. Inventory says Self-managed.</td><td>Managed card with the tenant address and an Automation Broker field. Its playbooks stay owned by Security operations.</td></tr>
+        <tr><td>Splunk SOAR · Cloud</td><td class="was">Plain card. Owner "Security operations team", which isn't a listed party. Inventory says Self-managed.</td><td>Managed card with the tenant address and an Automation Broker field. Its playbooks stay owned by Security operations. With an ES search head, it takes the findings link.</td></tr>
+        <tr><td>Splunk Cloud ES search head (new)</td><td class="was">Doesn't exist. CV-1 and CV-2 show threat detection as Planned, and the services views say "No Enterprise Security component provides S12".</td><td>Managed premium search head on the stack, ES Premier by default. It provides S9, S10 and S12, and its UEBA function is realised with Premier.</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -222,7 +259,7 @@ code{font:500 .78em var(--mono);color:var(--cloud-ink)}
     <h2 id="revT">Review and threat model</h2>
     <div class="cols">
       <ul>
-        <li><b>Threat model:</b> a "Splunk Cloud (provider managed)" zone holds the four services, plus the configuration hosted in them. Threats on the four services are transferred to the Splunk Cloud provider.</li>
+        <li><b>Threat model:</b> a "Splunk Cloud (provider managed)" zone holds the managed services, plus the configuration hosted in them. Threats on the managed services are transferred to the Splunk Cloud provider.</li>
         <li><b>Flows into them stay yours:</b> the transport from your forwarders and collectors is still your control.</li>
         <li><b>Inventory and pack:</b> hosting reads "Splunk Cloud · acme" or "Splunk SOAR Cloud · acmesec". The pack's deployment section lists every managed service.</li>
       </ul>
@@ -234,15 +271,18 @@ code{font:500 .78em var(--mono);color:var(--cloud-ink)}
     </div>
   </section>
 
-  <div class="foot"><span>Splunk Pipeline Explorer · Builder · mockup for the Splunk-managed components handoff</span><span>Reference: Build 175 · 6 Oct 2026</span></div>
+  <div class="foot"><span>Splunk Pipeline Explorer · Builder · mockup for the Splunk-managed components and ES search head handoffs</span><span>Reference: Build 177 · 8 Oct 2026</span></div>
 </div>
 
 <script>
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const S={stack:'acme',tenant:'acmesec',broker:'Not recorded',region:'AWS ap-southeast-2 (Sydney)'};
+const S={stack:'acme',tenant:'acmesec',broker:'Not recorded',region:'AWS ap-southeast-2 (Sydney)',edition:'Premier',identity:'Not recorded',esAddress:''};
 const shortRegion=()=>S.region.replace(/^AWS |^GCP |^Azure /,'').replace(/ \(.*\)$/,'');
 const fqdn=()=>S.stack?S.stack+'.splunkcloud.com':'Stack not set';
 const soarFqdn=()=>S.tenant?S.tenant+'.soar.splunkcloud.com':'Tenant not set';
+// The ES search head's address is a default from the stack; the provisioning details win when recorded.
+const esFqdn=()=>S.esAddress||(S.stack?'es-'+S.stack+'.splunkcloud.com':'Stack not set');
+const premier=()=>S.edition==='Premier';
 const NODES={
   uf:{kind:'cust',cls:'fwd',x:14,y:20,tier:'Forwarding tier',title:()=>'Universal Forwarder 1',chips:['Env · Production','Sydney'],stages:['Source acquisition','Checkpointing'],band:'1 pipeline set'},
   lambda:{kind:'cust',cls:'aws',x:14,y:288,tier:'AWS serverless collector',title:()=>'AWS Lambda 1',chips:['Env · Production','ap-southeast-2'],stages:['Event batching','HEC submission']},
@@ -252,21 +292,30 @@ const NODES={
        facts:()=>[shortRegion()+' · SAML sign-in','Searches Splunk Cloud · '+(S.stack||'—')]},
   ip:{kind:'managed',x:314,y:288,tier:'☁ Splunk Cloud · processing',title:()=>'Ingest Processor · '+(S.stack||'stack not set'),addr:fqdn,
        facts:()=>[shortRegion()+' · SPL2 pipelines','1 sender → indexing']},
-  soar:{kind:'managed',x:614,y:288,tier:'☁ Splunk SOAR · cloud',title:()=>'SOAR Cloud · '+(S.tenant||'tenant not set'),addr:soarFqdn,
+  es:{kind:'managed',x:614,y:288,tier:'☁ Splunk Cloud · security',title:()=>'ES search head · '+(S.stack||'stack not set'),addr:esFqdn,edition:()=>'ES '+S.edition.toUpperCase(),
+       facts:()=>[shortRegion()+' · '+(premier()?'UEBA on':'no UEBA'),'Searches Splunk Cloud · '+(S.stack||'—'),'SOAR paired']},
+  soar:{kind:'managed',x:614,y:556,tier:'☁ Splunk SOAR · cloud',title:()=>'SOAR Cloud · '+(S.tenant||'tenant not set'),addr:soarFqdn,
        facts:()=>[shortRegion()+' · 2 playbooks',{t:'Automation Broker: '+S.broker.toLowerCase(),rv:S.broker==='Not recorded'}]}
 };
 const world=document.getElementById('world'),insp=document.getElementById('insp');
-let sel='cs';
+let sel='es';
 function cardHtml(id){const n=NODES[id];
   if(n.kind==='cust')return `<span class="tier">${esc(n.tier)}</span><span class="title">${esc(n.title())}</span><span class="chips">${n.chips.map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</span>${n.stages.map(s=>`<span class="stage">${esc(s)}</span>`).join('')}${n.band?`<span class="band">${esc(n.band)}</span>`:''}`;
-  return `<span class="tier">${esc(n.tier)}</span><span class="title">${esc(n.title())}</span><span class="badge" title="Managed by Splunk">MANAGED</span><span class="fqdn">${esc(n.addr())}</span><span class="facts">${n.facts().map(f=>typeof f==='string'?`<span>${esc(f)}</span>`:`<span class="${f.rv?'rv':''}">${esc(f.t)}</span>`).join('')}</span><span class="foot">Run and upgraded by Splunk</span>`}
-function label(id){const n=NODES[id];return n.kind==='managed'?`${n.title()}, ${n.addr()}, managed by Splunk`:n.title()}
+  const badge='<span class="badge" title="Managed by Splunk">MANAGED</span>';
+  return `<span class="tier">${esc(n.tier)}</span><span class="title">${esc(n.title())}</span>${n.edition?`<span class="badges">${badge}<span class="edition" title="Enterprise Security licence edition">${esc(n.edition())}</span></span>`:badge}<span class="fqdn">${esc(n.addr())}</span><span class="facts">${n.facts().map(f=>typeof f==='string'?`<span>${esc(f)}</span>`:`<span class="${f.rv?'rv':''}">${esc(f.t)}</span>`).join('')}</span><span class="foot">Run and upgraded by Splunk</span>`}
+function label(id){const n=NODES[id];return n.kind==='managed'?`${n.title()}, ${n.addr()}${n.edition?', Enterprise Security '+S.edition:''}, managed by Splunk`:n.title()}
 function drawCards(){for(const [id,n] of Object.entries(NODES)){let el=document.getElementById('n-'+id);
   if(!el){el=document.createElement('div');el.id='n-'+id;el.tabIndex=0;el.setAttribute('role','button');el.style.left=n.x+'px';el.style.top=n.y+'px';
     el.addEventListener('click',()=>select(id));el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(id)}});world.appendChild(el)}
-  el.className='node '+n.kind+(n.cls?' '+n.cls:'')+(sel===id?' sel':'');el.setAttribute('aria-pressed',String(sel===id));el.setAttribute('aria-label',label(id));el.innerHTML=cardHtml(id)}}
+  el.className='node '+n.kind+(n.cls?' '+n.cls:'')+(sel===id?' sel':'');el.setAttribute('aria-pressed',String(sel===id));el.setAttribute('aria-label',label(id));el.innerHTML=cardHtml(id);
+  if(n.kind==='managed')fitGuard(el)}}
+// Fit guard (Build 177 fix 2): when long names or addresses push content past the card, hide fact lines
+// from the last one up. The inspector still shows every fact.
+function fitGuard(card){const bottom=()=>card.getBoundingClientRect().bottom-10,lines=[...card.querySelectorAll('.facts>span')];
+  for(let i=lines.length-1;i>=0&&[...card.children].some(c=>c.getBoundingClientRect().bottom>bottom()+0.5);i--)lines[i].hidden=true}
 function drawWires(){const W=document.getElementById('wires');const pill=(x,y,t)=>{const w=t.length*6.1+14;return `<g class="wl"><rect x="${x-w/2}" y="${y-10}" width="${w}" height="20" rx="10"/><text x="${x}" y="${y+3.5}" text-anchor="middle">${esc(t)}</text></g>`};
-  const lines=[['M204 132 L314 132','S2S 9997 · TLS',259,132],['M204 400 L314 400','HEC 443 · TLS',259,400],['M409 288 L409 244','index destination',409,266],['M504 132 L614 132','search',559,132]];
+  const lines=[['M204 132 L314 132','S2S 9997 · TLS',259,132],['M204 400 L314 400','HEC 443 · TLS',259,400],['M409 288 L409 244','index destination',409,266],['M504 132 L614 132','search',559,132],
+    ['M504 196 L559 196 L559 400 L614 400','search',559,300],['M709 512 L709 556','findings · 443',709,534]];
   W.innerHTML='<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#57c7e8"/></marker></defs>'+lines.map(l=>`<path class="wire data" d="${l[0]}" marker-end="url(#ah)"/>`).join('')+lines.map(l=>pill(l[2],l[3],l[1])).join('')}
 const field=(id,lab,val,opts={})=>`<label class="field" for="${id}">${esc(lab)}${opts.select?`<select id="${id}">${opts.select.map(o=>`<option ${o===val?'selected':''}>${esc(o)}</option>`).join('')}</select>`:`<input id="${id}" value="${esc(val)}" ${opts.ro?'readonly':''} ${opts.ph?`placeholder="${esc(opts.ph)}"`:''}>`}${opts.hint?`<span class="hint">${opts.hint}</span>`:''}</label>`;
 const lists=(sp,you)=>`<div class="lists"><div><h5>Splunk manages</h5><ul>${sp.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div><div><h5>You manage</h5><ul>${you.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></div>`;
@@ -277,7 +326,23 @@ const stackField=(extra)=>field('f-stack','Splunk Cloud stack',S.stack,{ph:'acme
 const stackPick=()=>`<label class="field" for="f-stackpick">Splunk Cloud stack<select id="f-stackpick"><option>${esc(S.stack||'stack not set')} · from Splunk Cloud · ${esc(S.stack||'stack not set')}</option><option>Another stack…</option></select><span class="hint"><span class="addr" data-fqdn>${esc(fqdn())}</span> · the stack name and region live on the indexing card</span></label>`;
 const regionFrom=()=>field('f-region-ro','Cloud region',S.region,{ro:true,hint:'From the stack. Change it on Splunk Cloud · '+esc(S.stack||'—')+'.'});
 const hiddenNote='<p class="note">Host, network zone and subnet aren\'t shown: Splunk runs this service in its own environment. "Put on one host" is refused for it.</p>';
+// What the licence edition includes, from Splunk's ES 8 editions overview.
+const included=()=>[
+  ['y','Enterprise Security','detections, risk-based alerting, findings and investigations'],
+  premier()?['y','UEBA','on by default; baselines users and entities']:['n','UEBA','Premier only'],
+  premier()?['y','SOAR','actions and playbooks from ES, once paired with a SOAR tenant']:['n','SOAR','not included in Essentials']
+].map(([k,b,t])=>`<li class="${k}"><i aria-hidden="true">${k==='y'?'✓':'–'}</i><span><b>${b}</b> · ${esc(t)}<span class="vh">${k==='y'?' (included)':' (not included)'}</span></span></li>`).join('');
 const INSP={
+ es:()=>`<div class="box">${field('f-name','Component name',NODES.es.title())}${field('f-env','Environment','Production',{select:['Production','Non-production']})}${hiddenNote}</div>
+   <div class="box cloudbox"><h4>☁ Splunk Cloud ES search head · managed by Splunk</h4>${stackPick()}
+   ${field('f-esaddr','ES search head address',esFqdn(),{hint:'Default <code>es-&lt;stack&gt;.splunkcloud.com</code>. Check it against your Splunk Cloud provisioning details.'})}
+   ${regionFrom()}
+   ${field('f-edition','Enterprise Security edition',S.edition,{select:['Premier','Essentials']})}
+   <ul class="incl" id="f-incl" aria-label="Included in this edition">${included()}</ul>
+   <div id="f-uebaid"${premier()?'':' hidden'}>${field('f-identity','Asset and identity data for UEBA',S.identity,{select:['Not recorded','Configured','Not configured'],hint:'UEBA needs the asset and identity framework with at least one identity source.'})}</div>
+   ${owner}
+   ${lists(['Premium search head and capacity','ES and UEBA upgrades','Availability (Splunk Cloud SLA)'],['Detections and risk rules','Asset and identity data','Analyst roles and SAML sign-in','SOAR pairing and allow lists'])}</div>
+   ${conn([['data','in','From Splunk Cloud · '+(S.stack||'—')+' (indexing) · search'],['data','out','To SOAR Cloud · '+(S.tenant||'—')+' · findings · HTTPS 443 · allow lists recorded'],['auth','sign-in','From Identity provider · Cloud · SAML']])}`,
  cs:()=>`<div class="box">${field('f-name','Component name',NODES.cs.title())}${field('f-env','Environment','Production',{select:['Production','Non-production']})}${hiddenNote}</div>
    <div class="box cloudbox"><h4>☁ Splunk Cloud Search · managed by Splunk</h4>${stackPick()}${regionFrom()}${owner}
    ${lists(['Search heads and clustering','Scaling and upgrades','Availability (Splunk Cloud SLA)'],['Apps (through app vetting)','Roles and SAML sign-in','Searches and dashboards','Federated S3 connections'])}</div>
@@ -288,7 +353,7 @@ const INSP={
    <label class="field" for="f-ep">Receiving endpoints<span class="addr" id="f-ep">${esc(S.stack?'inputs1.'+S.stack+'.splunkcloud.com:9997':'Set the stack name')}<br>${esc(S.stack?'http-inputs-'+S.stack+'.splunkcloud.com:443':'')}</span></label>
    ${field('f-allow','IP allow list (customer egress)','203.0.113.0/28')}
    ${lists(['Indexers, storage and replication','Pipeline sets and capacity','Upgrades and availability'],['Indexes and retention','Stack name and allow list','Forwarder credentials app','Ingest licence'])}</div>
-   ${conn([['data','in','From Universal Forwarder 1 · S2S 9997 · TLS'],['data','in','From Ingest Processor · acme · index destination'],['data','out','To Splunk Cloud Search · search']])}`,
+   ${conn([['data','in','From Universal Forwarder 1 · S2S 9997 · TLS'],['data','in','From Ingest Processor · acme · index destination'],['data','out','To Splunk Cloud Search · search'],['data','out','To ES search head · '+(S.stack||'—')+' · search']])}`,
  ip:()=>`<div class="box">${field('f-name','Component name',NODES.ip.title())}${field('f-env','Environment','Production',{select:['Production','Non-production']})}${hiddenNote}</div>
    <div class="box cloudbox"><h4>☁ Ingest Processor · managed by Splunk</h4>${stackPick()}${regionFrom()}${owner}
    <label class="field" for="f-ep">Receiving endpoints (from the stack)<span class="addr" id="f-ep">${esc(S.stack?'inputs1.'+S.stack+'.splunkcloud.com:9997':'Set the stack name')}<br>${esc(S.stack?'http-inputs-'+S.stack+'.splunkcloud.com:443':'')}</span></label>
@@ -298,7 +363,7 @@ const INSP={
    <div class="box cloudbox"><h4>☁ Splunk SOAR · Cloud · managed by Splunk</h4>${field('f-tenant','SOAR tenant',S.tenant,{ph:'acmesec',hint:`<span class="addr" data-soarfqdn>${esc(soarFqdn())}</span>`})}${field('f-region','Cloud region',S.region,{select:REGIONS})}${owner}
    ${field('f-broker','Automation Broker',S.broker,{select:['Not recorded','Installed in your network','Not needed'],hint:'Needed when playbooks act on assets inside your network.'})}
    ${lists(['SOAR platform and scaling','Upgrades and backups','Availability'],['Playbooks (owner: Security operations)','Apps and assets','Automation Broker host','SAML sign-in'])}</div>
-   ${conn([['none','hosts','SOAR Playbook 1 · New container'],['none','hosts','SOAR Playbook 2 · New artifact']])}`,
+   ${conn([['data','in','From ES search head · '+(S.stack||'—')+' · findings (ES–SOAR pairing)'],['none','hosts','SOAR Playbook 1 · New container'],['none','hosts','SOAR Playbook 2 · New artifact']])}`,
  uf:()=>`<div class="box">${field('f-name','Component name','Universal Forwarder 1')}<div class="two">${field('f-env','Environment','Production',{select:['Production','Non-production']})}${field('f-reg','Region','Sydney')}</div>${field('f-group','Group container','Sydney collection',{select:['Sydney collection','No group']})}<div class="two">${field('f-zone','Network zone','customer')}${field('f-subnet','Subnet / CIDR','10.10.20.0/24')}</div>${field('f-host','Host','Runs on its own',{select:['Runs on its own','syslog-syd-01']})}${field('f-own','Owner','Log onboarding team',{select:['Log onboarding team','Splunk platform team']})}</div>
    <p class="hintline">Customer-managed components keep every placement field: host, zone, subnet and owner.</p>
    ${conn([['data','out','To Splunk Cloud · '+(S.stack||'—')+' · S2S 9997 · TLS required'],['mgmt','fleet','From Deployment Server 1 · phone-home 8089']])}`,
@@ -306,19 +371,25 @@ const INSP={
    <p class="hintline">Sends to Ingest Processor on the stack's HEC endpoint, so the link gets HEC 443, TLS required and a HEC token.</p>
    ${conn([['data','out','To Ingest Processor · '+(S.stack||'—')+' · HEC 443 · TLS required']])}`
 };
-const SUB={cs:'Splunk Cloud search tier · managed by Splunk',idx:'Splunk Cloud indexing · managed by Splunk',ip:'Splunk Cloud processing · managed by Splunk',soar:'Splunk-hosted SOAR · managed by Splunk',uf:'Splunk forwarding tier · Production · Sydney',lambda:'AWS serverless collector · Production · ap-southeast-2'};
+const SUB={es:'Splunk Cloud premium search head · managed by Splunk',cs:'Splunk Cloud search tier · managed by Splunk',idx:'Splunk Cloud indexing · managed by Splunk',ip:'Splunk Cloud processing · managed by Splunk',soar:'Splunk-hosted SOAR · managed by Splunk',uf:'Splunk forwarding tier · Production · Sydney',lambda:'AWS serverless collector · Production · ap-southeast-2'};
 function drawInspector(){insp.innerHTML=`<span class="eyebrow">Inspector</span><h3 id="i-title">${esc(NODES[sel].title())}</h3><p class="sub">${esc(SUB[sel])}</p>`+INSP[sel]();
   const stack=document.getElementById('f-stack');if(stack)stack.addEventListener('input',()=>{S.stack=stack.value.trim().toLowerCase().replace(/[^a-z0-9.-]/g,'');refresh(false)});
   const tenant=document.getElementById('f-tenant');if(tenant)tenant.addEventListener('input',()=>{S.tenant=tenant.value.trim().toLowerCase().replace(/[^a-z0-9.-]/g,'');refresh(false)});
   const region=document.getElementById('f-region');if(region)region.addEventListener('change',()=>{S.region=region.value;refresh(false)});
-  const broker=document.getElementById('f-broker');if(broker)broker.addEventListener('change',()=>{S.broker=broker.value;refresh(false)})}
+  const broker=document.getElementById('f-broker');if(broker)broker.addEventListener('change',()=>{S.broker=broker.value;refresh(false)});
+  const edition=document.getElementById('f-edition');if(edition)edition.addEventListener('change',()=>{S.edition=edition.value;refresh(false)});
+  const identity=document.getElementById('f-identity');if(identity)identity.addEventListener('change',()=>{S.identity=identity.value;refresh(false)});
+  const esAddr=document.getElementById('f-esaddr');if(esAddr)esAddr.addEventListener('input',()=>{const v=esAddr.value.trim().toLowerCase().replace(/[^a-z0-9.-]/g,'');S.esAddress=v===(S.stack?'es-'+S.stack+'.splunkcloud.com':'')?'':v;refresh(false)})}
 function refresh(full){drawCards();if(full){drawInspector();return}
   const t=document.getElementById('i-title');if(t)t.textContent=NODES[sel].title();
   insp.querySelectorAll('[data-fqdn]').forEach(e=>e.textContent=fqdn());const pk=document.getElementById('f-stackpick');if(pk)pk.options[0].textContent=(S.stack||'stack not set')+' · from Splunk Cloud · '+(S.stack||'stack not set');insp.querySelectorAll('[data-soarfqdn]').forEach(e=>e.textContent=soarFqdn());
   const ep=document.getElementById('f-ep');if(ep)ep.innerHTML=S.stack?esc('inputs1.'+S.stack+'.splunkcloud.com:9997')+'<br>'+esc('http-inputs-'+S.stack+'.splunkcloud.com:443'):'Set the stack name';
-  const nm=document.getElementById('f-name');if(nm&&NODES[sel].kind==='managed')nm.value=NODES[sel].title()}
+  const nm=document.getElementById('f-name');if(nm&&NODES[sel].kind==='managed')nm.value=NODES[sel].title();
+  const incl=document.getElementById('f-incl');if(incl)incl.innerHTML=included();
+  const ueba=document.getElementById('f-uebaid');if(ueba)ueba.hidden=!premier();
+  const esAddr=document.getElementById('f-esaddr');if(esAddr&&document.activeElement!==esAddr)esAddr.value=esFqdn()}
 function select(id){sel=id;refresh(true)}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sel!=='cs'){select('cs');document.getElementById('n-cs').focus()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sel!=='es'){select('es');document.getElementById('n-es').focus()}});
 drawWires();refresh(true);
 </script>
 
