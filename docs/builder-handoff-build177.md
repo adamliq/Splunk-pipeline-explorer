@@ -26,6 +26,8 @@ The OV-2 drawing (`builder-ov2-visual-v138`) places nodes in two ways:
 
 Build 177 gives managed nodes the location "Cloud · `<region>`" but keeps their roles, so they qualify for both. On the acceptance topology the diagram shows a "CLOUD · AWS AP-SOUTHEAST-2 (SYDNEY)" site holding ON-3, ON-4, ON-5 and ON-6. ON-3 and ON-4 appear again under "SPLUNK PLATFORM" and ON-5 under "SECURITY OPERATIONS", and the needlines attach to whichever copy was drawn last. The pack's OV-2 page uses the same drawing.
 
+Screenshot: `docs/mockups/compare/build177-ov2-duplicates.png`.
+
 The playbook is also split off. A SOAR Playbook on SOAR · Cloud isn't managed, so it becomes its own node, "ON-8 Response and cases · Security operations", separate from its platform.
 
 **Rule:**
