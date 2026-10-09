@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>Load Balancer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: the Builder as it looks today (dark, dotted canvas) with palette, canvas and inspector columns, a live
+   rule table, then the reference tables. One dark look on purpose: it mirrors the Builder it mocks up. Cards use the
+   Builder's real size (190 × 224 at 100%), so the load balancer card has to fit the same box. */
+:root{
+  color-scheme:dark;
+  --page:#07111a; --panel:#0c1822; --canvas:#08131c; --dot:#1b2d3c; --card:#0f1d29; --card-2:#132433; --rule:#20364a;
+  --ink:#e6eff5; --ink-2:#aab9c8; --muted:#8498aa;
+  --data:#57c7e8; --mgmt:#2dd4bf; --auth:#d28df5;
+  --lb:#9db4cc; --lb-ink:#dbe6f1; --lb-tint:rgba(157,180,204,.14); --lb-line:rgba(157,180,204,.42);
+  --ok:#66e0a3; --warn:#f3bd61; --bad:#f28b7d; --focus:#57c7e8;
+  --font:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.45 var(--font)}
+.page{max-width:1560px;margin:0 auto;padding-inline:16px;padding-block:18px 32px;display:grid;gap:16px}
+.page>*{min-width:0}
+.tag{justify-self:start;font:600 .66rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--lb);border:1px solid var(--lb-line);border-radius:999px;padding:5px 9px}
+h1{margin:0;font:700 1.4rem/1.2 var(--font);text-wrap:balance}
+h2{margin:0;font:700 1rem/1.25 var(--font);text-wrap:balance}
+.lede{margin:0;color:var(--ink-2);max-width:92ch}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* Scene switcher */
+.scenes{display:flex;flex-wrap:wrap;gap:6px}
+.scenes button{background:var(--panel);border:1px solid var(--rule);border-radius:999px;padding:7px 12px;font-size:.8rem;color:var(--ink-2);cursor:pointer}
+.scenes button[aria-selected="true"]{background:var(--lb-tint);border-color:var(--lb);color:var(--ink);font-weight:600}
+
+.work{display:grid;grid-template-columns:230px minmax(0,1fr) 340px;gap:12px;align-items:start}
+@media (max-width:1480px){.work{grid-template-columns:minmax(0,1fr) 340px}.palette{grid-column:1/-1}}
+@media (max-width:920px){.work{grid-template-columns:minmax(0,1fr)}}
+.work>*{min-width:0}
+
+/* Palette */
+.palette{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:10px;display:grid;gap:10px;align-content:start}
+.find{background:var(--card);border:1px solid var(--rule);border-radius:7px;padding:7px 9px;color:var(--muted);font-size:.8rem}
+.pgroup{display:grid;gap:6px}
+.pgroup h3{margin:0;font:700 .64rem/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--lb)}
+.pitem{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--lb);border-radius:7px;padding:6px 8px}
+.pitem .ic{font:700 .62rem/1 var(--mono);color:var(--lb);border:1px solid var(--lb-line);border-radius:4px;padding:3px 4px;min-width:30px;text-align:center}
+.pitem b{display:block;font:600 .8rem/1.25 var(--font)}
+.pitem small{display:block;font-size:.7rem;color:var(--muted);line-height:1.3}
+.pill{font:700 .56rem/1 var(--mono);letter-spacing:.06em;color:var(--page);background:var(--lb);border-radius:3px;padding:3px 4px}
+.pnote{margin:0;font-size:.74rem;color:var(--muted)}
+.others{display:grid;gap:3px;border-top:1px solid var(--rule);padding-top:8px}
+.others div{display:flex;justify-content:space-between;gap:8px;font-size:.76rem;color:var(--ink-2)}
+.others span:last-child{font-family:var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.others .new{color:var(--ink)}
+.others .new span:first-child::after{content:" · new";color:var(--lb)}
+
+/* Canvas */
+.canvasWrap{border:1px solid var(--rule);border-radius:10px;background:var(--canvas) radial-gradient(var(--dot) 1px,transparent 1px) 0 0/22px 22px;overflow-x:auto}
+.world{position:relative;width:818px;height:532px}
+svg.wires{position:absolute;inset:0;width:818px;height:532px;overflow:visible}
+.wire{fill:none;stroke-width:2}
+.wire.data{stroke:var(--data)}
+.wire.mgmt{stroke:var(--mgmt);stroke-dasharray:6 5}
+.wl rect{fill:var(--canvas);stroke:var(--ink-2);stroke-width:1}
+.wl text{font:600 10px var(--mono);fill:var(--ink)}
+.node{position:absolute;width:190px;height:224px;border-radius:11px;padding:10px;display:flex;flex-direction:column;gap:6px;cursor:pointer;text-align:left;overflow:hidden}
+.node.cust{background:linear-gradient(155deg,var(--card-2),var(--card));border:1px solid #2f4b61}
+.node .tier{font:600 .66rem/1.2 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.node .title{font:700 .92rem/1.22 var(--font);color:var(--ink);overflow-wrap:anywhere}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font:500 .66rem/1 var(--font);color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:3px 7px;white-space:nowrap}
+.stage{font-size:.68rem;color:var(--ink-2);border:1px solid var(--rule);border-radius:6px;padding:4px 6px}
+.node.lb{background:linear-gradient(180deg,var(--lb-tint),var(--card) 46%);border:1.5px solid var(--lb)}
+.node.lb .tier{color:var(--lb-ink)}
+.node .badges{display:flex;flex-wrap:wrap;align-items:center;gap:5px}
+.node .badge{font:800 .6rem/1 var(--mono);letter-spacing:.08em;color:var(--page);background:var(--lb);border-radius:4px;padding:4px 6px}
+.node .badge.rv{background:var(--warn)}
+.node .prod{font:700 .58rem/1 var(--mono);letter-spacing:.04em;color:var(--lb-ink);border:1px solid var(--lb-line);border-radius:4px;padding:3px 5px}
+.node .addr{font:500 .68rem/1.3 var(--mono);color:var(--lb-ink);overflow-wrap:anywhere}
+.node .addr.rv{color:var(--warn)}
+.node .facts{display:grid;gap:2px;font-size:.66rem;line-height:1.35;color:var(--ink-2)}
+.node .facts .rv{color:var(--warn)}
+.node .facts .bad{color:var(--bad)}
+.node .foot{margin-top:auto;border-top:1px solid var(--lb-line);padding-top:6px;font-size:.64rem;color:var(--muted)}
+.node.sel{box-shadow:0 0 0 3px rgba(157,180,204,.5)}
+.node.cust.sel{box-shadow:0 0 0 3px rgba(87,199,232,.4)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;padding:8px 12px;border-top:1px solid var(--rule);font-size:.74rem;color:var(--ink-2);background:var(--panel)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:22px;height:12px;border-radius:3px;display:inline-block}
+.sw.l{border:1.5px solid var(--lb);background:var(--lb-tint)}
+.ln{width:22px;height:0;border-top:2px solid var(--data);display:inline-block}
+.ln.m{border-top:2px dashed var(--mgmt)}
+
+/* Inspector */
+.inspector{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px;display:grid;gap:10px;align-content:start}
+.inspector .eyebrow{font:700 .62rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.inspector h3{margin:0;font:700 1.05rem/1.25 var(--font);text-wrap:balance}
+.inspector .sub{margin:0;font-size:.78rem;color:var(--data)}
+.box{border:1px solid var(--rule);border-radius:9px;padding:10px;display:grid;gap:8px;background:var(--card)}
+.box.lbbox{border-color:var(--lb-line);background:linear-gradient(180deg,var(--lb-tint),var(--card) 40%)}
+.box h4{margin:0;font:700 .8rem/1.25 var(--font)}
+.field{display:grid;gap:3px;font-size:.72rem;color:var(--ink-2)}
+.field input,.field select{width:100%;background:var(--page);border:1px solid var(--rule);border-radius:6px;padding:6px 8px;font-size:.8rem}
+.field input[readonly]{color:var(--muted);border-style:dashed}
+.field select:disabled{color:var(--muted);border-style:dashed}
+.field .hint{font-size:.7rem;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:420px){.two{grid-template-columns:1fr}}
+.checks{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.78rem;color:var(--ink)}
+.checks label{display:inline-flex;align-items:center;gap:5px}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:4px;font-size:.72rem;color:var(--ink-2);min-width:0}
+legend.fl{padding:0;font-size:.72rem;color:var(--ink-2)}
+.note{margin:0;font-size:.72rem;color:var(--muted);line-height:1.45}
+.note.guide{border-left:2px solid var(--lb-line);padding-left:8px}
+.conn{display:grid;gap:5px;font-size:.76rem}
+.conn div{display:flex;gap:7px;align-items:baseline}
+.conn .k{font:600 .6rem/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-radius:3px;padding:3px 4px;white-space:nowrap}
+.k.data{color:var(--data);border:1px solid rgba(87,199,232,.45)}
+.k.mgmt{color:var(--mgmt);border:1px solid rgba(45,212,191,.45)}
+.k.pool{color:var(--lb);border:1px solid var(--lb-line)}
+.hintline{margin:0;font-size:.72rem;color:var(--muted)}
+[hidden]{display:none!important}
+
+/* Tables */
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px;display:grid;gap:10px}
+.panel>p{margin:0;color:var(--ink-2);font-size:.86rem;max-width:95ch}
+.tw{overflow-x:auto;border:1px solid var(--rule);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:.8rem}
+th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--rule)}
+thead th{font:700 .62rem/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--card)}
+tbody tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600;white-space:nowrap}
+.st{display:inline-block;font:700 .6rem/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-radius:3px;padding:4px 6px;white-space:nowrap}
+.st.pass{color:var(--page);background:var(--ok)}
+.st.advisory{color:var(--page);background:var(--warn)}
+.st.fail{color:var(--page);background:var(--bad)}
+.st.na{color:var(--muted);border:1px solid var(--rule)}
+tr.na td{color:var(--muted)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:820px){.cols{grid-template-columns:1fr}}
+.cols>*{min-width:0}
+.cols ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:.84rem;color:var(--ink-2)}
+.cols b{color:var(--ink)}
+code{font:500 .78em var(--mono);color:var(--lb-ink)}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;border-top:1px solid var(--rule);padding-top:10px;font-size:.74rem;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.node{transition:box-shadow .15s}}
+</style>
+
+<div class="page">
+  <span class="tag">Mockup · Build 185 target · example topologies</span>
+  <h1>Load balancer</h1>
+  <p class="lede">A <b>Load balancer</b> gives a pool of identical components one address. Clients send to the address; the load balancer passes each connection to one member. It takes the plane and ports of what it serves: <b>syslog receivers</b> and <b>HEC</b> on the event-data plane, <b>Deployment Servers</b> on the fleet-management plane. Pick a scene, select a card to see its inspector, and change the load balancer's settings to see the review rules update.</p>
+
+  <div class="scenes" role="tablist" aria-label="Scene" id="scenes"></div>
+
+  <div class="work">
+    <aside class="palette" aria-label="Palette">
+      <div class="find">⌕ Find components…</div>
+      <div class="pgroup">
+        <h3>Network</h3>
+        <div class="pitem"><span class="ic">LB</span><span><b>Load balancer</b><small>One address in front of a pool</small></span><span class="pill">NEW</span></div>
+        <p class="pnote">Select a syslog server, HEC endpoint, heavy forwarder, indexer, Edge Processor or Deployment Server first: the load balancer goes in front of it and takes over its incoming links. With a client selected, it's added after the client.</p>
+      </div>
+      <div class="others" aria-label="Palette groups">
+        <div><span>Sources</span><span>7</span></div>
+        <div><span>Collection</span><span>8</span></div>
+        <div class="new"><span>Network</span><span>1</span></div>
+        <div><span>Processing</span><span>2</span></div>
+        <div><span>☁ Splunk Cloud · managed by Splunk</span><span>5</span></div>
+        <div><span>Destinations</span><span>2</span></div>
+        <div><span>Access &amp; management</span><span>6</span></div>
+        <div><span>Deployment configuration</span><span>2</span></div>
+        <div><span>Indexer clustering</span><span>2</span></div>
+        <div><span>Search head clustering</span><span>3</span></div>
+        <div><span>S3 federated search</span><span>3</span></div>
+        <div><span>Splunk Stream · configuration</span><span>2</span></div>
+        <div><span>Splunk SOAR · response</span><span>2</span></div>
+      </div>
+    </aside>
+
+    <section aria-label="Canvas">
+      <div class="canvasWrap">
+        <div class="world" id="world">
+          <svg class="wires" id="wires" viewBox="0 0 818 532" aria-hidden="true"></svg>
+        </div>
+      </div>
+      <div class="legend" id="legend"></div>
+    </section>
+
+    <aside class="inspector" id="insp" aria-live="polite" aria-label="Inspector"></aside>
+  </div>
+
+  <section class="panel" aria-labelledby="rulesT">
+    <h2 id="rulesT">Review rules for this scene</h2>
+    <p>AR-009 to AR-015 are new and apply in every rule profile. AR-004 now counts a highly available load balancer with two or more members as redundant first hops. The results follow the inspector.</p>
+    <div class="tw"><table>
+      <thead><tr><th>ID</th><th>Rule</th><th>Severity</th><th>Result</th><th>Finding</th></tr></thead>
+      <tbody id="rules"></tbody>
+    </table></div>
+  </section>
+
+  <section class="panel" aria-labelledby="linkT">
+    <h2 id="linkT">What it can serve</h2>
+    <p>Its first link decides what it serves. Every link through it must be one the client could make straight to the member, and a pool holds one kind of component.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Serves</th><th>Plane</th><th>Clients (send to its address)</th><th>Pool members</th><th>Listeners</th></tr></thead>
+      <tbody>
+        <tr><td>Syslog receivers</td><td>Event data</td><td>Syslog Source</td><td>Syslog Server, Heavy Forwarder, Indexer, Edge Processor</td><td>UDP 514, TCP 514, TLS 6514</td></tr>
+        <tr><td>HTTP Event Collector</td><td>Event data</td><td>HEC Client, AWS Lambda, Azure Function, API Collector</td><td>HEC Endpoint, Heavy Forwarder, Indexer, Edge Processor</td><td>HTTPS 8088, HTTPS 443</td></tr>
+        <tr><td>Deployment Servers</td><td>Fleet management</td><td>Universal Forwarder, Heavy Forwarder (they phone home to its address)</td><td>Deployment Server, up to 3 in a cluster</td><td>HTTPS 8089</td></tr>
+      </tbody>
+    </table></div>
+    <div class="cols">
+      <ul>
+        <li><b>Refused: forwarders.</b> A Universal or Heavy Forwarder sending S2S (9997) can't link to a load balancer. Forwarders balance across indexers themselves (autoLB), or use indexer discovery.</li>
+        <li><b>Refused: Splunk-managed members.</b> Splunk Cloud already balances its own inputs. Link straight to the managed component.</li>
+        <li><b>Refused: mixed pools,</b> a load balancer in front of another, and data links to one that serves Deployment Servers (or management links to one that serves data).</li>
+      </ul>
+      <ul>
+        <li><b>Volume</b> passes through unchanged and splits evenly across the members. Nothing is copied.</li>
+        <li><b>Deployment Servers:</b> clients phone home to the load balancer's address. Server classes and apps on any member apply to every client behind it.</li>
+        <li><b>Methods:</b> a load balancer (proxy), DNS round robin, or a floating virtual IP (keepalived, MetalLB). The last two don't translate addresses and have no single box in the path.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="viewsT">
+    <h2 id="viewsT">What the views show</h2>
+    <p>The load balancer is infrastructure. Views about systems and services see through it; views about networks and threats show it.</p>
+    <div class="tw"><table>
+      <thead><tr><th>View</th><th>With a load balancer</th></tr></thead>
+      <tbody>
+        <tr><td>Canvas</td><td>One link from each client to the load balancer, and one from it to each member. In tier grouping it sits in its pool's tier.</td></tr>
+        <tr><td>Network and firewall overlay</td><td>Clients → its address on the listener ports, and load balancer → members on the same ports.</td></tr>
+        <tr><td>Threat model</td><td>A component in its network zone. A zone crossing is on the client → load balancer link. New threats: denial of service when it's a single instance, information disclosure when TLS ends on it.</td></tr>
+        <tr><td>OV-1, OV-2, OV-3</td><td>Part of its pool's operational node: no new node or needline. Its links to members show as internal flows.</td></tr>
+        <tr><td>CV-1, CV-2, SvcV-1 to SvcV-6, DIV-1</td><td>The same results as clients linked straight to the members. Interfaces name the load balancer, and it isn't listed as a system.</td></tr>
+        <tr><td>Failure Lab</td><td>It can be the fault target. Its stages are the fault points: virtual IP listener, health checks, member selection, client address handling and session persistence.</td></tr>
+        <tr><td>Inventory and pack</td><td>A row for it. Clients behind a deployment load balancer show it, and its Deployment Servers, as their management authority.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <div class="foot"><span>Splunk Pipeline Explorer · Builder · mockup for the load balancer handoff</span><span>Reference: Build 184 · 9 Oct 2026</span></div>
+</div>
+
+<script>
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=n=>Number(n).toLocaleString('en-AU');
+const LISTENERS={syslog:[['udp514','UDP 514'],['tcp514','TCP 514'],['tls6514','TLS 6514']],hec:[['https8088','HTTPS 8088'],['https443','HTTPS 443']],deployment:[['https8089','HTTPS 8089']]};
+const SERVES={syslog:'Syslog receivers',hec:'HTTP Event Collector',deployment:'Deployment Servers'};
+const MEMBER={syslog:'Syslog Server',hec:'HEC Endpoint',deployment:'Deployment Server'};
+const METHOD={proxy:'Load balancer (proxy)',dns:'DNS round robin',vip:'Floating virtual IP (keepalived, MetalLB)'};
+const CLIENTIP={notSet:'Not set',dnat:'Kept (DNAT)',proxyProtocol:'PROXY protocol',xff:'X-Forwarded-For (layer 7)',snat:'Not kept (SNAT)'};
+const PERSIST={notSet:'Not set',none:'None',sourceIp:'Source IP',cookie:'Cookie (layer 7)'};
+const HEALTH={notSet:'Not set',tcp:'TCP port check',http:'HTTP check',none:'None'};
+const HA={notSet:'Not set',single:'Single instance',pair:'Active–standby pair',cluster:'Active–active cluster',cloud:'Cloud-managed across zones'};
+const TLSM={passthrough:'Pass-through',terminate:'Terminate',reencrypt:'Terminate and re-encrypt'};
+const YN={notRecorded:'Not recorded',yes:'Yes',no:'No'};
+const SHORT={'F5 BIG-IP':'F5 BIG-IP','Citrix NetScaler ADC':'NetScaler','HAProxy':'HAProxy','NGINX':'NGINX','AWS Network Load Balancer':'AWS NLB','AWS Application Load Balancer':'AWS ALB','Azure Load Balancer':'Azure LB','Google Cloud Load Balancing':'Google Cloud LB','MetalLB':'MetalLB','keepalived':'keepalived','Other':'Other'};
+const PRODUCTS=['Not set','F5 BIG-IP','Citrix NetScaler ADC','HAProxy','NGINX','AWS Network Load Balancer','AWS Application Load Balancer','Azure Load Balancer','Google Cloud Load Balancing','MetalLB','keepalived','Other'];
+
+// Three example topologies. Clients sit left of the load balancer on the data plane; on the fleet-management plane
+// the Deployment Servers sit left (they serve apps) and the clients right, as the Builder draws management links.
+const SCENES={
+ syslog:{tab:'In front of syslog servers',plane:'data',
+  lb:{name:'Syslog VIP',serves:'syslog',method:'proxy',product:'F5 BIG-IP',address:'syslog-vip.example.gov.au',listeners:['udp514','tcp514'],layer:'l4',tls:'passthrough',clientIp:'snat',persistence:'none',health:'tcp',ha:'pair',dsVersion:'notRecorded',dsShared:'notRecorded'},
+  clients:[{id:'c1',x:14,y:20,tier:'Source system',title:'Firewalls',chips:['Env · Production','Sydney','× 40'],stages:['Event emission','Source retry / buffer']},
+           {id:'c2',x:14,y:288,tier:'Source system',title:'Network switches',chips:['Env · Production','Sydney','× 120'],stages:['Event emission','Source retry / buffer']}],
+  members:[{id:'m1',x:614,y:20,tier:'Collection relay',title:'Syslog Server 1',chips:['Env · Production','Sydney','SC4S'],stages:['Listener & framing','File write & rotation']},
+           {id:'m2',x:614,y:288,tier:'Collection relay',title:'Syslog Server 2',chips:['Env · Production','Sydney','SC4S'],stages:['Listener & framing','File write & rotation']}],
+  guide:'SC4S guidance: load balancers aren\'t a best practice for syslog, except for senders on the untrusted internet. TCP connections tend to stay on one member, and the load balancer becomes a new single point of failure. For high availability, SC4S recommends MetalLB in BGP mode.'},
+ hec:{tab:'In front of HEC endpoints',plane:'data',
+  lb:{name:'HEC VIP',serves:'hec',method:'proxy',product:'AWS Application Load Balancer',address:'hec.example.gov.au',listeners:['https443'],layer:'l7',tls:'reencrypt',clientIp:'xff',persistence:'none',health:'http',ha:'cloud',dsVersion:'notRecorded',dsShared:'notRecorded'},
+  clients:[{id:'c1',x:14,y:20,tier:'AWS serverless collector',title:'Cloud audit collector',chips:['Env · Production','ap-southeast-2'],stages:['HEC submission','ackId polling'],ack:true},
+           {id:'c2',x:14,y:288,tier:'Source system',title:'Payments app',chips:['Env · Production','Sydney'],stages:['Event envelope','HTTPS submission']}],
+  members:[{id:'m1',x:614,y:20,tier:'Splunk HTTP Event Collector',title:'HEC Endpoint 1',chips:['Env · Production','Sydney'],stages:['HTTPS listener','Token & index authorisation']},
+           {id:'m2',x:614,y:288,tier:'Splunk HTTP Event Collector',title:'HEC Endpoint 2',chips:['Env · Production','Sydney'],stages:['HTTPS listener','Token & index authorisation']}],
+  guide:'With HEC acknowledgement, use sticky sessions with the longest cookie timeout the load balancer allows. Duplicates are still possible when a client moves to another member under load.'},
+ deployment:{tab:'In front of Deployment Servers',plane:'management',
+  lb:{name:'Deploy VIP',serves:'deployment',method:'proxy',product:'HAProxy',address:'deploy.example.gov.au',listeners:['https8089'],layer:'l4',tls:'passthrough',clientIp:'dnat',persistence:'none',health:'http',ha:'single',dsVersion:'yes',dsShared:'notRecorded'},
+  members:[{id:'m1',x:14,y:20,tier:'Splunk management tier',title:'Deployment Server 1',chips:['Env · Production','Sydney','9.4'],stages:['Server class evaluation','App manifest response']},
+           {id:'m2',x:14,y:288,tier:'Splunk management tier',title:'Deployment Server 2',chips:['Env · Production','Sydney','9.4'],stages:['Server class evaluation','App manifest response']}],
+  clients:[{id:'c1',x:614,y:20,tier:'Splunk forwarding tier',title:'Universal Forwarders',chips:['Env · Production','Sydney','× 1,200'],stages:['Phone home','App download'],count:1200},
+           {id:'c2',x:614,y:288,tier:'Splunk parsing tier',title:'Heavy Forwarder 1',chips:['Env · Production','Sydney'],stages:['Phone home','App download'],count:1}],
+  guide:'Two or more Deployment Servers behind one address are a deployment server cluster (Splunk Enterprise 9.2 or later): up to 3 servers, about 25,000 clients each, sharing deployment_apps and client_events on a shared drive. Clients can run older versions. If server classes match clients by IP address, keep the client\'s address or match by host name.'}
+};
+let scene='syslog',sel='lb';
+const SC=()=>SCENES[scene],L=()=>SC().lb;
+const proxy=()=>L().method==='proxy';
+const hasTls=()=>L().listeners.some(x=>/tls|https/.test(x));
+const listenerText=()=>L().listeners.map(x=>LISTENERS[L().serves].find(l=>l[0]===x)?.[1]).filter(Boolean).join(' · ')||'No listener';
+const shortListener=()=>{const s=L().serves,ls=L().listeners;if(s==='syslog'){const p=[ls.includes('udp514')?'UDP':'',ls.includes('tcp514')?'TCP':''].filter(Boolean).join(' · ');return [p?p+' 514':'',ls.includes('tls6514')?'TLS 6514':''].filter(Boolean).join(' · ')||'no listener'}return listenerText()};
+const backend=()=>!proxy()||L().tls==='passthrough'||!hasTls()?'pass-through':L().tls==='reencrypt'?'re-encrypted':'decrypted';
+const memberNames=()=>SC().members.map(m=>m.title).join(' and ');
+const clientCount=()=>SC().clients.reduce((n,c)=>n+(c.count||1),0);
+
+function lbFacts(){const l=L(),f=[];
+  f.push({t:listenerText()});
+  const n=SC().members.length;f.push({t:'Pool · '+n+' '+MEMBER[l.serves]+'s'+(['none','notSet'].includes(l.health)?' · no health check':''),rv:['none','notSet'].includes(l.health)});
+  if(l.serves==='syslog')f.push(!proxy()?{t:'Senders reach members directly'}:l.clientIp==='dnat'?{t:'Sender address kept (DNAT)'}:l.clientIp==='proxyProtocol'?{t:'Sender address via PROXY protocol',rv:l.listeners.includes('udp514')}:l.clientIp==='snat'?{t:'Sender address lost (SNAT)',bad:true}:{t:'Sender address not recorded',rv:true});
+  if(l.serves==='hec')f.push(!proxy()?{t:'Clients pick a member by DNS'}:l.persistence==='cookie'?{t:'Sticky sessions (cookie)'}:l.persistence==='sourceIp'?{t:'Sticky by source IP'}:(SC().clients.some(c=>c.ack)?{t:'Not sticky · acknowledgement in use',rv:true}:{t:'Not sticky'}));
+  if(l.serves==='deployment'){const ok=l.dsVersion==='yes'&&l.dsShared==='yes';f.push(ok?{t:'Cluster · 9.2+ · shared drive'}:{t:'Cluster not confirmed',rv:true});f.push({t:fmt(clientCount())+' clients phone home here'})}
+  return f}
+function haBadge(){const l=L();if(l.method==='dns')return['DNS ROUND ROBIN',false];if(l.method==='vip')return['FLOATING VIP',false];return({pair:['HA PAIR',false],cluster:['HA CLUSTER',false],cloud:['CLOUD HA',false],single:['SINGLE',true],notSet:['HA NOT SET',true]})[l.ha]}
+function lbCard(){const l=L(),[b,rv]=haBadge();
+  return `<span class="tier">⇄ Load balancer</span><span class="title">${esc(l.name)}</span><span class="badges"><span class="badge${rv?' rv':''}">${b}</span>${l.product!=='Not set'?`<span class="prod" title="${esc(l.product)}">${esc(SHORT[l.product]||l.product)}</span>`:''}</span><span class="addr${l.address?'':' rv'}">${esc(l.address||'Address not set')}</span><span class="facts">${lbFacts().map(f=>`<span class="${f.bad?'bad':f.rv?'rv':''}">${esc(f.t)}</span>`).join('')}</span><span class="foot">Serves ${esc(SERVES[l.serves].replace('HTTP Event Collector','HEC'))}</span>`}
+function custCard(n){return `<span class="tier">${esc(n.tier)}</span><span class="title">${esc(n.title)}</span><span class="chips">${n.chips.map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</span>${n.stages.map(s=>`<span class="stage">${esc(s)}</span>`).join('')}`}
+const all=()=>[...SC().clients,...SC().members];
+function fitGuard(card){const bottom=()=>card.getBoundingClientRect().bottom-10,lines=[...card.querySelectorAll('.facts>span')];
+  for(let i=lines.length-1;i>=0&&[...card.children].some(c=>c.getBoundingClientRect().bottom>bottom()+0.5);i--)lines[i].hidden=true}
+function drawCards(){const world=document.getElementById('world');world.querySelectorAll('.node').forEach(e=>e.remove());
+  const add=(id,x,y,cls,html,label)=>{const el=document.createElement('div');el.id='n-'+id;el.className='node '+cls+(sel===id?' sel':'');el.style.left=x+'px';el.style.top=y+'px';el.tabIndex=0;el.setAttribute('role','button');el.setAttribute('aria-pressed',String(sel===id));el.setAttribute('aria-label',label);el.innerHTML=html;
+    el.addEventListener('click',()=>select(id));el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(id)}});world.appendChild(el);return el};
+  const l=L();fitGuard(add('lb',314,154,'lb',lbCard(),`${l.name}, load balancer for ${SERVES[l.serves]}, ${l.address||'address not set'}, ${SC().members.length} members`));
+  for(const n of all())add(n.id,n.x,n.y,'cust',custCard(n),n.title)}
+function drawWires(){const W=document.getElementById('wires'),m=SC().plane==='management',cls=m?'mgmt':'data',col=m?'#2dd4bf':'#57c7e8';
+  const pill=(x,y,t)=>{const w=t.length*6.1+14;return `<g class="wl"><rect x="${x-w/2}" y="${y-10}" width="${w}" height="20" rx="10"/><text x="${x}" y="${y+3.5}" text-anchor="middle">${esc(t)}</text></g>`};
+  const left=m?SC().members:SC().clients,right=m?SC().clients:SC().members,lines=[];
+  for(const n of left)lines.push([`M204 ${n.y+112} L259 ${n.y+112} L259 266 L314 266`,m?'pool · 8089':shortListener(),259,n.y+112]);
+  for(const n of right)lines.push([`M504 266 L559 266 L559 ${n.y+112} L614 ${n.y+112}`,m?'phone home':backend(),559,n.y+112]);
+  W.innerHTML=`<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="${col}"/></marker></defs>`+lines.map(l=>`<path class="wire ${cls}" d="${l[0]}" marker-end="url(#ah)"/>`).join('')+lines.map(l=>pill(l[2],l[3],l[1])).join('');
+  document.getElementById('legend').innerHTML=`<span><i class="sw l"></i>Load balancer (new)</span><span><i class="ln${m?' m':''}"></i>${m?'Fleet management':'Event data'}</span><span>${m?'Clients phone home to the address; any member can answer':'Volume splits evenly across the members'}</span>`}
+
+// Inspector
+const field=(id,lab,val,opts={})=>`<label class="field" for="${id}">${esc(lab)}${opts.select?`<select id="${id}"${opts.disabled?' disabled':''}>${Object.entries(opts.select).map(([k,v])=>`<option value="${esc(k)}" ${k===val?'selected':''}>${esc(v)}</option>`).join('')}</select>`:`<input id="${id}" value="${esc(val)}" ${opts.ro?'readonly':''} ${opts.ph?`placeholder="${esc(opts.ph)}"`:''}>`}${opts.hint?`<span class="hint">${opts.hint}</span>`:''}</label>`;
+const asMap=a=>Object.fromEntries(a.map(x=>[x,x]));
+function lbInspector(){const l=L(),p=proxy(),s=l.serves;
+  const listeners=`<fieldset><legend class="fl">Listeners</legend><div class="checks">${LISTENERS[s].map(([k,t])=>`<label><input type="checkbox" data-listener="${k}" ${l.listeners.includes(k)?'checked':''}> ${esc(t)}</label>`).join('')}</div></fieldset>`;
+  const proxyFields=p?`<div class="two">${field('f-layer','Layer',l.layer,{select:{l4:'Layer 4 (TCP/UDP)',l7:'Layer 7 (HTTP)'},disabled:s==='syslog',hint:s==='syslog'?'Syslog needs layer 4.':''})}${field('f-tls','TLS',hasTls()?l.tls:'passthrough',{select:TLSM,disabled:!hasTls(),hint:hasTls()?'':'No TLS listener.'})}</div>
+     ${field('f-ip','Sender address (client IP)',l.clientIp,{select:Object.fromEntries(Object.entries(CLIENTIP).filter(([k])=>k!=='xff'||l.layer==='l7')),hint:s==='syslog'?'UDP needs DNAT. TCP and TLS: DNAT, or SNAT with the PROXY protocol.':'What members see as the client\'s address.'})}
+     <div class="two">${field('f-persist','Persistence',l.persistence,{select:Object.fromEntries(Object.entries(PERSIST).filter(([k])=>k!=='cookie'||l.layer==='l7'))})}${field('f-health','Health check',l.health,{select:HEALTH})}</div>
+     ${field('f-ha','High availability',l.ha,{select:HA})}`
+    :`${field('f-ip-ro','Sender address (client IP)',l.method==='dns'?'Kept: clients connect to members directly':'Kept: the floating address isn\'t translated',{ro:true})}${field('f-health','Health check',l.health,{select:HEALTH,hint:l.method==='dns'?'Without health-checked DNS, clients keep reaching a failed member until its record is removed.':''})}${field('f-ha-ro','High availability',l.method==='dns'?'Several DNS records':'The address moves between nodes',{ro:true})}`;
+  const cluster=s==='deployment'?`<div class="box"><h4>Deployment server cluster</h4>${field('f-dsv','All members run Splunk Enterprise 9.2 or later',l.dsVersion,{select:YN})}${field('f-dss','deployment_apps and client_events are on a shared drive',l.dsShared,{select:YN})}<p class="note">${fmt(clientCount())} clients phone home here, within ${fmt(SC().members.length*25000)} (${SC().members.length} × 25,000). A cluster has at most 3 servers.</p></div>`:'';
+  const m=SC().plane==='management';
+  const conns=[...SC().clients.map(c=>[m?'mgmt':'data',m?'fleet':'in',`${c.title}${c.count>1?' ('+fmt(c.count)+')':''} · ${m?'phone-home HTTPS 8089':shortListener()}${c.ack?' · HEC acknowledgement':''}`]),...SC().members.map(n=>['pool','pool',`${n.title} · ${m?'serves apps':backend()}`])];
+  return `<div class="box">${field('f-name','Component name',l.name)}<div class="two">${field('f-env','Environment','Production',{select:asMap(['Production','Non-production'])})}${field('f-owner','Owner','Network team',{select:asMap(['Network team','Splunk platform team','Cloud platform team','Log onboarding team'])})}</div><div class="two">${field('f-reg','Region','Sydney')}${field('f-zone','Network zone','Collection DMZ')}</div></div>
+   <div class="box lbbox"><h4>⇄ Load balancer</h4>
+   ${field('f-serves','Serves',SERVES[s],{ro:true,hint:'Set by its first link. Remove its links to change it.'})}
+   ${field('f-method','Method',l.method,{select:METHOD})}
+   ${field('f-product','Product',l.product,{select:asMap(PRODUCTS)})}
+   ${field('f-addr','Address',l.address,{ph:s==='syslog'?'syslog-vip.example.gov.au':'vip.example.gov.au',hint:'Clients send to this address. It becomes the endpoint on their links'+(s==='deployment'?' and the targetUri they phone home to.':'.')})}
+   ${listeners}${proxyFields}
+   <p class="note guide">${esc(SC().guide)}</p></div>${cluster}
+   <div class="box"><h4>Links · ${conns.length}</h4><div class="conn">${conns.map(r=>`<div><span class="k ${r[0]}">${esc(r[1])}</span><span>${esc(r[2])}</span></div>`).join('')}</div></div>`}
+function nodeInspector(n){const m=SC().plane==='management',isClient=SC().clients.includes(n),l=L();
+  const line=m?(isClient?`Phones home to ${l.name} (${l.address||'address not set'}:8089). Any Deployment Server in its pool can answer.`:`Member of ${l.name}'s pool. Its server classes and apps apply to every client behind ${l.name}.`)
+             :(isClient?`Sends to ${l.name} (${l.address||'address not set'}), which passes each connection to one member. The link's endpoint is the load balancer's address.`:`Member of ${l.name}'s pool. It receives about half the volume; the inspector of each member shows the link from ${l.name}.`);
+  return `<div class="box">${field('f-name','Component name',n.title)}<div class="two">${field('f-env','Environment','Production',{select:asMap(['Production','Non-production'])})}${field('f-reg','Region','Sydney')}</div></div><p class="hintline">${esc(line)}</p>`}
+function drawInspector(){const insp=document.getElementById('insp'),l=L();
+  if(sel==='lb'){insp.innerHTML=`<span class="eyebrow">Inspector</span><h3>${esc(l.name)}</h3><p class="sub">Network load balancer · Production · Sydney</p>`+lbInspector();wire()}
+  else{const n=all().find(x=>x.id===sel);insp.innerHTML=`<span class="eyebrow">Inspector</span><h3>${esc(n.title)}</h3><p class="sub">${esc(n.tier)} · Production · Sydney</p>`+nodeInspector(n)}}
+function wire(){const l=L(),on=(id,ev,fn)=>{const e=document.getElementById(id);if(e)e.addEventListener(ev,()=>{fn(e);refresh(e.tagName==='SELECT'&&['f-method','f-layer'].includes(id))})};
+  on('f-method','change',e=>l.method=e.value);on('f-product','change',e=>l.product=e.value);on('f-addr','input',e=>l.address=e.value.trim());on('f-name','input',e=>l.name=e.value.trim()||'Load Balancer 1');
+  on('f-layer','change',e=>{l.layer=e.value;if(e.value==='l4'){if(l.clientIp==='xff')l.clientIp='notSet';if(l.persistence==='cookie')l.persistence='sourceIp'}});
+  on('f-tls','change',e=>l.tls=e.value);on('f-ip','change',e=>l.clientIp=e.value);on('f-persist','change',e=>l.persistence=e.value);on('f-health','change',e=>l.health=e.value);on('f-ha','change',e=>l.ha=e.value);
+  on('f-dsv','change',e=>l.dsVersion=e.value);on('f-dss','change',e=>l.dsShared=e.value);
+  document.querySelectorAll('[data-listener]').forEach(c=>c.addEventListener('change',()=>{const k=c.dataset.listener;l.listeners=c.checked?[...new Set([...l.listeners,k])]:l.listeners.filter(x=>x!==k);refresh(true)}))}
+
+// Review rules: the same tests the handoff gives the Builder.
+function rules(){const l=L(),s=l.serves,p=proxy(),n=SC().members.length,out=[],add=(id,title,sev,status,text)=>out.push({id,title,sev,status,text});
+  if(s==='deployment')add('AR-004','Critical production sources have redundant first hops','High','na','No event sources in this scene.');
+  else{const paths=!p||['pair','cluster','cloud'].includes(l.ha)?n:Math.min(n,1),names=SC().clients.map(c=>c.title).join(' and ');
+    add('AR-004','Critical production sources have redundant first hops','High',paths>=2?'pass':'advisory',paths>=2?`${names} each have ${paths} first-hop paths through ${l.name}.`:`${names} each have one first-hop path: ${l.name} ${l.ha==='single'?'is a single instance':'has no high availability recorded'}.`)}
+  const t9='Load-balanced syslog keeps the sender\'s address';
+  if(s!=='syslog')add('AR-009',t9,'Critical','na','Applies to load balancers that serve syslog receivers.');
+  else if(!p)add('AR-009',t9,'Critical','pass',`${METHOD[l.method].replace(/ \(.*\)$/,'')} doesn't translate addresses, so senders keep theirs.`);
+  else{const udp=l.listeners.includes('udp514');
+    if(l.clientIp==='notSet')add('AR-009',t9,'Critical','advisory',`Record how ${l.name} handles the sender's address.${udp?' UDP needs DNAT.':''}`);
+    else if(udp&&l.clientIp!=='dnat')add('AR-009',t9,'Critical','fail',`${l.name} listens on UDP 514 but ${l.clientIp==='snat'?'replaces the sender\'s address (SNAT)':'relies on the PROXY protocol'}. Every event's host becomes the load balancer: UDP needs DNAT.`);
+    else if(l.clientIp==='snat')add('AR-009',t9,'Critical','fail',`${l.name} replaces the sender's address (SNAT). Every event's host becomes the load balancer: use DNAT, or SNAT with the PROXY protocol.`);
+    else if(l.clientIp==='proxyProtocol')add('AR-009',t9,'Critical','pass',`PROXY protocol on TCP and TLS. Set SC4S_SOURCE_PROXYCONNECT=yes on ${memberNames()}.`);
+    else add('AR-009',t9,'Critical','pass',`${l.name} keeps the sender's address (DNAT).`)}
+  const t10='HEC acknowledgement through a load balancer is sticky';
+  if(s!=='hec')add('AR-010',t10,'High','na','Applies to load balancers that serve HEC.');
+  else{const ack=SC().clients.filter(c=>c.ack),names=ack.map(c=>c.title).join(' and ');
+    if(!ack.length)add('AR-010',t10,'High','na','No client uses HEC acknowledgement.');
+    else if(!p)add('AR-010',t10,'High','advisory',`${names} use${ack.length===1?'s':''} HEC acknowledgement. Confirm each client keeps one address while it checks acknowledgements.`);
+    else if(['cookie','sourceIp'].includes(l.persistence))add('AR-010',t10,'High','pass',`Sticky sessions (${PERSIST[l.persistence].replace(/ \(.*\)$/,'').toLowerCase()}). Duplicates are still possible when a client moves under load.`);
+    else add('AR-010',t10,'High','fail',`${names} use${ack.length===1?'s':''} HEC acknowledgement, so ${l.name} needs sticky sessions, with the longest cookie timeout. Otherwise acknowledgement checks reach another member and events are sent again.`)}
+  const t11='Deployment Servers behind one address form a cluster';
+  if(s!=='deployment')add('AR-011',t11,'High','na','Applies to load balancers that serve Deployment Servers.');
+  else if(n<2)add('AR-011',t11,'High','na','One Deployment Server: no cluster needed.');
+  else{const v=l.dsVersion,d=l.dsShared;
+    if(v==='yes'&&d==='yes')add('AR-011',t11,'High','pass',`${n} Deployment Servers form a cluster: 9.2 or later, with deployment_apps and client_events on a shared drive.`);
+    else if(v==='no'||d==='no')add('AR-011',t11,'High','fail',`${l.name} pools ${n} Deployment Servers without a cluster. Clients would get different apps from each one: run 9.2 or later on each, with deployment_apps and client_events on a shared drive.`);
+    else add('AR-011',t11,'High','advisory',`Confirm the deployment server cluster: ${[v!=='yes'?'Splunk Enterprise 9.2 or later on each server':'',d!=='yes'?'deployment_apps and client_events on a shared drive':''].filter(Boolean).join(', and ')}.`)}
+  const t12='Deployment server cluster stays within Splunk\'s limits';
+  if(s!=='deployment'||n<2)add('AR-012',t12,'Medium','na','Applies to a cluster of Deployment Servers.');
+  else{const cap=n*25000,c=clientCount();
+    if(n>3)add('AR-012',t12,'Medium','fail',`${n} Deployment Servers: a cluster has at most 3.`);
+    else if(c>cap)add('AR-012',t12,'Medium','advisory',`${fmt(c)} clients is more than ${n} × 25,000.`);
+    else add('AR-012',t12,'Medium','pass',`${fmt(c)} clients, within ${fmt(cap)} (${n} × 25,000).`)}
+  const t13='A load balancer isn\'t a single point of failure';
+  if(!p)add('AR-013',t13,'High','pass',`${METHOD[l.method].replace(/ \(.*\)$/,'')} has no single box in the path.`);
+  else if(l.ha==='single')add('AR-013',t13,'High','fail',`${l.name} is a single instance: if it fails, every client behind it stops. Use an active–standby pair, a cluster or a cloud-managed load balancer.`);
+  else if(l.ha==='notSet')add('AR-013',t13,'High','advisory',`Record ${l.name}'s high availability.`);
+  else add('AR-013',t13,'High','pass',`${HA[l.ha]}.`);
+  const t14='Load balancers check member health';
+  if(['none','notSet'].includes(l.health))add('AR-014',t14,'Medium','advisory',`${l.name} has no health check recorded, so it can keep sending to a failed member.`);
+  else if(n<2)add('AR-014',t14,'Medium','advisory',`${l.name} has one member: there's nothing to balance.`);
+  else add('AR-014',t14,'Medium','pass',`${n} members, ${HEALTH[l.health]}.`);
+  const t15='TLS that ends on a load balancer is re-encrypted';
+  if(!hasTls())add('AR-015',t15,'Medium','na','No TLS listener.');
+  else if(!p||l.tls==='passthrough')add('AR-015',t15,'Medium','pass','TLS passes through to the members.');
+  else if(l.tls==='reencrypt')add('AR-015',t15,'Medium','pass','TLS ends on the load balancer and is re-encrypted to the members.');
+  else add('AR-015',t15,'Medium','advisory',`${l.name} ends TLS and sends to ${memberNames()} unencrypted. Re-encrypt unless both sit in one trusted zone.`);
+  return out}
+function drawRules(){const label={pass:'Pass',advisory:'Advisory',fail:'Fail',na:'Not applicable'};
+  document.getElementById('rules').innerHTML=rules().map(r=>`<tr class="${r.status==='na'?'na':''}"><td>${r.id}</td><td>${esc(r.title)}</td><td>${r.sev}</td><td><span class="st ${r.status}">${label[r.status]}</span></td><td>${esc(r.text)}</td></tr>`).join('')}
+
+function drawScenes(){document.getElementById('scenes').innerHTML=Object.entries(SCENES).map(([k,s])=>`<button role="tab" aria-selected="${k===scene}" data-scene="${k}">${esc(s.tab)}</button>`).join('');
+  document.querySelectorAll('[data-scene]').forEach(b=>b.addEventListener('click',()=>{scene=b.dataset.scene;sel='lb';drawScenes();refresh(true)}))}
+function refresh(full){drawCards();drawWires();drawRules();if(full)drawInspector()}
+function select(id){sel=id;refresh(true)}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sel!=='lb'){select('lb');document.getElementById('n-lb').focus()}});
+drawScenes();refresh(true);
+</script>
+
+</body>
+</html>
