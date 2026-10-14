@@ -37,7 +37,7 @@ Follow the SvcV-1 and SvcV-2 pattern (`builder-svcv12-v175`).
 
 **Page furniture,** as on the SvcV pages:
 - banners;
-- the title block, with Viewpoint "All (DoDAF V2.0)" and "Accountable" from `state.builderCv1.owner`;
+- the title block, with Viewpoint "All · DoDAF V2.0" and "Accountable" from `state.builderCv1.owner`;
 - the purpose line (take the text from the mockup);
 - the summary figures, with Build 185's singular forms;
 - the footer `AV-n · 1 of 1 · Build <n>`.

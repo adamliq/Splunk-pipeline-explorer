@@ -38,7 +38,7 @@ Follow the SV-1, SV-2 and SV-6 pattern.
 **Page furniture,** as on the SV pages:
 - banners;
 - the title block from `builderOv3Furniture139`:
-  - Viewpoint "Standards (DoDAF V2.0)";
+  - Viewpoint "Standards · DoDAF V2.0", in the form SvcV-4 uses;
   - "Standards owner" from `state.builderCv1.owner` (until a standards owner field exists), or Not set;
 - the purpose line (take the text from the mockup);
 - the compliance tiles, which take the place of the summary figures;
