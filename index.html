@@ -9964,5 +9964,40 @@ const button=document.createElement('button');button.className='builderPaletteIt
 changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Load balancer: one address in front of syslog receivers, HEC or Deployment Servers','Pool membership, listener and address settings, fleet clusters, availability reviews, topology files and architecture views.',true]);document.title='Splunk Pipeline Explorer · Build 186 · 9 Oct 2026';const build=document.querySelector('#topologyBuilder');build.dataset.buildNumber='186';build.dataset.buildDate='2026-10-09';const stamp=document.querySelector('.builderBuildStamp');if(stamp){stamp.querySelector('b').textContent='Build 186';stamp.setAttribute('aria-label','Build 186, dated 9 October 2026');const time=stamp.querySelector('time');if(time){time.dateTime='2026-10-09';time.textContent='9 Oct 2026'}}builderInfoText159.textContent=builderInfoText159.textContent.replace('Build 185','Build 186');renderPaletteSearch();syncPaletteAccordion();renderBuilder();
 })();
 </script>
+<script id="builder-review-v187">
+/* Build 187: corrections from the Build 186 recheck, without changing earlier blocks. */
+(()=>{
+'use strict';
+const is=n=>n?.type==='loadBalancer',label=n=>componentInstanceLabel(n),fields=['protocol','port','endpoint','tls'];
+const counts=s=>s.replace(/\b(\d+) (clients?\b)/g,(_,n,word)=>Number(n).toLocaleString('en-US')+' '+word);
+const seen=new WeakMap(),routes=new WeakMap(),identities=new WeakMap();let syncing=false;
+function remember(){for(const r of state.builderDataRelations){const e=extraDataEdge(r.id);if(e)routes.set(r,{from:r.from,to:r.to,defaults:defaultRelationshipDetails(e),details:{...r.relationshipDetails}})}for(const n of state.builderNodes){const old=seen.get(n),source=state.builderNodes.find(x=>x.id===n.parent);if(source){const e={plane:'data',source,target:n,label:builderHandoff(source,n)};seen.set(n,{parent:n.parent,defaults:defaultRelationshipDetails(e),details:{...n.relationshipDetails}})}else if(old)seen.set(n,{...old,parent:null});if(is(n))identities.set(n,{name:label(n),address:n.lbAddress||''})}}
+function sync(){if(syncing)return;syncing=true;try{
+ for(const n of state.builderNodes){const old=seen.get(n),source=state.builderNodes.find(x=>x.id===n.parent);if(old&&source&&old.parent!==n.parent&&(is(source)||is(n))&&n.relationshipDetails){const next=defaultRelationshipDetails({plane:'data',source,target:n,label:builderHandoff(source,n)});for(const k of fields){if(old.details[k]!=null&&old.details[k]!==old.defaults[k])n.relationshipDetails[k]=old.details[k];else if(n.relationshipDetails[k]===old.defaults[k])n.relationshipDetails[k]=next[k]}}
+ // Insertion copies the former client link onto the new load balancer.
+ if(is(n)&&!identities.has(n)&&source){const member=state.builderNodes.find(x=>x.parent===n.id&&seen.get(x)?.parent===n.parent),prior=member&&seen.get(member);if(prior&&n.relationshipDetails){const next=defaultRelationshipDetails({plane:'data',source,target:n,label:builderHandoff(source,n)});for(const k of fields)n.relationshipDetails[k]=prior.details[k]!=null&&prior.details[k]!==prior.defaults[k]?prior.details[k]:next[k]}}
+ }
+ for(const r of state.builderDataRelations){const old=routes.get(r),e=extraDataEdge(r.id);if(old&&e&&(old.from!==r.from||old.to!==r.to)&&(is(e.source)||is(e.target))&&r.relationshipDetails){const next=defaultRelationshipDetails(e);for(const k of fields){if(old.details[k]!=null&&old.details[k]!==old.defaults[k])r.relationshipDetails[k]=old.details[k];else r.relationshipDetails[k]=next[k]}}}
+ for(const lb of state.builderNodes.filter(is)){const old=identities.get(lb),name=label(lb),address=lb.lbAddress||'';if(!old||old.name===name&&old.address===address)continue;const automatic=new Set([old.name,old.address,name].filter(Boolean)),endpoint=address||name;
+ for(const e of builderTraceEdges('all').filter(e=>e.from===lb.id||e.to===lb.id)){const store=relationshipDetailsStore(e.edge),d=store?.relationshipDetails;if(d&&automatic.has(d.endpoint))d.endpoint=endpoint;const r=e.edge.relation;if(r?.type==='deployment_client'&&r.from===lb.id&&r.targetUri===old.address)r.targetUri=address}
+ }
+ remember();
+}finally{syncing=false}}
+remember();
+const render=renderBuilder;renderBuilder=function(...args){sync();return render.apply(this,args)};
+const commit=commitBuilderHistory;commitBuilderHistory=function(...args){sync();return commit.apply(this,args)};
+// Keep typed details current immediately before operations that can replace a parent.
+for(const key of ['beginBuilderConnection','moveBuilderNode','addBuilderNode','removeSelectedBuilderEdge','createAdditionalDataRelation']){const before=window[key];window[key]=function(...args){remember();return before.apply(this,args)}}
+const markup=unifiedNodeMarkup;unifiedNodeMarkup=function(n,...args){const html=markup.call(this,n,...args);if(!is(n))return html;const box=document.createElement('div');box.innerHTML=html;for(const fact of box.querySelectorAll('.lbFacts186>span'))fact.innerHTML=counts(fact.innerHTML);return box.innerHTML};
+const inspector=renderBuilderInstanceInspector;renderBuilderInstanceInspector=function(...args){const result=inspector.apply(this,args),lb=state.builderNodes.find(n=>n.id===state.builderSelected),box=document.querySelector('.lbInspector186');if(!is(lb)||!box)return result;
+ for(const paragraph of box.querySelectorAll('p'))paragraph.textContent=counts(paragraph.textContent);
+ const button=box.querySelector('[data-lb-move]');if(button){const fresh=button.cloneNode(true);button.replaceWith(fresh);fresh.addEventListener('click',()=>{const before=builderHistorySnapshot(),members=new Set(builderLbMembers(lb).map(n=>n.id)),direct=state.builderRelations.filter(r=>members.has(r.from)&&r.type==='deployment_client');for(const r of direct){if(state.builderRelations.some(x=>x!==r&&x.from===lb.id&&x.to===r.to&&x.type==='deployment_client'))state.builderRelations=state.builderRelations.filter(x=>x!==r);else{r.from=lb.id;r.targetUri=lb.lbAddress;if(r.relationshipDetails)r.relationshipDetails.endpoint=lb.lbAddress||label(lb)}}commitBuilderHistory(before,'Move clients to '+label(lb));renderBuilder()})}return result};
+const hec=architectureRules.find(r=>r.id==='AR-010'),hecEvaluate=hec.evaluate;hec.evaluate=function(){const result=hecEvaluate.call(this);return{...result,evidence:result.evidence.map((text,i)=>{const lb=state.builderNodes.find(n=>n.id===result.nodes[i]);if(!lb)return text;if(lb.lbMethod==='proxy'){return ['cookie','sourceIp'].includes(lb.lbPersistence)?`Sticky sessions (${lb.lbPersistence==='cookie'?'cookie':'source IP'}). Duplicates are still possible when a client moves under load.`:text}const clients=builderTraceEdges('data').filter(e=>e.to===lb.id&&/^(HEC|Indexer) acknowledgement$/.test(ensureRelationshipDetails(e.edge).acknowledgement)).map(e=>label(e.edge.source));return clients.join(', ')+(clients.length===1?' uses':' use')+' HEC acknowledgement. Confirm each client keeps one address while it checks acknowledgements.'})}};
+const capacity=architectureRules.find(r=>r.id==='AR-012'),capacityEvaluate=capacity.evaluate;capacity.evaluate=function(){const result=capacityEvaluate.call(this);return{...result,evidence:result.evidence.map(counts)}};
+changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Build 187: load balancer review fixes','Accurate HEC acknowledgement evidence; formatted client counts; default endpoints follow name and address edits; re-linked members refresh automatic details while keeping typed values; Move clients removes duplicate authorities in one Undo step.',true]);
+document.title=document.title.replace('Build 186','Build 187');document.querySelector('#topologyBuilder').dataset.buildNumber='187';const stamp=document.querySelector('.builderBuildStamp');if(stamp){stamp.querySelector('b').textContent='Build 187';stamp.setAttribute('aria-label','Build 187, dated 9 October 2026')}builderInfoText159.textContent=builderInfoText159.textContent.replace('Build 186','Build 187');renderBuilder();
+})();
+
+</script>
 </body>
 </html>
