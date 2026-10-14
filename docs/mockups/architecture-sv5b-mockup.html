@@ -3,19 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body>
-<title>SV-5b Activity to Systems</title>
+<title>SV-5b Activity to Systems Traceability</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Layout: one architecture-pack sheet in the same family as the OV, DIV, CV and SV mockups. Banners, title block, purpose, a
-   detail strip for the selection, then the system × activity matrix (SV-1 systems by location down, OV-5 activities across) with blocked and limited cells marked, and findings. Amber marks partial or limited, red marks not realised or blocked. */
+/* Layout: title block, purpose, summary, a detail panel, then systems by activities. Each cell lists the OV-5a parts the system takes part in, coloured by whether its own share works. */
 :root{
   --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
   --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
-  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --hi:#fff4d6; --sel:#0f7fa6;
   --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
   --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
   --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -24,18 +21,19 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
   --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
-  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --hi:#2a2412; --sel:#4fb7d6;
   --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
   --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
-  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --hi:#2a2412; --sel:#4fb7d6;
   --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
 .page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
 .page>*,.inner>*,.sheet>*{min-width:0}
-.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.top{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
+.example{font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
 .sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
 .banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
 .banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
@@ -46,209 +44,421 @@ body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--f
 .tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
 .tb-v.big{font-size:1.25rem;text-wrap:balance}
-.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap;font-size:.92em}
 @media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
 .summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
 .summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
 .summary .rv b{color:var(--review)}
-
+.summary .st b{color:var(--stop)}
 .purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
 .purpose .tb-k{white-space:nowrap}
 .purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
 @media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
 h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
 .sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
-.sw{width:12px;height:12px;border-radius:2px;display:inline-block;vertical-align:-1px}
 .chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
 .chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
-.chip.part,.chip.plan,.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
 .chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
 .chip.ext{color:var(--muted);background:var(--zone)}
-
-/* Detail strip */
-.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px 16px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.3fr) minmax(0,1fr);gap:12px 22px;min-height:132px}
-@media (max-width:960px){.detail{grid-template-columns:1fr}}
+.plane{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.plane.data{background:var(--d-index)}.plane.management{background:var(--d-collect)}.plane.authentication{background:var(--d-govern)}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{font:600 .76rem var(--font-body);padding:6px 11px;border:0;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sheet)}
+.model{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.model>*{min-width:0}
+@media (max-width:1150px){.model{grid-template-columns:1fr}}
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+svg.lanes{display:block;width:100%;min-width:900px;height:auto}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.colhead{font:600 9px var(--font-code);letter-spacing:.1em;text-transform:uppercase;fill:var(--muted)}
+.band rect{fill:var(--sheet);stroke:var(--rule);stroke-dasharray:5 4}
+.band.dmz rect{stroke:var(--review);fill:color-mix(in srgb,var(--review) 5%,var(--sheet))}
+.band.managed rect{stroke:var(--d-search);fill:color-mix(in srgb,var(--d-search) 5%,var(--sheet))}
+.band text.bl{font:600 10px var(--font-code);letter-spacing:.12em;text-transform:uppercase;fill:var(--ink-2)}
+.band text.bs{font:500 9.5px var(--font-code);fill:var(--muted)}
+.zone rect{fill:color-mix(in srgb,var(--d-collect) 4%,var(--sheet));stroke:var(--line);stroke-width:1}
+.zone.fallback rect{fill:none;stroke-dasharray:2 3}
+.zone.dmz rect{stroke:var(--review);fill:color-mix(in srgb,var(--review) 7%,var(--sheet))}
+.zone.managed rect{stroke:var(--d-search);fill:color-mix(in srgb,var(--d-search) 6%,var(--sheet))}
+.zone text.zn{font:600 8.5px var(--font-code);letter-spacing:.08em;text-transform:uppercase;fill:var(--ink-2)}
+.zone text.zs{font:500 8.5px var(--font-code);fill:var(--muted)}
+.zone{cursor:pointer}
+.zone.sel rect{stroke:var(--sel);stroke-width:2}
+.sys{cursor:pointer}
+.sys:focus{outline:none}
+.sys rect.box{fill:var(--node);stroke:var(--line);stroke-width:1}
+.sys.external rect.box{stroke-dasharray:4 3}
+.sys.person rect.box{stroke-dasharray:2 3}
+.sys.managed rect.box{stroke:var(--d-search);stroke-width:1.4}
+.sys.network rect.box{stroke:var(--d-collect);stroke-width:1.6}
+.sys.lonely rect.box{stroke:var(--review);stroke-dasharray:4 3;stroke-width:1.4}
+.sys:focus-visible rect.box,.sys.sel rect.box{stroke:var(--sel);stroke-width:2.6}
+.sys .t{font:600 11.5px var(--font-title);fill:var(--ink)}
+.sys .ty{font:500 9px var(--font-code);fill:var(--muted)}
+.ln{fill:none;stroke-width:1.8}
+.lk.data .ln{stroke:var(--d-index)}
+.lk.management .ln{stroke:var(--d-collect);stroke-dasharray:7 4;stroke-width:1.6}
+.lk.authentication .ln{stroke:var(--d-govern);stroke-dasharray:2 4;stroke-linecap:round;stroke-width:2.2}
+.lk.inferred .ln{stroke:var(--review);stroke-dasharray:3 3;stroke-width:1.6}
+.lk.missing .ln{stroke:var(--stop);stroke-dasharray:6 4;stroke-width:1.6}
+.lk.inside .ln{stroke-width:1.1;opacity:.75}
+.lk.cross .ln{stroke-width:2.6}
+.lk.plain.cross .ln{stroke:var(--stop)}
+.lk.planned .ln{stroke:var(--review);stroke-dasharray:3 3;stroke-width:1.6}
+.lk .hit{fill:none;stroke:transparent;stroke-width:12;cursor:pointer}
+.lk .hd{stroke:none}
+.lk.data .hd{fill:var(--d-index)}.lk.management .hd{fill:var(--d-collect)}.lk.authentication .hd{fill:var(--d-govern)}
+.lk.inferred .hd,.lk.planned .hd{fill:var(--review)}.lk.missing .hd,.lk.plain.cross .hd{fill:var(--stop)}
+.tag{cursor:pointer}
+.tag rect{fill:var(--sheet);stroke:var(--line);stroke-width:1}
+.tag.missing rect,.tag.plain rect{stroke:var(--stop)}
+.tag.inferred rect,.tag.planned rect,.tag.noport rect{stroke:var(--review);stroke-dasharray:3 2}
+.tag text{font:600 9px var(--font-code);fill:var(--ink-2)}
+.tag.noport text{fill:var(--review)}
+.stub{fill:var(--sheet);stroke:var(--stop)}
+.stubq{font:700 10px var(--font-code);fill:var(--stop)}
+svg.focused .sys:not(.on):not(.sel){opacity:.25}
+svg.focused .lk:not(.on),svg.focused .tag:not(.on){opacity:.1}
+svg.focused .tag.on rect{stroke:var(--sel);stroke-width:2}
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:9px;align-content:start}
 .detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.detail h3{margin:4px 0 6px;font:700 1.16rem/1.2 var(--font-title)}
-.detail p{margin:0;font-size:.86rem;line-height:1.5}
-.detail dl{margin:0;display:grid;gap:7px;align-content:start}
+.detail h3{margin:0;font:700 1.12rem/1.2 var(--font-title);overflow-wrap:anywhere}
+.detail p{margin:0;font-size:.85rem}
+.detail dl{margin:0;display:grid;gap:7px}
 .detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.detail dd{margin:2px 0 0;font-size:.85rem}
-.detail ul{margin:2px 0 0;padding:0;list-style:none;display:grid;gap:4px;font-size:.84rem}
-.detail code{font:500 .76rem var(--font-code);background:var(--zone);padding:1px 5px;border-radius:3px}
-
-/* Matrix */
-.mwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
-table.mx{border-collapse:separate;border-spacing:0;width:100%;font-size:.8rem}
-.mx th,.mx td{border-bottom:1px solid var(--rule);padding:0}
-.mx thead th{background:var(--zone);font:600 .62rem/1.2 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);vertical-align:bottom}
-.mx thead tr.fam th{border-bottom:0;padding:7px 6px 2px;text-align:center;border-left:1px solid var(--rule)}
-.mx thead tr.fam th:first-child{border-left:0}
-.mx thead tr.cols th{padding:4px 4px 8px}
-.mx th.colh{width:58px;min-width:58px;text-align:center;border-left:1px solid var(--rule);cursor:pointer}
-.mx th.colh button{all:unset;cursor:pointer;display:grid;gap:3px;justify-items:center;width:100%;padding:2px 0}
-.mx th.colh .cid{font:600 .66rem var(--font-code);color:var(--ink)}
-.mx th.colh .nm{font:500 .62rem/1.2 var(--font-body);letter-spacing:0;text-transform:none;color:var(--ink-2);max-width:56px;text-wrap:balance}
-.mx th.colh button:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
-.mx th.rowh{position:sticky;left:0;z-index:1;background:var(--sheet);text-align:left;font-weight:400;padding:6px 10px;min-width:250px;border-right:1px solid var(--rule);cursor:pointer}
-.mx thead th.rowh{background:var(--zone);vertical-align:bottom;padding:8px 10px}
-.mx th.rowh .cid{font:600 .7rem var(--font-code);color:var(--muted);margin-right:6px}
-.mx th.rowh .dot{margin-left:6px}
-.mx tr.grp th,.mx tr.grp td{background:var(--zone);font:700 .78rem var(--font-title);padding:5px 10px}
-.mx tr.grp th{position:sticky;left:0;z-index:1}
-.mx td.c{text-align:center;border-left:1px solid var(--rule);font:600 .95rem/1 var(--font-code);height:30px}
-.mx td.c.p{color:var(--ink)}
-.mx td.c.s{color:var(--muted)}
-.mx td.c.gap{color:var(--review);background:color-mix(in srgb,var(--review) 9%,transparent)}
-.mx td.c.okc{color:var(--ok)}
-.mx td.st{padding:6px 10px;white-space:nowrap;border-left:1px solid var(--rule)}
-.mx tfoot td,.mx tfoot th{background:var(--zone);padding:6px 4px;text-align:center;font:600 .66rem/1.3 var(--font-code);border-bottom:0;border-top:1px solid var(--rule)}
-.mx tfoot th.rowh{text-align:left;padding:6px 10px;background:var(--zone)}
-.mx tfoot td{border-left:1px solid var(--rule)}
-.dot{display:inline-block;width:7px;height:7px;border-radius:50%;vertical-align:1px}
-.dot.ok{background:var(--ok)}.dot.part{background:var(--review)}.dot.plan{border:1.5px solid var(--review)}
-.mx tbody tr:not(.grp):hover th.rowh,.mx tbody tr:not(.grp):hover td{background-color:var(--hi)}
-.mx.focused tbody tr:not(.grp):not(.on){opacity:.35}
-.mx.focused .col-on{background-color:color-mix(in srgb,var(--sel) 10%,transparent)}
-.mx tr.on th.rowh{box-shadow:inset 3px 0 0 var(--sel)}
-.mx th.colh.sel{box-shadow:inset 0 -3px 0 var(--sel)}
-.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.78rem;color:var(--ink-2)}
-.legend span{display:inline-flex;gap:6px;align-items:center}
-.legend b{font:600 .95rem var(--font-code)}
-
-/* Findings */
-.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
-.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
-.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.detail dd{margin:2px 0 0;font-size:.84rem;overflow-wrap:anywhere}
+.detail ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:.84rem}
+.detail li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
+.detail code{font:500 .74rem var(--font-code);background:var(--zone);padding:1px 4px;border-radius:3px}
+.detail .hint{font-size:.78rem;color:var(--muted)}
+.detail .acts{display:flex;flex-wrap:wrap;gap:6px}
+.act{font:600 .74rem var(--font-body);padding:6px 10px;border:1px solid var(--sel);border-radius:4px;background:var(--sheet);color:var(--sel);cursor:pointer}
+.toast{font-size:.78rem;color:var(--ink-2);background:var(--zone);border-radius:4px;padding:6px 8px}
+.muted{color:var(--muted)}
+.usual{display:block;font-size:.72rem;color:var(--muted)}
 .tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
 table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
 .reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg th.n,.reg td.n{text-align:right}
 .reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
-.reg tr:last-child td{border-bottom:0}
-.reg tbody tr{cursor:pointer}
-.reg tbody tr:hover,.reg tbody tr.sel{background:var(--hi)}
+.reg tbody tr:last-child td{border-bottom:0}
+.reg td.n{font:500 .76rem var(--font-code);font-variant-numeric:tabular-nums;white-space:nowrap}
+.reg tbody tr[data-k]{cursor:pointer}
+.reg tbody tr[data-k]:hover,.reg tbody tr.sel{background:var(--hi)}
 .id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
 .mono{font:500 .76rem var(--font-code)}
+.bad{color:var(--stop);font-weight:600}
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+@media (max-width:560px){.findings li{grid-template-columns:1fr}}
 .foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+.headrow{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
+.filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.filters button{font:600 .74rem var(--font-body);padding:5px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--sheet);color:var(--ink-2);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.filters button[aria-pressed="true"]{border-color:var(--sel);color:var(--ink);background:color-mix(in srgb,var(--sel) 10%,var(--sheet))}
+.filters .lbl{font:600 .62rem var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:2px}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-@media (prefers-reduced-motion:no-preference){.mx tbody tr{transition:opacity .15s}}
-
-
-.mx tr.grp th{text-align:left;white-space:nowrap}
-.mx td.c.no{color:var(--stop);background:color-mix(in srgb,var(--stop) 8%,transparent)}
-.mx td.c.ext{color:var(--muted)}
-.mx th.rowh small{display:block;font:500 .66rem var(--font-code);color:var(--muted);margin-left:0}
+@media (prefers-reduced-motion:no-preference){.sys,.lk,.tag{transition:opacity .15s}}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+table.mx6{width:100%;border-collapse:separate;border-spacing:0;font-size:.8rem;min-width:760px}
+.mx6 th,.mx6 td{border-bottom:1px solid var(--rule);padding:7px 9px;vertical-align:top;text-align:left}
+.mx6 thead th{background:var(--zone);font:600 .6rem/1.2 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.mx6 th.sticky,.mx6 td.sticky{position:sticky;left:0;background:var(--sheet);z-index:1;border-right:1px solid var(--rule)}
+.mx6 thead th.sticky{background:var(--zone)}
+.mx6 td.sticky{min-width:230px;max-width:270px}
+.mx6 td.sticky .fid{font:600 .72rem var(--font-code);color:var(--muted);margin-right:6px}
+.mx6 td.sticky small{display:block;color:var(--ink-2);font-size:.74rem;margin-top:2px}
+.mx6 tbody tr{cursor:pointer}
+.mx6 tbody tr:hover td,.mx6 tbody tr.sel td{background:var(--hi)}
+.mx6 tbody tr.sel td.sticky{box-shadow:inset 3px 0 0 var(--sel)}
+.mx6 .chip{white-space:normal}
+.mx6 td.n,.mx6 th.n{text-align:right;font-variant-numeric:tabular-nums}
+.mx6 td.n{font:500 .74rem var(--font-code);white-space:nowrap}
+.origin{display:block;color:var(--muted);font-size:.68rem;margin-top:2px}
+.empty{padding:16px;color:var(--muted);font-size:.84rem}
+.trace{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(190px,100%),1fr));gap:8px}
+.rf{border:1px solid var(--rule);border-radius:4px;padding:8px 10px;display:grid;gap:3px;background:var(--sheet)}
+.rf b{font:600 .74rem var(--font-code)}
+.rf span{font-size:.78rem;color:var(--ink-2)}
+.rf .si{font:500 .7rem var(--font-code);color:var(--muted)}
+.rf.none{border-color:color-mix(in srgb,var(--review) 55%,transparent);background:color-mix(in srgb,var(--review) 6%,var(--sheet))}
+.model.wide{grid-template-columns:1fr}
+.model.wide .detail dl{grid-template-columns:repeat(auto-fill,minmax(min(240px,100%),1fr));gap:10px 22px}
+.model.wide .detail>ul{columns:2 300px;column-gap:24px;display:block}
+.model.wide .detail>ul li{break-inside:avoid;margin-bottom:5px}
+.detail dl>div{min-width:0}
+/* Shared by the OV-5a, SvcV-5 and CV-6 mockups. */
+.stc{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.05em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.stc.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.stc.partial{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.stc.planned{color:var(--sel);background:color-mix(in srgb,var(--sel) 12%,transparent)}
+.stc.not{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.stc.unknown{color:var(--muted);background:var(--zone)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex:none;background:var(--muted)}
+.dot.ok{background:var(--ok)}.dot.partial{background:var(--review)}.dot.not{background:var(--stop)}
+.dot.planned{background:transparent;border:2px solid var(--sel);width:9px;height:9px}
+.dot.unknown{background:transparent;border:1.5px dashed var(--muted);width:9px;height:9px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:.78rem;color:var(--ink-2)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend .hint{color:var(--muted)}
+.vcs{display:flex;flex-wrap:wrap;gap:4px}
+.vc{font:600 .68rem/1 var(--font-code);padding:4px 6px;border-radius:3px;border:1px solid var(--rule);background:var(--zone);color:var(--ink-2);cursor:pointer}
+.vc:hover{border-color:var(--sel);color:var(--ink)}
+.vc:focus-visible,.tree button:focus-visible,.mx button:focus-visible,.mx td[tabindex]:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.panel{border:1px solid var(--rule);border-radius:4px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:14px 24px;min-height:120px}
+.panel h3{margin:2px 0 4px;font:700 1.15rem/1.25 var(--font-title)}
+.panel p{margin:0 0 6px;font-size:.86rem;color:var(--ink-2)}
+.panel .ov{display:block;font:600 .62rem/1.3 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.panel dl{margin:0;display:grid;gap:4px}
+.panel dt{font:600 .62rem/1.3 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.panel dd{margin:0;font-size:.86rem}
+.panel ul{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+.panel li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline;font-size:.85rem}
+.panel li small{display:block;color:var(--ink-2);font-size:.78rem}
+.panel .hint{color:var(--muted);font-size:.8rem}
+.idc{font:600 .66rem/1 var(--font-code);padding:3px 5px;border-radius:3px;white-space:nowrap}
+.idc.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.idc.partial{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.idc.planned{color:var(--sel);background:color-mix(in srgb,var(--sel) 12%,transparent)}
+.idc.not{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.idc.unknown{color:var(--muted);background:var(--zone)}
+@media (max-width:760px){.panel{grid-template-columns:1fr}}
+/* OV-5a tree */
+.treewrap{border:1px solid var(--rule);border-radius:4px;background:var(--zone);padding:14px 14px 10px;display:grid;gap:10px}
+.tree{display:grid;gap:22px}
+.a0{justify-self:center;text-align:center;background:var(--node);border:1px solid var(--rule);border-radius:4px;padding:10px 22px;max-width:560px;position:relative}
+.a0 .k{display:block;font:600 .62rem/1.3 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.a0 b{display:block;font:700 1.15rem/1.3 var(--font-title)}
+.a0 small{display:block;font-size:.8rem;color:var(--ink-2)}
+.a0::after{content:"";position:absolute;left:50%;top:100%;height:12px;border-left:1px solid var(--line)}
+.acols{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:8px;position:relative}
+.acol{position:relative;display:grid;gap:8px;align-content:start;min-width:0}
+.acol::before{content:"";position:absolute;top:-10px;left:50%;height:10px;border-left:1px solid var(--line)}
+.acol::after{content:"";position:absolute;top:-10px;left:-4px;right:-4px;border-top:1px solid var(--line)}
+.acol:first-child::after{left:50%}.acol:last-child::after{right:50%}
+.ahead,.part{font:inherit;text-align:left;color:var(--ink);cursor:pointer;background:var(--node);border:1px solid var(--rule);border-radius:4px;width:100%}
+.ahead{border-top:4px solid var(--dc);padding:7px 8px;display:grid;gap:2px}
+.ahead .aid,.part .pid{display:flex;gap:5px;align-items:center;font:600 .64rem/1.2 var(--font-code);letter-spacing:.04em;color:var(--ink-2)}
+.ahead b{font:700 .9rem/1.2 var(--font-title)}
+.ahead small{font:500 .66rem/1.3 var(--font-code);color:var(--muted)}
+.parts{list-style:none;margin:0;padding:0 0 0 10px;display:grid;gap:6px;position:relative}
+.parts::before{content:"";position:absolute;left:3px;top:-8px;bottom:14px;border-left:1px solid var(--line)}
+.parts li{position:relative}
+.parts li::before{content:"";position:absolute;left:-7px;top:14px;width:7px;border-top:1px solid var(--line)}
+.part{padding:6px 7px;display:grid;gap:2px;border-left:3px solid var(--rule)}
+.part b{font:600 .8rem/1.25 var(--font-body)}
+.part.ok{border-left-color:var(--ok)}.part.partial{border-left-color:var(--review)}
+.part.planned{border-left-color:var(--sel);border-style:dashed;border-left-style:solid}
+.part.not{border-left-color:var(--stop);background:color-mix(in srgb,var(--stop) 7%,var(--node))}
+.part.unknown{border-left-color:var(--rule);color:var(--muted)}
+.ahead[aria-pressed="true"],.part[aria-pressed="true"]{outline:2px solid var(--sel);outline-offset:1px;background:color-mix(in srgb,var(--sel) 8%,var(--node))}
+.tree.picking .part:not([aria-pressed="true"]):not(.rel){opacity:.45}
+.tree.picking .ahead:not([aria-pressed="true"]):not(.rel){opacity:.6}
+@media (max-width:760px){
+ .acols{grid-template-columns:1fr;gap:14px}.acol::before,.acol::after,.a0::after{display:none}
+ .a0{justify-self:stretch}
+}
+/* SvcV-5 and CV-6 matrices */
+.mxwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+.mx{border-collapse:collapse;width:100%;min-width:1080px;font-size:.84rem}
+.mx th,.mx td{border-bottom:1px solid var(--rule);padding:6px 7px;vertical-align:middle}
+.mx thead th{background:var(--zone);font:600 .66rem/1.25 var(--font-code);color:var(--ink-2);text-align:center;vertical-align:bottom}
+.mx thead th:first-child{text-align:left;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mx thead th.state{text-align:left;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mx thead button{font:inherit;color:inherit;background:none;border:0;padding:2px;cursor:pointer;display:grid;gap:2px;justify-items:center;width:100%;border-radius:3px}
+.mx thead button b{font:700 .72rem/1 var(--font-code);color:var(--ink)}
+.mx thead button span{font:500 .66rem/1.2 var(--font-body)}
+.mx th.rowh{text-align:left;font-weight:400;border-right:1px solid var(--rule);width:240px}
+.mx th.rowh button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left;display:grid;gap:1px}
+.mx th.rowh b{font-weight:500}.mx th.rowh b i{font:600 .7rem var(--font-code);font-style:normal;color:var(--muted);margin-right:5px}
+.mx th.rowh small{font:500 .7rem var(--font-code);color:var(--muted)}
+.mx tr.grp th{background:color-mix(in srgb,var(--zone) 70%,var(--sheet));text-align:left;font:700 .8rem/1.2 var(--font-body);padding:7px}
+.mx tr.grp th .sq{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:7px;vertical-align:-1px}
+.mx td.c{text-align:center;border-left:1px solid color-mix(in srgb,var(--rule) 55%,transparent)}
+.mx td.c[tabindex]{cursor:pointer}
+.mx td.c .fns{display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
+.mx td.out{background:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--rule) 45%,transparent) 6px 7px)}
+.mx td.state{white-space:nowrap}
+.mx td.state small{display:block;font:500 .68rem var(--font-code);color:var(--muted);margin-top:3px}
+.mx tfoot td,.mx tfoot th{background:var(--zone);font-size:.74rem;text-align:center}
+.mx tfoot th{text-align:left;font:600 .68rem var(--font-code);color:var(--ink-2)}
+.mx tfoot small{display:block;font:500 .66rem var(--font-code);color:var(--ink-2);margin-top:3px}
+.mx .sel{background:color-mix(in srgb,var(--sel) 10%,transparent)}
+.mx td.c.hit{background:color-mix(in srgb,var(--sel) 16%,transparent)}
+.mx.picking tbody tr:not(.grp):not(.on) th.rowh{opacity:.55}
+.mx th[aria-pressed="true"] button,.mx th.rowh.on button{color:var(--sel)}
+.summary .ok b{color:var(--ok)}.summary .pl b{color:var(--sel)}
+/* SV-3, SV-5b and CV-7 */
+.model3{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.model3>*{min-width:0}
+@media (max-width:1150px){.model3{grid-template-columns:1fr}}
+.m3wrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.m3{border-collapse:separate;border-spacing:0;font-size:.8rem;min-width:max-content}
+.m3 th,.m3 td{border-bottom:1px solid color-mix(in srgb,var(--rule) 70%,transparent);padding:0}
+.m3 thead th{background:var(--zone);font:600 .6rem/1.2 var(--font-code);color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:6px 3px;text-align:center;vertical-align:bottom}
+.m3 thead th.loc{border-left:1px solid var(--rule)}
+.m3 thead th.corner{text-align:left;position:sticky;left:0;z-index:2;background:var(--zone)}
+.m3 thead tr.nums button{font:600 .7rem var(--font-code);color:var(--ink-2);background:none;border:0;cursor:pointer;width:100%;padding:3px 0;border-radius:3px}
+.m3 td.c{width:42px;min-width:42px;height:30px;text-align:center;vertical-align:middle;border-left:1px solid color-mix(in srgb,var(--rule) 45%,transparent)}
+.m3 td.c .sis{display:flex;flex-direction:column;gap:2px;align-items:center;padding:2px 0}
+.m3 td.diag{background:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--rule) 60%,transparent) 5px 6px)}
+.m3 th.rh{text-align:left;font-weight:400;white-space:nowrap;border-right:1px solid var(--rule);position:sticky;left:0;background:var(--sheet);z-index:1}
+.m3 th.rh button{display:flex;gap:8px;align-items:baseline;background:none;border:0;padding:6px 12px 6px 8px;font:inherit;color:var(--ink);cursor:pointer;text-align:left;width:100%}
+.m3 th.rh i{font:600 .66rem var(--font-code);font-style:normal;color:var(--muted);min-width:18px}
+.m3 th.rh.none button{color:var(--muted)}
+.m3 tr.grp th{background:color-mix(in srgb,var(--zone) 70%,var(--sheet));text-align:left;font:700 .76rem var(--font-body);padding:5px 8px;position:sticky;left:0;z-index:1}
+.m3 td.n,.m3 th.n{font:500 .72rem var(--font-code);text-align:center;color:var(--ink-2);padding:0 8px;border-left:1px solid var(--rule)}
+.m3 tfoot th,.m3 tfoot td{background:var(--zone);font:500 .68rem var(--font-code);color:var(--ink-2);text-align:center;padding:5px 2px}
+.m3 tfoot th{text-align:left;padding-left:8px;position:sticky;left:0}
+.m3 .hl{background:color-mix(in srgb,var(--sel) 8%,transparent)}
+.m3 .on{box-shadow:inset 0 0 0 2px var(--sel)}
+.m3 th.rh.hl{background:color-mix(in srgb,var(--sel) 10%,var(--sheet))}
+.si{font:600 .58rem/1 var(--font-code);padding:4px 3px 4px 4px;border-radius:2px;border:1px solid transparent;border-left:3px solid var(--pl);cursor:pointer;white-space:nowrap;color:var(--ink);background:var(--node)}
+.si.ok{background:color-mix(in srgb,var(--ok) 13%,var(--node))}
+.si.gap{background:color-mix(in srgb,var(--review) 16%,var(--node))}
+.si.stop{background:color-mix(in srgb,var(--stop) 14%,var(--node))}
+.si.inferred{border-color:var(--review);border-style:dashed dashed dashed solid}
+.si.missing{border-color:var(--stop);border-style:dashed dashed dashed solid}
+.si[aria-pressed="true"]{outline:2px solid var(--sel);outline-offset:1px}
+.si:focus-visible,.m3 button:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.sw{display:inline-block;width:18px;height:12px;border-radius:2px;border:1px solid transparent;vertical-align:-1px}
+.sw.ok{background:color-mix(in srgb,var(--ok) 13%,var(--node))}
+.sw.gap{background:color-mix(in srgb,var(--review) 16%,var(--node))}
+.sw.stop{background:color-mix(in srgb,var(--stop) 14%,var(--node))}
+.sw.inferred{border-color:var(--review);border-style:dashed}
+.pl{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:-1px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.two>*{min-width:0}
+@media (max-width:900px){.two{grid-template-columns:1fr}}
+.two h2,.reg2 h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.two p.sub,.reg2 p.sub{margin:4px 0 8px;font-size:.82rem;color:var(--ink-2)}
+table.lm{border-collapse:collapse;width:100%;font-size:.78rem}
+.lm th,.lm td{border:1px solid var(--rule);padding:6px 6px;text-align:center}
+.lm thead th,.lm tbody th{background:var(--zone);font:600 .6rem/1.2 var(--font-code);letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2)}
+.lm tbody th{text-align:left}
+.lm td{font:600 .76rem var(--font-code);color:var(--ink)}
+.lm td.z{color:var(--muted);font-weight:400}
+table.tl{border-collapse:collapse;width:100%;font-size:.8rem}
+.tl th{font:600 .6rem/1.2 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--zone);text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule)}
+.tl td{padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+.tl td.n{font:500 .74rem var(--font-code);text-align:right;font-variant-numeric:tabular-nums}
+.tl .chips{display:flex;flex-wrap:wrap;gap:3px}
+.panel3{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:8px;align-content:start}
+.panel3 .ov{display:block;font:600 .62rem/1.3 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.panel3 h3{margin:0;font:700 1.08rem/1.25 var(--font-title);overflow-wrap:anywhere}
+.panel3 p{margin:0;font-size:.84rem;color:var(--ink-2)}
+.panel3 dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;font-size:.82rem}
+.panel3 dt{font:600 .6rem/1.6 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.panel3 dd{margin:0;overflow-wrap:anywhere}
+.panel3 ul{list-style:none;margin:0;padding:0;display:grid;gap:5px;font-size:.82rem}
+.panel3 li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:7px;align-items:baseline}
+.panel3 li small{display:block;color:var(--ink-2);font-size:.76rem}
+.panel3 .hint{color:var(--muted);font-size:.78rem}
+.panel3 .act{justify-self:start}
+.svc-h{font:700 .66rem/1.1 var(--font-code)}
+.mx td.c.nd,.mx th.nd{background:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--rule) 40%,transparent) 6px 7px)}
+.mx thead th.grp2{font:600 .58rem/1.2 var(--font-code);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-left:1px solid var(--rule)}
+#mx.mx th.rowh{min-width:230px}
+.mx th.rowh small .dot{width:7px;height:7px;vertical-align:0}
+.mx th.rowh small .dot.planned{width:8px;height:8px}
+.cv7m thead tr:nth-child(2) th{vertical-align:bottom;padding:6px 2px;width:46px;min-width:46px}
+.cv7m thead tr:nth-child(2) th button{gap:5px}
+.cv7m thead tr:nth-child(2) th button span{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;text-align:left;line-height:1.1}
+.cv7m td.c{width:46px;min-width:46px;padding:5px 2px}
+.cv7m td.state{width:1%}
 </style>
-
+</head>
+<body>
 <div class="page">
-  <span class="example">Example content · reference topology</span>
+  <div class="top"><span class="example">Example content · Builder model</span><div class="seg" id="scen" role="group" aria-label="Example topology"></div></div>
   <section class="sheet" aria-labelledby="sTitle">
-    <div class="banner top">Security telemetry + PII</div>
+    <div class="banner top" id="cls1"></div>
     <div class="inner">
-      <div class="titleblock">
-        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="sTitle">SV-5b · Operational Activity to Systems Traceability Matrix</span></div>
-        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
-        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Systems (DoDAF V2.0)</span></div>
-        <div><span class="tb-k">System owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
-        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
-      </div>
-
-      <div class="purpose"><span class="tb-k">Purpose</span><p>Which systems in the Builder topology take part in each OV-5 operational activity, through the SV-4 functions they perform. A cell is red or amber where a system should take part but its interfaces stop it.</p></div>
-
-      <div class="summary" id="summary"></div>
-      <div class="detail" id="detail" aria-live="polite"></div>
-
-      <div class="legend">
-        <span><b style="color:var(--ok)">●</b>takes part</span>
-        <span><b style="color:var(--muted)">○</b>supports</span>
-        <span><b style="color:var(--review)">●</b>takes part, limited</span>
-        <span><b style="color:var(--stop)">●</b>should take part, blocked</span>
-        <span>Click a system or an activity. Esc clears.</span>
-      </div>
-      <div class="mwrap"><table class="mx" id="mx"></table></div>
-
-      <div class="findings">
-        <h2>What the matrix shows</h2>
-        <ul id="findings"></ul>
-      </div>
-
-      <div class="foot"><span>Splunk security telemetry architecture · System owner not set · Systems from SV-1; functions from SV-4; activities from OV-5</span><span>SV-5b · 1 of 1 · Build 167</span></div>
+      <div class="titleblock" id="tb"></div>
+      <div class="purpose"><span class="tb-k">Purpose</span><p>Which systems take part in each OV-5a operational activity, through the SvcV-4 functions their services provide. A cell is amber or red where the system takes part but its own share falls short, so one broken forwarder doesn't hide behind a working one.</p></div>
+      <div class="summary" id="sum"></div>
+      <div class="panel" id="detail" aria-live="polite"></div>
+      <div class="legend" id="legend"></div>
+      <div class="mxwrap"><table class="mx" id="mx"></table></div>
+      <div class="findings"><h2>What the matrix shows</h2><ul id="findings"></ul></div>
+      <div class="foot" id="foot"></div>
     </div>
-    <div class="banner bottom">Security telemetry + PII</div>
+    <div class="banner bottom" id="cls2"></div>
   </section>
 </div>
 
 <script>
-const ACT=[
- ['A1','Generate security telemetry','Security sources'],['A2','Collect, buffer and forward','Collection'],['A3','Forward and deliver events','Collection'],
- ['A4','Process and route events','Processing'],['A5','Index and replicate','Indexing'],['A6','Search and detect','Search and detection'],
- ['A7','Manage the platform','Management'],['A8','Authenticate and investigate','People'],['A9','Coordinate response','Response']];
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const ST={ok:['ok','Realised'],partial:['gap','Partial'],none:['stop','Not realised'],ext:['ext','Outside platform']};
+const DATA={"ref":{"sv5b":{"rows":[{"id":1,"name":"Firewalls and network devices","component":"Syslog Source","type":"syslogSource","location":"Sydney","cells":{"A1":[{"part":"A1.1","status":"ok","why":[],"fns":[]}]}},{"id":5,"name":"Windows Event Log 1","component":"Windows Event Log","type":"windowsEvent","location":"Sydney","cells":{"A1":[{"part":"A1.2","status":"none","why":["Windows Event Log 1 isn't collected: it has no interface (SV-1)."],"fns":[]}]}},{"id":2,"name":"Syslog Server 1","component":"Syslog Server","type":"syslog","location":"Sydney","cells":{"A2":[{"part":"A2.1","status":"ok","why":[],"fns":[{"id":"S3.1","name":"Receive syslog","code":"ok"},{"id":"S3.2","name":"Write host files","code":"ok"}]}]}},{"id":3,"name":"Universal Forwarder 1","component":"Universal Forwarder","type":"uf","location":"Sydney","cells":{"A2":[{"part":"A2.2","status":"ok","why":[],"fns":[{"id":"S1.1","name":"Tail host files","code":"ok"},{"id":"S1.3","name":"Read event logs","code":"ok"}]}],"A3":[{"part":"A3.1","status":"ok","why":[],"fns":[{"id":"S1.2","name":"Forward raw (S2S)","code":"ok"}]}]}},{"id":10,"name":"Heavy Forwarder 1","component":"Heavy Forwarder","type":"hf","location":"Sydney","cells":{"A2":[{"part":"A2.3","status":"ok","why":[],"fns":[{"id":"S4.1","name":"Accept HEC events","code":"ok"}]}],"A3":[{"part":"A3.1","status":"none","why":["S2.3 Forward cooked: no output to an indexer (SI-14 missing)."],"fns":[{"id":"S2.3","name":"Forward cooked","code":"none"}]}],"A4":[{"part":"A4.1","status":"ok","why":[],"fns":[{"id":"S4.2","name":"Queue to parser","code":"ok"},{"id":"S2.1","name":"Parse, timestamp","code":"ok"}]},{"part":"A4.2","status":"ok","why":[],"fns":[{"id":"S2.2","name":"Mask PII","code":"ok"}]}]}},{"id":15,"name":"Deployment Server 1","component":"Deployment Server","type":"ds","location":"Sydney","cells":{"A7":[{"part":"A7.1","status":"ok","why":[],"fns":[{"id":"S5.1","name":"Serve app bundles","code":"ok"}]}]}},{"id":16,"name":"License Manager 1","component":"License Manager","type":"licenseManager","location":"Sydney","cells":{"A7":[{"part":"A7.2","status":"partial","why":["S15.1 Pool, enforce licence: SI-16 is inferred; add the link to the topology."],"fns":[{"id":"S15.1","name":"Pool, enforce licence","code":"partial"}]}]}},{"id":17,"name":"Monitoring Console 1","component":"Monitoring Console","type":"monitoringConsole","location":"Sydney","cells":{"A7":[{"part":"A7.3","status":"none","why":["S16.1 Poll health (REST): SI-17, SI-18 are inferred; add the link to the topology.","S16.2 Alert on silence: Monitoring Console has no management relationship to a Deployment Server or forwarder."],"fns":[{"id":"S16.1","name":"Poll health (REST)","code":"partial"},{"id":"S16.2","name":"Alert on silence","code":"none"}]}]}},{"id":6,"name":"Syslog Source 2","component":"Syslog Source","type":"syslogSource","location":"Melbourne","cells":{"A1":[{"part":"A1.1","status":"ok","why":[],"fns":[]}]}},{"id":7,"name":"Syslog Server 2","component":"Syslog Server","type":"syslog","location":"Melbourne","cells":{"A2":[{"part":"A2.1","status":"ok","why":[],"fns":[{"id":"S3.1","name":"Receive syslog","code":"ok"},{"id":"S3.2","name":"Write host files","code":"ok"}]}]}},{"id":8,"name":"Universal Forwarder 2","component":"Universal Forwarder","type":"uf","location":"Melbourne","cells":{"A2":[{"part":"A2.2","status":"ok","why":[],"fns":[{"id":"S1.1","name":"Tail host files","code":"ok"},{"id":"S1.3","name":"Read event logs","code":"ok"}]}],"A3":[{"part":"A3.1","status":"none","why":["S1.2 Forward raw (S2S): no output to an indexer (SI-13 missing)."],"fns":[{"id":"S1.2","name":"Forward raw (S2S)","code":"none"}]}]}},{"id":9,"name":"AWS Lambda 1","component":"AWS Lambda","type":"awsLambda","location":"AWS ap-southeast-2","cells":{"A1":[{"part":"A1.3","status":"ok","why":[],"fns":[]}]}},{"id":13,"name":"Administrator 1","component":"User / Administrator","type":"authUser","location":"Security operations","cells":{"A6":[{"part":"A6.1","status":"ok","why":[],"fns":[]}],"A9":[{"part":"A9.2","status":"partial","why":["A9.2 Run cases and playbooks is partly supported (S13.1 Ingest findings: No relationship from a search tier to SOAR)."],"fns":[]}]}},{"id":4,"name":"Indexer 1","component":"Indexer","type":"idx","location":"Multisite","cells":{"A3":[{"part":"A3.1","status":"ok","why":[],"fns":[{"id":"S7.1","name":"Receive S2S","code":"ok"}]}],"A4":[{"part":"A4.1","status":"ok","why":[],"fns":[{"id":"S7.2","name":"Parse raw, mask","code":"ok"}]}],"A5":[{"part":"A5.1","status":"ok","why":[],"fns":[{"id":"S7.3","name":"Write, roll buckets","code":"ok"}]}],"A6":[{"part":"A6.1","status":"ok","why":[],"fns":[{"id":"S7.4","name":"Serve search","code":"ok"}]},{"part":"A6.2","status":"ok","why":[],"fns":[{"id":"S7.5","name":"Store summaries","code":"ok"}]}],"A7":[{"part":"A7.2","status":"partial","why":["S7.6 Report licence use: SI-16 is inferred; add the link to the topology."],"fns":[{"id":"S7.6","name":"Report licence use","code":"partial"}]}]}},{"id":11,"name":"Search Head 1","component":"Search Head","type":"search","location":"Multisite","cells":{"A6":[{"part":"A6.1","status":"ok","why":[],"fns":[{"id":"S9.1","name":"Dispatch, merge","code":"ok"},{"id":"S9.2","name":"Serve dashboards","code":"ok"}]},{"part":"A6.2","status":"ok","why":[],"fns":[{"id":"S10.1","name":"Build CIM summaries","code":"ok"}]}],"A8":[{"part":"A8.1","status":"ok","why":[],"fns":[{"id":"S9.4","name":"Check SAML session","code":"ok"}]}]}},{"id":12,"name":"SOAR Cloud","component":"Splunk SOAR · Cloud","type":"soarCloud","location":"Cloud","cells":{"A9":[{"part":"A9.2","status":"none","why":["S13.1 Ingest findings: No relationship from a search tier to SOAR.","S13.2 Run playbooks: SOAR exists but no playbook node is modelled."],"fns":[{"id":"S13.1","name":"Ingest findings","code":"none"},{"id":"S13.2","name":"Run playbooks","code":"partial"}]},{"part":"A9.3","status":"none","why":["S13.3 Update tickets: No service desk component or ticket-update interface is modelled."],"fns":[{"id":"S13.3","name":"Update tickets","code":"none"}]}]}},{"id":14,"name":"Authentication Provider · Cloud 1","component":"Authentication Provider · Cloud","type":"authProviderCloud","location":"Cloud","cells":{"A8":[{"part":"A8.1","status":"ok","why":[],"fns":[{"id":"S14.1","name":"Issue SAML assertion","code":"ok"}]}]}}],"activities":[{"id":"A1","name":"Generate security telemetry","domain":"collect","desc":"Network devices, hosts and cloud services record security events. The monitored systems do this, outside the platform.","status":"partial","parts":["A1.1","A1.2","A1.3"],"teams":["Source / application owner","Cloud platform team"],"nodes":[{"id":"ON-1","name":"Sydney event sources","location":"Sydney"},{"id":"ON-4","name":"Melbourne event sources","location":"Melbourne"},{"id":"ON-6","name":"Cloud event sources","location":"Cloud · AWS ap-southeast-2"}]},{"id":"A2","name":"Collect, buffer and forward","domain":"collect","desc":"Receive or read events at each site and in the cloud, and hold them until they can be sent.","status":"partial","parts":["A2.1","A2.2","A2.3"],"teams":["Log onboarding team","Splunk platform team"],"nodes":[{"id":"ON-2","name":"Site collection","location":"Sydney"},{"id":"ON-5","name":"Site collection","location":"Melbourne"},{"id":"ON-7","name":"Cloud ingestion","location":"Cloud · AWS ap-southeast-2"}]},{"id":"A3","name":"Forward and deliver events","domain":"collect","desc":"Send events to the indexers, and confirm they arrived.","status":"partial","parts":["A3.1"],"teams":["Log onboarding team","Splunk platform team"],"nodes":[{"id":"ON-2","name":"Site collection","location":"Sydney"},{"id":"ON-5","name":"Site collection","location":"Melbourne"},{"id":"ON-7","name":"Cloud ingestion","location":"Cloud · AWS ap-southeast-2"},{"id":"ON-9","name":"Indexing service","location":"Multisite"}]},{"id":"A4","name":"Process and route events","domain":"collect","desc":"Parse, mask, filter and route events before they are stored.","status":"partial","parts":["A4.1","A4.2","A4.3"],"teams":["Splunk platform team"],"nodes":[{"id":"ON-7","name":"Cloud ingestion","location":"Cloud · AWS ap-southeast-2"},{"id":"ON-9","name":"Indexing service","location":"Multisite"}]},{"id":"A5","name":"Index and replicate","domain":"index","desc":"Store events in indexes, age them out, and keep copies across sites.","status":"partial","parts":["A5.1","A5.2"],"teams":["Splunk platform team"],"nodes":[{"id":"ON-9","name":"Indexing service","location":"Multisite"}]},{"id":"A6","name":"Search and detect","domain":"search","desc":"Search, normalise and correlate events to find threats.","status":"partial","parts":["A6.1","A6.2","A6.3","A6.4"],"teams":["Splunk platform team"],"nodes":[{"id":"ON-9","name":"Indexing service","location":"Multisite"},{"id":"ON-10","name":"Search and detection","location":"Multisite"},{"id":"ON-11","name":"Security operations centre","location":"Security operations"}]},{"id":"A7","name":"Manage the platform","domain":"govern","desc":"Configure the fleet, manage the licence and watch platform health.","status":"partial","parts":["A7.1","A7.2","A7.3"],"teams":["Splunk platform team"],"nodes":[{"id":"ON-3","name":"Platform management","location":"Sydney"},{"id":"ON-9","name":"Indexing service","location":"Multisite"}]},{"id":"A8","name":"Authenticate and authorise","domain":"govern","desc":"Sign people in and map them to roles.","status":"ok","parts":["A8.1"],"teams":["Identity and access management","Splunk platform team"],"nodes":[{"id":"ON-12","name":"Identity services","location":"Security operations"},{"id":"ON-10","name":"Search and detection","location":"Multisite"}]},{"id":"A9","name":"Coordinate response","domain":"detect","desc":"Turn findings into cases, run playbooks and update tickets.","status":"partial","parts":["A9.1","A9.2","A9.3"],"teams":["Splunk Cloud provider"],"nodes":[{"id":"ON-8","name":"Response and cases (Splunk Cloud)","location":"Cloud · region not set"},{"id":"ON-11","name":"Security operations centre","location":"Security operations"}]}],"parts":[{"id":"A1.1","name":"Log network and security device events","activity":"A1","status":"ok"},{"id":"A1.2","name":"Log host and authentication events","activity":"A1","status":"none"},{"id":"A1.3","name":"Emit cloud and application events","activity":"A1","status":"ok"},{"id":"A2.1","name":"Receive syslog","activity":"A2","status":"partial"},{"id":"A2.2","name":"Read host and file logs","activity":"A2","status":"partial"},{"id":"A2.3","name":"Receive cloud events over HEC","activity":"A2","status":"ok"},{"id":"A3.1","name":"Deliver to the indexers","activity":"A3","status":"partial"},{"id":"A4.1","name":"Parse and route","activity":"A4","status":"ok"},{"id":"A4.2","name":"Mask personal information","activity":"A4","status":"ok"},{"id":"A4.3","name":"Filter at the edge","activity":"A4","status":"planned"},{"id":"A5.1","name":"Store and age events","activity":"A5","status":"ok"},{"id":"A5.2","name":"Replicate across sites","activity":"A5","status":"planned"},{"id":"A6.1","name":"Investigate","activity":"A6","status":"ok"},{"id":"A6.2","name":"Normalise to the CIM","activity":"A6","status":"partial"},{"id":"A6.3","name":"Run detections","activity":"A6","status":"none"},{"id":"A6.4","name":"Keep search available","activity":"A6","status":"planned"},{"id":"A7.1","name":"Distribute configuration","activity":"A7","status":"ok"},{"id":"A7.2","name":"Manage the licence","activity":"A7","status":"partial"},{"id":"A7.3","name":"Monitor health","activity":"A7","status":"partial"},{"id":"A8.1","name":"Sign in and map roles","activity":"A8","status":"ok"},{"id":"A9.1","name":"Raise findings","activity":"A9","status":"none"},{"id":"A9.2","name":"Run cases and playbooks","activity":"A9","status":"partial"},{"id":"A9.3","name":"Update tickets","activity":"A9","status":"none"}]},"title":"Splunk security telemetry architecture","classification":"Security telemetry + PII","owner":""},"zones":{"sv5b":{"rows":[{"id":1,"name":"Firewalls and network devices","component":"Syslog Source","type":"syslogSource","location":"Sydney","cells":{"A1":[{"part":"A1.1","status":"ok","why":[],"fns":[]}]}},{"id":5,"name":"Windows Event Log 1","component":"Windows Event Log","type":"windowsEvent","location":"Sydney","cells":{"A1":[{"part":"A1.2","status":"none","why":["Windows Event Log 1 isn't collected: it has no interface (SV-1)."],"fns":[]}]}},{"id":20,"name":"Syslog VIP","component":"Load Balancer","type":"loadBalancer","location":"Sydney","cells":{}},{"id":2,"name":"Syslog Server 1","component":"Syslog Server","type":"syslog","location":"Sydney","cells":{"A2":[{"part":"A2.1","status":"ok","why":[],"fns":[{"id":"S3.1","name":"Receive syslog","code":"ok"},{"id":"S3.2","name":"Write host files","code":"ok"}]}]}},{"id":3,"name":"Universal Forwarder 1","component":"Universal Forwarder","type":"uf","location":"Sydney","cells":{"A2":[{"part":"A2.2","status":"ok","why":[],"fns":[{"id":"S1.1","name":"Tail host files","code":"ok"},{"id":"S1.3","name":"Read event logs","code":"ok"}]}],"A3":[{"part":"A3.1","status":"ok","why":[],"fns":[{"id":"S1.2","name":"Forward raw (S2S)","code":"ok"}]}]}},{"id":18,"name":"Syslog Server 3","component":"Syslog Server","type":"syslog","location":"Sydney","cells":{"A2":[{"part":"A2.1","status":"ok","why":[],"fns":[{"id":"S3.1","name":"Receive syslog","code":"ok"},{"id":"S3.2","name":"Write host files","code":"ok"}]}]}},{"id":19,"name":"Universal Forwarder 3","component":"Universal Forwarder","type":"uf","location":"Sydney","cells":{"A2":[{"part":"A2.2","status":"ok","why":[],"fns":[{"id":"S1.1","name":"Tail host files","code":"ok"},{"id":"S1.3","name":"Read event logs","code":"ok"}]}],"A3":[{"part":"A3.1","status":"ok","why":[],"fns":[{"id":"S1.2","name":"Forward raw (S2S)","code":"ok"}]}]}},{"id":10,"name":"Heavy Forwarder 1","component":"Heavy Forwarder","type":"hf","location":"Sydney","cells":{"A2":[{"part":"A2.3","status":"ok","why":[],"fns":[{"id":"S4.1","name":"Accept HEC events","code":"ok"}]}],"A3":[{"part":"A3.1","status":"none","why":["S2.3 Forward cooked: no output to an indexer (SI-18 missing)."],"fns":[{"id":"S2.3","name":"Forward cooked","code":"none"}]}],"A4":[{"part":"A4.1","status":"ok","why":[],"fns":[{"id":"S4.2","name":"Queue to parser","code":"ok"},{"id":"S2.1","name":"Parse, timestamp","code":"ok"}]},{"part":"A4.2","status":"ok","why":[],"fns":[{"id":"S2.2","name":"Mask PII","code":"ok"}]}]}},{"id":15,"name":"Deployment Server 1","component":"Deployment Server","type":"ds","location":"Sydney","cells":{"A7":[{"part":"A7.1","status":"ok","why":[],"fns":[{"id":"S5.1","name":"Serve app bundles","code":"ok"}]}]}},{"id":16,"name":"License Manager 1","component":"License Manager","type":"licenseManager","location":"Sydney","cells":{"A7":[{"part":"A7.2","status":"partial","why":["S15.1 Pool, enforce licence: SI-20 is inferred; add the link to the topology."],"fns":[{"id":"S15.1","name":"Pool, enforce licence","code":"partial"}]}]}},{"id":17,"name":"Monitoring Console 1","component":"Monitoring Console","type":"monitoringConsole","location":"Sydney","cells":{"A7":[{"part":"A7.3","status":"none","why":["S16.1 Poll health (REST): SI-21, SI-22 are inferred; add the link to the topology.","S16.2 Alert on silence: Monitoring Console has no management relationship to a Deployment Server or forwarder."],"fns":[{"id":"S16.1","name":"Poll health (REST)","code":"partial"},{"id":"S16.2","name":"Alert on silence","code":"none"}]}]}},{"id":6,"name":"Syslog Source 2","component":"Syslog Source","type":"syslogSource","location":"Melbourne","cells":{"A1":[{"part":"A1.1","status":"ok","why":[],"fns":[]}]}},{"id":7,"name":"Syslog Server 2","component":"Syslog Server","type":"syslog","location":"Melbourne","cells":{"A2":[{"part":"A2.1","status":"ok","why":[],"fns":[{"id":"S3.1","name":"Receive syslog","code":"ok"},{"id":"S3.2","name":"Write host files","code":"ok"}]}]}},{"id":8,"name":"Universal Forwarder 2","component":"Universal Forwarder","type":"uf","location":"Melbourne","cells":{"A2":[{"part":"A2.2","status":"ok","why":[],"fns":[{"id":"S1.1","name":"Tail host files","code":"ok"},{"id":"S1.3","name":"Read event logs","code":"ok"}]}],"A3":[{"part":"A3.1","status":"none","why":["S1.2 Forward raw (S2S): no output to an indexer (SI-17 missing)."],"fns":[{"id":"S1.2","name":"Forward raw (S2S)","code":"none"}]}]}},{"id":9,"name":"AWS Lambda 1","component":"AWS Lambda","type":"awsLambda","location":"AWS ap-southeast-2","cells":{"A1":[{"part":"A1.3","status":"ok","why":[],"fns":[]}]}},{"id":13,"name":"Administrator 1","component":"User / Administrator","type":"authUser","location":"Security operations","cells":{"A6":[{"part":"A6.1","status":"ok","why":[],"fns":[]}],"A9":[{"part":"A9.2","status":"partial","why":["A9.2 Run cases and playbooks is partly supported (S13.1 Ingest findings: No relationship from a search tier to SOAR)."],"fns":[]}]}},{"id":4,"name":"Indexer 1","component":"Indexer","type":"idx","location":"Multisite","cells":{"A3":[{"part":"A3.1","status":"ok","why":[],"fns":[{"id":"S7.1","name":"Receive S2S","code":"ok"}]}],"A4":[{"part":"A4.1","status":"ok","why":[],"fns":[{"id":"S7.2","name":"Parse raw, mask","code":"ok"}]}],"A5":[{"part":"A5.1","status":"ok","why":[],"fns":[{"id":"S7.3","name":"Write, roll buckets","code":"ok"}]}],"A6":[{"part":"A6.1","status":"ok","why":[],"fns":[{"id":"S7.4","name":"Serve search","code":"ok"}]},{"part":"A6.2","status":"ok","why":[],"fns":[{"id":"S7.5","name":"Store summaries","code":"ok"}]}],"A7":[{"part":"A7.2","status":"partial","why":["S7.6 Report licence use: SI-20 is inferred; add the link to the topology."],"fns":[{"id":"S7.6","name":"Report licence use","code":"partial"}]}]}},{"id":11,"name":"Search Head 1","component":"Search Head","type":"search","location":"Multisite","cells":{"A6":[{"part":"A6.1","status":"ok","why":[],"fns":[{"id":"S9.1","name":"Dispatch, merge","code":"ok"},{"id":"S9.2","name":"Serve dashboards","code":"ok"}]},{"part":"A6.2","status":"ok","why":[],"fns":[{"id":"S10.1","name":"Build CIM summaries","code":"ok"}]}],"A8":[{"part":"A8.1","status":"ok","why":[],"fns":[{"id":"S9.4","name":"Check SAML session","code":"ok"}]}]}},{"id":12,"name":"SOAR Cloud","component":"Splunk SOAR · Cloud","type":"soarCloud","location":"Cloud","cells":{"A9":[{"part":"A9.2","status":"none","why":["S13.1 Ingest findings: No relationship from a search tier to SOAR.","S13.2 Run playbooks: SOAR exists but no playbook node is modelled."],"fns":[{"id":"S13.1","name":"Ingest findings","code":"none"},{"id":"S13.2","name":"Run playbooks","code":"partial"}]},{"part":"A9.3","status":"none","why":["S13.3 Update tickets: No service desk component or ticket-update interface is modelled."],"fns":[{"id":"S13.3","name":"Update tickets","code":"none"}]}]}},{"id":14,"name":"Authentication Provider · Cloud 1","component":"Authentication Provider · Cloud","type":"authProviderCloud","location":"Cloud","cells":{"A8":[{"part":"A8.1","status":"ok","why":[],"fns":[{"id":"S14.1","name":"Issue SAML assertion","code":"ok"}]}]}}],"activities":[{"id":"A1","name":"Generate security telemetry","domain":"collect","desc":"Network devices, hosts and cloud services record security events. The monitored systems do this, outside the platform.","status":"partial","parts":["A1.1","A1.2","A1.3"],"teams":["Source / application owner","Cloud platform team"],"nodes":[{"id":"ON-1","name":"Sydney event sources","location":"Sydney"},{"id":"ON-4","name":"Melbourne event sources","location":"Melbourne"},{"id":"ON-6","name":"Cloud event sources","location":"Cloud · AWS ap-southeast-2"}]},{"id":"A2","name":"Collect, buffer and forward","domain":"collect","desc":"Receive or read events at each site and in the cloud, and hold them until they can be sent.","status":"partial","parts":["A2.1","A2.2","A2.3"],"teams":["Log onboarding team","Splunk platform team"],"nodes":[{"id":"ON-2","name":"Site collection","location":"Sydney"},{"id":"ON-5","name":"Site collection","location":"Melbourne"},{"id":"ON-7","name":"Cloud ingestion","location":"Cloud · AWS ap-southeast-2"}]},{"id":"A3","name":"Forward and deliver events","domain":"collect","desc":"Send events to the indexers, and confirm they arrived.","status":"partial","parts":["A3.1"],"teams":["Log onboarding team","Splunk platform team"],"nodes":[{"id":"ON-2","name":"Site collection","location":"Sydney"},{"id":"ON-5","name":"Site collection","location":"Melbourne"},{"id":"ON-7","name":"Cloud ingestion","location":"Cloud · AWS ap-southeast-2"},{"id":"ON-9","name":"Indexing service","location":"Multisite"}]},{"id":"A4","name":"Process and route events","domain":"collect","desc":"Parse, mask, filter and route events before they are stored.","status":"partial","parts":["A4.1","A4.2","A4.3"],"teams":["Splunk platform team"],"nodes":[{"id":"ON-7","name":"Cloud ingestion","location":"Cloud · AWS ap-southeast-2"},{"id":"ON-9","name":"Indexing service","location":"Multisite"}]},{"id":"A5","name":"Index and replicate","domain":"index","desc":"Store events in indexes, age them out, and keep copies across sites.","status":"partial","parts":["A5.1","A5.2"],"teams":["Splunk platform team"],"nodes":[{"id":"ON-9","name":"Indexing service","location":"Multisite"}]},{"id":"A6","name":"Search and detect","domain":"search","desc":"Search, normalise and correlate events to find threats.","status":"partial","parts":["A6.1","A6.2","A6.3","A6.4"],"teams":["Splunk platform team"],"nodes":[{"id":"ON-9","name":"Indexing service","location":"Multisite"},{"id":"ON-10","name":"Search and detection","location":"Multisite"},{"id":"ON-11","name":"Security operations centre","location":"Security operations"}]},{"id":"A7","name":"Manage the platform","domain":"govern","desc":"Configure the fleet, manage the licence and watch platform health.","status":"partial","parts":["A7.1","A7.2","A7.3"],"teams":["Splunk platform team"],"nodes":[{"id":"ON-3","name":"Platform management","location":"Sydney"},{"id":"ON-9","name":"Indexing service","location":"Multisite"}]},{"id":"A8","name":"Authenticate and authorise","domain":"govern","desc":"Sign people in and map them to roles.","status":"ok","parts":["A8.1"],"teams":["Identity and access management","Splunk platform team"],"nodes":[{"id":"ON-12","name":"Identity services","location":"Security operations"},{"id":"ON-10","name":"Search and detection","location":"Multisite"}]},{"id":"A9","name":"Coordinate response","domain":"detect","desc":"Turn findings into cases, run playbooks and update tickets.","status":"partial","parts":["A9.1","A9.2","A9.3"],"teams":["Splunk Cloud provider"],"nodes":[{"id":"ON-8","name":"Response and cases (Splunk Cloud)","location":"Cloud · region not set"},{"id":"ON-11","name":"Security operations centre","location":"Security operations"}]}],"parts":[{"id":"A1.1","name":"Log network and security device events","activity":"A1","status":"ok"},{"id":"A1.2","name":"Log host and authentication events","activity":"A1","status":"none"},{"id":"A1.3","name":"Emit cloud and application events","activity":"A1","status":"ok"},{"id":"A2.1","name":"Receive syslog","activity":"A2","status":"partial"},{"id":"A2.2","name":"Read host and file logs","activity":"A2","status":"partial"},{"id":"A2.3","name":"Receive cloud events over HEC","activity":"A2","status":"ok"},{"id":"A3.1","name":"Deliver to the indexers","activity":"A3","status":"partial"},{"id":"A4.1","name":"Parse and route","activity":"A4","status":"ok"},{"id":"A4.2","name":"Mask personal information","activity":"A4","status":"ok"},{"id":"A4.3","name":"Filter at the edge","activity":"A4","status":"planned"},{"id":"A5.1","name":"Store and age events","activity":"A5","status":"ok"},{"id":"A5.2","name":"Replicate across sites","activity":"A5","status":"planned"},{"id":"A6.1","name":"Investigate","activity":"A6","status":"ok"},{"id":"A6.2","name":"Normalise to the CIM","activity":"A6","status":"partial"},{"id":"A6.3","name":"Run detections","activity":"A6","status":"none"},{"id":"A6.4","name":"Keep search available","activity":"A6","status":"planned"},{"id":"A7.1","name":"Distribute configuration","activity":"A7","status":"ok"},{"id":"A7.2","name":"Manage the licence","activity":"A7","status":"partial"},{"id":"A7.3","name":"Monitor health","activity":"A7","status":"partial"},{"id":"A8.1","name":"Sign in and map roles","activity":"A8","status":"ok"},{"id":"A9.1","name":"Raise findings","activity":"A9","status":"none"},{"id":"A9.2","name":"Run cases and playbooks","activity":"A9","status":"partial"},{"id":"A9.3","name":"Update tickets","activity":"A9","status":"none"}]},"title":"Splunk security telemetry architecture","classification":"Security telemetry + PII","owner":""}};
+const PAGE_SCEN={"ref":"Reference topology","zones":"Zoned, with a syslog load balancer"};
+/* Shared by the SV-3, SV-5b and CV-7 mockups. DATA holds the Builder model for two topologies, exported from Build 187. */
+const SCEN=PAGE_SCEN;
+let scen='ref',D=DATA.ref;
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const plural=(n,one,many)=>n+' '+(n===1?one:(many||one+'s'));
+const and=l=>l.length>1?l.slice(0,-1).join(', ')+' and '+l.at(-1):l.join('');
+const chip=(cls,text)=>`<span class="chip ${cls}">${esc(text)}</span>`;
+// Activity and part status (OV-5a), function status (SvcV-4), capability status (CV-2): [label, class]
+const AST={ok:['Supported','ok'],partial:['Partly supported','partial'],planned:['Planned','planned'],none:['Not supported','not'],nosrc:['No sources','unknown']};
+const FST={ok:['Realised','ok'],partial:['Partly realised','partial'],planned:['Planned','planned'],none:['Not realised','not']};
+const CST={'In topology':['In topology','ok'],Partial:['Partial','partial'],Planned:['Planned','planned']};
+const st=(map,k)=>`<span class="stc ${map[k][1]}">${esc(map[k][0])}</span>`;
+const dot=(map,k)=>`<i class="dot ${map[k][1]}" title="${esc(map[k][0])}"></i>`;
+const VIEWID={ov2:'OV-2',ov5a:'OV-5a',svcv1:'SvcV-1',svcv4:'SvcV-4',svcv5:'SvcV-5',cv2:'CV-2',cv6:'CV-6',sv1:'SV-1',sv2:'SV-2',sv6:'SV-6',sv3:'SV-3',sv5b:'SV-5b',cv7:'CV-7'};
+const PLANE={data:['Event data','var(--d-index)'],management:['Management','var(--d-collect)'],authentication:['Authentication','var(--d-govern)']};
+const PST={ok:['Takes part','ok'],partial:['Limited','partial'],none:['Blocked','not']};
+const vchips=keys=>`<span class="vcs">${keys.map(k=>`<button type="button" class="vc" data-view="${k}">${VIEWID[k]}</button>`).join('')}</span>`;
+const DOMAIN={collect:'var(--d-collect)',index:'var(--d-index)',search:'var(--d-search)',detect:'var(--d-detect)',govern:'var(--d-govern)'};
+function furniture(view,name,viewpoint,ownerKey,footLeft){
+ document.getElementById('cls1').textContent=document.getElementById('cls2').textContent=D.classification;
+ document.getElementById('tb').innerHTML=`<div><span class="tb-k">Architecture view</span><span class="tb-v big" id="sTitle">${esc(view)} · ${esc(name)}</span></div><div><span class="tb-k">Architecture</span><span class="tb-v">${esc(D.title)}</span></div><div><span class="tb-k">Viewpoint</span><span class="tb-v">${esc(viewpoint)}</span></div><div><span class="tb-k">${esc(ownerKey)}</span><span class="tb-v">${D.owner?esc(D.owner):'<span class="notset">Not set</span>'}</span></div><div><span class="tb-k">Build · prepared</span><span class="tb-v">1xx · 14 Oct 2026</span></div>`;
+ document.getElementById('foot').innerHTML=`<span>${esc(D.title)} · ${esc(footLeft)}</span><span>${esc(view)} · 1 of 1 · Build 1xx</span>`}
+function scenarioSwitch(onChange){const box=document.getElementById('scen');box.innerHTML=Object.entries(SCEN).map(([k,v])=>`<button type="button" data-scen="${k}" aria-pressed="${k===scen}">${esc(v)}</button>`).join('');box.querySelectorAll('button').forEach(b=>b.onclick=()=>{scen=b.dataset.scen;D=DATA[scen];box.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));onChange()})}
+function toast(text){let t=document.getElementById('toast');if(!t){t=document.createElement('p');t.id='toast';t.className='toast';t.setAttribute('role','status');t.style.cssText='position:fixed;left:50%;bottom:20px;transform:translateX(-50%);margin:0;z-index:9;box-shadow:0 2px 8px rgba(0,0,0,.2)';document.body.appendChild(t)}t.textContent=text;clearTimeout(t._h);t._h=setTimeout(()=>t.remove(),2200)}
+document.addEventListener('click',e=>{const v=e.target.closest('[data-view]');if(v)toast(`In the Builder this opens the ${VIEWID[v.dataset.view]||v.dataset.view} tab.`)});
 
-// system, Builder component, location, {activity: [mark, state, reason]} mark p|s, state ok|partial|blocked
-const S=[
- ['Melbourne',[
-  ['Syslog Source 2','Syslog Source',{A1:['p','ok','Sends appliance syslog (SI-4)']}],
-  ['Syslog Server 2','Syslog Server',{A2:['p','ok','Receives syslog, writes host files (F1.1)']}],
-  ['Universal Forwarder 2','Universal Forwarder',{A2:['p','ok','Reads the syslog files (F1.2)'],A3:['p','blocked','No output to an indexer (SI-13 missing)'],A7:['s','ok','Phone-home client (SI-9)']}]]],
- ['Sydney',[
-  ['Firewalls and network devices','Syslog Source',{A1:['p','ok','Sends firewall syslog (SI-1)']}],
-  ['Syslog Server 1','Syslog Server',{A2:['p','ok','Receives syslog, writes host files (F1.1)']}],
-  ['Universal Forwarder 1','Universal Forwarder',{A2:['p','ok','Reads the syslog files (F1.2)'],A3:['p','ok','S2S to Indexer 1 (SI-3)'],A7:['s','ok','Phone-home client (SI-8)']}],
-  ['Windows Event Log 1','Windows Event Log',{A1:['p','blocked','No forwarder collects its events; no interface at all']}],
-  ['Heavy Forwarder 1','Heavy Forwarder',{A2:['p','ok','Receives HEC from AWS (F1.3)'],A3:['p','blocked','No output to an indexer (SI-14 missing)'],A4:['p','partial','Parses and masks, but the result goes nowhere'],A7:['s','ok','Phone-home client (SI-10)']}],
-  ['Deployment Server 1','Deployment Server',{A7:['p','ok','Serves apps to three clients (F7.1)']}],
-  ['License Manager 1','License Manager',{A7:['p','partial','Licence peer link inferred, not in topology (SI-16)']}],
-  ['Monitoring Console 1','Monitoring Console',{A7:['p','partial','Polling link inferred, not in topology (SI-17)']}]]],
- ['AWS ap-southeast-2',[
-  ['AWS Lambda 1','AWS Lambda',{A1:['p','ok','Sends CloudTrail and GuardDuty findings over HEC (SI-6)']}]]],
- ['Multisite',[
-  ['Indexer 1','Indexer',{A4:['p','ok','Parses the syslog path (F2.1–F2.4)'],A5:['p','partial','Indexes; no replication with one indexer (F4.3)'],A6:['p','ok','Search peer (F5.1)'],A7:['s','ok','Reports licence usage (F7.2)']}],
-  ['Search Head 1','Search Head',{A6:['p','partial','Searches; no correlation searches without ES (F6.1)'],A8:['p','ok','Validates SAML, applies roles (F8.1, F8.2)'],A9:['s','blocked','Findings to SOAR inferred, not in topology (SI-15)']}]]],
- ['Cloud',[
-  ['Splunk SOAR · Cloud 1','Splunk SOAR · Cloud',{A9:['p','partial','Cases and playbooks, but receives no findings (F6.2)']}],
-  ['Authentication Provider · Cloud 1','Authentication Provider · Cloud',{A8:['p','ok','Signs SAML assertions (SI-11, SI-12)']}]]],
- ['Security operations',[
-  ['Administrator 1','User / Administrator',{A8:['p','ok','Signs in and investigates']}]]]
-];
-const SYS=S.flatMap(([loc,list])=>list.map(s=>({name:s[0],type:s[1],loc,m:s[2]})));
-const CELL={ok:'okc',partial:'gap',blocked:'no'};
-const mx=document.getElementById('mx');
-mx.innerHTML=`<thead><tr class="cols"><th class="rowh">System (SV-1)</th>${ACT.map(a=>`<th class="colh" data-a="${a[0]}"><button type="button" aria-pressed="false"><span class="cid">${a[0]}</span><span class="nm">${esc(a[1])}</span></button></th>`).join('')}<th class="st">Activities</th></tr></thead>
-<tbody>${S.map(([loc,list])=>`<tr class="grp"><th>${esc(loc)}</th><td colspan="${ACT.length+1}"></td></tr>`+list.map(s=>{const m=s[2],blocked=Object.values(m).filter(v=>v[1]==='blocked').length;
-  return `<tr data-c="${esc(s[0])}"><th class="rowh" tabindex="0">${esc(s[0])}<small>${esc(s[1])}</small></th>${ACT.map(a=>{const v=m[a[0]];return `<td class="c ${v?(v[0]==='s'&&v[1]==='ok'?'s':CELL[v[1]]):''}" data-a="${a[0]}" title="${v?esc(v[2]):''}">${v?(v[0]==='p'?'●':'○'):''}</td>`}).join('')}<td class="st">${blocked?`<span class="chip stop">${blocked} blocked</span>`:Object.values(m).some(v=>v[1]==='partial')?'<span class="chip gap">Limited</span>':'<span class="chip ok">OK</span>'}</td></tr>`}).join('')).join('')}</tbody>
-<tfoot><tr><th class="rowh">Systems taking part</th>${ACT.map(a=>{const p=SYS.filter(s=>s.m[a[0]]&&s.m[a[0]][0]==='p'),ok=p.filter(s=>s.m[a[0]][1]==='ok').length;return `<td>${ok} of ${p.length}</td>`}).join('')}<td></td></tr></tfoot>`;
+/* SV-5b · Operational Activity to Systems Traceability Matrix */
+let pick={a:null,s:null};
+const B=()=>D.sv5b,actOf=id=>B().activities.find(a=>a.id===id),partOf=id=>B().parts.find(p=>p.id===id),rowOf=id=>B().rows.find(r=>r.id===id);
+const worst=l=>l.some(c=>c.status==='none')?'none':l.some(c=>c.status==='partial')?'partial':'ok';
+const cellsOf=r=>Object.entries(r.cells);
+const people=r=>r.type==='authUser';
+function render(){const R=B().rows,A=B().activities,cells=R.flatMap(r=>cellsOf(r).map(([a,l])=>({r,a,l,st:worst(l)}))),c=k=>cells.filter(x=>x.st===k).length,blockedSys=R.filter(r=>cellsOf(r).some(([,l])=>worst(l)==='none')).length;
+ furniture('SV-5b','Operational Activity to Systems Traceability Matrix','Systems (DoDAF V2.0)','System owner','Systems from SV-1 · Activities from OV-5a · Functions and their status from SvcV-4');
+ document.getElementById('sum').innerHTML=`<span><b>${R.length}</b>systems</span><span><b>${A.length}</b>activities</span><span><b>${cells.length}</b>assignments</span><span class="ok"><b>${c('ok')}</b>without limits</span><span class="rv"><b>${c('partial')}</b>limited</span><span class="st"><b>${c('none')}</b>blocked</span><span class="st"><b>${blockedSys}</b>${blockedSys===1?'system':'systems'} with a blocked share</span>`;
+ document.getElementById('legend').innerHTML=Object.keys(PST).map(k=>`<span><span class="idc ${PST[k][1]}">A0.0</span>${PST[k][0].toLowerCase()}</span>`).join('')+'<span class="hint">Cells list OV-5a parts; the colour is this system\'s own share. Select a system, an activity or a cell. Esc clears.</span>';
+ const locs=[...new Set(R.map(r=>r.location))],mx=document.getElementById('mx');mx.classList.toggle('picking',!!(pick.a||pick.s));
+ mx.innerHTML=`<thead><tr><th>System (SV-1)</th>${A.map(a=>`<th aria-pressed="${pick.a===a.id}"><button type="button" data-a="${a.id}"><b>${a.id}</b><span>${esc(a.name)}</span></button></th>`).join('')}<th class="state">Status</th></tr></thead><tbody>${locs.map(l=>`<tr class="grp"><th colspan="${A.length+2}">${esc(l)}</th></tr>`+R.filter(r=>r.location===l).map(r=>{const n=cellsOf(r),bl=n.filter(([,x])=>worst(x)==='none').length,li=n.filter(([,x])=>worst(x)==='partial').length;return`<tr class="${pick.s===r.id?'on':''}"><th class="rowh${pick.s===r.id?' on':''}"><button type="button" data-s="${r.id}"><b>${esc(r.name)}</b><small>${esc(r.component)}</small></button></th>${A.map(a=>{const l2=r.cells[a.id]||[],cls=['c',pick.a===a.id?'sel':'',pick.a===a.id&&pick.s===r.id?'hit':''].join(' ');return l2.length?`<td class="${cls}" tabindex="0" data-cs="${r.id}" data-ca="${a.id}"><span class="fns">${l2.map(x=>`<span class="idc ${PST[x.status][1]}" title="${esc(x.part+' '+partOf(x.part).name+' · '+PST[x.status][0]+(x.why.length?' · '+x.why.join(' '):''))}">${x.part}</span>`).join('')}</span></td>`:`<td class="${cls}"></td>`}).join('')}<td class="state">${!n.length?'<span class="stc unknown">No activity</span>':bl?`<span class="stc not">${bl} blocked</span>`:li?`<span class="stc partial">${li} limited</span>`:'<span class="stc ok">OK</span>'}</td></tr>`}).join('')).join('')}</tbody><tfoot><tr><th>Systems without limits</th>${A.map(a=>{const t=R.filter(r=>r.cells[a.id]),ok=t.filter(r=>worst(r.cells[a.id])==='ok');return`<td>${ok.length} of ${t.length}</td>`}).join('')}<td></td></tr></tfoot>`;
+ mx.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{pick=pick.a===b.dataset.a&&!pick.s?{a:null,s:null}:{a:b.dataset.a,s:null};render()});
+ mx.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const v=+b.dataset.s;pick=pick.s===v&&!pick.a?{a:null,s:null}:{a:null,s:v};render()});
+ mx.querySelectorAll('[data-cs]').forEach(t=>{const go=()=>{const s=+t.dataset.cs,a=t.dataset.ca;pick=pick.a===a&&pick.s===s?{a:null,s:null}:{a,s};render()};t.onclick=go;t.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}}});
+ detail();findings()}
+const partLi=(x)=>`<li><span class="idc ${PST[x.status][1]}">${x.part}</span><span>${esc(partOf(x.part).name)} · ${PST[x.status][0]}${x.why.length?`<small>${x.why.map(esc).join('<br>')}</small>`:''}</span></li>`;
+function detail(){const R=B().rows,A=B().activities,el=document.getElementById('detail');
+ if(pick.a&&pick.s){const r=rowOf(pick.s),a=actOf(pick.a),l=r.cells[a.id]||[];
+  el.innerHTML=`<div><span class="ov">${a.id} · ${esc(a.name)}</span><h3>${esc(r.name)}</h3><p>${esc(r.component)} · ${esc(r.location)}</p><p><span class="stc ${PST[worst(l)][1]}">${PST[worst(l)][0]}</span></p></div><div><dl><dt>Its share (OV-5a parts)</dt><dd><ul>${l.map(partLi).join('')}</ul></dd>${l.some(x=>x.fns.length)?`<dt>Functions it provides (SvcV-4)</dt><dd>${l.flatMap(x=>x.fns).map(f=>`${f.id} ${esc(f.name)} · ${PST[f.code][0]}`).join('<br>')}</dd>`:''}<dt>See</dt><dd>${vchips(['ov5a','svcv4','sv1'])}</dd></dl></div>`;return}
+ if(pick.a){const a=actOf(pick.a),t=R.filter(r=>r.cells[a.id]),ok=t.filter(r=>worst(r.cells[a.id])==='ok');
+  el.innerHTML=`<div><span class="ov">Operational activity · OV-5a</span><h3>${a.id} · ${esc(a.name)}</h3><p>${esc(a.desc)}</p><p>${ok.length} of ${t.length} ${t.length===1?'system takes':'systems take'} part without limits.</p></div><div><dl><dt>Systems</dt><dd>${t.length?`<ul>${t.map(r=>{const l=r.cells[a.id],w=worst(l);return`<li><span class="stc ${PST[w][1]}">${PST[w][0]}</span><span><b>${esc(r.name)}</b> · ${l.map(x=>x.part).join(', ')}${l.some(x=>x.why.length)?`<small>${l.flatMap(x=>x.why).map(esc).join('<br>')}</small>`:''}</span></li>`}).join('')}</ul>`:'<span class="hint">No system takes part yet.</span>'}</dd><dt>See</dt><dd>${vchips(['ov5a','svcv5'])}</dd></dl></div>`;return}
+ if(pick.s){const r=rowOf(pick.s),n=cellsOf(r);
+  el.innerHTML=`<div><span class="ov">System · SV-1 · ${esc(r.location)}</span><h3>${esc(r.name)}</h3><p>${esc(r.component)}</p><p class="hint">${n.length?`Takes part in ${plural(n.length,'activity','activities')}.`:'Takes part in no activity.'}</p></div><div><dl><dt>Activities</dt><dd>${n.length?`<ul>${n.map(([a,l])=>`<li><span class="idc ${PST[worst(l)][1]}">${a}</span><span>${esc(actOf(a).name)}<small>${l.map(x=>`${x.part} ${esc(partOf(x.part).name)} · ${PST[x.status][0]}${x.why.length?': '+x.why.map(esc).join(' '):''}`).join('<br>')}</small></span></li>`).join('')}</ul>`:'<span class="hint">None. It provides no service function an activity needs.</span>'}</dd><dt>See</dt><dd>${vchips(['sv1','sv3','ov5a'])}</dd></dl></div>`;return}
+ const all=R.flatMap(r=>cellsOf(r).flatMap(([a,l])=>l.map(x=>({r,x})))),bl=all.filter(y=>y.x.status==='none'),li=all.filter(y=>y.x.status==='partial'),cells=R.flatMap(r=>cellsOf(r)),ok=cells.filter(([,l])=>worst(l)==='ok').length;
+ const line=y=>`<li><span class="idc ${PST[y.x.status][1]}">${y.x.part}</span><span><b>${esc(y.r.name)}</b> · ${esc(partOf(y.x.part).name)}<small>${y.x.why.map(esc).join('<br>')}</small></span></li>`;
+ el.innerHTML=`<div><span class="ov">Taking part today</span><h3>${ok} of ${cells.length} assignments without limits</h3><p>An assignment is one system in one activity. Its colour is the system's own share, not the activity as a whole.</p><p class="hint">Select a system, an activity or a cell. Esc clears.</p></div><div><dl>${bl.length?`<dt>Blocked</dt><dd><ul>${bl.map(line).join('')}</ul></dd>`:''}${li.length?`<dt>Limited</dt><dd><ul>${li.map(line).join('')}</ul></dd>`:''}${!bl.length&&!li.length?'<dt>Gaps</dt><dd>None.</dd>':''}</dl></div>`}
+function findings(){const R=B().rows,A=B().activities,list=[];
+ const blr=R.filter(r=>cellsOf(r).some(([,l])=>l.some(x=>x.status==='none')));if(blr.length)list.push(['stop','Blocked',`<b>${plural(blr.length,'system has','systems have')} a blocked share:</b> ${esc(and(blr.map(r=>`${r.name} (${cellsOf(r).flatMap(([,l])=>l.filter(x=>x.status==='none').map(x=>x.part)).join(', ')})`)))}. Select a system for the reason.`]);
+ for(const a of A.filter(a=>a.id!=='A1')){const t=R.filter(r=>r.cells[a.id]&&!people(r));if(t.length===1){const w=worst(t[0].cells[a.id]);list.push([w==='ok'?'gap':'stop',a.id,`<b>${esc(a.name)} runs on ${esc(t[0].name)} alone${w==='ok'?'':`, and its share is ${PST[w][0].toLowerCase()}`}.</b> One system is a single point of failure for the activity.`])}}
+ const busy=[...R].filter(r=>!people(r)).sort((x,y)=>cellsOf(y).length-cellsOf(x).length)[0];if(busy&&cellsOf(busy).length>=4){const ids=cellsOf(busy).map(([a])=>a);list.push(['gap','Busiest',`<b>${esc(busy.name)} takes part in ${ids.length} activities</b> (${and(ids)}). Losing it stops all of them.`])}
+ const idle=R.filter(r=>!cellsOf(r).length);if(idle.length)list.push(['ext','No activity',`<b>${esc(and(idle.map(r=>r.name)))} ${idle.length===1?'takes':'take'} part in no activity.</b> ${idle.every(r=>r.type==='loadBalancer')?(idle.length===1?'It passes':'They pass')+' connections on to the systems behind '+(idle.length===1?'it':'them')+' (SV-2).':(idle.length===1?'It provides':'They provide')+' no service function an activity needs.'}`]);
+ const clean=A.filter(a=>a.id!=='A1').filter(a=>{const t=R.filter(r=>r.cells[a.id]);return t.length>1&&t.every(r=>worst(r.cells[a.id])==='ok')});if(clean.length)list.push(['ok','Without limits',`<b>${esc(and(clean.map(a=>a.id+' '+a.name)))} ${clean.length===1?'has':'have'} every system taking part without limits.</b>`]);
+ document.getElementById('findings').innerHTML=list.map(f=>`<li>${chip(f[0],f[1])}<span>${f[2]}</span></li>`).join('')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(pick.a||pick.s)){pick={a:null,s:null};render()}});
+scenarioSwitch(()=>{pick={a:null,s:null};render()});render();
 
-const detail=document.getElementById('detail');
-function showAct(a){const act=ACT.find(x=>x[0]===a),list=SYS.filter(s=>s.m[a]);
-  detail.innerHTML=`<div><span class="dom">Operational activity · ${esc(act[2])}</span><h3>${a} · ${esc(act[1])}</h3><p>${list.filter(s=>s.m[a][0]==='p'&&s.m[a][1]==='ok').length} of ${list.filter(s=>s.m[a][0]==='p').length} taking part without limits.</p></div>
-  <dl style="grid-column:span 2"><dt>Systems</dt><dd><ul>${list.map(s=>`<li><span class="chip ${s.m[a][1]==='ok'?'ok':s.m[a][1]==='partial'?'gap':'stop'}">${s.m[a][0]==='s'?'supports':s.m[a][1]==='ok'?'OK':s.m[a][1]==='partial'?'limited':'blocked'}</span> <b>${esc(s.name)}</b> · ${esc(s.m[a][2])}</li>`).join('')}</ul></dd></dl>`}
-function showSys(n){const s=SYS.find(x=>x.name===n);
-  detail.innerHTML=`<div><span class="dom">System · ${esc(s.loc)}</span><h3>${esc(n)}</h3><p>${esc(s.type)}</p></div>
-  <dl style="grid-column:span 2"><dt>Activities</dt><dd><ul>${Object.entries(s.m).map(([a,v])=>`<li><span class="chip ${v[1]==='ok'?'ok':v[1]==='partial'?'gap':'stop'}">${a}</span> ${esc(ACT.find(x=>x[0]===a)[1])}${v[0]==='s'?' (supports)':''} · ${esc(v[2])}</li>`).join('')}</ul></dd></dl>`}
-let current=null;
-function select(k){current=k;mx.classList.add('focused');const isA=/^A\d$/.test(k);
-  mx.querySelectorAll('tbody tr[data-c]').forEach(r=>r.classList.toggle('on',isA?!!SYS.find(s=>s.name===r.dataset.c).m[k]:r.dataset.c===k));
-  mx.querySelectorAll('[data-a]').forEach(e=>e.classList.toggle('col-on',e.dataset.a===k));
-  mx.querySelectorAll('th.colh').forEach(h=>{h.classList.toggle('sel',h.dataset.a===k);h.querySelector('button').setAttribute('aria-pressed',String(h.dataset.a===k))});
-  isA?showAct(k):showSys(k)}
-function clear(){current=null;mx.classList.remove('focused');mx.querySelectorAll('.on,.col-on,.sel').forEach(e=>e.classList.remove('on','col-on','sel'));showAct('A3')}
-mx.querySelectorAll('th.colh button').forEach(b=>b.addEventListener('click',()=>{const a=b.parentElement.dataset.a;current===a?clear():select(a)}));
-mx.querySelectorAll('tbody tr[data-c] th.rowh').forEach(h=>{const c=h.parentElement.dataset.c;h.addEventListener('click',()=>current===c?clear():select(c));h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();current===c?clear():select(c)}})});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)clear()});
-
-const cells=SYS.flatMap(s=>Object.values(s.m));
-document.getElementById('summary').innerHTML=`<span><b>${SYS.length}</b>systems</span><span><b>${ACT.length}</b>activities</span><span><b>${cells.length}</b>assignments</span><span><b>${cells.filter(v=>v[1]==='ok').length}</b>without limits</span><span class="rv"><b>${cells.filter(v=>v[1]==='partial').length}</b>limited</span><span class="rv"><b>${cells.filter(v=>v[1]==='blocked').length}</b>blocked</span><span class="rv"><b>${SYS.filter(s=>Object.values(s.m).some(v=>v[1]==='blocked')).length}</b>systems with a blocked activity</span>`;
-document.getElementById('findings').innerHTML=[
- ['stop','A3','<b>Forward and deliver events is blocked for two of three forwarders.</b> Only Universal Forwarder 1 delivers; Universal Forwarder 2 and Heavy Forwarder 1 have no output (SI-13, SI-14). Melbourne syslog and all AWS events stop there.'],
- ['stop','A1','<b>Windows Event Log 1 generates telemetry nobody collects.</b> It is the only source with no interface, so the activity it was added for never starts.'],
- ['gap','A9','<b>Coordinate response has one system, and it is limited.</b> Splunk SOAR · Cloud 1 receives no findings because the Search Head → SOAR link is only inferred (SI-15).'],
- ['gap','A5, A6','<b>Indexer 1 and Search Head 1 carry A5 and A6 alone</b>, with no replication and no correlation searches. Each is a single system for its activity (CV-4 single points of failure).'],
- ['ok','A2, A8','<b>Collection and access have every system taking part without limits</b>: five systems collect, and three take part in authentication and investigation.']
-].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
-clear();
 </script>
-
 </body>
 </html>

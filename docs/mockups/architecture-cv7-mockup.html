@@ -3,20 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body>
-<title>CV-7 Capability to Services</title>
+<title>CV-7 Capability to Services Mapping</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Layout: one architecture-pack sheet in the same family as the OV, DIV-1 and CV mockups. Banners, title block, purpose, a detail
-   strip for the selected row or column, then the capability × service matrix (CV-2 parts down, services grouped by family across) with a readiness column, and the findings.
-   Colour encodes the capability domain; amber marks gaps, partial or planned items. */
+/* Layout: title block, purpose, summary, a detail panel, then capabilities by services. Each cell lists the SvcV-4 functions that service carries out for the capability; shaded columns are services not deployed. Then the service register and findings. */
 :root{
   --paper:#f7f9fb; --sheet:#ffffff; --ink:#132433; --ink-2:#3f5566; --muted:#6a7f8f; --rule:#cfdae3; --zone:#eef3f7; --node:#ffffff;
   --d-collect:#0f7fa6; --d-index:#11897a; --d-search:#7a4fc4; --d-detect:#c2621b; --d-govern:#8a5a00;
-  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --up:#a23b72; --hi:#fff4d6; --sel:#0f7fa6;
+  --line:#5d7385; --review:#8a5a00; --ok:#1d7a46; --stop:#b42318; --hi:#fff4d6; --sel:#0f7fa6;
   --class-bg:#8a5a00; --class-fg:#ffffff; --focus:#0f7fa6;
   --font-title:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
   --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -25,18 +21,19 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
   --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
-  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --hi:#2a2412; --sel:#4fb7d6;
   --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#08121b; --sheet:#0c1823; --ink:#e4eef4; --ink-2:#b4c6d2; --muted:#8aa0b0; --rule:#233a4b; --zone:#102131; --node:#0e1d2a;
   --d-collect:#4fb7d6; --d-index:#2dd4bf; --d-search:#b39cff; --d-detect:#f09a55; --d-govern:#e0b567;
-  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --up:#f08cc0; --hi:#2a2412; --sel:#4fb7d6;
+  --line:#8ea6b8; --review:#e0b567; --ok:#5fd394; --stop:#ff8a7a; --hi:#2a2412; --sel:#4fb7d6;
   --class-bg:#e0b567; --class-fg:#1b1204; --focus:#4fb7d6; color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--font-body)}
 .page{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 36px;display:grid;gap:14px}
 .page>*,.inner>*,.sheet>*{min-width:0}
-.example{justify-self:start;font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
+.top{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
+.example{font:600 .66rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--review);border:1px solid color-mix(in srgb,var(--review) 45%,transparent);border-radius:999px;padding:5px 9px}
 .sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;display:grid}
 .banner{background:var(--class-bg);color:var(--class-fg);text-align:center;font:600 .72rem/1 var(--font-code);letter-spacing:.14em;text-transform:uppercase;padding:7px 12px}
 .banner.top{border-radius:3px 3px 0 0}.banner.bottom{border-radius:0 0 3px 3px}
@@ -47,237 +44,426 @@ body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--f
 .tb-k{display:block;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .tb-v{display:block;font:600 .9rem/1.3 var(--font-title);margin-top:3px}
 .tb-v.big{font-size:1.25rem;text-wrap:balance}
-.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap}
+.notset{background:color-mix(in srgb,var(--review) 16%,transparent);color:var(--review);padding:1px 6px;border-radius:3px;font-weight:600;white-space:nowrap;font-size:.92em}
 @media (max-width:760px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--rule)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}.inner{padding:14px}}
 .summary{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.84rem;color:var(--ink-2);align-items:baseline}
 .summary b{font:600 1.05rem/1 var(--font-title);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
 .summary .rv b{color:var(--review)}
-
+.summary .st b{color:var(--stop)}
 .purpose{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:baseline;border-left:3px solid var(--d-collect);padding:4px 0 4px 12px}
 .purpose .tb-k{white-space:nowrap}
 .purpose p{margin:0;font:500 .98rem/1.45 var(--font-body);max-width:100ch}
 @media (max-width:560px){.purpose{grid-template-columns:1fr;gap:4px}}
 h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
 .sub{margin:-10px 0 0;font-size:.84rem;color:var(--ink-2)}
-.sw{width:12px;height:12px;border-radius:2px;display:inline-block;vertical-align:-1px}
 .chip{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
 .chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
-.chip.part,.chip.plan,.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.chip.gap{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
 .chip.stop{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
 .chip.ext{color:var(--muted);background:var(--zone)}
-
-/* Detail strip */
-.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px 16px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.3fr) minmax(0,1fr);gap:12px 22px;min-height:132px}
-@media (max-width:960px){.detail{grid-template-columns:1fr}}
+.plane{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.plane.data{background:var(--d-index)}.plane.management{background:var(--d-collect)}.plane.authentication{background:var(--d-govern)}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{font:600 .76rem var(--font-body);padding:6px 11px;border:0;background:var(--sheet);color:var(--ink-2);cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sheet)}
+.model{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.model>*{min-width:0}
+@media (max-width:1150px){.model{grid-template-columns:1fr}}
+figure{margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--zone)}
+.figscroll{overflow-x:auto}
+svg.lanes{display:block;width:100%;min-width:900px;height:auto}
+figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2);background:var(--sheet)}
+.key{display:inline-flex;align-items:center;gap:6px}
+.colhead{font:600 9px var(--font-code);letter-spacing:.1em;text-transform:uppercase;fill:var(--muted)}
+.band rect{fill:var(--sheet);stroke:var(--rule);stroke-dasharray:5 4}
+.band.dmz rect{stroke:var(--review);fill:color-mix(in srgb,var(--review) 5%,var(--sheet))}
+.band.managed rect{stroke:var(--d-search);fill:color-mix(in srgb,var(--d-search) 5%,var(--sheet))}
+.band text.bl{font:600 10px var(--font-code);letter-spacing:.12em;text-transform:uppercase;fill:var(--ink-2)}
+.band text.bs{font:500 9.5px var(--font-code);fill:var(--muted)}
+.zone rect{fill:color-mix(in srgb,var(--d-collect) 4%,var(--sheet));stroke:var(--line);stroke-width:1}
+.zone.fallback rect{fill:none;stroke-dasharray:2 3}
+.zone.dmz rect{stroke:var(--review);fill:color-mix(in srgb,var(--review) 7%,var(--sheet))}
+.zone.managed rect{stroke:var(--d-search);fill:color-mix(in srgb,var(--d-search) 6%,var(--sheet))}
+.zone text.zn{font:600 8.5px var(--font-code);letter-spacing:.08em;text-transform:uppercase;fill:var(--ink-2)}
+.zone text.zs{font:500 8.5px var(--font-code);fill:var(--muted)}
+.zone{cursor:pointer}
+.zone.sel rect{stroke:var(--sel);stroke-width:2}
+.sys{cursor:pointer}
+.sys:focus{outline:none}
+.sys rect.box{fill:var(--node);stroke:var(--line);stroke-width:1}
+.sys.external rect.box{stroke-dasharray:4 3}
+.sys.person rect.box{stroke-dasharray:2 3}
+.sys.managed rect.box{stroke:var(--d-search);stroke-width:1.4}
+.sys.network rect.box{stroke:var(--d-collect);stroke-width:1.6}
+.sys.lonely rect.box{stroke:var(--review);stroke-dasharray:4 3;stroke-width:1.4}
+.sys:focus-visible rect.box,.sys.sel rect.box{stroke:var(--sel);stroke-width:2.6}
+.sys .t{font:600 11.5px var(--font-title);fill:var(--ink)}
+.sys .ty{font:500 9px var(--font-code);fill:var(--muted)}
+.ln{fill:none;stroke-width:1.8}
+.lk.data .ln{stroke:var(--d-index)}
+.lk.management .ln{stroke:var(--d-collect);stroke-dasharray:7 4;stroke-width:1.6}
+.lk.authentication .ln{stroke:var(--d-govern);stroke-dasharray:2 4;stroke-linecap:round;stroke-width:2.2}
+.lk.inferred .ln{stroke:var(--review);stroke-dasharray:3 3;stroke-width:1.6}
+.lk.missing .ln{stroke:var(--stop);stroke-dasharray:6 4;stroke-width:1.6}
+.lk.inside .ln{stroke-width:1.1;opacity:.75}
+.lk.cross .ln{stroke-width:2.6}
+.lk.plain.cross .ln{stroke:var(--stop)}
+.lk.planned .ln{stroke:var(--review);stroke-dasharray:3 3;stroke-width:1.6}
+.lk .hit{fill:none;stroke:transparent;stroke-width:12;cursor:pointer}
+.lk .hd{stroke:none}
+.lk.data .hd{fill:var(--d-index)}.lk.management .hd{fill:var(--d-collect)}.lk.authentication .hd{fill:var(--d-govern)}
+.lk.inferred .hd,.lk.planned .hd{fill:var(--review)}.lk.missing .hd,.lk.plain.cross .hd{fill:var(--stop)}
+.tag{cursor:pointer}
+.tag rect{fill:var(--sheet);stroke:var(--line);stroke-width:1}
+.tag.missing rect,.tag.plain rect{stroke:var(--stop)}
+.tag.inferred rect,.tag.planned rect,.tag.noport rect{stroke:var(--review);stroke-dasharray:3 2}
+.tag text{font:600 9px var(--font-code);fill:var(--ink-2)}
+.tag.noport text{fill:var(--review)}
+.stub{fill:var(--sheet);stroke:var(--stop)}
+.stubq{font:700 10px var(--font-code);fill:var(--stop)}
+svg.focused .sys:not(.on):not(.sel){opacity:.25}
+svg.focused .lk:not(.on),svg.focused .tag:not(.on){opacity:.1}
+svg.focused .tag.on rect{stroke:var(--sel);stroke-width:2}
+.detail{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:9px;align-content:start}
 .detail .dom{font:600 .62rem/1 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.detail h3{margin:4px 0 6px;font:700 1.16rem/1.2 var(--font-title)}
-.detail p{margin:0;font-size:.86rem;line-height:1.5}
-.detail dl{margin:0;display:grid;gap:7px;align-content:start}
+.detail h3{margin:0;font:700 1.12rem/1.2 var(--font-title);overflow-wrap:anywhere}
+.detail p{margin:0;font-size:.85rem}
+.detail dl{margin:0;display:grid;gap:7px}
 .detail dt{font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.detail dd{margin:2px 0 0;font-size:.85rem}
-.detail ul{margin:2px 0 0;padding:0;list-style:none;display:grid;gap:4px;font-size:.84rem}
-.detail code{font:500 .76rem var(--font-code);background:var(--zone);padding:1px 5px;border-radius:3px}
-
-/* Matrix */
-.mwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
-table.mx{border-collapse:separate;border-spacing:0;width:100%;font-size:.8rem}
-.mx th,.mx td{border-bottom:1px solid var(--rule);padding:0}
-.mx thead th{background:var(--zone);font:600 .62rem/1.2 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);vertical-align:bottom}
-.mx thead tr.fam th{border-bottom:0;padding:7px 6px 2px;text-align:center;border-left:1px solid var(--rule)}
-.mx thead tr.fam th:first-child{border-left:0}
-.mx thead tr.cols th{padding:4px 4px 8px}
-.mx th.colh{width:47px;min-width:47px;text-align:center;border-left:1px solid var(--rule);cursor:pointer}
-.mx th.colh button{all:unset;cursor:pointer;display:grid;gap:3px;justify-items:center;width:100%;padding:2px 0}
-.mx th.colh .cid{font:600 .66rem var(--font-code);color:var(--ink)}
-.mx th.colh .nm{font:500 .62rem/1.2 var(--font-body);letter-spacing:0;text-transform:none;color:var(--ink-2);max-width:46px;text-wrap:balance}
-.mx th.colh button:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
-.mx th.rowh{position:sticky;left:0;z-index:1;background:var(--sheet);text-align:left;font-weight:400;padding:6px 10px;min-width:200px;border-right:1px solid var(--rule);cursor:pointer}
-.mx thead th.rowh{background:var(--zone);vertical-align:bottom;padding:8px 10px}
-.mx th.rowh .cid{font:600 .7rem var(--font-code);color:var(--muted);margin-right:6px}
-.mx th.rowh .dot{margin-left:6px}
-.mx tr.grp th,.mx tr.grp td{background:var(--zone);font:700 .78rem var(--font-title);padding:5px 10px}
-.mx tr.grp th{position:sticky;left:0;z-index:1;text-align:left;white-space:nowrap}
-.mx td.c{text-align:center;border-left:1px solid var(--rule);font:600 .95rem/1 var(--font-code);height:30px}
-.mx td.c.p{color:var(--ink)}
-.mx td.c.s{color:var(--muted)}
-.mx td.c.gap{color:var(--review);background:color-mix(in srgb,var(--review) 9%,transparent)}
-.mx td.c.okc{color:var(--ok)}
-.mx td.st{padding:6px 10px;white-space:nowrap;border-left:1px solid var(--rule)}
-.mx tfoot td,.mx tfoot th{background:var(--zone);padding:6px 4px;text-align:center;font:600 .66rem/1.3 var(--font-code);border-bottom:0;border-top:1px solid var(--rule)}
-.mx tfoot th.rowh{text-align:left;padding:6px 10px;background:var(--zone)}
-.mx tfoot td{border-left:1px solid var(--rule)}
-.dot{display:inline-block;width:7px;height:7px;border-radius:50%;vertical-align:1px}
-.dot.ok{background:var(--ok)}.dot.part{background:var(--review)}.dot.plan{border:1.5px solid var(--review)}
-.mx tbody tr:not(.grp):hover th.rowh,.mx tbody tr:not(.grp):hover td{background-color:var(--hi)}
-.mx.focused tbody tr:not(.grp):not(.on){opacity:.35}
-.mx.focused .col-on{background-color:color-mix(in srgb,var(--sel) 10%,transparent)}
-.mx tr.on th.rowh{box-shadow:inset 3px 0 0 var(--sel)}
-.mx th.colh.sel{box-shadow:inset 0 -3px 0 var(--sel)}
-.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.78rem;color:var(--ink-2)}
-.legend span{display:inline-flex;gap:6px;align-items:center}
-.legend b{font:600 .95rem var(--font-code)}
-
-/* Findings */
-.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
-.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
-.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.detail dd{margin:2px 0 0;font-size:.84rem;overflow-wrap:anywhere}
+.detail ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:.84rem}
+.detail li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
+.detail code{font:500 .74rem var(--font-code);background:var(--zone);padding:1px 4px;border-radius:3px}
+.detail .hint{font-size:.78rem;color:var(--muted)}
+.detail .acts{display:flex;flex-wrap:wrap;gap:6px}
+.act{font:600 .74rem var(--font-body);padding:6px 10px;border:1px solid var(--sel);border-radius:4px;background:var(--sheet);color:var(--sel);cursor:pointer}
+.toast{font-size:.78rem;color:var(--ink-2);background:var(--zone);border-radius:4px;padding:6px 8px}
+.muted{color:var(--muted)}
+.usual{display:block;font-size:.72rem;color:var(--muted)}
 .tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
 table.reg{width:100%;border-collapse:collapse;font-size:.82rem}
 .reg th{text-align:left;font:600 .62rem/1.2 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--zone);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.reg th.n,.reg td.n{text-align:right}
 .reg td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
-.reg tr:last-child td{border-bottom:0}
-.reg tbody tr{cursor:pointer}
-.reg tbody tr:hover,.reg tbody tr.sel{background:var(--hi)}
+.reg tbody tr:last-child td{border-bottom:0}
+.reg td.n{font:500 .76rem var(--font-code);font-variant-numeric:tabular-nums;white-space:nowrap}
+.reg tbody tr[data-k]{cursor:pointer}
+.reg tbody tr[data-k]:hover,.reg tbody tr.sel{background:var(--hi)}
 .id{font:600 .74rem var(--font-code);color:var(--muted);white-space:nowrap}
 .mono{font:500 .76rem var(--font-code)}
+.bad{color:var(--stop);font-weight:600}
+.findings{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;display:grid;gap:8px}
+.findings ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.85rem}
+.findings li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+@media (max-width:560px){.findings li{grid-template-columns:1fr}}
 .foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+.headrow{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
+.filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.filters button{font:600 .74rem var(--font-body);padding:5px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--sheet);color:var(--ink-2);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.filters button[aria-pressed="true"]{border-color:var(--sel);color:var(--ink);background:color-mix(in srgb,var(--sel) 10%,var(--sheet))}
+.filters .lbl{font:600 .62rem var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:2px}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-@media (prefers-reduced-motion:no-preference){.mx tbody tr{transition:opacity .15s}}
+@media (prefers-reduced-motion:no-preference){.sys,.lk,.tag{transition:opacity .15s}}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+table.mx6{width:100%;border-collapse:separate;border-spacing:0;font-size:.8rem;min-width:760px}
+.mx6 th,.mx6 td{border-bottom:1px solid var(--rule);padding:7px 9px;vertical-align:top;text-align:left}
+.mx6 thead th{background:var(--zone);font:600 .6rem/1.2 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.mx6 th.sticky,.mx6 td.sticky{position:sticky;left:0;background:var(--sheet);z-index:1;border-right:1px solid var(--rule)}
+.mx6 thead th.sticky{background:var(--zone)}
+.mx6 td.sticky{min-width:230px;max-width:270px}
+.mx6 td.sticky .fid{font:600 .72rem var(--font-code);color:var(--muted);margin-right:6px}
+.mx6 td.sticky small{display:block;color:var(--ink-2);font-size:.74rem;margin-top:2px}
+.mx6 tbody tr{cursor:pointer}
+.mx6 tbody tr:hover td,.mx6 tbody tr.sel td{background:var(--hi)}
+.mx6 tbody tr.sel td.sticky{box-shadow:inset 3px 0 0 var(--sel)}
+.mx6 .chip{white-space:normal}
+.mx6 td.n,.mx6 th.n{text-align:right;font-variant-numeric:tabular-nums}
+.mx6 td.n{font:500 .74rem var(--font-code);white-space:nowrap}
+.origin{display:block;color:var(--muted);font-size:.68rem;margin-top:2px}
+.empty{padding:16px;color:var(--muted);font-size:.84rem}
+.trace{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(190px,100%),1fr));gap:8px}
+.rf{border:1px solid var(--rule);border-radius:4px;padding:8px 10px;display:grid;gap:3px;background:var(--sheet)}
+.rf b{font:600 .74rem var(--font-code)}
+.rf span{font-size:.78rem;color:var(--ink-2)}
+.rf .si{font:500 .7rem var(--font-code);color:var(--muted)}
+.rf.none{border-color:color-mix(in srgb,var(--review) 55%,transparent);background:color-mix(in srgb,var(--review) 6%,var(--sheet))}
+.model.wide{grid-template-columns:1fr}
+.model.wide .detail dl{grid-template-columns:repeat(auto-fill,minmax(min(240px,100%),1fr));gap:10px 22px}
+.model.wide .detail>ul{columns:2 300px;column-gap:24px;display:block}
+.model.wide .detail>ul li{break-inside:avoid;margin-bottom:5px}
+.detail dl>div{min-width:0}
+/* Shared by the OV-5a, SvcV-5 and CV-6 mockups. */
+.stc{display:inline-block;font:600 .62rem/1 var(--font-code);letter-spacing:.05em;text-transform:uppercase;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.stc.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.stc.partial{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.stc.planned{color:var(--sel);background:color-mix(in srgb,var(--sel) 12%,transparent)}
+.stc.not{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.stc.unknown{color:var(--muted);background:var(--zone)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex:none;background:var(--muted)}
+.dot.ok{background:var(--ok)}.dot.partial{background:var(--review)}.dot.not{background:var(--stop)}
+.dot.planned{background:transparent;border:2px solid var(--sel);width:9px;height:9px}
+.dot.unknown{background:transparent;border:1.5px dashed var(--muted);width:9px;height:9px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:.78rem;color:var(--ink-2)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend .hint{color:var(--muted)}
+.vcs{display:flex;flex-wrap:wrap;gap:4px}
+.vc{font:600 .68rem/1 var(--font-code);padding:4px 6px;border-radius:3px;border:1px solid var(--rule);background:var(--zone);color:var(--ink-2);cursor:pointer}
+.vc:hover{border-color:var(--sel);color:var(--ink)}
+.vc:focus-visible,.tree button:focus-visible,.mx button:focus-visible,.mx td[tabindex]:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.panel{border:1px solid var(--rule);border-radius:4px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:14px 24px;min-height:120px}
+.panel h3{margin:2px 0 4px;font:700 1.15rem/1.25 var(--font-title)}
+.panel p{margin:0 0 6px;font-size:.86rem;color:var(--ink-2)}
+.panel .ov{display:block;font:600 .62rem/1.3 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.panel dl{margin:0;display:grid;gap:4px}
+.panel dt{font:600 .62rem/1.3 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.panel dd{margin:0;font-size:.86rem}
+.panel ul{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+.panel li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline;font-size:.85rem}
+.panel li small{display:block;color:var(--ink-2);font-size:.78rem}
+.panel .hint{color:var(--muted);font-size:.8rem}
+.idc{font:600 .66rem/1 var(--font-code);padding:3px 5px;border-radius:3px;white-space:nowrap}
+.idc.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.idc.partial{color:var(--review);background:color-mix(in srgb,var(--review) 16%,transparent)}
+.idc.planned{color:var(--sel);background:color-mix(in srgb,var(--sel) 12%,transparent)}
+.idc.not{color:var(--stop);background:color-mix(in srgb,var(--stop) 14%,transparent)}
+.idc.unknown{color:var(--muted);background:var(--zone)}
+@media (max-width:760px){.panel{grid-template-columns:1fr}}
+/* OV-5a tree */
+.treewrap{border:1px solid var(--rule);border-radius:4px;background:var(--zone);padding:14px 14px 10px;display:grid;gap:10px}
+.tree{display:grid;gap:22px}
+.a0{justify-self:center;text-align:center;background:var(--node);border:1px solid var(--rule);border-radius:4px;padding:10px 22px;max-width:560px;position:relative}
+.a0 .k{display:block;font:600 .62rem/1.3 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.a0 b{display:block;font:700 1.15rem/1.3 var(--font-title)}
+.a0 small{display:block;font-size:.8rem;color:var(--ink-2)}
+.a0::after{content:"";position:absolute;left:50%;top:100%;height:12px;border-left:1px solid var(--line)}
+.acols{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:8px;position:relative}
+.acol{position:relative;display:grid;gap:8px;align-content:start;min-width:0}
+.acol::before{content:"";position:absolute;top:-10px;left:50%;height:10px;border-left:1px solid var(--line)}
+.acol::after{content:"";position:absolute;top:-10px;left:-4px;right:-4px;border-top:1px solid var(--line)}
+.acol:first-child::after{left:50%}.acol:last-child::after{right:50%}
+.ahead,.part{font:inherit;text-align:left;color:var(--ink);cursor:pointer;background:var(--node);border:1px solid var(--rule);border-radius:4px;width:100%}
+.ahead{border-top:4px solid var(--dc);padding:7px 8px;display:grid;gap:2px}
+.ahead .aid,.part .pid{display:flex;gap:5px;align-items:center;font:600 .64rem/1.2 var(--font-code);letter-spacing:.04em;color:var(--ink-2)}
+.ahead b{font:700 .9rem/1.2 var(--font-title)}
+.ahead small{font:500 .66rem/1.3 var(--font-code);color:var(--muted)}
+.parts{list-style:none;margin:0;padding:0 0 0 10px;display:grid;gap:6px;position:relative}
+.parts::before{content:"";position:absolute;left:3px;top:-8px;bottom:14px;border-left:1px solid var(--line)}
+.parts li{position:relative}
+.parts li::before{content:"";position:absolute;left:-7px;top:14px;width:7px;border-top:1px solid var(--line)}
+.part{padding:6px 7px;display:grid;gap:2px;border-left:3px solid var(--rule)}
+.part b{font:600 .8rem/1.25 var(--font-body)}
+.part.ok{border-left-color:var(--ok)}.part.partial{border-left-color:var(--review)}
+.part.planned{border-left-color:var(--sel);border-style:dashed;border-left-style:solid}
+.part.not{border-left-color:var(--stop);background:color-mix(in srgb,var(--stop) 7%,var(--node))}
+.part.unknown{border-left-color:var(--rule);color:var(--muted)}
+.ahead[aria-pressed="true"],.part[aria-pressed="true"]{outline:2px solid var(--sel);outline-offset:1px;background:color-mix(in srgb,var(--sel) 8%,var(--node))}
+.tree.picking .part:not([aria-pressed="true"]):not(.rel){opacity:.45}
+.tree.picking .ahead:not([aria-pressed="true"]):not(.rel){opacity:.6}
+@media (max-width:760px){
+ .acols{grid-template-columns:1fr;gap:14px}.acol::before,.acol::after,.a0::after{display:none}
+ .a0{justify-self:stretch}
+}
+/* SvcV-5 and CV-6 matrices */
+.mxwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+.mx{border-collapse:collapse;width:100%;min-width:1080px;font-size:.84rem}
+.mx th,.mx td{border-bottom:1px solid var(--rule);padding:6px 7px;vertical-align:middle}
+.mx thead th{background:var(--zone);font:600 .66rem/1.25 var(--font-code);color:var(--ink-2);text-align:center;vertical-align:bottom}
+.mx thead th:first-child{text-align:left;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mx thead th.state{text-align:left;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mx thead button{font:inherit;color:inherit;background:none;border:0;padding:2px;cursor:pointer;display:grid;gap:2px;justify-items:center;width:100%;border-radius:3px}
+.mx thead button b{font:700 .72rem/1 var(--font-code);color:var(--ink)}
+.mx thead button span{font:500 .66rem/1.2 var(--font-body)}
+.mx th.rowh{text-align:left;font-weight:400;border-right:1px solid var(--rule);width:240px}
+.mx th.rowh button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left;display:grid;gap:1px}
+.mx th.rowh b{font-weight:500}.mx th.rowh b i{font:600 .7rem var(--font-code);font-style:normal;color:var(--muted);margin-right:5px}
+.mx th.rowh small{font:500 .7rem var(--font-code);color:var(--muted)}
+.mx tr.grp th{background:color-mix(in srgb,var(--zone) 70%,var(--sheet));text-align:left;font:700 .8rem/1.2 var(--font-body);padding:7px}
+.mx tr.grp th .sq{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:7px;vertical-align:-1px}
+.mx td.c{text-align:center;border-left:1px solid color-mix(in srgb,var(--rule) 55%,transparent)}
+.mx td.c[tabindex]{cursor:pointer}
+.mx td.c .fns{display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
+.mx td.out{background:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--rule) 45%,transparent) 6px 7px)}
+.mx td.state{white-space:nowrap}
+.mx td.state small{display:block;font:500 .68rem var(--font-code);color:var(--muted);margin-top:3px}
+.mx tfoot td,.mx tfoot th{background:var(--zone);font-size:.74rem;text-align:center}
+.mx tfoot th{text-align:left;font:600 .68rem var(--font-code);color:var(--ink-2)}
+.mx tfoot small{display:block;font:500 .66rem var(--font-code);color:var(--ink-2);margin-top:3px}
+.mx .sel{background:color-mix(in srgb,var(--sel) 10%,transparent)}
+.mx td.c.hit{background:color-mix(in srgb,var(--sel) 16%,transparent)}
+.mx.picking tbody tr:not(.grp):not(.on) th.rowh{opacity:.55}
+.mx th[aria-pressed="true"] button,.mx th.rowh.on button{color:var(--sel)}
+.summary .ok b{color:var(--ok)}.summary .pl b{color:var(--sel)}
+/* SV-3, SV-5b and CV-7 */
+.model3{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.model3>*{min-width:0}
+@media (max-width:1150px){.model3{grid-template-columns:1fr}}
+.m3wrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.m3{border-collapse:separate;border-spacing:0;font-size:.8rem;min-width:max-content}
+.m3 th,.m3 td{border-bottom:1px solid color-mix(in srgb,var(--rule) 70%,transparent);padding:0}
+.m3 thead th{background:var(--zone);font:600 .6rem/1.2 var(--font-code);color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:6px 3px;text-align:center;vertical-align:bottom}
+.m3 thead th.loc{border-left:1px solid var(--rule)}
+.m3 thead th.corner{text-align:left;position:sticky;left:0;z-index:2;background:var(--zone)}
+.m3 thead tr.nums button{font:600 .7rem var(--font-code);color:var(--ink-2);background:none;border:0;cursor:pointer;width:100%;padding:3px 0;border-radius:3px}
+.m3 td.c{width:42px;min-width:42px;height:30px;text-align:center;vertical-align:middle;border-left:1px solid color-mix(in srgb,var(--rule) 45%,transparent)}
+.m3 td.c .sis{display:flex;flex-direction:column;gap:2px;align-items:center;padding:2px 0}
+.m3 td.diag{background:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--rule) 60%,transparent) 5px 6px)}
+.m3 th.rh{text-align:left;font-weight:400;white-space:nowrap;border-right:1px solid var(--rule);position:sticky;left:0;background:var(--sheet);z-index:1}
+.m3 th.rh button{display:flex;gap:8px;align-items:baseline;background:none;border:0;padding:6px 12px 6px 8px;font:inherit;color:var(--ink);cursor:pointer;text-align:left;width:100%}
+.m3 th.rh i{font:600 .66rem var(--font-code);font-style:normal;color:var(--muted);min-width:18px}
+.m3 th.rh.none button{color:var(--muted)}
+.m3 tr.grp th{background:color-mix(in srgb,var(--zone) 70%,var(--sheet));text-align:left;font:700 .76rem var(--font-body);padding:5px 8px;position:sticky;left:0;z-index:1}
+.m3 td.n,.m3 th.n{font:500 .72rem var(--font-code);text-align:center;color:var(--ink-2);padding:0 8px;border-left:1px solid var(--rule)}
+.m3 tfoot th,.m3 tfoot td{background:var(--zone);font:500 .68rem var(--font-code);color:var(--ink-2);text-align:center;padding:5px 2px}
+.m3 tfoot th{text-align:left;padding-left:8px;position:sticky;left:0}
+.m3 .hl{background:color-mix(in srgb,var(--sel) 8%,transparent)}
+.m3 .on{box-shadow:inset 0 0 0 2px var(--sel)}
+.m3 th.rh.hl{background:color-mix(in srgb,var(--sel) 10%,var(--sheet))}
+.si{font:600 .58rem/1 var(--font-code);padding:4px 3px 4px 4px;border-radius:2px;border:1px solid transparent;border-left:3px solid var(--pl);cursor:pointer;white-space:nowrap;color:var(--ink);background:var(--node)}
+.si.ok{background:color-mix(in srgb,var(--ok) 13%,var(--node))}
+.si.gap{background:color-mix(in srgb,var(--review) 16%,var(--node))}
+.si.stop{background:color-mix(in srgb,var(--stop) 14%,var(--node))}
+.si.inferred{border-color:var(--review);border-style:dashed dashed dashed solid}
+.si.missing{border-color:var(--stop);border-style:dashed dashed dashed solid}
+.si[aria-pressed="true"]{outline:2px solid var(--sel);outline-offset:1px}
+.si:focus-visible,.m3 button:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.sw{display:inline-block;width:18px;height:12px;border-radius:2px;border:1px solid transparent;vertical-align:-1px}
+.sw.ok{background:color-mix(in srgb,var(--ok) 13%,var(--node))}
+.sw.gap{background:color-mix(in srgb,var(--review) 16%,var(--node))}
+.sw.stop{background:color-mix(in srgb,var(--stop) 14%,var(--node))}
+.sw.inferred{border-color:var(--review);border-style:dashed}
+.pl{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:-1px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.two>*{min-width:0}
+@media (max-width:900px){.two{grid-template-columns:1fr}}
+.two h2,.reg2 h2{margin:0;font:700 .95rem/1.2 var(--font-title);letter-spacing:.04em;text-transform:uppercase}
+.two p.sub,.reg2 p.sub{margin:4px 0 8px;font-size:.82rem;color:var(--ink-2)}
+table.lm{border-collapse:collapse;width:100%;font-size:.78rem}
+.lm th,.lm td{border:1px solid var(--rule);padding:6px 6px;text-align:center}
+.lm thead th,.lm tbody th{background:var(--zone);font:600 .6rem/1.2 var(--font-code);letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2)}
+.lm tbody th{text-align:left}
+.lm td{font:600 .76rem var(--font-code);color:var(--ink)}
+.lm td.z{color:var(--muted);font-weight:400}
+table.tl{border-collapse:collapse;width:100%;font-size:.8rem}
+.tl th{font:600 .6rem/1.2 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--zone);text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule)}
+.tl td{padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+.tl td.n{font:500 .74rem var(--font-code);text-align:right;font-variant-numeric:tabular-nums}
+.tl .chips{display:flex;flex-wrap:wrap;gap:3px}
+.panel3{border:1px solid var(--rule);border-radius:4px;background:var(--sheet);padding:14px;display:grid;gap:8px;align-content:start}
+.panel3 .ov{display:block;font:600 .62rem/1.3 var(--font-code);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.panel3 h3{margin:0;font:700 1.08rem/1.25 var(--font-title);overflow-wrap:anywhere}
+.panel3 p{margin:0;font-size:.84rem;color:var(--ink-2)}
+.panel3 dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;font-size:.82rem}
+.panel3 dt{font:600 .6rem/1.6 var(--font-code);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.panel3 dd{margin:0;overflow-wrap:anywhere}
+.panel3 ul{list-style:none;margin:0;padding:0;display:grid;gap:5px;font-size:.82rem}
+.panel3 li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:7px;align-items:baseline}
+.panel3 li small{display:block;color:var(--ink-2);font-size:.76rem}
+.panel3 .hint{color:var(--muted);font-size:.78rem}
+.panel3 .act{justify-self:start}
+.svc-h{font:700 .66rem/1.1 var(--font-code)}
+.mx td.c.nd,.mx th.nd{background:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--rule) 40%,transparent) 6px 7px)}
+.mx thead th.grp2{font:600 .58rem/1.2 var(--font-code);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-left:1px solid var(--rule)}
+#mx.mx th.rowh{min-width:230px}
+.mx th.rowh small .dot{width:7px;height:7px;vertical-align:0}
+.mx th.rowh small .dot.planned{width:8px;height:8px}
+.cv7m thead tr:nth-child(2) th{vertical-align:bottom;padding:6px 2px;width:46px;min-width:46px}
+.cv7m thead tr:nth-child(2) th button{gap:5px}
+.cv7m thead tr:nth-child(2) th button span{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;text-align:left;line-height:1.1}
+.cv7m td.c{width:46px;min-width:46px;padding:5px 2px}
+.cv7m td.state{width:1%}
 </style>
-
+</head>
+<body>
 <div class="page">
-  <span class="example">Example content · reference topology</span>
-  <section class="sheet" aria-labelledby="cvTitle">
-    <div class="banner top">Security telemetry + PII</div>
+  <div class="top"><span class="example">Example content · Builder model</span><div class="seg" id="scen" role="group" aria-label="Example topology"></div></div>
+  <section class="sheet" aria-labelledby="sTitle">
+    <div class="banner top" id="cls1"></div>
     <div class="inner">
-      <div class="titleblock">
-        <div><span class="tb-k">Architecture view</span><span class="tb-v big" id="cvTitle">CV-7 · Capability to Services Mapping</span></div>
-        <div><span class="tb-k">Architecture</span><span class="tb-v">Splunk security telemetry architecture</span></div>
-        <div><span class="tb-k">Viewpoint</span><span class="tb-v">Capability (DoDAF V2.0)</span></div>
-        <div><span class="tb-k">Capability owner</span><span class="tb-v"><span class="notset">Not set</span></span></div>
-        <div><span class="tb-k">Build · prepared</span><span class="tb-v">167 · 5 Oct 2026</span></div>
-      </div>
-
-      <div class="purpose"><span class="tb-k">Purpose</span><p>Which Splunk services each capability needs, and whether the Builder topology deploys them. A capability is ready only when every service it needs is deployed. Services are the ones the SvcV-1 components provide.</p></div>
-
-      <div class="summary" id="summary"></div>
-
-      <div class="detail" id="detail" aria-live="polite"></div>
-
-      <div class="legend">
-        <span><b style="color:var(--ok)">●</b>needs the service; deployed</span>
-        <span><b style="color:var(--review)">○</b>needs the service; not deployed</span>
-        <span>Shaded columns are services not in the topology</span>
-        <span>Click a capability or a service to trace it. Esc clears.</span>
-      </div>
-      <div class="mwrap"><table class="mx" id="mx"></table></div>
-
-      <h2>Service register</h2>
-      <p class="sub">The services in the matrix, the Builder component that provides each one, and the interface it is reached on.</p>
-      <div class="tablewrap"><table class="reg" id="svc">
-        <thead><tr><th>ID</th><th>Service</th><th>Provided by (Builder component)</th><th>Interface</th><th>Used by</th><th>In topology</th></tr></thead>
-        <tbody></tbody>
-      </table></div>
-
-      <div class="findings">
-        <h2>What the mapping shows</h2>
-        <ul id="findings"></ul>
-      </div>
-
-      <div class="foot"><span>Splunk security telemetry architecture · Capabilities from CV-2 · Services from SvcV-1 and the Builder topology</span><span>CV-7 · 1 of 1 · Build 167</span></div>
+      <div class="titleblock" id="tb"></div>
+      <div class="purpose"><span class="tb-k">Purpose</span><p>Which services each capability needs, and whether the topology deploys them. A capability uses a service when the service carries out an activity the capability performs (CV-6) and is built from the capability's components (CV-2). Each cell lists the SvcV-4 functions involved.</p></div>
+      <div class="summary" id="sum"></div>
+      <div class="panel" id="detail" aria-live="polite"></div>
+      <div class="legend" id="legend"></div>
+      <div class="mxwrap"><table class="mx cv7m" id="mx"></table></div>
+      <div class="reg2"><h2>Service register</h2><p class="sub">The services in the matrix, the Builder components that provide them, and the capabilities that use them.</p><div class="mxwrap"><table class="tl" id="reg"></table></div></div>
+      <div class="findings"><h2>What the mapping shows</h2><ul id="findings"></ul></div>
+      <div class="foot" id="foot"></div>
     </div>
-    <div class="banner bottom">Security telemetry + PII</div>
+    <div class="banner bottom" id="cls2"></div>
   </section>
 </div>
 
 <script>
-// Capabilities from CV-2: level 1 [id, name, domain], level 2 [id, name, status]
-const L1=[['C1','Telemetry collection','collect'],['C2','Fleet configuration','collect'],['C3','Indexing and retention','index'],['C4','Search and analytics','search'],
-  ['C5','Threat detection','detect'],['C6','Automated response','detect'],['C7','Identity and access','govern'],['C8','Platform health and licence','index']];
-const L2=[['C1.1','Network and syslog collection','ok'],['C1.2','Endpoint collection','ok'],['C1.3','Cloud and API collection','ok'],['C1.4','Filtering and masking at source','plan'],
-  ['C2.1','Configuration as code','ok'],['C2.2','Forwarder fleet health','ok'],
-  ['C3.1','Event indexing','ok'],['C3.2','Retention management','ok'],['C3.3','Data replication','part'],
-  ['C4.1','Ad hoc investigation','ok'],['C4.2','Normalised data (CIM)','ok'],['C4.3','Search high availability','part'],
-  ['C5.1','Correlation detections','plan'],['C5.2','Risk-based alerting','plan'],
-  ['C6.1','Case management','ok'],['C6.2','Playbook automation','ok'],
-  ['C7.1','Single sign-on','ok'],['C7.2','Data access control','ok'],['C7.3','Access review','ok'],
-  ['C8.1','Licence management','ok'],['C8.2','Health monitoring','part'],['C8.3','Capacity planning','ok']];
-const ST={ok:'In topology',part:'Partial',plan:'Planned'};
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const parentOf=id=>L1.find(p=>p[0]===id.split('.')[0]);
+const DATA={"ref":{"cv7":{"rows":[{"id":"C1.1","name":"Network and syslog collection","parent":"C1","parentName":"Telemetry collection","domain":"collect","status":"Partial","reason":"Universal Forwarder 2: path stops before an indexer","parts":["A2.1","A3.1"],"uses":{"S1":[{"id":"S1.2","name":"Forward raw (S2S)","part":"A3.1","code":"partial","reason":"Universal Forwarder 2: no output to an indexer"}],"S3":[{"id":"S3.1","name":"Receive syslog","part":"A2.1","code":"partial","reason":"Firewalls and network devices, Syslog Source 2: syslog accepts UDP or has no required TLS"},{"id":"S3.2","name":"Write host files","part":"A2.1","code":"ok","reason":""}]},"waiting":[]},{"id":"C1.2","name":"Endpoint collection","parent":"C1","parentName":"Telemetry collection","domain":"collect","status":"Partial","reason":"Windows Event Log 1: path stops before an indexer","parts":["A2.2","A3.1"],"uses":{"S1":[{"id":"S1.1","name":"Tail host files","part":"A2.2","code":"ok","reason":""},{"id":"S1.3","name":"Read event logs","part":"A2.2","code":"none","reason":"Windows Event Log 1: no path to an indexer"},{"id":"S1.2","name":"Forward raw (S2S)","part":"A3.1","code":"partial","reason":"Universal Forwarder 2: no output to an indexer"}]},"waiting":[]},{"id":"C1.3","name":"Cloud and API collection","parent":"C1","parentName":"Telemetry collection","domain":"collect","status":"Partial","reason":"Heavy Forwarder 1: path stops before an indexer","parts":["A2.3","A3.1"],"uses":{"S2":[{"id":"S2.3","name":"Forward cooked","part":"A3.1","code":"none","reason":"Heavy Forwarder 1: no output to an indexer"}],"S4":[{"id":"S4.1","name":"Accept HEC events","part":"A2.3","code":"ok","reason":""}]},"waiting":[]},{"id":"C1.4","name":"Filtering and masking at source","parent":"C1","parentName":"Telemetry collection","domain":"collect","status":"Planned","reason":"No Edge or Ingest Processor on a path","parts":["A4.2","A4.3"],"uses":{"S6":[{"id":"S6.1","name":"Filter at the edge","part":"A4.3","code":"planned","reason":"Edge pipelines is not deployed"}]},"waiting":["S6"]},{"id":"C2.1","name":"Configuration as code","parent":"C2","parentName":"Fleet configuration","domain":"collect","status":"In topology","reason":"Deployment Server has management relationships","parts":["A7.1"],"uses":{"S5":[{"id":"S5.1","name":"Serve app bundles","part":"A7.1","code":"ok","reason":""}]},"waiting":[]},{"id":"C2.2","name":"Forwarder fleet health","parent":"C2","parentName":"Fleet configuration","domain":"collect","status":"In topology","reason":"Deployment clients and Monitoring Console modelled","parts":["A7.3"],"uses":{"S16":[{"id":"S16.1","name":"Poll health (REST)","part":"A7.3","code":"partial","reason":"SF-17: interface is inferred; no real relationship is modelled"},{"id":"S16.2","name":"Alert on silence","part":"A7.3","code":"none","reason":"Monitoring Console has no management relationship to a Deployment Server or forwarder"}]},"waiting":[]},{"id":"C3.1","name":"Event indexing","parent":"C3","parentName":"Indexing and retention","domain":"index","status":"In topology","reason":"Indexing tier modelled","parts":["A4.1","A5.1"],"uses":{"S7":[{"id":"S7.2","name":"Parse raw, mask","part":"A4.1","code":"ok","reason":""},{"id":"S7.3","name":"Write, roll buckets","part":"A5.1","code":"ok","reason":""}]},"waiting":[]},{"id":"C3.2","name":"Retention management","parent":"C3","parentName":"Indexing and retention","domain":"index","status":"In topology","reason":"Indexing tier modelled; retention values require owner evidence","parts":["A5.1"],"uses":{"S7":[{"id":"S7.3","name":"Write, roll buckets","part":"A5.1","code":"ok","reason":""}]},"waiting":[]},{"id":"C3.3","name":"Data replication","parent":"C3","parentName":"Indexing and retention","domain":"index","status":"Partial","reason":"Single indexer; no replication cluster","parts":["A5.2"],"uses":{"S8":[{"id":"S8.1","name":"Replicate buckets","part":"A5.2","code":"planned","reason":"Index replication is not deployed"}]},"waiting":["S8"]},{"id":"C4.1","name":"Ad hoc investigation","parent":"C4","parentName":"Search and analytics","domain":"search","status":"In topology","reason":"Authentication relationship reaches a search tier","parts":["A6.1"],"uses":{"S9":[{"id":"S9.1","name":"Dispatch, merge","part":"A6.1","code":"ok","reason":""},{"id":"S9.2","name":"Serve dashboards","part":"A6.1","code":"ok","reason":""}]},"waiting":[]},{"id":"C4.2","name":"Normalised data (CIM)","parent":"C4","parentName":"Search and analytics","domain":"search","status":"In topology","reason":"Search tier modelled; CIM compliance requires owner evidence","parts":["A6.2"],"uses":{"S10":[{"id":"S10.1","name":"Build CIM summaries","part":"A6.2","code":"ok","reason":""},{"id":"S10.2","name":"Serve tstats","part":"A6.2","code":"planned","reason":"No correlation service consumes scheduled searches or tstats"}]},"waiting":[]},{"id":"C4.3","name":"Search high availability","parent":"C4","parentName":"Search and analytics","domain":"search","status":"Partial","reason":"Single search head; no high availability","parts":["A6.4"],"uses":{"S11":[{"id":"S11.1","name":"Replicate config","part":"A6.4","code":"planned","reason":"Search head clustering is not deployed"}]},"waiting":["S11"]},{"id":"C5.1","name":"Correlation detections","parent":"C5","parentName":"Threat detection","domain":"detect","status":"Planned","reason":"No Enterprise Security component","parts":["A6.3"],"uses":{"S9":[{"id":"S9.3","name":"Run schedules","part":"A6.3","code":"planned","reason":"No correlation service consumes scheduled searches or tstats"}],"S12":[{"id":"S12.1","name":"Correlate events","part":"A6.3","code":"none","reason":"No Enterprise Security component provides correlation and risk"},{"id":"S12.3","name":"Detect anomalies (UEBA)","part":"A6.3","code":"none","reason":"No Enterprise Security component provides correlation and risk"}]},"waiting":["S12"]},{"id":"C5.2","name":"Risk-based alerting","parent":"C5","parentName":"Threat detection","domain":"detect","status":"Planned","reason":"No Enterprise Security component","parts":["A6.3","A9.1"],"uses":{"S9":[{"id":"S9.3","name":"Run schedules","part":"A6.3","code":"planned","reason":"No correlation service consumes scheduled searches or tstats"}],"S12":[{"id":"S12.1","name":"Correlate events","part":"A6.3","code":"none","reason":"No Enterprise Security component provides correlation and risk"},{"id":"S12.3","name":"Detect anomalies (UEBA)","part":"A6.3","code":"none","reason":"No Enterprise Security component provides correlation and risk"},{"id":"S12.2","name":"Raise risk findings","part":"A9.1","code":"none","reason":"No Enterprise Security component provides correlation and risk"}]},"waiting":["S12"]},{"id":"C5.3","name":"Behaviour analytics (UEBA)","parent":"C5","parentName":"Threat detection","domain":"detect","status":"Planned","reason":"No ES Premier search head","parts":["A6.3"],"uses":{"S9":[{"id":"S9.3","name":"Run schedules","part":"A6.3","code":"planned","reason":"No correlation service consumes scheduled searches or tstats"}],"S12":[{"id":"S12.1","name":"Correlate events","part":"A6.3","code":"none","reason":"No Enterprise Security component provides correlation and risk"},{"id":"S12.3","name":"Detect anomalies (UEBA)","part":"A6.3","code":"none","reason":"No Enterprise Security component provides correlation and risk"}]},"waiting":["S12"]},{"id":"C6.1","name":"Case management","parent":"C6","parentName":"Automated response","domain":"detect","status":"Partial","reason":"SOAR has no relationship from a search tier","parts":["A9.2","A9.3"],"uses":{"S13":[{"id":"S13.1","name":"Ingest findings","part":"A9.2","code":"none","reason":"No relationship from a search tier to SOAR"},{"id":"S13.2","name":"Run playbooks","part":"A9.2","code":"partial","reason":"SOAR exists but no playbook node is modelled"},{"id":"S13.3","name":"Update tickets","part":"A9.3","code":"none","reason":"No service desk component or ticket-update interface is modelled"}]},"waiting":[]},{"id":"C6.2","name":"Playbook automation","parent":"C6","parentName":"Automated response","domain":"detect","status":"Partial","reason":"SOAR has no playbook node","parts":["A9.2"],"uses":{"S13":[{"id":"S13.1","name":"Ingest findings","part":"A9.2","code":"none","reason":"No relationship from a search tier to SOAR"},{"id":"S13.2","name":"Run playbooks","part":"A9.2","code":"partial","reason":"SOAR exists but no playbook node is modelled"}]},"waiting":[]},{"id":"C7.1","name":"Single sign-on","parent":"C7","parentName":"Identity and access","domain":"govern","status":"In topology","reason":"Provider authenticates a search tier","parts":["A8.1"],"uses":{"S14":[{"id":"S14.1","name":"Issue SAML assertion","part":"A8.1","code":"ok","reason":""}]},"waiting":[]},{"id":"C7.2","name":"Data access control","parent":"C7","parentName":"Identity and access","domain":"govern","status":"In topology","reason":"Provider authenticates a search tier","parts":["A8.1"],"uses":{"S9":[{"id":"S9.4","name":"Check SAML session","part":"A8.1","code":"ok","reason":""}],"S14":[{"id":"S14.1","name":"Issue SAML assertion","part":"A8.1","code":"ok","reason":""}]},"waiting":[]},{"id":"C7.3","name":"Access review","parent":"C7","parentName":"Identity and access","domain":"govern","status":"In topology","reason":"Search tier available for access review","parts":["A8.1"],"uses":{"S9":[{"id":"S9.4","name":"Check SAML session","part":"A8.1","code":"ok","reason":""}]},"waiting":[]},{"id":"C8.1","name":"Licence management","parent":"C8","parentName":"Platform health and licence","domain":"index","status":"In topology","reason":"License Manager modelled","parts":["A7.2"],"uses":{"S15":[{"id":"S15.1","name":"Pool, enforce licence","part":"A7.2","code":"partial","reason":"SF-16: interface is inferred; no real relationship is modelled"}]},"waiting":[]},{"id":"C8.2","name":"Health monitoring","parent":"C8","parentName":"Platform health and licence","domain":"index","status":"In topology","reason":"Monitoring Console modelled","parts":["A7.3"],"uses":{"S16":[{"id":"S16.1","name":"Poll health (REST)","part":"A7.3","code":"partial","reason":"SF-17: interface is inferred; no real relationship is modelled"},{"id":"S16.2","name":"Alert on silence","part":"A7.3","code":"none","reason":"Monitoring Console has no management relationship to a Deployment Server or forwarder"}]},"waiting":[]},{"id":"C8.3","name":"Capacity planning","parent":"C8","parentName":"Platform health and licence","domain":"index","status":"In topology","reason":"Licence and search tiers modelled","parts":["A7.2","A7.3"],"uses":{"S15":[{"id":"S15.1","name":"Pool, enforce licence","part":"A7.2","code":"partial","reason":"SF-16: interface is inferred; no real relationship is modelled"}]},"waiting":[]}],"services":[{"id":"S1","name":"Universal forwarding","layer":"Collection","deployed":true,"provider":"Universal Forwarder 1, Universal Forwarder 2","interface":"S2S 9997 · TLS","types":["uf"],"usedBy":["C1.1","C1.2"]},{"id":"S2","name":"Heavy forwarding and parsing","layer":"Collection","deployed":true,"provider":"Heavy Forwarder 1","interface":"S2S 9997 · TLS","types":["hf"],"usedBy":["C1.3"]},{"id":"S3","name":"Syslog reception","layer":"Collection","deployed":true,"provider":"Syslog Server 1, Syslog Server 2","interface":"514 UDP/TCP · 6514 TLS","types":["syslog"],"usedBy":["C1.1"]},{"id":"S4","name":"HTTP Event Collector","layer":"Collection","deployed":true,"provider":"HEC on Heavy Forwarder 1","interface":"HTTPS 8088 · TLS","types":["hf","hecEndpoint"],"usedBy":["C1.3"]},{"id":"S5","name":"Deployment","layer":"Platform and access","deployed":true,"provider":"Deployment Server 1","interface":"Phone-home 8089 · TLS","types":["ds"],"usedBy":["C2.1"]},{"id":"S6","name":"Edge pipelines","layer":"Collection","deployed":false,"provider":"Edge Processor","interface":"S2S / HEC · TLS","types":["edgeProcessor","ip"],"usedBy":["C1.4"]},{"id":"S7","name":"Indexing","layer":"Indexing","deployed":true,"provider":"Indexer 1","interface":"S2S 9997 · TLS","types":["idx","indexerCluster","cloudIndexer148"],"usedBy":["C3.1","C3.2"]},{"id":"S8","name":"Index replication","layer":"Indexing","deployed":false,"provider":"Indexer Cluster Manager","interface":"Replication 9887 · TLS","types":["indexerCluster","indexerClusterManager"],"usedBy":["C3.3"]},{"id":"S9","name":"Search and REST API","layer":"Search","deployed":true,"provider":"Search Head 1","interface":"HTTPS 8000 · REST 8089","types":["search","shcMember","shcCluster","cloudSearchTier","cloudEsSearchHead"],"usedBy":["C4.1","C5.1","C5.2","C5.3","C7.2","C7.3"]},{"id":"S10","name":"Data model acceleration","layer":"Search","deployed":true,"provider":"Search Head 1","interface":"Internal","types":["search","shcMember","shcCluster","cloudSearchTier","cloudEsSearchHead"],"usedBy":["C4.2"]},{"id":"S11","name":"Search head clustering","layer":"Search","deployed":false,"provider":"Search Head Cluster Deployer","interface":"REST 8089 · TLS","types":["shcCluster","shcMember"],"usedBy":["C4.3"]},{"id":"S12","name":"Correlation and risk","layer":"Detection and response","deployed":false,"provider":"Splunk Cloud ES search head","interface":"On the ES search head","types":["cloudEsSearchHead"],"usedBy":["C5.1","C5.2","C5.3"]},{"id":"S13","name":"Cases and playbooks","layer":"Detection and response","deployed":true,"provider":"SOAR Cloud","interface":"HTTPS 443 · REST","types":["soarCloud","soar","soarOnPrem","soarPlaybook"],"usedBy":["C6.1","C6.2"]},{"id":"S14","name":"SAML sign-in","layer":"Platform and access","deployed":true,"provider":"Authentication Provider · Cloud 1","interface":"SAML 2.0 · HTTPS","types":["authProviderCloud","authProvider","authProviderOnPrem"],"usedBy":["C7.1","C7.2"]},{"id":"S15","name":"Licence management","layer":"Platform and access","deployed":true,"provider":"License Manager 1","interface":"REST 8089 · TLS","types":["licenseManager"],"usedBy":["C8.1","C8.3"]},{"id":"S16","name":"Platform monitoring","layer":"Platform and access","deployed":true,"provider":"Monitoring Console 1","interface":"REST 8089 · TLS","types":["monitoringConsole"],"usedBy":["C2.2","C8.2"]}]},"title":"Splunk security telemetry architecture","classification":"Security telemetry + PII","owner":""},"def":{"cv7":{"rows":[{"id":"C1.1","name":"Network and syslog collection","parent":"C1","parentName":"Telemetry collection","domain":"collect","status":"In topology","reason":"Every source path reaches an indexer","parts":["A2.1","A3.1"],"uses":{"S1":[{"id":"S1.2","name":"Forward raw (S2S)","part":"A3.1","code":"ok","reason":""}],"S3":[{"id":"S3.1","name":"Receive syslog","part":"A2.1","code":"partial","reason":"Syslog Source 1: syslog accepts UDP or has no required TLS"},{"id":"S3.2","name":"Write host files","part":"A2.1","code":"ok","reason":""}]},"waiting":[]},{"id":"C1.2","name":"Endpoint collection","parent":"C1","parentName":"Telemetry collection","domain":"collect","status":"Planned","reason":"No source nodes modelled","parts":["A2.2","A3.1"],"uses":{"S1":[{"id":"S1.1","name":"Tail host files","part":"A2.2","code":"ok","reason":""},{"id":"S1.3","name":"Read event logs","part":"A2.2","code":"planned","reason":"No Windows Event Log nodes"},{"id":"S1.2","name":"Forward raw (S2S)","part":"A3.1","code":"ok","reason":""}]},"waiting":[]},{"id":"C1.3","name":"Cloud and API collection","parent":"C1","parentName":"Telemetry collection","domain":"collect","status":"Planned","reason":"No source nodes modelled","parts":["A2.3","A3.1"],"uses":{"S2":[{"id":"S2.3","name":"Forward cooked","part":"A3.1","code":"planned","reason":"Heavy forwarding and parsing is not deployed"}],"S4":[{"id":"S4.1","name":"Accept HEC events","part":"A2.3","code":"planned","reason":"HTTP Event Collector is not deployed"}]},"waiting":["S2","S4"]},{"id":"C1.4","name":"Filtering and masking at source","parent":"C1","parentName":"Telemetry collection","domain":"collect","status":"Planned","reason":"No Edge or Ingest Processor on a path","parts":["A4.2","A4.3"],"uses":{"S6":[{"id":"S6.1","name":"Filter at the edge","part":"A4.3","code":"planned","reason":"Edge pipelines is not deployed"}]},"waiting":["S6"]},{"id":"C2.1","name":"Configuration as code","parent":"C2","parentName":"Fleet configuration","domain":"collect","status":"Planned","reason":"No Deployment Server","parts":["A7.1"],"uses":{"S5":[{"id":"S5.1","name":"Serve app bundles","part":"A7.1","code":"planned","reason":"Deployment is not deployed"}]},"waiting":["S5"]},{"id":"C2.2","name":"Forwarder fleet health","parent":"C2","parentName":"Fleet configuration","domain":"collect","status":"Planned","reason":"No monitored deployment-client fleet","parts":["A7.3"],"uses":{"S16":[{"id":"S16.1","name":"Poll health (REST)","part":"A7.3","code":"planned","reason":"Platform monitoring is not deployed"},{"id":"S16.2","name":"Alert on silence","part":"A7.3","code":"planned","reason":"Platform monitoring is not deployed"}]},"waiting":["S16"]},{"id":"C3.1","name":"Event indexing","parent":"C3","parentName":"Indexing and retention","domain":"index","status":"In topology","reason":"Indexing tier modelled","parts":["A4.1","A5.1"],"uses":{"S7":[{"id":"S7.2","name":"Parse raw, mask","part":"A4.1","code":"ok","reason":""},{"id":"S7.3","name":"Write, roll buckets","part":"A5.1","code":"ok","reason":""}]},"waiting":[]},{"id":"C3.2","name":"Retention management","parent":"C3","parentName":"Indexing and retention","domain":"index","status":"In topology","reason":"Indexing tier modelled; retention values require owner evidence","parts":["A5.1"],"uses":{"S7":[{"id":"S7.3","name":"Write, roll buckets","part":"A5.1","code":"ok","reason":""}]},"waiting":[]},{"id":"C3.3","name":"Data replication","parent":"C3","parentName":"Indexing and retention","domain":"index","status":"Partial","reason":"Single indexer; no replication cluster","parts":["A5.2"],"uses":{"S8":[{"id":"S8.1","name":"Replicate buckets","part":"A5.2","code":"planned","reason":"Index replication is not deployed"}]},"waiting":["S8"]},{"id":"C4.1","name":"Ad hoc investigation","parent":"C4","parentName":"Search and analytics","domain":"search","status":"Planned","reason":"No search tier","parts":["A6.1"],"uses":{"S9":[{"id":"S9.1","name":"Dispatch, merge","part":"A6.1","code":"planned","reason":"Search and REST API is not deployed"},{"id":"S9.2","name":"Serve dashboards","part":"A6.1","code":"planned","reason":"Search and REST API is not deployed"}]},"waiting":["S9"]},{"id":"C4.2","name":"Normalised data (CIM)","parent":"C4","parentName":"Search and analytics","domain":"search","status":"Planned","reason":"No search tier","parts":["A6.2"],"uses":{"S10":[{"id":"S10.1","name":"Build CIM summaries","part":"A6.2","code":"planned","reason":"Data model acceleration is not deployed"},{"id":"S10.2","name":"Serve tstats","part":"A6.2","code":"planned","reason":"Data model acceleration is not deployed"}]},"waiting":["S10"]},{"id":"C4.3","name":"Search high availability","parent":"C4","parentName":"Search and analytics","domain":"search","status":"Planned","reason":"No highly available search tier","parts":["A6.4"],"uses":{"S11":[{"id":"S11.1","name":"Replicate config","part":"A6.4","code":"planned","reason":"Search head clustering is not deployed"}]},"waiting":["S11"]},{"id":"C5.1","name":"Correlation detections","parent":"C5","parentName":"Threat detection","domain":"detect","status":"Planned","reason":"No Enterprise Security component","parts":["A6.3"],"uses":{"S9":[{"id":"S9.3","name":"Run schedules","part":"A6.3","code":"planned","reason":"Search and REST API is not deployed"}],"S12":[{"id":"S12.1","name":"Correlate events","part":"A6.3","code":"planned","reason":"No search tier to feed a correlation service"},{"id":"S12.3","name":"Detect anomalies (UEBA)","part":"A6.3","code":"planned","reason":"No search tier to feed a correlation service"}]},"waiting":["S9","S12"]},{"id":"C5.2","name":"Risk-based alerting","parent":"C5","parentName":"Threat detection","domain":"detect","status":"Planned","reason":"No Enterprise Security component","parts":["A6.3","A9.1"],"uses":{"S9":[{"id":"S9.3","name":"Run schedules","part":"A6.3","code":"planned","reason":"Search and REST API is not deployed"}],"S12":[{"id":"S12.1","name":"Correlate events","part":"A6.3","code":"planned","reason":"No search tier to feed a correlation service"},{"id":"S12.3","name":"Detect anomalies (UEBA)","part":"A6.3","code":"planned","reason":"No search tier to feed a correlation service"},{"id":"S12.2","name":"Raise risk findings","part":"A9.1","code":"planned","reason":"No search tier to feed a correlation service"}]},"waiting":["S9","S12"]},{"id":"C5.3","name":"Behaviour analytics (UEBA)","parent":"C5","parentName":"Threat detection","domain":"detect","status":"Planned","reason":"No ES Premier search head","parts":["A6.3"],"uses":{"S9":[{"id":"S9.3","name":"Run schedules","part":"A6.3","code":"planned","reason":"Search and REST API is not deployed"}],"S12":[{"id":"S12.1","name":"Correlate events","part":"A6.3","code":"planned","reason":"No search tier to feed a correlation service"},{"id":"S12.3","name":"Detect anomalies (UEBA)","part":"A6.3","code":"planned","reason":"No search tier to feed a correlation service"}]},"waiting":["S9","S12"]},{"id":"C6.1","name":"Case management","parent":"C6","parentName":"Automated response","domain":"detect","status":"Planned","reason":"No SOAR platform","parts":["A9.2","A9.3"],"uses":{"S13":[{"id":"S13.1","name":"Ingest findings","part":"A9.2","code":"planned","reason":"Cases and playbooks is not deployed"},{"id":"S13.2","name":"Run playbooks","part":"A9.2","code":"planned","reason":"Cases and playbooks is not deployed"},{"id":"S13.3","name":"Update tickets","part":"A9.3","code":"planned","reason":"Cases and playbooks is not deployed"}]},"waiting":["S13"]},{"id":"C6.2","name":"Playbook automation","parent":"C6","parentName":"Automated response","domain":"detect","status":"Planned","reason":"No SOAR playbook","parts":["A9.2"],"uses":{"S13":[{"id":"S13.1","name":"Ingest findings","part":"A9.2","code":"planned","reason":"Cases and playbooks is not deployed"},{"id":"S13.2","name":"Run playbooks","part":"A9.2","code":"planned","reason":"Cases and playbooks is not deployed"}]},"waiting":["S13"]},{"id":"C7.1","name":"Single sign-on","parent":"C7","parentName":"Identity and access","domain":"govern","status":"Planned","reason":"No authentication provider","parts":["A8.1"],"uses":{"S14":[{"id":"S14.1","name":"Issue SAML assertion","part":"A8.1","code":"planned","reason":"SAML sign-in is not deployed"}]},"waiting":["S14"]},{"id":"C7.2","name":"Data access control","parent":"C7","parentName":"Identity and access","domain":"govern","status":"Planned","reason":"No authentication provider","parts":["A8.1"],"uses":{"S9":[{"id":"S9.4","name":"Check SAML session","part":"A8.1","code":"planned","reason":"Search and REST API is not deployed"}],"S14":[{"id":"S14.1","name":"Issue SAML assertion","part":"A8.1","code":"planned","reason":"SAML sign-in is not deployed"}]},"waiting":["S9","S14"]},{"id":"C7.3","name":"Access review","parent":"C7","parentName":"Identity and access","domain":"govern","status":"Planned","reason":"No search tier","parts":["A8.1"],"uses":{"S9":[{"id":"S9.4","name":"Check SAML session","part":"A8.1","code":"planned","reason":"Search and REST API is not deployed"}]},"waiting":["S9"]},{"id":"C8.1","name":"Licence management","parent":"C8","parentName":"Platform health and licence","domain":"index","status":"Planned","reason":"No License Manager","parts":["A7.2"],"uses":{"S15":[{"id":"S15.1","name":"Pool, enforce licence","part":"A7.2","code":"planned","reason":"Licence management is not deployed"}]},"waiting":["S15"]},{"id":"C8.2","name":"Health monitoring","parent":"C8","parentName":"Platform health and licence","domain":"index","status":"Planned","reason":"No Monitoring Console","parts":["A7.3"],"uses":{"S16":[{"id":"S16.1","name":"Poll health (REST)","part":"A7.3","code":"planned","reason":"Platform monitoring is not deployed"},{"id":"S16.2","name":"Alert on silence","part":"A7.3","code":"planned","reason":"Platform monitoring is not deployed"}]},"waiting":["S16"]},{"id":"C8.3","name":"Capacity planning","parent":"C8","parentName":"Platform health and licence","domain":"index","status":"Planned","reason":"No licence or search tier","parts":["A7.2","A7.3"],"uses":{"S15":[{"id":"S15.1","name":"Pool, enforce licence","part":"A7.2","code":"planned","reason":"Licence management is not deployed"}]},"waiting":["S15"]}],"services":[{"id":"S1","name":"Universal forwarding","layer":"Collection","deployed":true,"provider":"Universal Forwarder 1","interface":"S2S 9997 · TLS","types":["uf"],"usedBy":["C1.1","C1.2"]},{"id":"S2","name":"Heavy forwarding and parsing","layer":"Collection","deployed":false,"provider":"Heavy forwarding and parsing","interface":"S2S 9997 · TLS","types":["hf"],"usedBy":["C1.3"]},{"id":"S3","name":"Syslog reception","layer":"Collection","deployed":true,"provider":"Syslog Server 1","interface":"514 UDP/TCP · 6514 TLS","types":["syslog"],"usedBy":["C1.1"]},{"id":"S4","name":"HTTP Event Collector","layer":"Collection","deployed":false,"provider":"HTTP Event Collector","interface":"HTTPS 8088 · TLS","types":["hecEndpoint","hf"],"usedBy":["C1.3"]},{"id":"S5","name":"Deployment","layer":"Platform and access","deployed":false,"provider":"Deployment","interface":"Phone-home 8089 · TLS","types":["ds"],"usedBy":["C2.1"]},{"id":"S6","name":"Edge pipelines","layer":"Collection","deployed":false,"provider":"Edge Processor","interface":"S2S / HEC · TLS","types":["edgeProcessor","ip"],"usedBy":["C1.4"]},{"id":"S7","name":"Indexing","layer":"Indexing","deployed":true,"provider":"Indexer 1","interface":"S2S 9997 · TLS","types":["idx","indexerCluster","cloudIndexer148"],"usedBy":["C3.1","C3.2"]},{"id":"S8","name":"Index replication","layer":"Indexing","deployed":false,"provider":"Indexer Cluster Manager","interface":"Replication 9887 · TLS","types":["indexerCluster","indexerClusterManager"],"usedBy":["C3.3"]},{"id":"S9","name":"Search and REST API","layer":"Search","deployed":false,"provider":"Search and REST API","interface":"HTTPS 8000 · REST 8089","types":["search","shcMember","shcCluster","cloudSearchTier","cloudEsSearchHead"],"usedBy":["C4.1","C5.1","C5.2","C5.3","C7.2","C7.3"]},{"id":"S10","name":"Data model acceleration","layer":"Search","deployed":false,"provider":"Data model acceleration","interface":"Internal","types":["search","shcMember","shcCluster","cloudSearchTier","cloudEsSearchHead"],"usedBy":["C4.2"]},{"id":"S11","name":"Search head clustering","layer":"Search","deployed":false,"provider":"Search Head Cluster Deployer","interface":"REST 8089 · TLS","types":["shcCluster","shcMember"],"usedBy":["C4.3"]},{"id":"S12","name":"Correlation and risk","layer":"Detection and response","deployed":false,"provider":"Splunk Cloud ES search head","interface":"On the ES search head","types":["cloudEsSearchHead"],"usedBy":["C5.1","C5.2","C5.3"]},{"id":"S13","name":"Cases and playbooks","layer":"Detection and response","deployed":false,"provider":"Cases and playbooks","interface":"HTTPS 443 · REST","types":["soarCloud","soar","soarOnPrem","soarPlaybook"],"usedBy":["C6.1","C6.2"]},{"id":"S14","name":"SAML sign-in","layer":"Platform and access","deployed":false,"provider":"SAML sign-in","interface":"SAML 2.0 · HTTPS","types":["authProviderCloud","authProvider","authProviderOnPrem"],"usedBy":["C7.1","C7.2"]},{"id":"S15","name":"Licence management","layer":"Platform and access","deployed":false,"provider":"Licence management","interface":"REST 8089 · TLS","types":["licenseManager"],"usedBy":["C8.1","C8.3"]},{"id":"S16","name":"Platform monitoring","layer":"Platform and access","deployed":false,"provider":"Platform monitoring","interface":"REST 8089 · TLS","types":["monitoringConsole"],"usedBy":["C2.2","C8.2"]}]},"title":"Splunk security telemetry architecture","classification":"Security telemetry + PII","owner":""}};
+const PAGE_SCEN={"ref":"Reference topology","def":"Default topology"};
+/* Shared by the SV-3, SV-5b and CV-7 mockups. DATA holds the Builder model for two topologies, exported from Build 187. */
+const SCEN=PAGE_SCEN;
+let scen='ref',D=DATA.ref;
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const plural=(n,one,many)=>n+' '+(n===1?one:(many||one+'s'));
+const and=l=>l.length>1?l.slice(0,-1).join(', ')+' and '+l.at(-1):l.join('');
+const chip=(cls,text)=>`<span class="chip ${cls}">${esc(text)}</span>`;
+// Activity and part status (OV-5a), function status (SvcV-4), capability status (CV-2): [label, class]
+const AST={ok:['Supported','ok'],partial:['Partly supported','partial'],planned:['Planned','planned'],none:['Not supported','not'],nosrc:['No sources','unknown']};
+const FST={ok:['Realised','ok'],partial:['Partly realised','partial'],planned:['Planned','planned'],none:['Not realised','not']};
+const CST={'In topology':['In topology','ok'],Partial:['Partial','partial'],Planned:['Planned','planned']};
+const st=(map,k)=>`<span class="stc ${map[k][1]}">${esc(map[k][0])}</span>`;
+const dot=(map,k)=>`<i class="dot ${map[k][1]}" title="${esc(map[k][0])}"></i>`;
+const VIEWID={ov2:'OV-2',ov5a:'OV-5a',svcv1:'SvcV-1',svcv4:'SvcV-4',svcv5:'SvcV-5',cv2:'CV-2',cv6:'CV-6',sv1:'SV-1',sv2:'SV-2',sv6:'SV-6',sv3:'SV-3',sv5b:'SV-5b',cv7:'CV-7'};
+const PLANE={data:['Event data','var(--d-index)'],management:['Management','var(--d-collect)'],authentication:['Authentication','var(--d-govern)']};
+const PST={ok:['Takes part','ok'],partial:['Limited','partial'],none:['Blocked','not']};
+const vchips=keys=>`<span class="vcs">${keys.map(k=>`<button type="button" class="vc" data-view="${k}">${VIEWID[k]}</button>`).join('')}</span>`;
+const DOMAIN={collect:'var(--d-collect)',index:'var(--d-index)',search:'var(--d-search)',detect:'var(--d-detect)',govern:'var(--d-govern)'};
+function furniture(view,name,viewpoint,ownerKey,footLeft){
+ document.getElementById('cls1').textContent=document.getElementById('cls2').textContent=D.classification;
+ document.getElementById('tb').innerHTML=`<div><span class="tb-k">Architecture view</span><span class="tb-v big" id="sTitle">${esc(view)} · ${esc(name)}</span></div><div><span class="tb-k">Architecture</span><span class="tb-v">${esc(D.title)}</span></div><div><span class="tb-k">Viewpoint</span><span class="tb-v">${esc(viewpoint)}</span></div><div><span class="tb-k">${esc(ownerKey)}</span><span class="tb-v">${D.owner?esc(D.owner):'<span class="notset">Not set</span>'}</span></div><div><span class="tb-k">Build · prepared</span><span class="tb-v">1xx · 14 Oct 2026</span></div>`;
+ document.getElementById('foot').innerHTML=`<span>${esc(D.title)} · ${esc(footLeft)}</span><span>${esc(view)} · 1 of 1 · Build 1xx</span>`}
+function scenarioSwitch(onChange){const box=document.getElementById('scen');box.innerHTML=Object.entries(SCEN).map(([k,v])=>`<button type="button" data-scen="${k}" aria-pressed="${k===scen}">${esc(v)}</button>`).join('');box.querySelectorAll('button').forEach(b=>b.onclick=()=>{scen=b.dataset.scen;D=DATA[scen];box.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));onChange()})}
+function toast(text){let t=document.getElementById('toast');if(!t){t=document.createElement('p');t.id='toast';t.className='toast';t.setAttribute('role','status');t.style.cssText='position:fixed;left:50%;bottom:20px;transform:translateX(-50%);margin:0;z-index:9;box-shadow:0 2px 8px rgba(0,0,0,.2)';document.body.appendChild(t)}t.textContent=text;clearTimeout(t._h);t._h=setTimeout(()=>t.remove(),2200)}
+document.addEventListener('click',e=>{const v=e.target.closest('[data-view]');if(v)toast(`In the Builder this opens the ${VIEWID[v.dataset.view]||v.dataset.view} tab.`)});
 
-// id, name, family, provider component, interface, deployed in the reference topology
-const SVC=[
- ['S1','Universal forwarding','Collection','Universal Forwarder','S2S 9997 · TLS',true],
- ['S2','Heavy forwarding and parsing','Collection','Heavy Forwarder','S2S 9997 · TLS',true],
- ['S3','Syslog reception','Collection','Syslog Server','514 UDP/TCP · 6514 TLS',true],
- ['S4','HTTP Event Collector','Collection','HEC Endpoint on Heavy Forwarder','HTTPS 8088 · TLS',true],
- ['S5','Deployment','Collection','Deployment Server','Phone-home 8089 · TLS',true],
- ['S6','Edge pipelines','Collection','Edge Processor','S2S / HEC · TLS',false],
- ['S7','Indexing','Indexing','Indexer','S2S 9997 · TLS',true],
- ['S8','Index replication','Indexing','Indexer Cluster Manager','Replication 9887 · TLS',false],
- ['S9','Search and REST API','Search','Search Head','HTTPS 8000 · REST 8089',true],
- ['S10','Data model acceleration','Search','Search Head (CIM add-on)','Internal',true],
- ['S11','Search head clustering','Search','Search Head Cluster Deployer','REST 8089 · TLS',false],
- ['S12','Correlation and risk','Detection and response','Splunk Enterprise Security','On the search tier',false],
- ['S13','Cases and playbooks','Detection and response','Splunk SOAR','HTTPS 443 · REST',true],
- ['S14','SAML sign-in','Platform and access','Authentication Provider · Cloud','SAML 2.0 · HTTPS',true],
- ['S15','Licence management','Platform and access','License Manager','REST 8089 · TLS',true],
- ['S16','Platform monitoring','Platform and access','Monitoring Console','REST 8089 · TLS',false]
-];
-const NEEDS={
- 'C1.1':['S3','S1'],'C1.2':['S1'],'C1.3':['S4','S2'],'C1.4':['S6'],
- 'C2.1':['S5'],'C2.2':['S5'],
- 'C3.1':['S7'],'C3.2':['S7'],'C3.3':['S7','S8'],
- 'C4.1':['S9','S14'],'C4.2':['S10'],'C4.3':['S11'],
- 'C5.1':['S12','S10'],'C5.2':['S12'],
- 'C6.1':['S13','S12'],'C6.2':['S13','S9'],
- 'C7.1':['S14'],'C7.2':['S9','S7'],'C7.3':['S9'],
- 'C8.1':['S15'],'C8.2':['S16'],'C8.3':['S15','S9']
-};
-const svc=id=>SVC.find(s=>s[0]===id);
-const missing=c=>NEEDS[c].filter(s=>!svc(s)[5]);
-const usedBy=s=>L2.filter(c=>NEEDS[c[0]].includes(s));
-const ready=L2.filter(c=>!missing(c[0]).length);
-const conflict=L2.filter(c=>c[2]==='ok'&&missing(c[0]).length);
+/* CV-7 · Capability to Services Mapping */
+let pick={c:null,s:null};
+const LAYERS=['Collection','Indexing','Search','Detection and response','Platform and access'];
+const C=()=>D.cv7,svc=id=>C().services.find(s=>s.id===id),cap=id=>C().rows.find(r=>r.id===id);
+const ordered=()=>LAYERS.flatMap(l=>C().services.filter(s=>s.layer===l));
+const fnChip=f=>`<span class="idc ${FST[f.code][1]}" title="${esc(f.id+' '+f.name+' · '+FST[f.code][0]+(f.reason?' · '+f.reason:''))}">${f.id}</span>`;
+const ready=r=>!r.waiting.length;
+function render(){const R=C().rows,S=ordered(),caps=[...new Set(R.map(r=>r.parent))],nd=S.filter(s=>!s.deployed),rd=R.filter(ready).length;
+ furniture('CV-7','Capability to Services Mapping','Capability (DoDAF V2.0)','Capability owner','Capabilities from CV-2 · Activities from CV-6 · Services from SvcV-1 · Functions from SvcV-4');
+ document.getElementById('sum').innerHTML=`<span><b>${R.length}</b>capabilities</span><span><b>${S.length}</b>services</span><span class="ok"><b>${S.length-nd.length}</b>deployed</span><span class="st"><b>${nd.length}</b>not deployed</span><span class="ok"><b>${rd}</b>${rd===1?'capability':'capabilities'} service-ready</span><span class="rv"><b>${R.length-rd}</b>waiting on a service</span>`;
+ document.getElementById('legend').innerHTML=Object.keys(FST).map(k=>`<span><span class="idc ${FST[k][1]}">S0.0</span>${FST[k][0].toLowerCase()}</span>`).join('')+'<span><span class="sw" style="background:repeating-linear-gradient(135deg,transparent 0 4px,var(--rule) 4px 5px)"></span>service not deployed</span><span class="hint">Cells list SvcV-4 functions. Select a capability, a service or a cell. Esc clears.</span>';
+ const mx=document.getElementById('mx');mx.classList.toggle('picking',!!(pick.c||pick.s));
+ const groups=LAYERS.filter(l=>S.some(s=>s.layer===l));
+ mx.innerHTML=`<thead><tr><th rowspan="2">Capability (CV-2)</th>${groups.map(l=>`<th class="grp2" colspan="${S.filter(s=>s.layer===l).length}">${esc(l)}</th>`).join('')}<th class="state" rowspan="2">Services</th></tr><tr>${S.map(s=>`<th class="${s.deployed?'':'nd'}" aria-pressed="${pick.s===s.id}"><button type="button" data-s="${s.id}"><b>${s.id}</b><span>${esc(s.name)}</span></button></th>`).join('')}</tr></thead><tbody>${caps.map(cid=>{const rs=R.filter(r=>r.parent===cid);return`<tr class="grp"><th colspan="${S.length+2}"><span class="sq" style="background:${DOMAIN[rs[0].domain]}"></span>${cid} ${esc(rs[0].parentName)}</th></tr>`+rs.map(r=>`<tr class="${pick.c===r.id?'on':''}"><th class="rowh${pick.c===r.id?' on':''}"><button type="button" data-c="${r.id}"><b><i>${r.id}</i>${esc(r.name)}</b><small>${dot(CST,r.status)} CV-2: ${esc(r.status)}</small></button></th>${S.map(s=>{const f=r.uses[s.id]||[],cls=['c',s.deployed?'':'nd',pick.s===s.id?'sel':'',pick.s===s.id&&pick.c===r.id?'hit':''].join(' ');return f.length?`<td class="${cls}" tabindex="0" data-cc="${r.id}" data-cs="${s.id}"><span class="fns">${f.map(fnChip).join('')}</span></td>`:`<td class="${cls}"></td>`}).join('')}<td class="state">${ready(r)?'<span class="stc ok">Ready</span>':`<span class="stc partial">Waiting on ${r.waiting.join(', ')}</span>`}</td></tr>`).join('')}).join('')}</tbody><tfoot><tr><th>Capabilities using it</th>${S.map(s=>`<td>${s.usedBy.length||'·'}</td>`).join('')}<td></td></tr></tfoot>`;
+ mx.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{pick=pick.s===b.dataset.s&&!pick.c?{c:null,s:null}:{c:null,s:b.dataset.s};render()});
+ mx.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{pick=pick.c===b.dataset.c&&!pick.s?{c:null,s:null}:{c:b.dataset.c,s:null};render()});
+ mx.querySelectorAll('[data-cc]').forEach(t=>{const go=()=>{pick=pick.c===t.dataset.cc&&pick.s===t.dataset.cs?{c:null,s:null}:{c:t.dataset.cc,s:t.dataset.cs};render()};t.onclick=go;t.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}}});
+ document.getElementById('reg').innerHTML=`<thead><tr><th>ID</th><th>Service</th><th>Provided by</th><th>Interface (SvcV-1)</th><th>Used by</th><th>In topology</th></tr></thead><tbody>${S.map(s=>`<tr><td class="n">${s.id}</td><td>${esc(s.name)}</td><td>${esc(s.provider)}</td><td><code>${esc(s.interface)}</code></td><td>${s.usedBy.join(', ')||'<span class="hint">None</span>'}</td><td>${s.deployed?'<span class="stc ok">Deployed</span>':'<span class="stc not">Not deployed</span>'}</td></tr>`).join('')}</tbody>`;
+ detail();findings()}
+const fnLi=f=>`<li><span class="idc ${FST[f.code][1]}">${f.id}</span><span>${esc(f.name)} · ${FST[f.code][0]} <span class="hint">(${f.part})</span>${f.code!=='ok'&&f.reason?`<small>${esc(f.reason)}</small>`:''}</span></li>`;
+function detail(){const R=C().rows,S=ordered(),el=document.getElementById('detail');
+ if(pick.c&&pick.s){const r=cap(pick.c),s=svc(pick.s),f=r.uses[s.id]||[];
+  el.innerHTML=`<div><span class="ov">${r.id} · ${esc(r.name)}</span><h3>${s.id} · ${esc(s.name)}</h3><p>${esc(s.provider)}</p><p>${s.deployed?'<span class="stc ok">Deployed</span>':'<span class="stc not">Not deployed</span>'}</p></div><div><dl><dt>Functions it carries out for ${r.id} (SvcV-4)</dt><dd><ul>${f.map(fnLi).join('')}</ul></dd><dt>See</dt><dd>${vchips(['svcv4','cv6'])}</dd></dl></div>`;return}
+ if(pick.c){const r=cap(pick.c),u=Object.keys(r.uses);
+  el.innerHTML=`<div><span class="ov">Capability · CV-2 · ${r.parent} ${esc(r.parentName)}</span><h3>${r.id} · ${esc(r.name)}</h3><p>${st(CST,r.status)} ${ready(r)?'<span class="stc ok">Ready</span>':`<span class="stc partial">Waiting on ${r.waiting.join(', ')}</span>`}</p><p class="hint" style="margin-top:6px">CV-2: ${esc(r.reason)}</p><p class="hint">Performs ${r.parts.join(', ')} (CV-6).</p></div><div><dl><dt>Services it uses</dt><dd>${u.length?`<ul>${u.map(id=>{const s=svc(id);return`<li><span class="idc ${s.deployed?'ok':'not'}">${s.id}</span><span>${esc(s.name)}${s.deployed?'':' · not deployed'}<small>${r.uses[id].map(f=>`${f.id} ${esc(f.name)} · ${FST[f.code][0]}`).join('<br>')}</small></span></li>`}).join('')}</ul>`:'<span class="hint">None</span>'}</dd><dt>See</dt><dd>${vchips(['cv2','cv6','svcv1'])}</dd></dl></div>`;return}
+ if(pick.s){const s=svc(pick.s),users=R.filter(r=>r.uses[s.id]);
+  el.innerHTML=`<div><span class="ov">Service · SvcV-1 · ${esc(s.layer)}</span><h3>${s.id} · ${esc(s.name)}</h3><p>${esc(s.provider)}</p><p>${s.deployed?'<span class="stc ok">Deployed</span>':'<span class="stc not">Not deployed</span>'}</p><dl><dt>Interface</dt><dd><code>${esc(s.interface)}</code></dd></dl></div><div><dl><dt>Used by</dt><dd>${users.length?`<ul>${users.map(r=>`<li><span class="idc ${CST[r.status][1]}">${r.id}</span><span>${esc(r.name)}<small>${r.uses[s.id].map(f=>`${f.id} ${esc(f.name)} · ${FST[f.code][0]}`).join('<br>')}</small></span></li>`).join('')}</ul>`:'<span class="hint">No capability</span>'}</dd>${!s.deployed&&users.length?`<dt>If not deployed</dt><dd>${plural(users.length,'capability waits','capabilities wait')} on it. Add ${esc(s.provider)} in the Builder.</dd>`:''}<dt>See</dt><dd>${vchips(['svcv1','svcv4'])}</dd></dl></div>`;return}
+ const waiting=R.filter(r=>!ready(r)),nd=S.filter(s=>!s.deployed&&s.usedBy.length);
+ el.innerHTML=`<div><span class="ov">Service readiness</span><h3>${R.length-waiting.length} of ${R.length} capabilities ready</h3><p>Ready means every service the capability uses is deployed. The cell colours show whether those services' functions are realised (SvcV-4).</p><p class="hint">Select a capability, a service or a cell. Esc clears.</p></div><div><dl>${nd.length?`<dt>Services not deployed</dt><dd><ul>${nd.map(s=>`<li><span class="idc not">${s.id}</span><span>${esc(s.name)}<small>${s.usedBy.join(', ')} ${s.usedBy.length===1?'waits':'wait'} on it</small></span></li>`).join('')}</ul></dd>`:''}${!nd.length?'<dt>Gaps</dt><dd>None. Every service a capability uses is deployed.</dd>':''}</dl></div>`}
+function findings(){const R=C().rows,S=ordered(),list=[];
+ const nd=S.filter(s=>!s.deployed&&s.usedBy.length).sort((a,b)=>b.usedBy.length-a.usedBy.length||a.id.localeCompare(b.id,undefined,{numeric:true}));
+ if(nd.length){const g=nd[0];list.push(['stop','Biggest gap',`<b>${g.id} ${esc(g.name)} isn't deployed, and ${plural(g.usedBy.length,'capability waits','capabilities wait')} on it:</b> ${esc(and(g.usedBy))}.`]);
+  const rest=nd.slice(1).sort((a,b)=>a.id.localeCompare(b.id,undefined,{numeric:true}));if(rest.length)list.push(['gap','Waiting',rest.length>4?`<b>${rest.length} more services aren't deployed:</b> ${rest.map(s=>`${s.id} (${s.usedBy.join(', ')})`).join('; ')}.`:rest.map(s=>`<b>${esc(and(s.usedBy))} ${s.usedBy.length===1?'waits':'wait'} on ${s.id} ${esc(s.name)}.</b>`).join(' ')])}
+ const broke=R.filter(r=>ready(r)&&Object.values(r.uses).flat().some(f=>f.code==='none'));if(broke.length){const fns=[...new Set(broke.flatMap(r=>Object.values(r.uses).flat().filter(f=>f.code==='none').map(f=>f.id)))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));list.push(['gap','Deployed, not working',`<b>${esc(and(broke.map(r=>r.id)))} ${broke.length===1?'has':'have'} every service deployed, but a function ${broke.length===1?'it needs':'they need'} isn't realised:</b> ${esc(and(fns))}. Select one for the reason.`])}
+ const shared=[...S].sort((a,b)=>b.usedBy.length-a.usedBy.length)[0];if(shared&&shared.deployed&&shared.usedBy.length>=3)list.push(['ext','Shared',`<b>${shared.id} ${esc(shared.name)} is used by ${shared.usedBy.length} capabilities,</b> more than any other service. Its availability is theirs.`]);
+ const mis=R.filter(r=>r.status==='In topology'&&!ready(r));if(mis.length)list.push(['gap','Check CV-2',`<b>${esc(and(mis.map(r=>r.id)))} ${mis.length===1?'reads':'read'} In topology in CV-2, but ${mis.length===1?'waits':'wait'} on a service that isn't deployed.</b>`]);
+ const none=R.filter(r=>!Object.keys(r.uses).length),idle=S.filter(s=>!s.usedBy.length);list.push(none.length||idle.length?['gap','Check',`${none.length?`<b>${esc(and(none.map(r=>r.id)))} ${none.length===1?'uses':'use'} no service.</b> `:''}${idle.length?`<b>${esc(and(idle.map(s=>s.id)))} ${idle.length===1?'serves':'serve'} no capability.</b>`:''}`]:['ok','Coverage','<b>Every capability uses at least one service, and every service serves a capability.</b>']);
+ document.getElementById('findings').innerHTML=list.map(f=>`<li>${chip(f[0],f[1])}<span>${f[2]}</span></li>`).join('')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(pick.c||pick.s)){pick={c:null,s:null};render()}});
+scenarioSwitch(()=>{pick={c:null,s:null};render()});render();
 
-document.getElementById('summary').innerHTML=`<span><b>${L2.length}</b>capabilities</span><span><b>${SVC.length}</b>services</span><span><b>${SVC.filter(s=>s[5]).length}</b>deployed</span><span class="rv"><b>${SVC.filter(s=>!s[5]).length}</b>not deployed</span><span><b>${ready.length}</b>capabilities service-ready</span><span class="rv"><b>${L2.length-ready.length}</b>waiting on a service</span><span class="rv"><b>${conflict.length}</b>CV-2 status to correct</span>`;
-
-// Matrix with a family header row
-const fams=[...new Set(SVC.map(s=>s[2]))];
-const mx=document.getElementById('mx');
-const offCol=SVC.filter(s=>!s[5]).map(s=>s[0]);
-mx.innerHTML=`<thead><tr class="fam"><th class="rowh" rowspan="2">Capability (CV-2)</th>${fams.map(f=>`<th colspan="${SVC.filter(s=>s[2]===f).length}">${esc(f)}</th>`).join('')}<th class="st" rowspan="2">Services</th></tr>
-<tr class="cols">${SVC.map(s=>`<th class="colh" data-a="${s[0]}" ${s[5]?'':'style="background:color-mix(in srgb,var(--review) 12%,var(--zone))"'}><button type="button" aria-pressed="false"><span class="cid">${s[0]}</span><span class="nm">${esc(s[1])}</span></button></th>`).join('')}</tr></thead>
-<tbody>${L1.map(p=>`<tr class="grp"><th><span class="sw" style="background:var(--d-${p[2]});margin-right:6px"></span>${p[0]} ${esc(p[1])}</th><td colspan="${SVC.length+1}"></td></tr>`+
- L2.filter(c=>c[0].startsWith(p[0]+'.')).map(c=>{const miss=missing(c[0]);return `<tr data-c="${c[0]}"><th class="rowh" tabindex="0"><span class="cid">${c[0]}</span>${esc(c[1])}</th>${SVC.map(s=>{const n=NEEDS[c[0]].includes(s[0]);
-   return `<td class="c ${n?(s[5]?'okc':'gap'):''}" data-a="${s[0]}" ${!s[5]&&!n?'style="background:color-mix(in srgb,var(--review) 5%,transparent)"':''} title="${n?esc(s[1])+(s[5]?' · deployed':' · not deployed'):''}">${n?(s[5]?'●':'○'):''}</td>`}).join('')}
-   <td class="st">${miss.length?`<span class="chip gap">Waiting on ${miss.join(', ')}</span>`:'<span class="chip ok">Ready</span>'}</td></tr>`}).join('')).join('')}</tbody>
-<tfoot><tr><th class="rowh">Capabilities using the service</th>${SVC.map(s=>`<td>${usedBy(s[0]).length}</td>`).join('')}<td></td></tr></tfoot>`;
-
-const detail=document.getElementById('detail');
-function showSvc(id){const s=svc(id),u=usedBy(id);
-  detail.innerHTML=`<div><span class="dom">Service · ${esc(s[2])}</span><h3>${id} · ${esc(s[1])}</h3><p>Provided by <b>${esc(s[3])}</b>. <span class="chip ${s[5]?'ok':'gap'}">${s[5]?'Deployed':'Not in topology'}</span></p></div>
-  <dl><dt>Interface</dt><dd><code>${esc(s[4])}</code></dd><dt>Needed by</dt><dd><ul>${u.map(c=>`<li>${c[0]} ${esc(c[1])}</li>`).join('')}</ul></dd></dl>
-  <dl><dt>If not deployed</dt><dd>${s[5]?'—':u.length+' '+(u.length===1?'capability waits':'capabilities wait')+' on it. Add a '+esc(s[3])+' in the Builder.'}</dd></dl>`}
-function showCap(id){const c=L2.find(x=>x[0]===id),p=parentOf(id),miss=missing(id);
-  detail.innerHTML=`<div><span class="dom" style="color:var(--d-${p[2]})">Capability · part of ${p[0]} ${esc(p[1])}</span><h3>${id} · ${esc(c[1])}</h3><p>CV-2 status <span class="chip ${c[2]}">${ST[c[2]]}</span> · services <span class="chip ${miss.length?'gap':'ok'}">${miss.length?'Waiting on '+miss.join(', '):'Ready'}</span></p></div>
-  <dl><dt>Needs</dt><dd><ul>${NEEDS[id].map(s=>`<li><span class="dot ${svc(s)[5]?'ok':'plan'}"></span> ${s} ${esc(svc(s)[1])} · ${esc(svc(s)[3])}</li>`).join('')}</ul></dd></dl>
-  <dl><dt>To make it ready</dt><dd>${miss.length?'Add '+miss.map(s=>esc(svc(s)[3])).join(' and ')+' to the topology.':'Nothing. Every service is deployed.'}</dd></dl>`}
-let current=null;
-function select(k){current=k;mx.classList.add('focused');
-  mx.querySelectorAll('tbody tr[data-c]').forEach(r=>r.classList.toggle('on',k[0]==='C'?r.dataset.c===k:NEEDS[r.dataset.c].includes(k)));
-  mx.querySelectorAll('[data-a]').forEach(e=>e.classList.toggle('col-on',e.dataset.a===k));
-  mx.querySelectorAll('th.colh').forEach(h=>{h.classList.toggle('sel',h.dataset.a===k);h.querySelector('button').setAttribute('aria-pressed',String(h.dataset.a===k))});
-  document.querySelectorAll('#svc tbody tr').forEach(r=>r.classList.toggle('sel',k[0]==='S'?r.dataset.s===k:NEEDS[k].includes(r.dataset.s)));
-  k[0]==='C'?showCap(k):showSvc(k)}
-function clear(){current=null;mx.classList.remove('focused');document.querySelectorAll('.on,.col-on,.sel').forEach(e=>e.classList.remove('on','col-on','sel'));showSvc('S12')}
-mx.querySelectorAll('th.colh button').forEach(b=>b.addEventListener('click',()=>{const a=b.parentElement.dataset.a;current===a?clear():select(a)}));
-mx.querySelectorAll('tbody tr[data-c] th.rowh').forEach(h=>{const c=h.parentElement.dataset.c;h.addEventListener('click',()=>current===c?clear():select(c));h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();current===c?clear():select(c)}})});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)clear()});
-
-document.querySelector('#svc tbody').innerHTML=SVC.map(s=>`<tr data-s="${s[0]}"><td class="id">${s[0]}</td><td>${esc(s[1])}</td><td>${esc(s[3])}</td><td class="mono">${esc(s[4])}</td><td class="mono">${usedBy(s[0]).map(c=>c[0]).join(', ')}</td><td><span class="chip ${s[5]?'ok':'gap'}">${s[5]?'Deployed':'Not deployed'}</span></td></tr>`).join('');
-document.querySelectorAll('#svc tbody tr').forEach(r=>r.addEventListener('click',()=>current===r.dataset.s?clear():select(r.dataset.s)));
-
-const blockers=SVC.filter(s=>!s[5]).map(s=>[s,usedBy(s[0])]).sort((a,b)=>b[1].length-a[1].length);
-document.getElementById('findings').innerHTML=[
- ['stop','Biggest gap',`<b>S12 Correlation and risk</b> (Enterprise Security) is not deployed, and ${blockers[0][1].length} capabilities wait on it: ${blockers[0][1].map(c=>c[0]).join(', ')}. Adding it unblocks most of goal G2.`],
- ...conflict.map(c=>['gap','Correct CV-2',`<b>${c[0]} ${esc(c[1])}</b> is marked "In topology" in CV-2, but it needs ${missing(c[0]).map(s=>s+' '+esc(svc(s)[1])).join(', ')}, which is not deployed. SOAR is there, but no findings reach it without ES. Mark it Partial.`]),
- ['part','Planned',`<b>S6, S8, S11 and S16</b> match the CV-1 roadmap: Edge Processor and replication in Increment 3, search head clustering in Increment 3, the Monitoring Console in Increment 2.`],
- ['ok','Shared',`<b>S9 Search and REST API</b> is used by ${usedBy('S9').length} capabilities and <b>S7 Indexing</b> by ${usedBy('S7').length}. They are the most shared services; their availability targets come from G4.`]
-].map(f=>`<li><span class="chip ${f[0]}">${f[1]}</span><span>${f[2]}</span></li>`).join('');
-clear();
 </script>
-
 </body>
 </html>
