@@ -74,7 +74,7 @@ A fixed table. Show a row only for views whose section exists in `builderOvSecti
 | `sv1` | SV-1 | Systems | Systems Interface Description | Which systems connect, and how? | Generated |
 | `sv2` | SV-2 | Systems | Systems Resource Flow Description | How does each interface cross the network? | Generated |
 | `sv6` | SV-6 | Systems | Systems Resource Flow Matrix | What are the attributes of each system exchange? | Generated |
-| `stdv1` | StdV-1 | Standards | Standards Profile | Which standards apply, and are they met? | Generated |
+| `stdv1` | StdV-1 | Standards | Standards Profile | Which standards apply, and are they met? | Mixed |
 | `tm1` | TM-1 | Security (not DoDAF) | Threat Model | Which threats apply to the telemetry paths? | Mixed |
 
 What the content values mean:
