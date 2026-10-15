@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Azure Storage Dataset</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: the Builder as it looks today (dark, dotted canvas): palette, canvas and inspector columns, the write and
+   search guide above the canvas, a live Validate panel, then reference tables. One dark look on purpose: it mirrors
+   the Builder it mocks up. Cards use the Builder's size (190 × 224 at 100%). */
+:root{
+  color-scheme:dark;
+  --page:#07111a; --panel:#0c1822; --canvas:#08131c; --dot:#1b2d3c; --card:#0f1d29; --card-2:#132433; --rule:#20364a;
+  --ink:#e6eff5; --ink-2:#aab9c8; --muted:#8498aa;
+  --data:#57c7e8; --mgmt:#2dd4bf; --auth:#d28df5;
+  --az:#4cb1f7; --az-ink:#d6ecfd; --az-tint:rgba(76,177,247,.13); --az-line:rgba(76,177,247,.45);
+  --con:#9cc8ee; --con-tint:rgba(156,200,238,.1); --con-line:rgba(156,200,238,.4);
+  --cloud:#d28df5; --cloud-tint:rgba(210,141,245,.12); --cloud-line:rgba(210,141,245,.42);
+  --ok:#66e0a3; --warn:#f3bd61; --bad:#f28b7d; --focus:#57c7e8;
+  --font:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.45 var(--font)}
+.page{max-width:1600px;margin:0 auto;padding-inline:16px;padding-block:18px 32px;display:grid;gap:16px}
+.page>*{min-width:0}
+.tag{justify-self:start;font:600 .66rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--az);border:1px solid var(--az-line);border-radius:999px;padding:5px 9px}
+h1{margin:0;font:700 1.4rem/1.2 var(--font);text-wrap:balance}
+h2{margin:0;font:700 1rem/1.25 var(--font);text-wrap:balance}
+.lede{margin:0;color:var(--ink-2);max-width:96ch}
+.lede b{color:var(--ink)}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+[hidden]{display:none!important}
+
+/* Scene switcher */
+.scenes{display:flex;flex-wrap:wrap;gap:6px}
+.scenes button{background:var(--panel);border:1px solid var(--rule);border-radius:999px;padding:7px 12px;font-size:.8rem;color:var(--ink-2);cursor:pointer}
+.scenes button[aria-selected="true"]{background:var(--az-tint);border-color:var(--az);color:var(--ink);font-weight:600}
+
+.work{display:grid;grid-template-columns:230px minmax(0,1fr) 350px;gap:12px;align-items:start}
+@media (max-width:1500px){.work{grid-template-columns:minmax(0,1fr) 350px}.palette{grid-column:1/-1}}
+@media (max-width:940px){.work{grid-template-columns:minmax(0,1fr)}}
+.work>*{min-width:0}
+
+/* Palette */
+.palette{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:10px;display:grid;gap:10px;align-content:start}
+.find{background:var(--card);border:1px solid var(--rule);border-radius:7px;padding:7px 9px;color:var(--ink-2);font-size:.8rem}
+.find span{color:var(--muted)}
+.pgroup{display:grid;gap:6px}
+.pgroup h3{margin:0;font:700 .64rem/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--az)}
+.pitem{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--az);border-radius:7px;padding:6px 8px}
+.pitem.c{border-left-color:var(--con)}
+.pitem .ic{font:700 .58rem/1 var(--mono);color:var(--az);border:1px solid var(--az-line);border-radius:4px;padding:3px 4px;min-width:34px;text-align:center}
+.pitem.c .ic{color:var(--con);border-color:var(--con-line)}
+.pitem b{display:block;font:600 .8rem/1.25 var(--font)}
+.pitem small{display:block;font-size:.7rem;color:var(--muted);line-height:1.3}
+.pill{font:700 .56rem/1 var(--mono);letter-spacing:.06em;color:var(--page);background:var(--az);border-radius:3px;padding:3px 4px}
+.pnote{margin:0;font-size:.74rem;color:var(--muted)}
+.others{display:grid;gap:3px;border-top:1px solid var(--rule);padding-top:8px}
+.others div{display:flex;justify-content:space-between;gap:8px;font-size:.76rem;color:var(--ink-2)}
+.others span:last-child{font-family:var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.others .new{color:var(--ink)}
+.others .new span:first-child::after{content:" · new";color:var(--az)}
+
+/* Guide (as the Builder's S3 guide above the canvas) */
+.guide{border:1px dashed rgba(243,189,97,.55);border-radius:9px;background:rgba(243,189,97,.05);padding:8px 12px;display:grid;gap:6px;margin-bottom:8px;font-size:.78rem}
+.guide summary{cursor:pointer;font-weight:700;color:var(--ink)}
+.guide .step{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.guide .step b{font:700 .62rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--warn);min-width:48px}
+.guide button{background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:3px 7px;font-size:.74rem;cursor:pointer}
+.guide .arr{color:var(--muted)}
+.guide .loc{font:500 .72rem var(--mono);color:var(--az-ink);overflow-wrap:anywhere}
+.guide .none{color:var(--muted)}
+.guide p{margin:0;color:var(--muted)}
+
+/* Canvas */
+.canvasWrap{border:1px solid var(--rule);border-radius:10px;background:var(--canvas) radial-gradient(var(--dot) 1px,transparent 1px) 0 0/22px 22px;overflow-x:auto}
+.world{position:relative;width:950px;height:540px}
+svg.wires{position:absolute;inset:0;width:950px;height:540px;overflow:visible}
+.wire{fill:none;stroke-width:2;stroke:var(--data)}
+.wire.sel{stroke-width:3.5;stroke:#9be3f7}
+.wl{cursor:pointer}
+.wl rect{fill:var(--canvas);stroke:var(--ink-2);stroke-width:1}
+.wl.az rect{stroke:var(--az)}
+.wl text{font:600 10px var(--mono);fill:var(--ink)}
+.wl.sel rect{fill:#10304a;stroke:#9be3f7}
+.node{position:absolute;width:190px;height:224px;border-radius:11px;padding:10px;display:flex;flex-direction:column;gap:6px;cursor:pointer;text-align:left;overflow:hidden;color:var(--ink)}
+.node.cust{background:linear-gradient(155deg,var(--card-2),var(--card));border:1px solid #2f4b61}
+.node.cloud{background:linear-gradient(180deg,var(--cloud-tint),var(--card) 50%);border:1.5px solid var(--cloud-line)}
+.node.az{background:linear-gradient(180deg,var(--az-tint),var(--card) 48%);border:1.5px solid var(--az)}
+.node.con{background:linear-gradient(180deg,var(--con-tint),var(--card) 48%);border:1.5px dashed var(--con-line)}
+.node .tier{font:600 .64rem/1.2 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.node.az .tier{color:var(--az-ink)}
+.node.cloud .tier{color:#ecd2fb}
+.node .title{font:700 .92rem/1.22 var(--font);overflow-wrap:anywhere}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font:500 .66rem/1 var(--font);color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:3px 7px;white-space:nowrap}
+.stage{font-size:.68rem;color:var(--ink-2);border:1px solid var(--rule);border-radius:6px;padding:4px 6px}
+.badges{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.badge{font:800 .58rem/1 var(--mono);letter-spacing:.08em;color:var(--page);background:var(--az);border-radius:4px;padding:4px 6px}
+.badge.m{background:var(--cloud)}
+.badge.c{background:var(--con)}
+.badge.rv{background:var(--warn)}
+.badge.bad{background:var(--bad)}
+.mono{font:500 .68rem/1.3 var(--mono);color:var(--az-ink);overflow-wrap:anywhere}
+.mono.rv{color:var(--warn)}
+.facts{display:grid;gap:2px;font-size:.66rem;line-height:1.35;color:var(--ink-2)}
+.facts .rv{color:var(--warn)}
+.facts .bad{color:var(--bad)}
+.node .foot{margin-top:auto;border-top:1px solid var(--rule);padding-top:6px;font-size:.64rem;color:var(--muted)}
+.node.az .foot{border-top-color:var(--az-line)}
+.node.sel{box-shadow:0 0 0 3px rgba(76,177,247,.5)}
+.node.cloud.sel{box-shadow:0 0 0 3px rgba(210,141,245,.45)}
+.node.cust.sel{box-shadow:0 0 0 3px rgba(87,199,232,.4)}
+.node.con.sel{box-shadow:0 0 0 3px rgba(156,200,238,.45)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;padding:8px 12px;border-top:1px solid var(--rule);font-size:.74rem;color:var(--ink-2);background:var(--panel)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:22px;height:12px;border-radius:3px;display:inline-block}
+.sw.az{border:1.5px solid var(--az);background:var(--az-tint)}
+.sw.con{border:1.5px dashed var(--con-line);background:var(--con-tint)}
+.sw.cl{border:1.5px solid var(--cloud-line);background:var(--cloud-tint)}
+.ln{width:22px;height:0;border-top:2px solid var(--data);display:inline-block}
+
+/* Inspector */
+.inspector{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px;display:grid;gap:10px;align-content:start}
+.inspector .eyebrow{font:700 .62rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.inspector h3{margin:0;font:700 1.05rem/1.25 var(--font);text-wrap:balance;overflow-wrap:anywhere}
+.inspector .sub{margin:0;font-size:.78rem;color:var(--data)}
+.box{border:1px solid var(--rule);border-radius:9px;padding:10px;display:grid;gap:8px;background:var(--card)}
+.box.azbox{border-color:var(--az-line);background:linear-gradient(180deg,var(--az-tint),var(--card) 40%)}
+.box.conbox{border-color:var(--con-line);background:linear-gradient(180deg,var(--con-tint),var(--card) 40%)}
+.box h4{margin:0;font:700 .8rem/1.25 var(--font)}
+.field{display:grid;gap:3px;font-size:.72rem;color:var(--ink-2);min-width:0}
+.field input,.field select{width:100%;min-width:0;background:var(--page);border:1px solid var(--rule);border-radius:6px;padding:6px 8px;font-size:.8rem}
+.field input.badv{border-color:var(--warn)}
+.field .hint{font-size:.7rem;color:var(--muted)}
+.field .hint.rv{color:var(--warn)}
+.ro{font:500 .74rem/1.35 var(--mono);color:var(--az-ink);background:var(--page);border:1px dashed var(--rule);border-radius:6px;padding:6px 8px;overflow-wrap:anywhere}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:420px){.two{grid-template-columns:1fr}}
+.checks{display:grid;gap:5px;font-size:.78rem;color:var(--ink)}
+.checks label{display:inline-flex;align-items:center;gap:6px}
+.note{margin:0;font-size:.72rem;color:var(--muted);line-height:1.45}
+.note.guide2{border-left:2px solid var(--az-line);padding-left:8px}
+.btnrow{display:flex;flex-wrap:wrap;gap:6px}
+.btnrow button,.linkbtn{background:var(--card-2);border:1px solid var(--rule);border-radius:6px;padding:5px 8px;font-size:.74rem;cursor:pointer}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;font-size:.76rem}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;overflow-wrap:anywhere}
+.kv dd.m{font-family:var(--mono);font-size:.72rem;color:var(--az-ink)}
+
+/* Validate panel */
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px;display:grid;gap:10px}
+.panel>p{margin:0;color:var(--ink-2);font-size:.86rem;max-width:100ch}
+.msgs{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.msgs li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:start;font-size:.82rem;background:var(--card);border:1px solid var(--rule);border-radius:7px;padding:7px 9px}
+.st{display:inline-block;font:700 .6rem/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-radius:3px;padding:4px 6px;white-space:nowrap}
+.st.pass{color:var(--page);background:var(--ok)}
+.st.advisory,.st.warn{color:var(--page);background:var(--warn)}
+.st.fail,.st.err{color:var(--page);background:var(--bad)}
+.st.na{color:var(--muted);border:1px solid var(--rule)}
+.clean{font-size:.82rem;color:var(--ok)}
+
+/* Tables */
+.tw{overflow-x:auto;border:1px solid var(--rule);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:.8rem}
+th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--rule)}
+thead th{font:700 .62rem/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--card)}
+tbody tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600}
+code{font:500 .78em var(--mono);color:var(--az-ink)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:860px){.cols{grid-template-columns:1fr}}
+.cols>*{min-width:0}
+.cols ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:.84rem;color:var(--ink-2)}
+.cols b{color:var(--ink)}
+.pfoot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;border-top:1px solid var(--rule);padding-top:10px;font-size:.74rem;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.node{transition:box-shadow .15s}}
+</style>
+</head>
+<body>
+<div class="page">
+  <span class="tag">Mockup · Build 194 target · example topology</span>
+  <h1>Ingest Processor → Azure Blob Storage</h1>
+  <p class="lede">Ingest Processor can write routed events to an <b>Azure Blob Storage</b> or <b>Azure Data Lake Storage</b> container. In Splunk Cloud you create a <b>Microsoft Azure connection</b> (a Microsoft Entra app registration) and a <b>dataset</b> for the container in the Data Management app, then use the dataset as a pipeline destination. The dataset can also be searchable by federated search. The Builder models the same parts: an <b>Azure Storage Dataset</b>, a <b>Microsoft Azure Connection</b>, and the data link from Ingest Processor or Edge Processor. Pick a scene, then select a card or the link label.</p>
+
+  <div class="scenes" role="tablist" aria-label="Scene" id="scenes"></div>
+
+  <div class="work">
+    <aside class="palette" aria-label="Palette">
+      <div class="find">⌕ <span>azure blob</span></div>
+      <div class="pgroup">
+        <h3>Azure storage</h3>
+        <div class="pitem"><span class="ic">BLOB</span><span><b>Azure Storage Dataset</b><small>Blob or Data Lake container · pipeline destination</small></span><span class="pill">NEW</span></div>
+        <div class="pitem c"><span class="ic">CON</span><span><b>Microsoft Azure Connection</b><small>Entra app registration · Data Management</small></span><span class="pill">NEW</span></div>
+        <p class="pnote">Select an Ingest Processor or Edge Processor first: the dataset is added after it with a data link. A connection has no data handle; pick it in the dataset's inspector.</p>
+      </div>
+      <div class="others" aria-label="Palette groups">
+        <div><span>Sources</span><span>7</span></div>
+        <div><span>Collection</span><span>8</span></div>
+        <div><span>Network</span><span>1</span></div>
+        <div><span>Processing</span><span>2</span></div>
+        <div><span>☁ Splunk Cloud · managed by Splunk</span><span>5</span></div>
+        <div><span>Destinations</span><span>2</span></div>
+        <div><span>Access &amp; management</span><span>6</span></div>
+        <div><span>S3 federated search</span><span>4</span></div>
+        <div class="new"><span>Azure storage</span><span>2</span></div>
+        <div><span>Splunk Stream · configuration</span><span>2</span></div>
+        <div><span>Splunk SOAR · response</span><span>2</span></div>
+      </div>
+    </aside>
+
+    <section aria-label="Canvas">
+      <details class="guide" open id="guide"></details>
+      <div class="canvasWrap">
+        <div class="world" id="world">
+          <svg class="wires" id="wires" viewBox="0 0 950 540" aria-hidden="true"></svg>
+        </div>
+      </div>
+      <div class="legend">
+        <span><i class="ln"></i>Event data</span>
+        <span><i class="sw az"></i>Azure Storage Dataset</span>
+        <span><i class="sw con"></i>Microsoft Azure Connection (no data handle)</span>
+        <span><i class="sw cl"></i>Managed by Splunk</span>
+      </div>
+    </section>
+
+    <aside class="inspector" id="insp" aria-live="polite" aria-label="Inspector"></aside>
+  </div>
+
+  <section class="panel" aria-labelledby="valT">
+    <h2 id="valT">Validate</h2>
+    <p>The Builder's Validate list for this scene, and AR-006, which now covers every object-storage destination. Both follow the inspector.</p>
+    <ul class="msgs" id="msgs"></ul>
+    <div class="tw"><table>
+      <thead><tr><th>ID</th><th>Rule</th><th>Severity</th><th>Result</th><th>Finding</th></tr></thead>
+      <tbody id="rules"></tbody>
+    </table></div>
+  </section>
+
+  <section class="panel" aria-labelledby="linkT">
+    <h2 id="linkT">Links</h2>
+    <p>Only a processor writes to a dataset. The connection and the search tier belong to the authentication and search paths, so they have no data handle.</p>
+    <div class="tw"><table>
+      <thead><tr><th>From</th><th>To</th><th>Result</th><th>Protocol and port</th><th>Message when refused</th></tr></thead>
+      <tbody>
+        <tr><td>Ingest Processor</td><td>Azure Storage Dataset</td><td><span class="st pass">Allowed</span></td><td>HTTPS 443 to <code>&lt;account&gt;.blob.core.windows.net</code> (Data Lake: <code>.dfs.</code>), TLS Required, Microsoft Entra app</td><td>—</td></tr>
+        <tr><td>Edge Processor</td><td>Azure Storage Dataset</td><td><span class="st pass">Allowed</span></td><td>The same, from the customer network</td><td>—</td></tr>
+        <tr><td>Any other component</td><td>Azure Storage Dataset</td><td><span class="st fail">Refused</span></td><td>—</td><td>Only an Ingest Processor or Edge Processor can write to an Azure Storage Dataset.</td></tr>
+        <tr><td>Azure Storage Dataset</td><td>Anything</td><td><span class="st fail">Refused</span></td><td>—</td><td>An Azure Storage Dataset is a destination. It doesn't send events.</td></tr>
+        <tr><td>Anything</td><td>Microsoft Azure Connection, or the other way</td><td><span class="st fail">Refused</span></td><td>—</td><td>Connections, catalogs and Cloud Search belong to the authentication and search paths. They don't carry events.</td></tr>
+        <tr><td>Ingest Processor</td><td>Azure dataset set to <em>Federated search only</em></td><td><span class="st na">Not offered</span></td><td>—</td><td>Azure datasets are routing destinations, so there is no search-only use.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="cols">
+      <ul>
+        <li><b>Versions.</b> Ingest Processor writes to Azure need Splunk Cloud Platform 10.5.2605 or higher (general availability, 29 June 2026), in any region, without Federated Search. The controlled-availability release needed 10.4.2604 or higher and Federated Search.</li>
+        <li><b>The secret stays in Splunk Cloud.</b> The connection records the directory (tenant) ID and application (client) ID only. Creating it needs the <code>edit_datasets</code> and <code>admin_all_objects</code> capabilities.</li>
+      </ul>
+      <ul>
+        <li><b>Reaching the account.</b> Ingest Processor runs in Splunk Cloud, so it reaches the storage account's public endpoint. With "Selected networks", the storage firewall must allow Splunk Cloud. "Private endpoint only" needs private connectivity confirmed with Splunk.</li>
+        <li><b>Amazon S3 datasets, fixed at the same time:</b> their links read port 8089 because the protocol text mentions "Data Management". Object writes use HTTPS 443.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="viewsT">
+    <h2 id="viewsT">What the views show</h2>
+    <p>The dataset is a system in its own right, owned by the cloud storage team, like the Amazon S3 Dataset. The connection is part of the authentication path, so views about events don't show it.</p>
+    <div class="tw"><table>
+      <thead><tr><th>View</th><th>With an Azure Storage Dataset</th></tr></thead>
+      <tbody>
+        <tr><td>Canvas</td><td>A data link from the processor. The connection and Cloud Search sit apart. A guide above the canvas, next to the S3 one, lists the write and search paths. Group by tier puts the dataset in Indexing with the S3 datasets, and the connection in management.</td></tr>
+        <tr><td>SV-1, SV-2, SV-3, SV-6</td><td>A system "Azure Storage Dataset 1" (Cloud storage team, Location from its Region, for example "Azure australiaeast"), and an interface "Ingest Processor → Azure Storage Dataset 1": HTTPS 443, TLS Required, Declared. In SV-2 it crosses from Splunk Cloud to the Azure segment, so a firewall rule asks the storage account to allow Splunk Cloud on 443. Connections and catalogs, Azure or S3, aren't systems, so they no longer show as "no interface".</td></tr>
+        <tr><td>OV-2, OV-3</td><td>The dataset joins the Indexing service node, as S3 datasets do, and the connection joins Platform management. The flow reads "HTTPS (Azure Blob Storage REST) 443 · TLS".</td></tr>
+        <tr><td>Threat model</td><td>A component in "Customer storage account". The processor → dataset flow crosses from Splunk Cloud (provider managed), with the threats an S3 dataset gets.</td></tr>
+        <tr><td>AV-2</td><td>Two terms: Azure Storage Dataset and Microsoft Azure Connection, from the catalogue entries.</td></tr>
+        <tr><td>Inventory and pack</td><td>A row for each. The connection lists its tenant ID, application ID, role and network access, never a secret.</td></tr>
+        <tr><td>Failure Lab</td><td>The dataset's stages are the fault points: storage account and container, dataset definition, routing and search scope.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <div class="pfoot"><span>Splunk Pipeline Explorer · Builder · mockup for the Azure storage handoff</span><span>Reference: Build 193 · 15 Oct 2026</span></div>
+</div>
+
+<script>
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const ACCOUNT=/^[a-z0-9]{3,24}$/;
+const CONTAINER=/^(?=.{3,63}$)[a-z0-9](?:[a-z0-9]|-(?!-))*[a-z0-9]$/;
+const ROLES=['Not recorded','Storage Blob Data Contributor','Storage Blob Data Owner','Other'];
+const NETWORKS=['Not recorded','All networks','Selected networks, Splunk Cloud allowed','Private endpoint only'];
+const NETSHORT={'Not recorded':'Network access not recorded','All networks':'All networks','Selected networks, Splunk Cloud allowed':'Selected networks','Private endpoint only':'Private endpoint only'};
+const USES=['Routing only','Routing and federated search'];
+const KINDS=['Azure Blob Storage','Azure Data Lake Storage'];
+
+const base=()=>({
+  dataset:{name:'Azure Storage Dataset 1',kind:'Azure Blob Storage',account:'secarchive01',container:'splunk-archive',path:'ingest/',region:'Azure australiaeast',use:'Routing only',connection:true},
+  connection:{name:'Microsoft Azure Connection 1',tenant:'7c1e4b9a-52f0-4d3e-9b1a-0f6d2c8ea2d4',client:'3f9a6c21-8e47-4b0d-a5c2-91d7e6b04f18',role:'Storage Blob Data Contributor',network:'Selected networks, Splunk Cloud allowed',ingest:true,edge:true,search:false,cloudSearch:false},
+  cloudSearch:false
+});
+const SCENES=[
+  {id:'route',label:'Routing only',make:base},
+  {id:'search',label:'Routing and federated search',make:()=>{const s=base();s.dataset.use='Routing and federated search';s.connection.search=true;s.connection.cloudSearch=true;s.cloudSearch=true;return s}},
+  {id:'attention',label:'Needs attention',make:()=>{const s=base();Object.assign(s.dataset,{kind:'Azure Data Lake Storage',account:'SecArchive',container:'',path:'ingest/'});Object.assign(s.connection,{ingest:false,role:'Not recorded',network:'Private endpoint only'});return s}}
+];
+let scene=SCENES[0],S=scene.make(),sel='dataset';
+
+const host=d=>d.account?`${d.account}.${d.kind==='Azure Data Lake Storage'?'dfs':'blob'}.core.windows.net`:'';
+const locOf=d=>d.account&&d.container?`https://${host(d)}/${d.container}/${d.path||''}`:'';
+
+function messages(){
+  const d=S.dataset,c=S.connection,out=[];
+  if(!d.connection)out.push(['warn',`${d.name} needs a Microsoft Azure connection.`]);
+  if(d.connection&&!c.ingest)out.push(['err',`${d.name}: its connection doesn't allow writes from Ingest Processor.`]);
+  if(!d.account||!d.container)out.push(['warn',`${d.name} needs a storage account and a container.`]);
+  if(d.account&&!ACCOUNT.test(d.account))out.push(['warn',`${d.name}: the storage account name must be 3 to 24 lowercase letters and digits.`]);
+  if(d.container&&!CONTAINER.test(d.container))out.push(['warn',`${d.name}: the container name must be 3 to 63 lowercase letters, digits and single hyphens, starting and ending with a letter or digit.`]);
+  if(d.use==='Routing and federated search'&&d.connection&&!c.search)out.push(['warn',`${d.name} is searchable, but its connection doesn't allow federated search.`]);
+  if(d.use==='Routing and federated search'&&d.connection&&c.search&&!c.cloudSearch)out.push(['warn',`${d.name} is searchable, but its connection has no Splunk Cloud Search tier.`]);
+  if(d.connection){
+    if(!GUID.test(c.tenant)||!GUID.test(c.client))out.push(['warn',`${c.name} needs a directory (tenant) ID and an application (client) ID.`]);
+    if(c.network==='Private endpoint only')out.push(['warn',`${c.name} is private endpoint only. Ingest Processor runs in Splunk Cloud and reaches the storage account over its public endpoint: allow Splunk Cloud in the storage firewall, or confirm private connectivity with Splunk.`]);
+    if(c.role==='Not recorded')out.push(['warn',`${c.name} has no Azure role recorded. The app registration needs write access to the container, for example Storage Blob Data Contributor.`]);
+  }
+  return out;
+}
+
+function nodes(){
+  const d=S.dataset,c=S.connection,loc=locOf(d),bad=!ACCOUNT.test(d.account||'')||!CONTAINER.test(d.container||'');
+  const list=[
+    {id:'uf',x:10,y:158,cls:'cust',html:`<span class="tier">Forwarding tier</span><span class="title">Universal Forwarder 1</span><span class="chips"><span class="chip">Env · Production</span><span class="chip">Sydney</span></span><span class="stage">Source acquisition</span><span class="stage">tcpout_queue</span>`},
+    {id:'ip',x:262,y:158,cls:'cloud',html:`<span class="tier">☁ Splunk Cloud · processing</span><span class="title">Ingest Processor</span><span class="badges"><span class="badge m">MANAGED</span></span><span class="mono">acme-prod</span><span class="facts"><span>AWS ap-southeast-2 · SPL2 pipelines</span><span>1 sender → Indexer 1, ${esc(d.name)}</span></span><span class="foot">Run and upgraded by Splunk</span>`},
+    {id:'idx',x:540,y:14,cls:'cust',html:`<span class="tier">Splunk indexing tier</span><span class="title">Indexer 1</span><span class="chips"><span class="chip">Env · Production</span><span class="chip">Sydney</span></span><span class="stage">tcpin_queue</span><span class="stage">indexQueue</span>`},
+    {id:'dataset',x:540,y:300,cls:'az',html:`<span class="tier">${d.kind==='Azure Data Lake Storage'?'Azure Data Lake':'Azure Blob'} · container</span><span class="title">${esc(d.name)}</span><span class="badges"><span class="badge">${d.use==='Routing only'?'ROUTING':'ROUTING + SEARCH'}</span>${!d.connection||!c.ingest?'<span class="badge bad">NO WRITE ACCESS</span>':''}</span><span class="mono ${bad?'rv':''}">${esc(d.account||'account not set')} / ${esc(d.container||'container not set')}</span><span class="facts"><span>${esc(d.path?'Path '+d.path:'No path prefix')}</span><span>${esc(d.region||'Region not set')}</span>${d.connection?'':'<span class="rv">No connection</span>'}</span><span class="foot">Cloud storage team</span>`},
+    {id:'connection',x:752,y:300,cls:'con',html:`<span class="tier">Data Management</span><span class="title">${esc(c.name)}</span><span class="badges"><span class="badge c">ENTRA APP</span></span><span class="mono">tenant ${esc(c.tenant?c.tenant.slice(0,8)+'…':'not set')}</span><span class="facts"><span class="${c.role==='Not recorded'?'rv':''}">${esc(c.role==='Not recorded'?'Role not recorded':c.role)}</span><span class="${c.network==='Private endpoint only'||c.network==='Not recorded'?'rv':''}">${esc(NETSHORT[c.network])}</span><span>Ingest ${c.ingest?'✓':'✕'} · Edge ${c.edge?'✓':'✕'} · Search ${c.search?'✓':'–'}</span></span><span class="foot">1 dataset</span>`}
+  ];
+  if(S.cloudSearch)list.push({id:'cloudSearch',x:752,y:14,cls:'cloud',html:`<span class="tier">☁ Splunk Cloud · search</span><span class="title">Splunk Cloud Search</span><span class="badges"><span class="badge m">MANAGED</span></span><span class="mono">acme-prod</span><span class="facts"><span>Federated · 1 Azure connection</span></span><span class="foot">Run and upgraded by Splunk</span>`});
+  return list;
+}
+
+function wires(){
+  const w=[
+    {id:'uf-ip',d:'M200 270 L262 270',label:'S2S',lx:231,ly:270},
+    {id:'ip-idx',d:'M452 236 C496 236 496 126 540 126',label:'Index',lx:496,ly:181},
+    {id:'ip-ds',d:'M452 316 C496 316 496 412 540 412',label:'HTTPS 443',lx:496,ly:364,az:true}
+  ];
+  return w;
+}
+
+function render(){
+  document.getElementById('scenes').innerHTML=SCENES.map(s=>`<button type="button" role="tab" aria-selected="${s===scene}" data-scene="${s.id}">${esc(s.label)}</button>`).join('');
+  document.querySelectorAll('[data-scene]').forEach(b=>b.onclick=()=>{scene=SCENES.find(s=>s.id===b.dataset.scene);S=scene.make();sel='dataset';render()});
+  const world=document.getElementById('world');world.querySelectorAll('.node').forEach(n=>n.remove());
+  for(const n of nodes()){const b=document.createElement('button');b.type='button';b.className=`node ${n.cls}${sel===n.id?' sel':''}`;b.style.left=n.x+'px';b.style.top=n.y+'px';b.innerHTML=n.html;b.onclick=()=>{sel=n.id;render()};world.appendChild(b)}
+  document.getElementById('wires').innerHTML=wires().map(w=>{const s=sel===w.id;const width=w.label.length*6.6+12;return`<path class="wire${s?' sel':''}" d="${w.d}"/><g class="wl${w.az?' az':''}${s?' sel':''}" data-wire="${w.id}"><rect x="${w.lx-width/2}" y="${w.ly-9}" width="${width}" height="18" rx="4"/><text x="${w.lx}" y="${w.ly+3.5}" text-anchor="middle">${esc(w.label)}</text></g>`}).join('');
+  document.getElementById('wires').style.pointerEvents='none';
+  document.querySelectorAll('[data-wire]').forEach(g=>{g.style.pointerEvents='auto';g.onclick=()=>{sel=g.dataset.wire;render()}});
+  renderGuide();renderInspector();renderValidate();
+}
+
+function renderGuide(){
+  const d=S.dataset,c=S.connection,searchable=d.use==='Routing and federated search';
+  const btn=(id,label)=>`<button type="button" data-focus="${id}">${esc(label)}</button>`;
+  document.getElementById('guide').innerHTML=`<summary>Azure storage · 1 dataset · write and query paths</summary>
+  <div class="step"><b>Write</b>${btn('ip','Ingest Processor')}<span class="arr">→</span>${btn('dataset',d.name)}<span class="loc">${esc(locOf(d)||'Storage account and container not set')}</span></div>
+  <div class="step"><b>Search</b>${searchable?`${S.cloudSearch&&c.cloudSearch?btn('cloudSearch','Splunk Cloud Search'):'<span class="none">Cloud Search unassigned</span>'}<span class="arr">→</span>${d.connection?btn('connection',c.name):'<span class="none">Connection unassigned</span>'}<span class="arr">→</span>${btn('dataset',d.name)}`:'<span class="none">Not searchable: the dataset is routing only.</span>'}</div>
+  <p>Ingest Processor writes through the connection's app registration. ${searchable?'Splunk Cloud searches the container through the same connection, without indexing it.':'Set the dataset to "Routing and federated search" to search it from Splunk Cloud.'}</p>`;
+  document.querySelectorAll('[data-focus]').forEach(b=>b.onclick=()=>{sel=b.dataset.focus;render()});
+}
+
+const opt=(list,v)=>list.map(x=>`<option ${x===v?'selected':''}>${esc(x)}</option>`).join('');
+function renderInspector(){
+  const d=S.dataset,c=S.connection,el=document.getElementById('insp');let h='';
+  if(sel==='dataset'){
+    const accBad=d.account&&!ACCOUNT.test(d.account),conBad=d.container&&!CONTAINER.test(d.container);
+    h=`<span class="eyebrow">Inspector</span><h3>${esc(d.name)}</h3><p class="sub">Azure Blob / ADLS Gen2 container · pipeline destination · Cloud storage team</p>
+    <div class="box"><h4>Component identity</h4><div class="two"><label class="field">Environment<select><option>Production</option></select></label><label class="field">Region<input data-d="region" value="${esc(d.region)}"></label></div></div>
+    <div class="box azbox"><h4>Azure storage dataset</h4>
+      <label class="field">Storage<select data-d="kind">${opt(KINDS,d.kind)}</select></label>
+      <div class="two"><label class="field">Storage account<input data-d="account" class="${accBad?'badv':''}" value="${esc(d.account)}" placeholder="secarchive01" maxlength="24"></label>
+      <label class="field">Container<input data-d="container" class="${conBad||!d.container?'badv':''}" value="${esc(d.container)}" placeholder="splunk-archive" maxlength="63"></label></div>
+      ${accBad?'<span class="field"><span class="hint rv">3 to 24 lowercase letters and digits.</span></span>':''}
+      <label class="field">Path prefix (optional)<input data-d="path" value="${esc(d.path)}" placeholder="ingest/" maxlength="240"></label>
+      <div class="field">Location<div class="ro">${esc(locOf(d)||'Set the storage account and container')}</div></div>
+      <label class="field">Dataset use<select data-d="use">${opt(USES,d.use)}</select></label>
+      <label class="field">Microsoft Azure connection<select data-d="connection"><option value="">Not assigned</option><option value="1" ${d.connection?'selected':''}>${esc(c.name)}</option></select></label>
+      <div class="btnrow"><button type="button" data-open="connection">Open connection</button><button type="button">＋ Connection</button>${d.use==='Routing and federated search'?'<button type="button">＋ Cloud Search</button>':''}</div>
+      <p class="note guide2">Receives Ingest Processor output through the data link. Needs Ingest Processor on Splunk Cloud Platform 10.5.2605 or higher. In the pipeline, the destination is this dataset.</p>
+    </div>
+    <div class="box"><h4>Connections · 1</h4><button type="button" class="linkbtn" data-open="ip-ds">← Ingest Processor · Event data · HTTPS 443</button></div>`;
+  }else if(sel==='connection'){
+    h=`<span class="eyebrow">Inspector</span><h3>${esc(c.name)}</h3><p class="sub">Splunk Cloud Data Management authentication · Microsoft Entra app registration</p>
+    <div class="box conbox"><h4>Microsoft Azure connection</h4>
+      <label class="field">Directory (tenant) ID<input data-c="tenant" class="${GUID.test(c.tenant)?'':'badv'}" value="${esc(c.tenant)}" placeholder="00000000-0000-0000-0000-000000000000"></label>
+      <label class="field">Application (client) ID<input data-c="client" class="${GUID.test(c.client)?'':'badv'}" value="${esc(c.client)}" placeholder="00000000-0000-0000-0000-000000000000"></label>
+      <label class="field">Azure role on the containers<select data-c="role">${opt(ROLES,c.role)}</select></label>
+      <label class="field">Storage network access<select data-c="network">${opt(NETWORKS,c.network)}</select></label>
+      <div class="checks"><label><input type="checkbox" data-cf="ingest" ${c.ingest?'checked':''}>Send data from Ingest Processor</label><label><input type="checkbox" data-cf="edge" ${c.edge?'checked':''}>Send data from Edge Processor</label><label><input type="checkbox" data-cf="search" ${c.search?'checked':''}>Run federated search</label></div>
+      ${c.search?`<label class="field">Splunk Cloud Search tier<select data-c="cloudSearch"><option value="">Not assigned</option><option value="1" ${c.cloudSearch?'selected':''}>Splunk Cloud Search</option></select></label>`:''}
+      <p class="note guide2">The client secret stays in Splunk Cloud: the topology records only these IDs. Creating the connection needs the edit_datasets and admin_all_objects capabilities.</p>
+      <button type="button" class="linkbtn" data-open="dataset">${esc(S.dataset.name)}</button>
+    </div>`;
+  }else if(sel==='ip-ds'){
+    const hst=host(d)||d.name;
+    h=`<span class="eyebrow">Relationship</span><h3>Ingest Processor → ${esc(d.name)}</h3><p class="sub">Event data · from template "Ingest Processor → Azure Storage"</p>
+    <div class="box azbox"><h4>Relationship details</h4><dl class="kv">
+      <dt>Protocol</dt><dd>HTTPS (Azure ${d.kind==='Azure Data Lake Storage'?'Data Lake Storage':'Blob Storage'} REST)</dd>
+      <dt>Endpoint</dt><dd class="m">${esc(hst)}</dd>
+      <dt>Port</dt><dd>443</dd><dt>TLS</dt><dd>Required</dd>
+      <dt>Authentication</dt><dd>Yes · OAuth 2.0 / bearer token (Microsoft Entra app registration)</dd>
+      <dt>Acknowledgement</dt><dd>Application response</dd>
+      <dt>Direction</dt><dd>Request-response</dd>
+      <dt>Retry</dt><dd>Managed destination retry and delivery backlog monitoring</dd>
+      <dt>Owner</dt><dd>Cloud storage team</dd>
+      <dt>Controls</dt><dd>Entra app registration · Azure role on the container · storage firewall · encryption at rest</dd>
+    </dl></div>
+    <p class="note">The same template applies from an Edge Processor, with "Edge Processor destination queue and retry".</p>`;
+  }else if(sel==='ip'){
+    h=`<span class="eyebrow">Inspector</span><h3>Ingest Processor</h3><p class="sub">Splunk Cloud processing · managed by Splunk</p>
+    <div class="box"><h4>Destinations · 2</h4><button type="button" class="linkbtn">→ Indexer 1 · Event data</button><button type="button" class="linkbtn" data-open="ip-ds">→ ${esc(d.name)} · HTTPS 443</button><p class="note">Azure destinations need Splunk Cloud Platform 10.5.2605 or higher.</p></div>`;
+  }else if(sel==='cloudSearch'){
+    h=`<span class="eyebrow">Inspector</span><h3>Splunk Cloud Search</h3><p class="sub">Cloud-hosted federated search tier · managed by Splunk</p>
+    <div class="box"><h4>Federated connections</h4><button type="button" class="linkbtn" data-open="connection">${esc(c.name)} · Microsoft Azure connection</button><p class="note">Lists Amazon S3 and Microsoft Azure connections that name this tier.</p></div>`;
+  }else{
+    h=`<span class="eyebrow">Inspector</span><h3>${sel==='uf'?'Universal Forwarder 1':sel==='idx'?'Indexer 1':'Link'}</h3><p class="note">Unchanged by this handoff. Select the dataset, the connection or the HTTPS 443 link label.</p>`;
+  }
+  el.innerHTML=h;
+  el.querySelectorAll('[data-d]').forEach(i=>i.onchange=()=>{const k=i.dataset.d;S.dataset[k]=k==='connection'?!!i.value:i.value.trim();render()});
+  el.querySelectorAll('[data-c]').forEach(i=>i.onchange=()=>{const k=i.dataset.c;S.connection[k]=k==='cloudSearch'?!!i.value:i.value.trim();if(k==='cloudSearch')S.cloudSearch=!!i.value;render()});
+  el.querySelectorAll('[data-cf]').forEach(i=>i.onchange=()=>{S.connection[i.dataset.cf]=i.checked;if(i.dataset.cf==='search'&&!i.checked){S.connection.cloudSearch=false}render()});
+  el.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{sel=b.dataset.open;render()});
+}
+
+function renderValidate(){
+  const m=messages();
+  document.getElementById('msgs').innerHTML=m.length?m.map(([k,t])=>`<li><span class="st ${k}">${k==='err'?'Error':'Warning'}</span><span>${esc(t)}</span></li>`).join(''):'<li><span class="st pass">Clear</span><span class="clean">No issues for the Azure dataset or its connection.</span></li>';
+  document.getElementById('rules').innerHTML=`<tr><td>AR-006</td><td>Object storage delivery has encryption and ownership metadata</td><td>High</td><td><span class="st pass">Pass</span></td><td>Ingest Processor → ${esc(S.dataset.name)}: TLS Required, owner Cloud storage team.</td></tr>`;
+}
+
+render();
+</script>
+</body>
+</html>
