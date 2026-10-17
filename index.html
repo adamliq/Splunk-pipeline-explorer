@@ -12534,6 +12534,10 @@ bar.addEventListener('keydown',event=>{
  if(next===undefined)return;event.preventDefault();buttons[next].focus();setTab(buttons[next].dataset.tab199,{user:true});
 });
 
+// Shift-clicked links leave the last one's target in builderMultiSelected (Build 198's selectedBuilderIds() puts it there),
+// but the person selected links. With two or more links, components count only when two or more are selected too.
+const selectedComponentIds=()=>{const ids=state.builderMultiSelected||[];return (state.builderBulkEdges||[]).length>1&&ids.length<2?[]:ids};
+
 // ---- Titles for the views that aren't a component.
 const planeName=plane=>text(q('#builderRelationshipInspector .relationshipPlaneBadge'))||({data:'Event data',management:'Fleet management',authentication:'User access'}[plane]||plane);
 function renderHead(){
@@ -12543,7 +12547,7 @@ function renderHead(){
   // Build 198 puts "Insert component on selected connection" in the target's connection list, which a link doesn't show.
   html=`<span class="eyebrow199">${esc(planeName(e.plane))} link</span><h3 class="route199"><button type="button" data-select199="${r.source.id}" title="Inspect ${esc(componentInstanceLabel(r.source))}">${esc(componentInstanceLabel(r.source))}</button><b aria-hidden="true">${esc(arrow)}</b><button type="button" data-select199="${r.target.id}" title="Inspect ${esc(componentInstanceLabel(r.target))}">${esc(componentInstanceLabel(r.target))}</button></h3>${r.label?`<p class="meta199">${esc(r.label)}</p>`:''}${q('#insertOnSelectedEdge')?'<button type="button" class="insert199" data-iinsert199>＋ Insert a component on this link</button>':''}`;
  }else if(mode==='selection'){
-  const n=(state.builderMultiSelected||[]).length,l=(state.builderBulkEdges||[]).length,parts=[n?`${n} component${n===1?'':'s'}`:'',l?`${l} link${l===1?'':'s'}`:''].filter(Boolean);
+  const n=selectedComponentIds().length,l=(state.builderBulkEdges||[]).length,parts=[n?`${n} component${n===1?'':'s'}`:'',l?`${l} link${l===1?'':'s'}`:''].filter(Boolean);
   html=`<span class="eyebrow199">Selection</span><h3>${parts.join(' and ')} selected</h3><p class="meta199">Shift-click to add or remove</p>`;
  }else if(mode==='container'){
   const g=builderGroupById(state.builderSelectedGroup),members=state.builderNodes.filter(n=>n.groupId===g.id).length;
@@ -12576,7 +12580,7 @@ selection.addEventListener('click',event=>{
  else if(event.target.closest('[data-iusefree199]')){const s=q('#unifiedLayoutMode');if(s)setOriginal(s,'free')}
 });
 function renderSelection(){
- const nodes=(state.builderMultiSelected||[]).map(Number).map(id=>state.builderNodes.find(n=>n.id===id)).filter(Boolean),edges=selectedBulkEdges();
+ const nodes=selectedComponentIds().map(Number).map(id=>state.builderNodes.find(n=>n.id===id)).filter(Boolean),edges=selectedBulkEdges();
  const chips=nodes.map(n=>`<button type="button" data-iselect199="${n.id}" title="Inspect only ${esc(componentInstanceLabel(n))}">${esc(componentInstanceLabel(n))}</button>`).concat(edges.map(e=>`<button type="button" data-iedge199="${esc(e.plane)}:${esc(String(e.id))}" title="Inspect only this link">${esc(componentInstanceLabel(e.source))} → ${esc(componentInstanceLabel(e.target))}</button>`)).join('');
  const box=selection.querySelector('.chips199');if(box.dataset.sig!==chips){box.dataset.sig=chips;box.innerHTML=chips}
  if(bulk&&!bulk.open)bulk.open=true;
@@ -12694,6 +12698,12 @@ const scroll=Element.prototype.scrollIntoView;Element.prototype.scrollIntoView=f
 changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Inspector tabs','The Inspector shows one thing at a time in tabs: Component, Connections, Settings, Fleet and Access for a component; Link, Assurance and Route for a link, titled with both ends; Selection, with bulk edit and align, for several; Container; and Topology with nothing selected. The Free place alignment bar leaves the toolbar.',true]);
 const build=document.querySelector('#topologyBuilder');build.dataset.buildNumber='199';build.dataset.buildDate='2026-10-18';document.title='Splunk Pipeline Explorer · Build 199 · 18 Oct 2026';
 builderInfoText159.textContent=builderInfoText159.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 199 · 18 Oct 2026');
+})();
+/* Build 200: count only components that the person selected. */
+(function(){
+changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Selection counts links','With two or more links Shift-clicked, Selection no longer counts the last link’s target as a selected component.',true]);
+const build=document.querySelector('#topologyBuilder');build.dataset.buildNumber='200';build.dataset.buildDate='2026-10-18';document.title='Splunk Pipeline Explorer · Build 200 · 18 Oct 2026';
+builderInfoText159.textContent=builderInfoText159.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 200 · 18 Oct 2026');
 })();
 </script>
 </body>
