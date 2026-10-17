@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Parsing Lab Examples</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}.tabs button[data-group="mistakes"]{border-color:#6b5a2a}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 200 TARGET · BUILD 199 + PROTOTYPE</span>
+ <h1>Parsing laboratory: more examples</h1>
+ <p class="lede">Operate › Parsing laboratory gets six more examples, in two groups: three more samples of common formats, and three common mistakes. Each example says what it shows, sets every setting it depends on, and adds the props lines its format needs to the generated configuration. Every scene is the real laboratory with the prototype block appended to Build 199; the “Today” scene is Build 199 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>The ten examples</h2>
+  <table>
+   <thead><tr><th>Example</th><th>What it shows</th><th>Settings</th><th>Its configuration uses</th></tr></thead>
+   <tbody>
+    <tr><td>Multiline syslog</td><td>A continuation line merges into the event above it</td><td>Timestamp prefix, merge on, KV_MODE = auto</td><td>—</td></tr>
+    <tr><td>Windows XML</td><td>Each &lt;Event&gt; is one event; Data fields at search time</td><td>XML Event element, KV_MODE = xml</td><td><code>TIME_PREFIX = SystemTime="</code></td></tr>
+    <tr><td>NDJSON API</td><td>Indexed JSON fields let the route on result=failure work</td><td>Every line, INDEXED_EXTRACTIONS = json</td><td><code>TIMESTAMP_FIELDS = time</code></td></tr>
+    <tr><td>CSV file</td><td>The header names indexed columns</td><td>Every line, INDEXED_EXTRACTIONS = csv</td><td><code>TIMESTAMP_FIELDS = time</code></td></tr>
+    <tr><td><b>Java stack trace</b></td><td>Stack frames stay with their event: six lines, two events</td><td>Timestamp prefix, merge on, KV_MODE = auto; index app</td><td><code>TIME_FORMAT = %Y-%m-%dT%H:%M:%S.%3N%Z</code></td></tr>
+    <tr><td><b>RFC 5424 syslog</b></td><td>The timestamp comes after a &lt;PRI&gt;VERSION header</td><td>Every line, KV_MODE = auto; index os</td><td><code>TIME_PREFIX = ^&lt;\d+&gt;\d+\s+</code></td></tr>
+    <tr><td><b>Kubernetes JSON</b></td><td>Epoch seconds become _time; errors route to their own index</td><td>Every line, epoch, INDEXED_EXTRACTIONS = json; index k8s, route level=error → k8s_errors</td><td><code>TIMESTAMP_FIELDS = ts</code></td></tr>
+    <tr><td><b>JSON extracted twice</b></td><td>Index-time and search-time JSON together: every value twice</td><td>NDJSON API with KV_MODE = json</td><td><code>TIMESTAMP_FIELDS = time</code></td></tr>
+    <tr><td><b>Event over TRUNCATE</b></td><td>A cut event is invalid JSON: no fields, and the route misses it</td><td>Every line, INDEXED_EXTRACTIONS = json, TRUNCATE = 256; index email, route action=quarantine → email_quarantine</td><td><code>TIMESTAMP_FIELDS = time</code></td></tr>
+    <tr><td><b>Stack trace split per line</b></td><td>Breaking at every line splits the stack trace</td><td>Java stack trace with Every line, merge off</td><td><code>TIME_FORMAT = %Y-%m-%dT%H:%M:%S.%3N%Z</code></td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The rules in short</h2>
+  <dl>
+   <dt>Two groups</dt><dd>Samples: formats as they should be parsed. Common mistakes: a sample with one setting wrong.</dd>
+   <dt>Choosing one</dt><dd>Every setting comes from the example, starting from the laboratory’s defaults (TRUNCATE 10000, UTC, index security, route result=failure → security_alerts). The index-time processing tier is kept.</dd>
+   <dt>The note</dt><dd>One line on what the example shows, and the props lines its format needs. Change a setting and it reads “Custom settings”. Editing the raw input keeps the example.</dd>
+   <dt>Configuration</dt><dd>While its settings are unchanged, the example’s TIME_PREFIX, TIME_FORMAT and TIMESTAMP_FIELDS go into Download config and the evidence pack’s parsing-laboratory.conf.</dd>
+   <dt>Walkthrough</dt><dd>Open in walkthrough picks the walkthrough’s JSON, CSV, Windows or syslog sample from the settings, so the JSON examples open as JSON.</dd>
+   <dt>Unchanged</dt><dd>The model, the settings, the placement, the metrics and the event preview.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-parsing-lab-examples.md</code> · Prototype: <code>docs/mockups/parsing-lab-examples-prototype.css</code> and <code>.js</code>, appended to Build 199.</p>
+</div>
+<script>
+const SCENES=[{"id": "pl-java", "img": "compare/parsing-lab-java.png", "group": "target", "tab": "Examples", "title": "1440 px, Operate › Parsing laboratory, Java stack trace chosen", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "Seven samples", "text": "The four from Build 199, plus Java stack trace, RFC 5424 syslog and Kubernetes JSON.", "x": 91.21, "y": 16.56, "box": [17.85, 14.78, 78.89, 3.56]}, {"n": 2, "head": "Three common mistakes", "text": "Each is a sample with one setting wrong, so you can see what that setting does to the events.", "x": 91.21, "y": 21.0, "box": [17.85, 19.22, 78.89, 3.56]}, {"n": 3, "head": "What the example shows", "text": "One line under the bar, with the props lines its format needs. Download config includes them.", "x": 74.25, "y": 25.56, "box": [17.85, 23.78, 54.24, 3.56]}, {"n": 4, "head": "Every setting comes from the example", "text": "Choosing one resets the rest to the laboratory’s defaults, so a TRUNCATE or a route from the last example doesn’t carry over. The processing tier stays yours.", "x": 63.53, "y": 35.94, "box": [64.31, 32.33, 15.56, 7.22]}, {"n": 5, "head": "Six lines, two events", "text": "The stack frames have no timestamp, so they merge into the event above them.", "x": 40.31, "y": 54.0, "box": [18.68, 32.33, 43.26, 27.78]}]}, {"id": "pl-java-events", "img": "compare/parsing-lab-java-events.png", "group": "target", "tab": "Java · events", "title": "1440 px, Java stack trace, the parsed events", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "The frames stay with their event", "text": "Event 1 holds the error line, the exception and three frames.", "x": 49.4, "y": 46.42, "box": [17.85, 25.33, 78.89, 32.44]}, {"n": 2, "head": "_time keeps the milliseconds", "text": "TIME_FORMAT = %Y-%m-%dT%H:%M:%S.%3N%Z, from the example.", "x": 94.1, "y": 33.06, "box": [69.17, 30.56, 26.81, 5.0]}, {"n": 3, "head": "Fields at search time", "text": "KV_MODE = auto finds thread, user, src and msg when you search. Nothing is indexed.", "x": 44.95, "y": 45.44, "box": [18.82, 41.11, 24.65, 8.67]}]}, {"id": "pl-rfc5424", "img": "compare/parsing-lab-rfc5424.png", "group": "target", "tab": "RFC 5424", "title": "1440 px, RFC 5424 syslog chosen", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "TIME_PREFIX skips the header", "text": "^&lt;\\d+&gt;\\d+\\s+ matches “&lt;38&gt;1 ”, so TIME_FORMAT reads the timestamp after it.", "x": 30.78, "y": 12.61, "box": [17.85, 11.78, 11.25, 1.67]}, {"n": 2, "head": "The PRI and version header", "text": "Priority 38 is auth.info and 86 authpriv.info; version 1 is RFC 5424. Each line is one message, so the boundary is every line.", "x": 53.29, "y": 40.67, "box": [18.68, 18.44, 43.26, 27.78]}]}, {"id": "pl-kubernetes", "img": "compare/parsing-lab-kubernetes.png", "group": "target", "tab": "Kubernetes", "title": "1440 px, Kubernetes JSON chosen", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "Two of three routed", "text": "level is an indexed field, so the route on level=error sends both errors to k8s_errors.", "x": 50.66, "y": 9.59, "box": [44.31, 0.89, 12.71, 6.44]}, {"n": 2, "head": "Epoch seconds become _time", "text": "ts=1789867200 is 2026-09-20T01:20:00Z. TIMESTAMP_FIELDS = ts names the field, and TIME_FORMAT = %s reads it.", "x": 94.1, "y": 33.06, "box": [69.17, 30.56, 26.81, 5.0]}, {"n": 3, "head": "Stored at index time", "text": "INDEXED_EXTRACTIONS = json, so search time adds nothing.", "x": 44.95, "y": 39.88, "box": [18.82, 36.44, 24.65, 11.44]}, {"n": 4, "head": "Target index k8s_errors", "text": "The third event, level=info, stays in k8s.", "x": 94.1, "y": 44.17, "box": [69.17, 41.67, 26.81, 5.0]}]}, {"id": "pl-phone", "img": "compare/parsing-lab-phone.png", "group": "target", "tab": "Phone", "title": "400 px, Kubernetes JSON chosen", "w": 400, "size": "400 × 860", "items": [{"n": 1, "head": "The groups stack", "text": "Each label sits above its examples, and the note wraps under them.", "x": 83.2, "y": 2.5, "box": [8.5, 1.4, 83.0, 14.88]}]}, {"id": "pl-jsontwice", "img": "compare/parsing-lab-json-twice.png", "group": "mistakes", "tab": "JSON twice", "title": "1440 px, JSON extracted twice chosen", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "A warning on every event", "text": "The same data as NDJSON API, with KV_MODE = json as well.", "x": 37.47, "y": 9.59, "box": [31.11, 0.89, 12.71, 6.44]}, {"n": 2, "head": "KV_MODE = json", "text": "Search time extracts the six fields again.", "x": 73.19, "y": 22.11, "box": [65.49, 11.78, 15.42, 9.22]}, {"n": 3, "head": "The same fields, twice", "text": "Each field is stored at index time and extracted again at search time, so searches show every value twice. Set KV_MODE = none.", "x": 39.7, "y": 45.33, "box": [18.82, 44.33, 49.72, 2.0]}]}, {"id": "pl-oversized", "img": "compare/parsing-lab-truncate.png", "group": "mistakes", "tab": "TRUNCATE", "title": "1440 px, Event over TRUNCATE chosen, the second event", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "TRUNCATE = 256 cuts the attachment", "text": "The event stops partway through the base64 attachment.", "x": 65.06, "y": 59.11, "box": [18.82, 53.44, 49.72, 6.67]}, {"n": 2, "head": "Three warnings", "text": "What is left isn’t valid JSON, so no field is indexed.", "x": 56.11, "y": 62.67, "box": [18.82, 61.67, 49.72, 2.0]}, {"n": 3, "head": "The quarantine route misses it", "text": "action=quarantine was never indexed, so the event goes to email, not email_quarantine.", "x": 94.1, "y": 67.06, "box": [69.17, 64.56, 26.81, 5.0]}, {"n": 4, "head": "256 of 567 characters kept", "text": "Set TRUNCATE above the largest valid event. Performance guardrails › Use parsing sample sizes it from these events.", "x": 94.1, "y": 72.61, "box": [69.17, 70.11, 26.81, 5.0]}]}, {"id": "pl-split", "img": "compare/parsing-lab-split.png", "group": "mistakes", "tab": "Split trace", "title": "1440 px, Stack trace split per line chosen", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "Six events, eight warnings", "text": "The Java stack trace again, with the event boundary set to every line.", "x": 47.83, "y": 9.59, "box": [17.85, 0.89, 78.89, 6.44]}, {"n": 2, "head": "mode=newline; merge=off", "text": "LINE_BREAKER = ([\\r\\n]+) with SHOULD_LINEMERGE = false: in Splunk too, every line is an event.", "x": 41.46, "y": 22.11, "box": [33.75, 11.78, 15.42, 9.22]}, {"n": 3, "head": "Frames without a timestamp or fields", "text": "The exception and each frame become events of their own. Use Timestamp prefix as the boundary, as in Java stack trace.", "x": 43.68, "y": 70.0, "box": [18.82, 69.0, 49.72, 2.0]}]}, {"id": "today-bar", "img": "compare/parsing-lab-today.png", "group": "today", "tab": "Today · Build 199", "title": "Build 199 today: Operate › Parsing laboratory", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "Four samples", "text": "Multiline syslog, Windows XML, NDJSON API and CSV file, with nothing to say what each one shows.", "x": 53.35, "y": 16.56, "box": [17.85, 14.78, 78.89, 3.56]}, {"n": 2, "head": "Settings carry over", "text": "An example sets only its own settings: a route, an index or a TRUNCATE you changed stays when you choose the next one.", "x": 40.31, "y": 45.67, "box": [18.68, 23.44, 43.26, 27.78]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;img.alt=s.title;shot.style.maxWidth=s.w<1000?s.w+'px':'';shot.style.marginInline=s.w<1000?'auto':'';document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size+' viewport';
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 199 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>

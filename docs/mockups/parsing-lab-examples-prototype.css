@@ -1,0 +1,9 @@
+/* parsing-lab-examples-v200: the example bar in two labelled groups, and a note on what the chosen example shows. */
+#operationsContent .parsePresetBar{display:grid;gap:7px}
+.parsePresetGroup200{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.parsePresetLabel200{flex:0 0 8.5rem;color:var(--muted);font-size:.55rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+.parsePresetGroup200 .parsePreset:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.parsePresetNote200{margin:-4px 0 13px;max-width:120ch;color:#b9cad7;font-size:.64rem;line-height:1.55}
+.parsePresetNote200 b{color:#e6f2f8;font-weight:700}
+.parsePresetNote200 code{border:1px solid #294052;border-radius:5px;background:#07111b;padding:1px 5px;color:#d9e7f0;font:600 .6rem/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap}
+@media (max-width:640px){.parsePresetLabel200{flex-basis:100%}.parsePresetNote200 code{white-space:normal;word-break:break-all}}
