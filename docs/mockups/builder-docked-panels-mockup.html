@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Builder Docked Panels</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.rules{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.rules h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 197 TARGET · BUILD 196 + PROTOTYPE</span>
+ <h1>Builder: dock Components and the Inspector</h1>
+ <p class="lede">From 1280 px wide, Components sits on the left, the canvas in the middle and the Inspector on the right, all visible at once, as in draw.io. Nothing covers the canvas, selecting a component no longer closes Components, and each column hides to a rail. Below 1280 px the panels stay drawers. Every scene is the real Builder with the prototype patch applied; the two “Today” scenes are Build 196 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="rules">
+  <h2>The rules in short</h2>
+  <dl>
+   <dt>≥ 1280 px</dt><dd>Three columns: Components 280 px · canvas · Inspector 340 px (resizable from 300 px to 560 px, as long as the canvas keeps 580 px). Both open by default.</dd>
+   <dt>Hide / rail</dt><dd>“‹ Hide” and “Hide ›” collapse a column to a 40 px rail; the rail shows it again. Remembered per browser.</dd>
+   <dt>Selection</dt><dd>Selecting never closes Components and never reopens a hidden Inspector; “Inspect settings” does.</dd>
+   <dt>Nothing selected</dt><dd>The Inspector shows the topology: components, links by plane, Validate findings.</dd>
+   <dt>Drawers</dt><dd>Open over the canvas without closing the columns. The SOAR pill hides while one is open.</dd>
+   <dt>Pin</dt><dd>Removed from 761 px up, where it covered the canvas. Phones keep it.</dd>
+   <dt>&lt; 1280 px</dt><dd>Drawers over the canvas, one at a time, as today. Phones unchanged. Focus canvas uses its own overlays.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-docked-panels.md</code> · Prototype: <code>docs/mockups/builder-docked-panels-prototype.css</code> and <code>.js</code>, appended to Build 196.</p>
+</div>
+<script>
+const SCENES=[{"id": "docked-1440", "img": "compare/docked-panels-1440.png", "group": "target", "tab": "1440 · selected", "title": "1440 px, Universal Forwarder 1 selected", "size": "1440 × 900", "items": [{"n": 1, "head": "Components docks on the left", "text": "280 px wide, under the toolbars. Selecting a component no longer closes it, so you can keep adding.", "x": 10.9, "y": 20.18, "box": [1.18, 15.22, 19.44, 82.56]}, {"n": 2, "head": "Compatible next components stay in view", "text": "The Builder already lists what can follow the selected component. Docked, the list sits beside the canvas.", "x": 18.37, "y": 42.05, "box": [2.22, 39.78, 17.36, 16.22]}, {"n": 3, "head": "“‹ Hide” replaces Close and Pin", "text": "It collapses the column to a 40 px rail. Pin is removed.", "x": 18.09, "y": 17.89, "box": [16.46, 16.33, 3.26, 3.11]}, {"n": 4, "head": "The canvas takes the middle column", "text": "Nothing covers it. It resizes when a column is hidden or resized, and a fitted view stays fitted.", "x": 47.92, "y": 56.5, "box": [21.74, 15.22, 52.36, 82.56]}, {"n": 5, "head": "The Inspector docks on the right", "text": "340 px by default. “Hide ›” collapses it; “Put on one host” stays.", "x": 87.01, "y": 39.99, "box": [75.21, 15.22, 23.61, 82.56]}, {"n": 6, "head": "Resize it from its left edge", "text": "Drag, or focus the edge and press ← or →. From 300 px to 560 px, as long as the canvas keeps 580 px. The width is remembered.", "x": 74.93, "y": 66.41, "box": [74.72, 15.22, 0.42, 82.56]}, {"n": 7, "head": "“+ Add” and “Inspector” leave the bottom bar", "text": "Each column has its own controls. View, the minimap, help and zoom stay.", "x": 32.58, "y": 94.56, "box": [22.36, 92.33, 51.11, 4.44]}]}, {"id": "docked-1440-empty", "img": "compare/docked-panels-1440-empty.png", "group": "target", "tab": "1440 · nothing selected", "title": "1440 px, nothing selected", "size": "1440 × 900", "items": [{"n": 1, "head": "The Inspector shows the topology", "text": "With nothing selected it lists components, links by plane and the Validate findings, instead of an empty form with dead buttons.", "x": 77.54, "y": 25.04, "box": [76.25, 22.11, 21.53, 36.67]}, {"n": 2, "head": "“Review” opens the Review drawer", "text": "Only when there are findings. Otherwise the box reads “No findings”.", "x": 94.34, "y": 49.22, "box": [91.94, 47.78, 4.79, 2.89]}, {"n": 3, "head": "Components stays open", "text": "Search and the groups are ready for the next component.", "x": 10.9, "y": 56.5, "box": [1.18, 15.22, 19.44, 82.56]}]}, {"id": "docked-1440-hidden", "img": "compare/docked-panels-1440-hidden.png", "group": "target", "tab": "Both hidden", "title": "1440 px, both columns hidden, Indexer 1 selected", "size": "1440 × 900", "items": [{"n": 1, "head": "A hidden column leaves a 40 px rail", "text": "Click it to show the column again and put the cursor in the search. The choice is remembered.", "x": 2.57, "y": 23.48, "box": [1.18, 15.22, 2.78, 82.56]}, {"n": 2, "head": "The Inspector rail marks a selection", "text": "Selecting doesn’t reopen a hidden Inspector. “Inspect settings” in the right-click menu does.", "x": 97.43, "y": 23.48, "box": [96.04, 15.22, 2.78, 82.56]}, {"n": 3, "head": "The canvas uses the space", "text": "1294 px here, against 754 px with both columns open.", "x": 50.0, "y": 56.5, "box": [5.07, 15.22, 89.86, 82.56]}]}, {"id": "docked-1280", "img": "compare/docked-panels-1280-tools.png", "group": "target", "tab": "1280 · Tools open", "title": "1280 px, the narrowest docked width, with Tools open", "size": "1280 × 800", "items": [{"n": 1, "head": "The canvas keeps at least 580 px", "text": "594 px here, with Components at 280 px and the Inspector at 340 px.", "x": 47.66, "y": 91.07, "box": [24.45, 17.12, 46.41, 80.38]}, {"n": 2, "head": "Canvas overlays stay in the canvas column", "text": "Tools fits the column (484 px here) and opens above the SOAR pill. Its own content was already clipped; that is a separate fix.", "x": 47.5, "y": 62.81, "box": [29.14, 19.12, 36.72, 87.38]}, {"n": 3, "head": "The Inspector is capped here", "text": "It can grow to 354 px at 1280 px, which leaves the canvas 580 px.", "x": 85.39, "y": 57.31, "box": [72.11, 17.12, 26.56, 80.38]}]}, {"id": "docked-1920", "img": "compare/docked-panels-1920.png", "group": "target", "tab": "1920 · wider Inspector", "title": "1920 px, Inspector resized to 420 px", "size": "1920 × 1080", "items": [{"n": 1, "head": "A resized Inspector", "text": "Dragged to 420 px. The width is stored and used on the next visit.", "x": 88.18, "y": 38.32, "box": [77.24, 12.69, 21.88, 85.46]}, {"n": 2, "head": "The canvas fills the rest", "text": "1154 px here.", "x": 46.35, "y": 55.42, "box": [16.3, 12.69, 60.1, 85.46]}]}, {"id": "docked-1440-drawer", "img": "compare/docked-panels-1440-drawer.png", "group": "target", "tab": "Review drawer", "title": "1440 px, the Review drawer open", "size": "1440 × 900", "items": [{"n": 1, "head": "Drawers open over the canvas", "text": "Coverage, Review, Rules, Inventory, Trace and History open as before, and no longer close the columns.", "x": 53.19, "y": 56.5, "box": [32.36, 15.33, 41.67, 82.33]}, {"n": 2, "head": "Close is clear of the SOAR pill", "text": "The pill hides while a drawer is open. In Build 196 it covered the drawer’s Close button at every desktop width.", "x": 70.49, "y": 18.39, "box": [67.78, 16.44, 5.42, 3.89]}, {"n": 3, "head": "Both columns stay", "text": "Close the drawer and the layout is as you left it.", "x": 87.01, "y": 56.5, "box": [75.21, 15.22, 23.61, 82.56]}]}, {"id": "overlay-1024", "img": "compare/docked-panels-1024-drawer.png", "group": "target", "tab": "1024 · drawers", "title": "Below 1280 px: 1024 px, Components opened with “+ Add”", "size": "1024 × 768", "items": [{"n": 1, "head": "Below 1280 px the panels stay drawers", "text": "Over the canvas, one at a time, as in Build 196. Phones are unchanged.", "x": 17.58, "y": 39.52, "box": [2.93, 17.84, 29.3, 72.27]}, {"n": 2, "head": "Pin is removed here too", "text": "The pinned drawers are what broke the grid; see the “Today” scenes.", "x": 28.22, "y": 20.96, "box": [25.49, 19.14, 5.47, 3.65]}]}, {"id": "before-pinned-palette", "img": "compare/docked-panels-today-pinned-palette.png", "group": "today", "tab": "Today · Pin palette", "title": "Build 196 today: Components pinned at 1440 px", "size": "1440 × 900", "items": [{"n": 1, "head": "The pinned palette covers the whole canvas", "text": "At every width. Build 140’s full-width grid rule outranks Build 126’s pinned-palette rule, so the palette and the canvas share one column.", "x": 50.0, "y": 52.33, "box": [1.18, 14.33, 97.64, 84.44]}, {"n": 2, "head": "Only the minimap and zoom show through", "text": "The topology is behind the palette list.", "x": 90.44, "y": 94.56, "box": [87.36, 92.56, 10.28, 4.0]}]}, {"id": "before-both-pinned", "img": "compare/docked-panels-today-both-pinned.png", "group": "today", "tab": "Today · Pin both", "title": "Build 196 today: both panels pinned at 1440 px", "size": "1440 × 900", "items": [{"n": 1, "head": "The canvas is squeezed into 274 px", "text": "Below 1680 px the grid gets three columns but the canvas stays in the first, under the palette.", "x": 11.25, "y": 66.41, "box": [1.74, 15.22, 19.03, 82.56]}, {"n": 2, "head": "The Inspector still floats", "text": "It is fixed over the right of the page, and the middle of the page is empty.", "x": 87.08, "y": 54.06, "box": [75.28, 15.22, 23.61, 77.67]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=(s.group==='today'?'':'')+s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size+' viewport';
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 196 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
