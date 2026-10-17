@@ -1,0 +1,11 @@
+/* builder-docked-fixes-v198: docked columns aren't overlays, so they mustn't hide the canvas help, its shortcuts or the minimap.
+   Older rules hide these whenever canvasPanelState.palette or .inspector is set, and docking keeps both set from 1280px. */
+@media (min-width:1280px){
+  #topologyBuilder.builderDocked197 .builderSpaceHelpPopover140{display:block!important}
+  #topologyBuilder.builderDocked197 .builderSpaceHelpPopover140[hidden],
+  #topologyBuilder.builderDocked197 .builderCanvas:has(.builderInspectorDrawer.open) .builderSpaceHelpPopover140{display:none!important}
+  #topologyBuilder.builderDocked197:not(.minimapHidden):not(.builderSpaceAutoMapHidden140) .builderMinimap{display:block!important}
+}
+@media (min-width:1280px) and (pointer:fine){
+  #topologyBuilder.builderDocked197 .builderNavigationHint{display:block!important}
+}

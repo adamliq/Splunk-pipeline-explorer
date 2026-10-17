@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Builder Menu Bar</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 198 TARGET · BUILD 197 + PROTOTYPE</span>
+ <h1>Builder: one menu bar and one toolbar</h1>
+ <p class="lede">From 761 px wide, the Builder gets one menu bar (File, Edit, View, Arrange, Validate, Analyze and Help) and one toolbar (undo and redo, zoom, + Add, the plane toggles, Find and the Validate status). They replace the two action rows, the dock’s Tools and Groups buttons, the canvas’s bottom bar and zoom, and the SOAR pill. Every scene is the real Builder with the prototype patch applied; the “Today” scene is Build 197 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>Where today’s controls go</h2>
+  <table>
+   <thead><tr><th>Today (Build 197)</th><th>Control</th><th>Goes to</th></tr></thead>
+   <tbody>
+    <tr><td>Row 1</td><td>Saved topologies, Load</td><td><b>File</b> › Saved topologies</td></tr>
+    <tr><td></td><td>Unsaved, Save</td><td>The right end of the menu bar</td></tr>
+    <tr><td></td><td>File menu (import, export, print)</td><td><b>File</b></td></tr>
+    <tr><td></td><td>Undo, Redo</td><td>The toolbar, and <b>Edit</b></td></tr>
+    <tr><td></td><td>History</td><td><b>Edit</b> › History (the History drawer)</td></tr>
+    <tr><td></td><td>Use in</td><td><b>File</b> › Use in explorer, Open in Failure Lab</td></tr>
+    <tr><td>Row 2</td><td>Data, Fleet, Access; Find</td><td>The toolbar, unchanged</td></tr>
+    <tr><td></td><td>Group by</td><td><b>Arrange</b> › Group by</td></tr>
+    <tr><td></td><td>Layout menu</td><td><b>Arrange</b></td></tr>
+    <tr><td></td><td>Validate menu</td><td><b>Validate</b>; its count becomes the toolbar’s Validate status</td></tr>
+    <tr><td></td><td>Analyze menu</td><td><b>Analyze</b></td></tr>
+    <tr><td>Canvas, top left</td><td>Tools</td><td>Its sections: <b>Edit</b> › Bulk edit…, Connection template…; <b>Arrange</b> › Layout profiles…; <b>Validate</b> › Route validation…; <b>Analyze</b> › Configuration draft…. The panel gets Close.</td></tr>
+    <tr><td></td><td>Groups</td><td><b>Arrange</b> › Containers…, with Close</td></tr>
+    <tr><td>Canvas, top right</td><td>SOAR guide</td><td><b>Help</b> › SOAR playbooks guide</td></tr>
+    <tr><td>Canvas, bottom left</td><td>View menu</td><td><b>View</b></td></tr>
+    <tr><td></td><td>+ Add</td><td>The toolbar’s + Add, and <b>View</b> › Components</td></tr>
+    <tr><td></td><td>Inspector</td><td><b>View</b> › Inspector</td></tr>
+    <tr><td></td><td>Hide minimap</td><td><b>View</b> › Minimap</td></tr>
+    <tr><td></td><td>?</td><td><b>Help</b> › Canvas controls and shortcuts</td></tr>
+    <tr><td>Canvas, bottom right</td><td>Zoom −, %, +, Fit</td><td>The toolbar, and <b>View</b></td></tr>
+    <tr><td>Title</td><td>ⓘ</td><td>Stays, and <b>Help</b> › About Builder</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The rules in short</h2>
+  <dl>
+   <dt>≥ 761 px</dt><dd>The menu bar and the toolbar replace the two rows, the dock buttons, the bottom bar, the zoom group and the SOAR pill. The header keeps its height, so the canvas keeps its size.</dd>
+   <dt>Delegation</dt><dd>Each menu item and toolbar button clicks the control it replaces. Those controls stay in the page, hidden, so their handlers, states and history labels are unchanged.</dd>
+   <dt>Keyboard</dt><dd>← → move between menus, ↓ ↑ through the items, Esc closes. Ctrl Z, Ctrl Y, /, 0 and A work as before.</dd>
+   <dt>&lt; 1280 px</dt><dd>Undo and Redo show icons only, the planes lose their swatches and the Validate status shortens. + Add opens the Components drawer.</dd>
+   <dt>Focus canvas</dt><dd>Unchanged: its own bar, bottom bar and zoom.</dd>
+   <dt>≤ 760 px</dt><dd>Phones keep today’s Builder.</dd>
+   <dt>Build 197 fixes</dt><dd>When docked, the first-visit help card, its shortcuts and the minimap show again. At every desktop width the first fit keeps the topology above the help card, and Esc closes the open Tools or Groups panel.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-menu-toolbar.md</code> · Prototype: <code>docs/mockups/builder-docked-fixes-prototype.css</code> and <code>.js</code>, then <code>docs/mockups/builder-menubar-prototype.css</code> and <code>.js</code>, appended to Build 197.</p>
+</div>
+<script>
+const SCENES=[{"id": "mb-1440", "img": "compare/menubar-1440.png", "group": "target", "tab": "1440 · both bars", "title": "1440 px, docked, Universal Forwarder 1 selected", "size": "1440 × 900", "items": [{"n": 1, "head": "Seven menus replace the action row", "text": "File, Edit, View, Arrange, Validate, Analyze and Help. Between them they hold every command from both rows, the canvas’s dock and bottom bar, and the SOAR pill.", "x": 33.62, "y": 7.78, "box": [8.54, 6.22, 23.89, 3.11]}, {"n": 2, "head": "The save state and Save sit at the right", "text": "“● Unsaved changes” in amber, or “Saved”. Save asks for a name, as before.", "x": 82.93, "y": 7.78, "box": [84.58, 6.33, 13.75, 2.89]}, {"n": 3, "head": "Undo and Redo start the toolbar", "text": "They are disabled when there is nothing to undo, and the tooltip names the change. Ctrl Z and Ctrl Y still work.", "x": 6.42, "y": 15.44, "box": [1.67, 10.44, 9.51, 3.44]}, {"n": 4, "head": "Zoom moves up from the canvas’s bottom right", "text": "−, the zoom level, + and Fit. 0 still fits.", "x": 16.6, "y": 15.44, "box": [11.6, 10.44, 10.0, 3.44]}, {"n": 5, "head": "+ Add opens Components", "text": "Docked, it shows the column if it is hidden and puts the cursor in its search. Below 1280 px it opens the Components drawer.", "x": 24.41, "y": 15.23, "box": [22.01, 10.56, 4.79, 3.22]}, {"n": 6, "head": "The plane toggles stay", "text": "Data, Fleet and Access. Group by moves to Arrange.", "x": 37.05, "y": 15.23, "box": [27.15, 10.56, 19.79, 3.22]}, {"n": 7, "head": "So does Find", "text": "Press / on the canvas, or choose Edit › Find.", "x": 57.01, "y": 15.07, "box": [47.29, 10.56, 19.44, 3.11]}, {"n": 8, "head": "The Validate status ends the toolbar", "text": "Red with errors, amber with findings to review, green when valid. Click it to open or close the Review drawer.", "x": 83.95, "y": 12.17, "box": [85.14, 10.56, 13.19, 3.22]}, {"n": 9, "head": "Nothing floats on the canvas", "text": "The dock buttons, the bottom bar and the SOAR pill are gone. The minimap stays.", "x": 26.97, "y": 19.35, "box": [21.74, 15.22, 52.36, 82.56]}]}, {"id": "mb-1440-file", "img": "compare/menubar-1440-file.png", "group": "target", "tab": "File", "title": "File: the old row’s save, load and File menu, and “Use in”", "size": "1440 × 900", "items": [{"n": 1, "head": "Save", "text": "The status at the right of the bar shows whether anything is unsaved.", "x": 29.09, "y": 12.22, "box": [9.03, 10.56, 17.92, 3.33]}, {"n": 2, "head": "Saved topologies and Load", "text": "The row’s select and Load button. A disabled Load says why: here, “No saved topologies yet”.", "x": 29.09, "y": 16.39, "box": [9.03, 15.11, 17.92, 2.56]}, {"n": 3, "head": "Import and export, from the old File menu", "text": "The export scope and its note come with them. Every item clicks the control it replaces.", "x": 29.09, "y": 36.94, "box": [9.03, 35.67, 17.92, 2.56]}, {"n": 4, "head": "“Use in” folds into File", "text": "Use in explorer and Open in Failure Lab.", "x": 29.09, "y": 66.11, "box": [9.03, 64.44, 17.92, 3.33]}, {"n": 5, "head": "Clear canvas… comes last, in red", "text": "It still asks before clearing.", "x": 29.09, "y": 74.0, "box": [9.03, 72.33, 17.92, 3.33]}]}, {"id": "mb-1440-edit", "img": "compare/menubar-1440-edit.png", "group": "target", "tab": "Edit", "title": "Edit: history, Find and the editing tools", "size": "1440 × 900", "items": [{"n": 1, "head": "Undo and Redo, with their shortcuts", "text": "The same commands as the toolbar’s first group.", "x": 31.53, "y": 12.22, "box": [11.46, 10.56, 17.92, 3.33]}, {"n": 2, "head": "History opens the History drawer", "text": "The row’s History button opened a short list under itself. The drawer lists the same changes; the count shows on the right.", "x": 31.53, "y": 18.89, "box": [11.46, 17.22, 17.92, 3.33]}, {"n": 3, "head": "Find", "text": "Puts the cursor in the toolbar’s Find. / does the same on the canvas.", "x": 31.53, "y": 23.44, "box": [11.46, 21.78, 17.92, 3.33]}, {"n": 4, "head": "Bulk edit… and Connection template…", "text": "Each opens the Tools panel at its section. The note counts the selection.", "x": 31.53, "y": 28.83, "box": [11.46, 26.33, 17.92, 5.0]}]}, {"id": "mb-1440-view", "img": "compare/menubar-1440-view.png", "group": "target", "tab": "View", "title": "View: the panels, the minimap, zoom and the old View menu", "size": "1440 × 900", "items": [{"n": 1, "head": "Components and Inspector are checkboxes", "text": "Docked, they hide and show the columns, like Hide and the rails. Below 1280 px they open and close the drawers.", "x": 34.16, "y": 12.22, "box": [14.1, 10.56, 17.92, 3.33]}, {"n": 2, "head": "Minimap", "text": "Replaces the bottom bar’s “Hide minimap”.", "x": 34.16, "y": 18.89, "box": [14.1, 17.22, 17.92, 3.33]}, {"n": 3, "head": "Zoom in, Zoom out and Fit to canvas", "text": "The same as the toolbar’s zoom group.", "x": 34.16, "y": 23.44, "box": [14.1, 21.78, 17.92, 3.33]}, {"n": 4, "head": "Focus canvas, Presentation and Full screen", "text": "From the old View menu. Focus canvas keeps its own bar, unchanged.", "x": 34.16, "y": 34.67, "box": [14.1, 33.0, 17.92, 3.33]}]}, {"id": "mb-1440-arrange", "img": "compare/menubar-1440-arrange.png", "group": "target", "tab": "Arrange", "title": "Arrange: the old Layout menu, Group by and Containers", "size": "1440 × 900", "items": [{"n": 1, "head": "Layout", "text": "The Layout menu’s select.", "x": 37.08, "y": 12.56, "box": [17.01, 10.56, 17.92, 4.0]}, {"n": 2, "head": "Group by", "text": "Moves here from the toolbar.", "x": 37.08, "y": 16.56, "box": [17.01, 14.56, 17.92, 4.0]}, {"n": 3, "head": "Tidy layout and the hosts", "text": "From the Layout menu. “Collapse or expand all hosts” is disabled when the topology has no hosts, as here.", "x": 37.08, "y": 20.52, "box": [17.01, 18.56, 17.92, 6.56]}, {"n": 4, "head": "Containers… and Layout profiles…", "text": "Containers opens the panel the dock’s Groups button opened. Layout profiles opens Tools at that section.", "x": 37.08, "y": 31.33, "box": [17.01, 29.67, 17.92, 3.33]}]}, {"id": "mb-1440-validate", "img": "compare/menubar-1440-validate.png", "group": "target", "tab": "Validate", "title": "Validate: the old Validate menu, and Route validation from Tools", "size": "1440 × 900", "items": [{"n": 1, "head": "Validate for", "text": "The rule profile select.", "x": 41.46, "y": 12.56, "box": [21.39, 10.56, 17.92, 4.0]}, {"n": 2, "head": "Coverage, Review and Rules", "text": "They open their drawers, as before. Review shows how many findings there are.", "x": 41.46, "y": 20.78, "box": [21.39, 19.11, 17.92, 3.33]}, {"n": 3, "head": "Route validation…", "text": "Opens Tools at Route validation. The note gives its counts.", "x": 41.46, "y": 29.5, "box": [21.39, 27.0, 17.92, 5.0]}]}, {"id": "mb-1440-analyze", "img": "compare/menubar-1440-analyze.png", "group": "target", "tab": "Analyze", "title": "Analyze: the old Analyze menu, and Configuration draft from Tools", "size": "1440 × 900", "items": [{"n": 1, "head": "The Analyze menu as it was", "text": "Trace path, Load selected path, Inventory, Network and Statistics, each with its description.", "x": 45.9, "y": 12.52, "box": [25.83, 10.56, 17.92, 6.56]}, {"n": 2, "head": "Configuration draft…", "text": "Moves here from Tools and names the selected component. With nothing selected it says “Select a component first”.", "x": 45.9, "y": 47.06, "box": [25.83, 44.56, 17.92, 5.0]}]}, {"id": "mb-1440-help", "img": "compare/menubar-1440-help.png", "group": "target", "tab": "Help", "title": "Help: the canvas help, the SOAR guide and About", "size": "1440 × 900", "items": [{"n": 1, "head": "Canvas controls and shortcuts", "text": "Shows the help card that the bottom bar’s “?” showed.", "x": 50.21, "y": 12.22, "box": [30.14, 10.56, 17.92, 3.33]}, {"n": 2, "head": "SOAR playbooks guide", "text": "Opens the guide that was a pill at the canvas’s top right. Disabled, with a note, when the topology has no SOAR platform.", "x": 50.21, "y": 15.56, "box": [30.14, 13.89, 17.92, 3.33]}, {"n": 3, "head": "About Builder", "text": "The ⓘ text. The ⓘ button beside the title stays too.", "x": 50.21, "y": 20.11, "box": [30.14, 18.44, 17.92, 3.33]}]}, {"id": "mb-1440-tools", "img": "compare/menubar-1440-tools.png", "group": "target", "tab": "Tools panel", "title": "1440 px, Edit › Bulk edit… chosen", "size": "1440 × 900", "items": [{"n": 1, "head": "Tools opens at the canvas’s left edge, with a header", "text": "The dock button that opened and closed it is gone, so the panel names itself and has Close. Close or Esc returns focus to the canvas.", "x": 29.07, "y": 18.61, "box": [22.43, 16.33, 41.53, 4.56]}, {"n": 2, "head": "At the section you chose", "text": "Bulk edit is expanded and focused. The panel’s content was already wider than the panel in Build 197; that is a separate fix.", "x": 24.73, "y": 32.0, "box": [23.54, 24.67, 59.24, 14.67]}]}, {"id": "mb-1440-help-card", "img": "compare/menubar-1440-help-card.png", "group": "target", "tab": "First visit", "title": "1440 px, docked, first visit", "size": "1440 × 900", "items": [{"n": 1, "head": "The help card shows again when docked", "text": "Build 197 never showed it from 1280 px. It sits at the canvas’s bottom left, and “Got it” dismisses it for good.", "x": 48.85, "y": 83.84, "box": [22.64, 82.44, 25.69, 14.0]}, {"n": 2, "head": "The fit keeps the topology above it", "text": "Build 197’s fit reserved a strip as wide as the card on the left, so a first visit opened at 18% zoom at 768 and 1024 px. It now reserves the card’s height.", "x": 46.63, "y": 26.7, "box": [21.67, 25.78, 49.93, 46.11]}]}, {"id": "mb-1024", "img": "compare/menubar-1024.png", "group": "target", "tab": "1024 · drawers", "title": "1024 px, + Add chosen", "size": "1024 × 768", "items": [{"n": 1, "head": "+ Add opens the Components drawer", "text": "Below 1280 px the panels are drawers, as in Build 197. Closing it returns focus to + Add.", "x": 27.2, "y": 16.6, "box": [23.83, 12.37, 6.74, 3.78]}, {"n": 2, "head": "Narrower toolbars drop labels", "text": "Below 1280 px Undo and Redo show icons only, the planes lose their line swatches and the Validate status shortens.", "x": 5.47, "y": 16.76, "box": [2.34, 12.24, 6.25, 4.04]}, {"n": 3, "head": "The short Validate status", "text": "The error count if there are errors, otherwise the number to review.", "x": 91.65, "y": 16.6, "box": [85.64, 12.37, 12.01, 3.78]}]}, {"id": "mb-768", "img": "compare/menubar-768.png", "group": "target", "tab": "768 · narrowest", "title": "768 px, just above the phone layout", "size": "768 × 1024", "items": [{"n": 1, "head": "Both bars fit down to 761 px", "text": "Nothing wraps and the page doesn’t scroll sideways. At 760 px and below the phone layout takes over, unchanged.", "x": 64.53, "y": 6.88, "box": [16.02, 5.37, 80.86, 3.03]}, {"n": 2, "head": "Find gives way first", "text": "It shrinks to fit the other controls.", "x": 73.44, "y": 12.34, "box": [66.8, 9.28, 13.28, 2.73]}]}, {"id": "mb-focus", "img": "compare/menubar-focus.png", "group": "target", "tab": "Focus canvas", "title": "1440 px, Focus canvas", "size": "1440 × 900", "items": [{"n": 1, "head": "Focus canvas is unchanged", "text": "It hides both bars and keeps its own: the planes, history and Save at the top.", "x": 50.0, "y": 6.76, "box": [0.56, 0.89, 98.89, 5.33]}, {"n": 2, "head": "Its bottom bar and zoom stay", "text": "In Focus canvas the canvas has no other controls, so they remain.", "x": 30.25, "y": 94.11, "box": [0.62, 94.56, 98.75, 4.44]}]}, {"id": "today-1440", "img": "compare/menubar-today-1440.png", "group": "today", "tab": "Today · Build 197", "title": "Build 197 today at 1440 px", "size": "1440 × 900", "items": [{"n": 1, "head": "Row 1: saved topologies, Save, File, Undo, Redo, History, Use in", "text": "Commands, history and status mixed in one row.", "x": 53.44, "y": 5.59, "box": [8.54, 6.11, 89.79, 3.44]}, {"n": 2, "head": "Row 2 ends with the Layout, Validate and Analyze menus", "text": "After the planes, Group by and Find.", "x": 87.78, "y": 8.69, "box": [77.22, 10.56, 21.11, 3.11]}, {"n": 3, "head": "Tools and Groups at the canvas’s top left", "text": "They open panels over the canvas.", "x": 28.17, "y": 21.61, "box": [22.36, 16.22, 5.28, 10.78]}, {"n": 4, "head": "The SOAR guide at the top right", "text": "A pill over the canvas.", "x": 67.22, "y": 20.41, "box": [61.25, 16.22, 11.94, 3.22]}, {"n": 5, "head": "View, + Add, Inspector, minimap and “?” at the bottom left", "text": "A third toolbar, inside the canvas.", "x": 47.92, "y": 91.22, "box": [22.36, 92.33, 51.11, 4.44]}, {"n": 6, "head": "Zoom at the bottom right", "text": "A fourth group of controls.", "x": 68.33, "y": 91.56, "box": [63.19, 92.56, 10.28, 4.0]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size+' viewport';
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 197 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
