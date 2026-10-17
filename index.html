@@ -11778,5 +11778,182 @@ const stamp196=document.querySelector('.builderBuildStamp');if(stamp196){stamp19
 
 })();
 </script>
+<style id="builder-docked-panels-v197-styles">
+/* builder-docked-panels-v197: from 1280px, Components and the Inspector dock beside the canvas. */
+@media (min-width:1280px){
+  #topologyBuilder.builderDocked197 .builderGrid{grid-template-columns:var(--dock-left197,280px) minmax(0,1fr) var(--dock-right197,340px)!important;column-gap:8px!important;align-items:start!important}
+  #topologyBuilder.builderDocked197 .builderWorkspace{grid-column:2!important;grid-row:1!important;min-width:0!important}
+  #topologyBuilder.builderDocked197 .builderPalette,
+  #topologyBuilder.builderDocked197 .builderInspector{display:block!important;position:relative!important;top:auto!important;right:auto!important;bottom:auto!important;left:auto!important;width:auto!important;min-width:0!important;max-width:none!important;height:var(--dock-height197,calc(100dvh - 160px))!important;max-height:none!important;margin:var(--dock-offset197,8px) 0 0!important;grid-row:1!important;transform:none!important;box-shadow:none!important;z-index:2!important;overflow-y:auto!important;overscroll-behavior:contain;opacity:1!important;visibility:visible!important;pointer-events:auto!important;border-radius:10px!important}
+  #topologyBuilder.builderDocked197 .builderPalette{grid-column:1!important}
+  #topologyBuilder.builderDocked197 .builderInspector{grid-column:3!important}
+  #topologyBuilder.builderDocked197.dockLeftCollapsed197 .builderPalette,
+  #topologyBuilder.builderDocked197.dockRightCollapsed197 .builderInspector{display:none!important}
+  /* Docking replaces the bottom-bar toggles and the old resize grip. */
+  #topologyBuilder.builderDocked197 #builderAddToggle,
+  #topologyBuilder.builderDocked197 #builderInspectorToggle,
+  #topologyBuilder.builderDocked197 .builderInspector .builderSpaceResize140{display:none!important}
+  /* Collapsed columns become 40px rails. */
+  #topologyBuilder.builderDocked197.dockLeftCollapsed197 .dockRailLeft197,
+  #topologyBuilder.builderDocked197.dockRightCollapsed197 .dockRailRight197{display:flex}
+  #topologyBuilder.builderDocked197:not(.dockRightCollapsed197) .dockResizer197{display:block}
+  /* Overlays that live in the canvas stay inside its column. */
+  #topologyBuilder.builderDocked197 .builderDensityPanels{width:min(600px,calc(var(--dock-canvas-width197,720px) - 110px))!important}
+  /* Drawers stop short of the Tools and Groups buttons at the canvas's top left. */
+  #topologyBuilder.builderDocked197 .builderInspectorDrawer{max-width:calc(100% - 92px)!important}
+}
+/* Pin is retired at every desktop width: docking replaces it, and a pinned overlay broke the grid. */
+@media (min-width:761px){
+  #topologyBuilder #builderPalettePin126,#topologyBuilder #builderInspectorPin{display:none!important}
+}
+.dockRail197{display:none;grid-row:1;align-self:start;height:var(--dock-height197,480px);margin-top:var(--dock-offset197,8px);flex-direction:column;align-items:center;gap:12px;padding:12px 0;box-sizing:border-box;border:1px solid #24465a;border-radius:10px;background:#0b1a26;color:#cfe3ef;font:600 12px/1 system-ui,sans-serif;cursor:pointer}
+.dockRail197 b{font-size:16px;line-height:1;color:#57c7e8}
+.dockRail197 span{writing-mode:vertical-rl;letter-spacing:.06em}
+.dockRail197:hover,.dockRail197:focus-visible{border-color:#57c7e8;outline:none}
+.dockRailLeft197{grid-column:1}.dockRailRight197{grid-column:3}
+.dockRail197 i{width:7px;height:7px;border-radius:50%;background:#57c7e8;display:none}
+.dockRail197.hasSelection197 i{display:block}
+.dockResizer197{display:none;grid-column:3;grid-row:1;justify-self:start;align-self:start;width:6px;height:var(--dock-height197,480px);margin:var(--dock-offset197,8px) 0 0 -7px;cursor:ew-resize;z-index:5;border-radius:3px}
+.dockResizer197:hover,.dockResizer197:focus-visible,.dockResizer197.active197{background:#57c7e8;outline:none}
+/* The SOAR pill (z-index 66) covered the drawer's Close button, and the Tools panel on a narrow canvas. */
+#topologyBuilder #builderInspectorDrawer.open~#builderSoarGuide{visibility:hidden}
+#topologyBuilder .builderDensityDock{z-index:67!important}
+/* With nothing selected, the docked Inspector shows the topology instead of an empty form. */
+#topologyBuilder .builderInspector.dockEmpty197>:not(.builderCanvasPanelHeader):not(#dockSummary197){display:none!important}
+#dockSummary197{padding:4px 2px 12px}
+#dockSummary197 h3{margin:4px 0 2px;font:700 18px/1.25 system-ui,sans-serif;color:#eef8fa}
+#dockSummary197 .dockMeta197{margin:0 0 12px;color:#8fb2c4;font:12px/1.4 system-ui,sans-serif}
+#dockSummary197 dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:0 0 14px;padding:10px 12px;border:1px solid #24465a;border-radius:8px;font:12px/1.3 system-ui,sans-serif}
+#dockSummary197 dt{color:#8fb2c4}#dockSummary197 dd{margin:0;color:#deebf3;font-weight:600}
+#dockSummary197 .dockFindings197{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid #6b5a2a;border-radius:8px;background:#1d1a10;color:#f3d98a;font:600 12px/1.3 system-ui,sans-serif}
+#dockSummary197 .dockFindings197.valid197{border-color:#2f6b55;background:#0f2019;color:#8fe0b8}
+#dockSummary197 .dockFindings197 button{border:1px solid currentColor;border-radius:6px;background:transparent;color:inherit;padding:5px 9px;font:600 12px system-ui,sans-serif;cursor:pointer}
+#dockSummary197 .dockHint197{margin:14px 0 0;color:#8fb2c4;font:12px/1.5 system-ui,sans-serif}
+</style>
+<script id="builder-docked-panels-v197">
+(function(){
+/* Build 197: from 1280px, Components and the Inspector dock beside the canvas, both open at once. */
+const media=window.matchMedia('(min-width:1280px)'),root=$('#topologyBuilder'),grid=$('.builderGrid'),canvas=$('.builderCanvas');
+const storeKey='splunkPipelineExplorer.dockedPanels.v1',dock={components:true,inspector:true};
+try{const saved=JSON.parse(localStorage.getItem(storeKey)||'null');if(saved&&typeof saved==='object'){dock.components=saved.components!==false;dock.inspector=saved.inspector!==false}}catch{}
+const save=()=>{try{localStorage.setItem(storeKey,JSON.stringify(dock))}catch{}};
+const isDocked=()=>media.matches&&state.view==='builder'&&!state.builderCanvasFocus;
+const esc=builderEscape;
+// Pin is retired from 761px: docking replaces it, and pinned overlays broke the grid below 1680px. Phones keep it as it was.
+const phone=window.matchMedia('(max-width:760px)'),storedPin=key=>{try{return localStorage.getItem(key)==='true'}catch{return false}};
+let pinsOff=false;
+const unpin=()=>{
+ if(!phone.matches){canvasPanelState.pinned=false;try{builderPalettePinned126=false}catch{}pinsOff=true}
+ else if(pinsOff){pinsOff=false;canvasPanelState.pinned=storedPin('splunkPipelineExplorer.inspectorPinned.v1');try{builderPalettePinned126=storedPin('splunkPipelineExplorer.palettePinned.v1')}catch{}}
+};unpin();
+const rail=(side,label,arrow)=>{const b=document.createElement('button');b.type='button';b.className='dockRail197 dockRail'+side+'197';b.innerHTML='<b aria-hidden="true">'+arrow+'</b><span>'+label+'</span><i aria-hidden="true"></i>';b.setAttribute('aria-label','Show '+label);b.title='Show '+label;return b};
+const railLeft=rail('Left','Components','›'),railRight=rail('Right','Inspector','‹');
+const resizer=document.createElement('div');resizer.className='dockResizer197';resizer.setAttribute('role','separator');resizer.setAttribute('aria-orientation','vertical');resizer.setAttribute('aria-label','Resize Inspector');resizer.tabIndex=0;
+grid.append(railLeft,railRight,resizer);
+const summary=document.createElement('section');summary.id='dockSummary197';summary.hidden=true;canvasInspector.querySelector('.builderCanvasPanelHeader')?.after(summary);
+const paletteClose=$('#builderPaletteDrawerClose'),inspectorClose=$('#builderInspectorDrawerClose');
+// The Inspector may take whatever the canvas has beyond 580px (measured, so page gutters don't matter), within 300–560px.
+const inspectorMax=()=>{const right=parseFloat(root.style.getPropertyValue('--dock-right197'))||340;return Math.max(300,Math.min(560,Math.floor(canvas.getBoundingClientRect().width+right-580)))};
+const inspectorWidth=()=>Math.max(300,Math.min(inspectorMax(),Number(builderSpaceInspectorWidth140)||340));
+function layout(){
+ root.style.setProperty('--dock-left197',dock.components?'280px':'40px');
+ root.style.setProperty('--dock-right197',dock.inspector?inspectorWidth()+'px':'40px');
+ const g=grid.getBoundingClientRect(),c=canvas.getBoundingClientRect();
+ if(c.height){root.style.setProperty('--dock-offset197',Math.max(0,Math.round(c.top-g.top))+'px');root.style.setProperty('--dock-height197',Math.round(c.height)+'px');root.style.setProperty('--dock-canvas-width197',Math.round(c.width)+'px')}
+}
+function keepView(before){requestAnimationFrame(()=>{const after=canvas.clientWidth;if(!before||!after||Math.abs(after-before)<2)return;if(typeof builderSpaceReadFit140==='function'&&builderSpaceReadFit140())fitBuilderView(false);else{state.builderViewport.x+=(after-before)/2;applyBuilderViewport()}})}
+// Docked, the Close buttons read Hide; undocked, they get Build 196's own text and labels back. Unchanged values aren't rewritten.
+const original=button=>button&&{text:button.textContent,label:button.getAttribute('aria-label'),title:button.getAttribute('title')};
+const closeOriginals=new Map([[paletteClose,original(paletteClose)],[inspectorClose,original(inspectorClose)]]);
+const setAttr=(el,name,value)=>{if(value==null)el.removeAttribute(name);else if(el.getAttribute(name)!==value)el.setAttribute(name,value)};
+function relabel(button,docked,text,label){if(!button)return;const o=closeOriginals.get(button),t=docked?text:o.text;if(button.textContent!==t)button.textContent=t;setAttr(button,'aria-label',docked?label:o.label);setAttr(button,'title',docked?label:o.title)}
+function labels(docked){
+ relabel(paletteClose,docked,'‹ Hide','Hide Components');
+ relabel(inspectorClose,docked,'Hide ›','Hide Inspector');
+ railRight.classList.toggle('hasSelection197',state.builderSelected!=null||!!state.builderSelectedEdge);
+}
+// The summary shows or hides at once; its counts and findings (which run Validate) are rebuilt at most once a frame,
+// outside renderBuilder, so redraws keep their budget.
+let summaryFrame=0;
+function topologySummary(){
+ const empty=isDocked()&&dock.inspector&&state.builderSelected==null&&!state.builderSelectedEdge;
+ canvasInspector.classList.toggle('dockEmpty197',empty);if(summary.hidden===empty)summary.hidden=!empty;if(!empty||summaryFrame)return;
+ summaryFrame=requestAnimationFrame(()=>{summaryFrame=0;if(!summary.hidden)fillSummary()});
+}
+function fillSummary(){
+ const count=plane=>builderTraceEdges(plane).length,data=count('data'),fleet=count('management'),access=count('authentication'),f=builderFindingSummary();
+ const title=state.builderPresentation?.title||defaultPresentationTitle();
+ summary.innerHTML='<span class="builderLabel">Topology</span><h3>'+esc(title)+'</h3><p class="dockMeta197">Nothing selected</p>'+
+  '<dl><dt>Components</dt><dd>'+state.builderNodes.length+'</dd><dt>Event data</dt><dd>'+data+' link'+(data===1?'':'s')+'</dd><dt>Fleet management</dt><dd>'+fleet+' link'+(fleet===1?'':'s')+'</dd><dt>User access</dt><dd>'+access+' link'+(access===1?'':'s')+'</dd></dl>'+
+  '<div class="dockFindings197'+(f.errors||f.review?'':' valid197')+'"><span>'+(f.errors||f.review?f.errors+' error'+(f.errors===1?'':'s')+' · '+f.review+' to review':'No findings')+'</span>'+(f.errors||f.review?'<button type="button" data-dock-review>Review</button>':'')+'</div>'+
+  '<p class="dockHint197">Select a component or link to inspect it. Right-click a component for its actions.</p>';
+ summary.querySelector('[data-dock-review]')?.addEventListener('click',()=>openBuilderDrawer('review'));
+}
+let wasDocked=false;
+const syncBefore=syncCanvasPanels;
+syncCanvasPanels=function(...args){
+ const docked=isDocked(),before=canvas.clientWidth;
+ unpin();
+ if(docked){canvasPanelState.palette=dock.components;canvasPanelState.inspector=dock.inspector}
+ else if(wasDocked){canvasPanelState.palette=false;canvasPanelState.inspector=false}
+ const result=syncBefore(...args);
+ root.classList.toggle('builderDocked197',docked);
+ root.classList.toggle('dockLeftCollapsed197',docked&&!dock.components);
+ root.classList.toggle('dockRightCollapsed197',docked&&!dock.inspector);
+ if(!phone.matches)root.classList.remove('canvasPalettePinned','canvasInspectorPinned');
+ if(docked){canvasPalette.inert=!dock.components;canvasInspector.inert=!dock.inspector;canvasPalette.setAttribute('aria-hidden',String(!dock.components));canvasInspector.setAttribute('aria-hidden',String(!dock.inspector));layout()}
+ labels(docked);topologySummary();
+ if(docked!==wasDocked||docked)keepView(before);
+ wasDocked=docked;
+ return result;
+};
+// Explicit show and hide. Everything else that closes a panel is overridden while docked.
+document.addEventListener('click',event=>{
+ if(!isDocked())return;
+ const target=event.target.closest?.('#builderPaletteDrawerClose,#builderInspectorDrawerClose,.dockRailLeft197,.dockRailRight197');if(!target)return;
+ event.preventDefault();event.stopPropagation();
+ if(target===paletteClose)dock.components=false;else if(target===inspectorClose)dock.inspector=false;else if(target===railLeft)dock.components=true;else dock.inspector=true;
+ save();syncCanvasPanels();
+ if(target===railLeft)$('#builderPaletteQuery')?.focus();else if(target===railRight)$('#builderInspectorName')?.focus({preventScroll:true});else (target===paletteClose?railLeft:railRight).focus();
+},true);
+// Esc in Components can't close it while docked, so it hands focus back to the canvas.
+canvasPalette.addEventListener('keydown',event=>{if(event.key!=='Escape'||!isDocked())return;setTimeout(()=>{const active=document.activeElement;if(!active||active===document.body||canvasPalette.contains(active))canvas.focus({preventScroll:true})},0)},true);
+// Docked, Components never reopens, so its "Adding after" line follows the selection instead (see refreshBuilderSelection below).
+const syncTarget=()=>{if(isDocked()&&typeof syncBuilderPaletteTarget==='function')syncBuilderPaletteTarget()};
+// "+ Add", the A key and the change-target flow open Components; inspect actions open the Inspector. Selection alone leaves a hidden Inspector hidden.
+const openPaletteBefore=openBuilderCanvasPalette;
+// Like Build 196, opening either panel (selecting included) closes an open drawer first.
+openBuilderCanvasPalette=function(options={}){if(!isDocked())return openPaletteBefore(options);if(activeDrawerKind)closeBuilderDrawer();if(!dock.components){dock.components=true;save()}syncCanvasPanels();syncTarget();if(options.focus!==false)$('#builderPaletteQuery')?.focus()};
+const openInspectorBefore=openBuilderCanvasInspector;
+openBuilderCanvasInspector=function(options={}){if(!isDocked())return openInspectorBefore(options);if(activeDrawerKind)closeBuilderDrawer();if(options.focus&&!dock.inspector){dock.inspector=true;save()}syncCanvasPanels();if(options.focus)$('#builderInspectorName')?.focus({preventScroll:true})};
+const contextBefore=runContextAction;runContextAction=function(action,...args){if(action==='inspect'&&isDocked()&&!dock.inspector){dock.inspector=true;save();syncCanvasPanels()}return contextBefore(action,...args)};
+// Resize the Inspector from its left edge (300px to whatever leaves the canvas 580px).
+let drag=null;
+const setWidth=w=>{builderSpaceInspectorWidth140=Math.max(300,Math.min(inspectorMax(),w));root.style.setProperty('--builder-inspector-width-v140',builderSpaceInspectorWidth140+'px');layout()};
+const keepWidth=()=>{try{localStorage.setItem('splunkPipelineExplorer.inspectorWidth.v1',String(builderSpaceInspectorWidth140))}catch{}};
+resizer.addEventListener('pointerdown',event=>{drag={id:event.pointerId,x:event.clientX,width:inspectorWidth(),view:canvas.clientWidth};resizer.setPointerCapture(event.pointerId);resizer.classList.add('active197');event.preventDefault()});
+resizer.addEventListener('pointermove',event=>{if(drag&&event.pointerId===drag.id)setWidth(drag.width+drag.x-event.clientX)});
+resizer.addEventListener('pointerup',()=>{if(!drag)return;const before=drag.view;drag=null;resizer.classList.remove('active197');keepWidth();keepView(before)});
+resizer.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight'].includes(event.key))return;event.preventDefault();const before=canvas.clientWidth;setWidth(inspectorWidth()+(event.key==='ArrowLeft'?12:-12));keepWidth();keepView(before)});
+// Keep the columns in step with the window, the view and the selection.
+let resizeTimer=0;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if(isDocked()){const before=canvas.clientWidth;layout();keepView(before)}},60)});
+media.addEventListener('change',()=>requestAnimationFrame(()=>syncCanvasPanels()));
+phone.addEventListener('change',()=>{if(state.view==='builder')syncCanvasPanels()});
+if(typeof ResizeObserver==='function')new ResizeObserver(()=>{if(isDocked())layout()}).observe(canvas);
+const switchBefore=switchView;switchView=function(...args){const result=switchBefore(...args);if(state.view==='builder')requestAnimationFrame(()=>syncCanvasPanels());return result};
+const renderBefore=renderBuilder;renderBuilder=function(...args){const result=renderBefore(...args);if(state.view==='builder'){labels(isDocked());topologySummary()}return result};
+const refreshBefore=refreshBuilderSelection;refreshBuilderSelection=function(...args){const result=refreshBefore(...args);if(state.view==='builder'){labels(isDocked());topologySummary();syncTarget()}return result};
+const focusBefore=toggleBuilderCanvasFocus;toggleBuilderCanvasFocus=function(...args){const result=focusBefore(...args);syncCanvasPanels();return result};
+syncCanvasPanels();
+})();
+
+/* Build records follow the unmodified supplied prototype. */
+(function(){
+changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Docked Components and Inspector','From 1280 px, docks Components and the Inspector beside the canvas, with collapsible rails, a topology summary, Inspector resizing and remembered panel choices. Preserves narrow-screen and Focus canvas overlays.',true]);
+const build=document.querySelector('#topologyBuilder');build.dataset.buildNumber='197';build.dataset.buildDate='2026-10-17';document.title='Splunk Pipeline Explorer · Build 197 · 17 Oct 2026';
+const stamp=document.querySelector('.builderBuildStamp');if(stamp){stamp.querySelector('b').textContent='Build 197';stamp.setAttribute('aria-label','Build 197, dated 17 October 2026');const time=stamp.querySelector('time');if(time){time.dateTime='2026-10-17';time.textContent='17 Oct 2026'}}
+builderInfoText159.textContent=builderInfoText159.textContent.replace('Build 196','Build 197');
+})();
+</script>
 </body>
 </html>
