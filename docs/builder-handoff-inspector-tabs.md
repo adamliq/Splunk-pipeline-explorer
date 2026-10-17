@@ -8,6 +8,8 @@
 
 The script only wraps existing functions and adds listeners, so there are no in-place edits. Paste both files as they are, then add the build records (see "Build records").
 
+**Done in Build 199**, with two fixes to the prototype that this handoff's checks missed (a revealed field's tab is now remembered, and Selection's link chips get their ends), and one small fix left for Build 200. See [`builder-handoff-build199.md`](builder-handoff-build199.md).
+
 **Mockup (the target):** [`docs/mockups/builder-inspector-tabs-mockup.html`](mockups/builder-inspector-tabs-mockup.html). Every scene is a screenshot of the real Builder: fourteen with the block pair applied, and three "Today" scenes from Build 198. The screenshots are `docs/mockups/compare/inspector-tabs-*.png`.
 **Tested first:** the block pair was appended to Build 198 and run. The results under "Check before uploading" come from that run.
 
