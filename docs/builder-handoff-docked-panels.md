@@ -167,16 +167,16 @@ For maintenance; the code is in the two prototype files.
 
 - **`node tools/builder-space-check.js index.html`:** 7/7. Build 196 also scores 7/7 with the updated tool.
 - **`node tools/builder-connector-check.js index.html`:** the same as Build 196. Scenarios 9 and 10 (the reference topology) are all OK; for the rest, see "Not in scope".
-- **`node tools/builder-perf-check.js index.html`:** the same as Build 196 within noise. Medians of five alternating runs (redraw, ms):
+- **`node tools/builder-perf-check.js index.html`:** no slower than Build 196. Medians of five alternating runs on the final code (redraw, ms):
 
   | Topology | Build 196 | Docked | Budget |
   |---|---|---|---|
-  | default | 36 | 34 | 40 |
-  | fan5 | 47 | 47 | 50 |
-  | fan8 | 73 | 75 | 80 |
-  | reference | 86 | 85 | 120 |
+  | default | 40 | 37 | 40 |
+  | fan5 | 49 | 45 | 50 |
+  | fan8 | 89 | 76 | 80 |
+  | reference | 94 | 81 | 120 |
 
-  In this container both builds sit at the fan5 and fan8 budgets, so single runs of either fail now and then; Build 196 passed 3 of 5. Run the tool three times on a quieter machine, and compare with Build 196 there.
+  In this container both builds sit at the fan5 and fan8 budgets, so single runs of either fail now and then. In this series Build 196 passed 0 of 5 runs and the docked build 2 of 5; in an earlier, quieter series the medians were within 2 ms of each other. Run the tool three times on a quieter machine and compare with Build 196 there.
 
 ### 3. Layout (reference topology)
 
