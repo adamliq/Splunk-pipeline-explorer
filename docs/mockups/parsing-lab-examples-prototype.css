@@ -1,20 +1,20 @@
 #operationsContent .parsePresetBar{display:grid;gap:7px}
-.parsePresetGroup200{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
-.parsePresetLabel200{flex:0 0 8.5rem;color:var(--muted);font-size:.55rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
-.parsePresetGroup200 .parsePreset:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
-.parsePresetNote200{margin:-4px 0 13px;max-width:120ch;color:#b9cad7;font-size:.64rem;line-height:1.55}
-.parsePresetNote200 b{color:#e6f2f8;font-weight:700}
-.parsePresetNote200 code{border:1px solid #294052;border-radius:5px;background:#07111b;padding:1px 5px;color:#d9e7f0;font:600 .6rem/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap}
+.parsePresetGroup201{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.parsePresetLabel201{flex:0 0 8.5rem;color:var(--muted);font-size:.55rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+.parsePresetGroup201 .parsePreset:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.parsePresetNote201{margin:-4px 0 13px;max-width:120ch;color:#b9cad7;font-size:.64rem;line-height:1.55}
+.parsePresetNote201 b{color:#e6f2f8;font-weight:700}
+.parsePresetNote201 code{border:1px solid #294052;border-radius:5px;background:#07111b;padding:1px 5px;color:#d9e7f0;font:600 .6rem/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap}
 /* The merge toggle as .parseToggle meant it: .parseField label and input made it a block with a full-width checkbox. */
 #operationsContent .parseField .parseToggle{display:flex;margin:0;color:#c4d3de;font-size:.63rem}
 #operationsContent .parseField .parseToggle input{width:auto;padding:0}
 #operationsContent .parseField .parseToggle:has(input:disabled){color:var(--muted)}
-.parseHint200{display:block;margin:4px 0 0 20px;color:var(--muted);font-size:.58rem;line-height:1.4}
+.parseHint201{display:block;margin:4px 0 0 20px;color:var(--muted);font-size:.58rem;line-height:1.4}
 /* A long event scrolls inside its card, 20 lines at a time, and the facts beside it keep their size. */
 #operationsContent .parseEventRaw{max-height:20lh;overflow:auto}
 #operationsContent .parseFacts{align-content:start}
-.parsePreviewNote200{margin:-2px 0 9px;color:#b9cad7;font-size:.64rem;line-height:1.5}
-.parseRow200{display:flex;align-items:baseline;gap:6px}
-.parseRow200+.parseRow200{margin-top:5px}
-.parseRow200>span{flex:0 0 2.6rem;color:var(--muted);font-size:.5rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-@media (max-width:640px){.parsePresetLabel200{flex-basis:100%}.parsePresetNote200 code{white-space:normal;word-break:break-all}}
+.parsePreviewNote201{margin:-2px 0 9px;color:#b9cad7;font-size:.64rem;line-height:1.5}
+.parseRow201{display:flex;align-items:baseline;gap:6px}
+.parseRow201+.parseRow201{margin-top:5px}
+.parseRow201>span{flex:0 0 2.6rem;color:var(--muted);font-size:.5rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+@media (max-width:640px){.parsePresetLabel201{flex-basis:100%}.parsePresetNote201 code{white-space:normal;word-break:break-all}}

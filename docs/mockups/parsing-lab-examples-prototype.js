@@ -1,5 +1,5 @@
 (function(){
-/* Build 200: more Parsing laboratory examples, in two groups: samples of common formats, and common mistakes. Each
+/* Build 201: more Parsing laboratory examples, in two groups: samples of common formats, and common mistakes. Each
    example sets every setting it depends on, says in one line what it shows, and adds the props lines its format needs
    (TIME_PREFIX, TIME_FORMAT, TIMESTAMP_FIELDS) to the generated configuration.
    Two event boundaries join the three there are: CSV header line, which starts an event at each repeat of the input's
@@ -180,31 +180,31 @@ function settings(root,c){
  if(boundary){boundary.insertAdjacentHTML('beforeend','<option value="header">CSV header line</option><option value="fixed">Fixed length</option>');boundary.value=c.boundary}
  if(search){search.insertAdjacentHTML('beforeend','<option value="multi">KV_MODE = multi</option>');search.value=c.searchExtraction}
  if(boundary&&c.boundary==='fixed'){
-  boundary.closest('.parseField').insertAdjacentHTML('afterend',`<div class="parseField" id="parseRecordLength200"><label for="parseRecordLengthInput200">Record length (characters)</label><input id="parseRecordLengthInput200" type="number" min="${MIN_RECORD}" step="1" value="${recordLength(c)}"></div>`);
-  root.querySelector('#parseRecordLengthInput200').onchange=e=>{state.parsingLab.recordLength=Math.max(MIN_RECORD,Math.round(+e.target.value)||128);state.parsingLab.preset='custom';renderParsingLab()};
+  boundary.closest('.parseField').insertAdjacentHTML('afterend',`<div class="parseField" id="parseRecordLength201"><label for="parseRecordLengthInput201">Record length (characters)</label><input id="parseRecordLengthInput201" type="number" min="${MIN_RECORD}" step="1" value="${recordLength(c)}"></div>`);
+  root.querySelector('#parseRecordLengthInput201').onchange=e=>{state.parsingLab.recordLength=Math.max(MIN_RECORD,Math.round(+e.target.value)||128);state.parsingLab.preset='custom';renderParsingLab()};
  }
  const merge=root.querySelector('[data-parse-check="merge"]');
- if(merge&&(c.boundary==='fixed'||c.boundary==='header')){merge.checked=false;merge.disabled=true;merge.setAttribute('aria-describedby','parseMergeHint200');merge.closest('label')?.insertAdjacentHTML('afterend','<span class="parseHint200" id="parseMergeHint200">Not used with this boundary: LINE_BREAKER alone ends each event.</span>')}
+ if(merge&&(c.boundary==='fixed'||c.boundary==='header')){merge.checked=false;merge.disabled=true;merge.setAttribute('aria-describedby','parseMergeHint201');merge.closest('label')?.insertAdjacentHTML('afterend','<span class="parseHint201" id="parseMergeHint201">Not used with this boundary: LINE_BREAKER alone ends each event.</span>')}
 }
 
 function decorate(full){
  const root=document.querySelector('#operationsContent'),bar=root?.querySelector('.parsePresetBar');if(!bar)return;
  const c=state.parsingLab,sample=parsingLabPresets[c.preset];
- bar.innerHTML=GROUPS.map(([group,label])=>`<div class="parsePresetGroup200" role="group" aria-label="${label}"><span class="parsePresetLabel200" aria-hidden="true">${label}</span>`+
+ bar.innerHTML=GROUPS.map(([group,label])=>`<div class="parsePresetGroup201" role="group" aria-label="${label}"><span class="parsePresetLabel201" aria-hidden="true">${label}</span>`+
   Object.entries(parsingLabPresets).filter(([,p])=>(p.group||'samples')===group).map(([id,p])=>`<button type="button" class="parsePreset ${c.preset===id?'active':''}" data-parse-preset="${id}" aria-pressed="${c.preset===id}">${esc(p.name)}</button>`).join('')+'</div>').join('');
  const props=Object.entries(sample?.props||{});
- bar.insertAdjacentHTML('afterend',sample?`<p class="parsePresetNote200"><b>${esc(sample.name)}.</b> ${esc(sample.note||'')}${props.length?` <span>Its configuration uses ${props.map(([k,v])=>`<code>${esc(k)} = ${esc(v)}</code>`).join(' and ')}.</span>`:''}</p>`:
-  '<p class="parsePresetNote200"><b>Custom settings.</b> Choose an example to reset every setting to it.</p>');
+ bar.insertAdjacentHTML('afterend',sample?`<p class="parsePresetNote201"><b>${esc(sample.name)}.</b> ${esc(sample.note||'')}${props.length?` <span>Its configuration uses ${props.map(([k,v])=>`<code>${esc(k)} = ${esc(v)}</code>`).join(' and ')}.</span>`:''}</p>`:
+  '<p class="parsePresetNote201"><b>Custom settings.</b> Choose an example to reset every setting to it.</p>');
  bar.querySelectorAll('[data-parse-preset]').forEach(b=>b.onclick=()=>choose(b.dataset.parsePreset));
  settings(root,full.c);
  const truncated=full.events.filter(e=>e.truncated).length,metrics=[...root.querySelectorAll('.parseMetric')];
  [full.eventCount,full.warningCount,full.routed,full.indexFieldNames.length,full.searchFieldNames.length,truncated].forEach((value,i)=>{const strong=metrics[i]?.querySelector('strong');if(strong)strong.textContent=value.toLocaleString()});
  metrics[5]?.style.setProperty('--parse',truncated?'var(--red)':'var(--green)');
  const list=root.querySelector('.parseEventList');
- if(list&&full.events.length>PREVIEW)list.insertAdjacentHTML('beforebegin',`<p class="parsePreviewNote200">Showing the first ${PREVIEW} of ${full.eventCount.toLocaleString()} events. The counts above include every event, and so does Download results.</p>`);
+ if(list&&full.events.length>PREVIEW)list.insertAdjacentHTML('beforebegin',`<p class="parsePreviewNote201">Showing the first ${PREVIEW} of ${full.eventCount.toLocaleString()} events. The counts above include every event, and so does Download results.</p>`);
  if(full.c.searchExtraction==='multi')root.querySelectorAll('.parseEvent').forEach((card,i)=>{
   const table=full.events[i]?.searchRows,box=card.querySelector('.parseFields.search');if(!table?.length||!box)return;
-  box.innerHTML=`<small>Search time · calculated · ${table.length} row${table.length===1?'':'s'}</small>`+table.map((row,j)=>`<div class="parseRow200"><span>Row ${j+1}</span><div class="parseFieldTags">${Object.entries(row).map(([k,v])=>`<b>${esc(k)}=${esc(v)}</b>`).join('')}</div></div>`).join('');
+  box.innerHTML=`<small>Search time · calculated · ${table.length} row${table.length===1?'':'s'}</small>`+table.map((row,j)=>`<div class="parseRow201"><span>Row ${j+1}</span><div class="parseFieldTags">${Object.entries(row).map(([k,v])=>`<b>${esc(k)}=${esc(v)}</b>`).join('')}</div></div>`).join('');
  });
  root.querySelectorAll('[data-parse-walk]').forEach(b=>b.onclick=()=>{const e=full.events[Number(b.dataset.parseWalk)];if(!e)return;
   state.walkthrough.raw=e.raw;state.walkthrough.preset=walkthroughFor(full.c);state.walkthrough.step=0;state.operationsView='walkthrough';renderOperations()});

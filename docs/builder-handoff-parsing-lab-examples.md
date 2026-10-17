@@ -1,10 +1,10 @@
 # Builder handoff: more Parsing laboratory examples and two event boundaries
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
-**Start from:** Build 199.
+**Start from:** Build 200.
 **One new block pair, at the end of the page (before `</body>`):**
-- `<style id="parsing-lab-examples-v200-styles">`, containing [`docs/mockups/parsing-lab-examples-prototype.css`](mockups/parsing-lab-examples-prototype.css);
-- `<script id="parsing-lab-examples-v200">`, containing [`docs/mockups/parsing-lab-examples-prototype.js`](mockups/parsing-lab-examples-prototype.js).
+- `<style id="parsing-lab-examples-v201-styles">`, containing [`docs/mockups/parsing-lab-examples-prototype.css`](mockups/parsing-lab-examples-prototype.css);
+- `<script id="parsing-lab-examples-v201">`, containing [`docs/mockups/parsing-lab-examples-prototype.js`](mockups/parsing-lab-examples-prototype.js).
 
 The script adds to `parsingLabPresets` and wraps these functions, so there are no in-place edits: `renderParsingLab`, `parsingLabModel`, `parsingLabConfiguration`, `parsingLabJson`, `evidencePackFiles`, `architectureReportJson` and `architectureReportMarkdown`. Paste both files as they are, then add the build records (see "Build records").
 
@@ -14,17 +14,17 @@ The script adds to `parsingLabPresets` and wraps these functions, so there are n
 - four examples that show them, two of them on a 1 MB single-line file;
 - a preview of the first 25 events for a large input.
 
-Build 200 hasn't been built, so paste the current files.
+Build 200 took only the Selection fix from [`builder-handoff-build199.md`](builder-handoff-build199.md), so neither version has been built. Paste the current files. Their ids and class names now end in 201, for the build that adds them.
 
 **Mockup (the target):** [`docs/mockups/parsing-lab-examples-mockup.html`](mockups/parsing-lab-examples-mockup.html).
-- **Scenes:** every scene is a screenshot of the real laboratory, 14 with the block pair applied and one "Today" scene from Build 199. The screenshots are `docs/mockups/compare/parsing-lab-*.png`.
+- **Scenes:** every scene is a screenshot of the real laboratory, 14 with the block pair applied and one "Today" scene from Build 200. The screenshots are `docs/mockups/compare/parsing-lab-*.png`.
 - **Generated props:** the last panel shows what Download config writes for the two new boundaries.
 
-**Tested first:** the block pair was appended to Build 199 and run. The results under "Check before uploading" come from that run.
+**Tested first:** the block pair was appended to Build 200 and run. The results under "Check before uploading" come from that run.
 
 ## Why
 
-**What Build 199's laboratory offers** (Operate › Parsing laboratory):
+**What Build 200's laboratory offers** (Operate › Parsing laboratory, unchanged since Build 199):
 - **Four samples:** Multiline syslog, Windows XML, NDJSON API and CSV file. Between them they show line merging, XML events, indexed JSON and indexed CSV. Nothing shows:
   - a stack trace;
   - a syslog header before the timestamp;
@@ -83,14 +83,14 @@ Settings an example doesn't list are the defaults in section 3.
 ### 2. The note
 
 One line under the bar says what the chosen example shows. When the example's format needs props lines (section 7), the note ends "Its configuration uses `TIME_PREFIX = …`".
-- **Changing a setting** makes the settings custom, as in Build 199. The note then reads "Custom settings. Choose an example to reset every setting to it." and no button is pressed.
-- **Editing the raw input** keeps the example and its note, as Build 199 keeps the pressed button.
+- **Changing a setting** makes the settings custom, as in Build 200. The note then reads "Custom settings. Choose an example to reset every setting to it." and no button is pressed.
+- **Editing the raw input** keeps the example and its note, as Build 200 keeps the pressed button.
 
-The bar has two rows, "Samples" and "Common mistakes", each labelled. On a phone each label sits above its buttons. The buttons keep Build 199's style and get `aria-pressed`.
+The bar has two rows, "Samples" and "Common mistakes", each labelled. On a phone each label sits above its buttons. The buttons keep Build 200's style and get `aria-pressed`.
 
 ### 3. Choosing an example
 
-Every setting comes from the example. Settings it doesn't list return to these defaults (Build 199's starting values):
+Every setting comes from the example. Settings it doesn't list return to these defaults (Build 200's starting values):
 
 | Setting | Default |
 |---|---|
@@ -101,7 +101,7 @@ Every setting comes from the example. Settings it doesn't list return to these d
 | Sourcetype, default index | custom, security |
 | Route | result = failure → security_alerts |
 
-The four Build 199 samples list the same settings as before, so they look the same; only a value carried over from another example is reset. **The index-time processing tier is kept**: it describes your topology, not the example.
+The four existing samples list the same settings as before, so they look the same; only a value carried over from another example is reset. **The index-time processing tier is kept**: it describes your topology, not the example.
 
 ### 4. Two new event boundaries
 
@@ -144,10 +144,10 @@ The Search-time extraction list gains **KV_MODE = multi**. It reads each event a
 
 - **The first 25 events are listed.** A note above them reads "Showing the first 25 of 8,250 events. The counts above include every event, and so does Download results." Below 26 events nothing changes. This applies to every boundary, not only the new ones.
 - **The metrics count every event,** with thousands separators (8,250). Truncated counts every event too, not just the 25 listed.
-- **The model is worked out once per render.** Build 199 works it out twice, for the page and for the tier panel.
+- **The model is worked out once per render.** Build 200 works it out twice, for the page and for the tier panel.
 - **Download results keeps every event:** 8.5 MB for Fixed-length records.
 - **The evidence pack and the architecture report list the first 25 events.** Both `assurance/effective-parsing-laboratory.json` and `reports/architecture-report.json` do, with the full counts and `"eventsListed": 25` in `summary`. Without this, the pack grows from 0.45 MB to 18 MB, because it holds the 8,250 events twice. With it, the pack is 2.5 MB, most of it the 1 MB input, which is kept so the result can be reproduced.
-- **The lab's state is not saved,** as in Build 199, so the 1 MB input never reaches the saved topology or localStorage.
+- **The lab's state is not saved,** as in Build 200, so the 1 MB input never reaches the saved topology or localStorage.
 
 ### 7. The configuration
 
@@ -184,18 +184,18 @@ The walkthrough has its own JSON, CSV, Windows and syslog samples, and models ea
 - INDEXED_EXTRACTIONS = csv gives CSV;
 - anything else gives syslog, the new boundaries and KV_MODE = multi included.
 
-The four Build 199 samples open as before. The JSON examples, and custom JSON input, open as JSON. A fixed-length event opens as its 128-character record.
+The four existing samples open as before. The JSON examples, and custom JSON input, open as JSON. A fixed-length event opens as its 128-character record.
 
 ### 9. Two layout fixes in the laboratory
 
-- **A long event scrolls inside its card.** The raw text shows 20 lines and scrolls, and the facts beside it keep their size. In Build 199, at 1440 px, a 10,000-character event makes its card 1,365 px tall and stretches each fact box beside it from 45 to 260 px. With the block the card is 471 px.
-- **The merge checkbox sits beside its label.** In Build 199, `.parseField label` and `.parseField input` override `.parseToggle`, so the label is a block and the checkbox spans the field's width, centred above its text. The block gives `.parseToggle` its flex layout, colour and size back, and `width:auto` to the checkbox.
+- **A long event scrolls inside its card.** The raw text shows 20 lines and scrolls, and the facts beside it keep their size. In Build 200, at 1440 px, a 10,000-character event makes its card 1,365 px tall and stretches each fact box beside it from 45 to 260 px. With the block the card is 471 px.
+- **The merge checkbox sits beside its label.** In Build 200, `.parseField label` and `.parseField input` override `.parseToggle`, so the label is a block and the checkbox spans the field's width, centred above its text. The block gives `.parseToggle` its flex layout, colour and size back, and `width:auto` to the checkbox.
 
 ### 10. Unchanged
 
 - **The layout:** the placement, the other settings, the configuration chain's layout, and the event cards apart from the KV_MODE = multi rows.
 - **The JSON export's format,** apart from the optional `summary.eventsListed`.
-- **The model's results:** with neither a new boundary nor KV_MODE = multi, the events, fields and warnings are Build 199's, with one exception. A row that repeats the CSV header gets one more warning, "CSV header row indexed as data: each field holds its own name", whatever the boundary.
+- **The model's results:** with neither a new boundary nor KV_MODE = multi, the events, fields and warnings are Build 200's, with one exception. A row that repeats the CSV header gets one more warning, "CSV header row indexed as data: each field holds its own name", whatever the boundary.
 - **Performance guardrails:** "Use parsing sample" reads the chosen example's events, as before.
 
 ## Splunk notes, with sources
@@ -215,18 +215,18 @@ The four Build 199 samples open as before. The JSON examples, and custom JSON in
 For maintenance; the code is in the two prototype files.
 
 - **Examples:**
-  - The four Build 199 samples get `group`, `note` and, where needed, `props`.
+  - The four existing samples get `group`, `note` and, where needed, `props`.
   - The ten new ones are added to `parsingLabPresets` with the same keys, so the architecture report names them like the others.
   - Fixed-length records and 1 MB line, no breaker have a `raw` getter that calls `badgeLine()`. It builds the 1 MB line once and keeps it.
-- **Choosing:** `choose(id)` starts from `SAMPLE_DEFAULTS`, copies the example's own settings (`raw` and the defaults' keys), sets `preset` and renders. It copies only setting keys, so `name`, `note` and `props` stay out of `state.parsingLab` and the JSON export. Build 199's handler copied every key, `name` included.
+- **Choosing:** `choose(id)` starts from `SAMPLE_DEFAULTS`, copies the example's own settings (`raw` and the defaults' keys), sets `preset` and renders. It copies only setting keys, so `name`, `note` and `props` stay out of `state.parsingLab` and the JSON export. Build 200's handler copies every key, `name` included.
 - **The model:** `parsingLabModel` is wrapped. For the new boundaries:
   1. `boundaryEvents()` breaks the input with the boundary's LINE_BREAKER (`breakEvents()`).
-  2. Build 199's model is given one event per line: each line break inside an event travels as U+2028. Its boundary is set to Every line, and its KV_MODE to none for multi.
+  2. Build 200's model is given one event per line: each line break inside an event travels as U+2028. Its boundary is set to Every line, and its KV_MODE to none for multi.
   3. The exact events are put back afterwards, with TRUNCATE applied, `originalLength`, `truncated` and the TRUNCATE warning.
   4. Blank events are dropped first, so the model's events and the block's line up one to one.
 
   KV_MODE = multi is `multikv()`. The repeated-header warning, the chain's details and the warning count follow.
-- **One model per render:** `renderParsingLab` is wrapped, on top of Build 199's processing-tier wrapper.
+- **One model per render:** `renderParsingLab` is wrapped, on top of Build 200's processing-tier wrapper.
   - **During a render,** `parsingLabModel()` gives the page and the tier panel the full model's first 25 events. The full model is worked out once.
   - **Then `decorate()`:**
     - rebuilds `.parsePresetBar` into the two groups, with `choose()` on each button, and adds the note after the bar;
@@ -252,12 +252,10 @@ For maintenance; the code is in the two prototype files.
 
 ## Build records
 
-As Build 199 did, after the block pair:
+As Build 200 did, after the block pair:
 - `changeRegister`, group "Governance and evidence" (where "Effective parsing laboratory" is):
   `['Parsing laboratory examples','Ten more Parsing laboratory examples, in two groups: Java stack trace, RFC 5424 syslog, Kubernetes JSON, CSV header per event and Fixed-length records (a 1 MB line), and five common mistakes. Two event boundaries, CSV header line and Fixed length, and KV_MODE = multi. Each example says what it shows, sets every setting it needs and adds its props lines to the generated configuration. A large input lists its first 25 events and counts all of them.',true]`.
-- `#topologyBuilder` `data-build-number` 200 and `data-build-date`, the page title, and the ⓘ text prefix, with the date you build it.
-
-If Build 200 also takes the Selection fix from [`builder-handoff-build199.md`](builder-handoff-build199.md), one set of build records covers both.
+- `#topologyBuilder` `data-build-number` 201 and `data-build-date`, the page title, and the ⓘ text prefix, with the date you build it.
 
 ## Found while building the examples (not changed)
 
@@ -268,7 +266,7 @@ The laboratory's model and its generated configuration disagree in two places. T
   - A fix: with the Timestamp prefix boundary, always break before a timestamp line, and let merging matter only for the Every line boundary. That is what `SHOULD_LINEMERGE` does there, with `BREAK_ONLY_BEFORE_DATE`.
 - **A syslog header before the timestamp.** The model's timestamp-prefix boundary accepts `<PRI>VERSION` before the timestamp (`^(?:<\d+>\d?\s+)?20\d\d-…`), but the generated LINE_BREAKER doesn't. A fix: `LINE_BREAKER = ([\r\n]+)(?=(?:<\d+>\d?\s+)?20\d{2}-\d{2}-\d{2})`.
 
-Also seen, and already in Build 199:
+Also seen, and already in Build 200:
 - **The chain's KV_MODE label:** with KV_MODE = auto, the configuration chain reads `KV_MODE=kv`, while the settings and the configuration say auto.
 - **No timestamp extraction:** with Timestamp mode "No extraction", the configuration writes `TIME_FORMAT = CURRENT`. Splunk's setting for that is `DATETIME_CONFIG = CURRENT`.
 - **The 1024 px overflow:** at 1024 px the page scrolls 9 px sideways, in Flow and in Operate, with or without the block. The cause is outside the laboratory.
@@ -280,7 +278,7 @@ All in Operate › Parsing laboratory, with the default topology, unless stated.
 ### 1. Regression
 
 - 0 `pageerror` events in every check below, from 320 to 1920 px.
-- **Every view's text** (all OV workspace pages and Validate) is identical to Build 199 on three topologies: 87 of 87.
+- **Every view's text** (all OV workspace pages and Validate) is identical to Build 200 on three topologies: 87 of 87.
   - the default;
   - reference: `docs/mockups/ov1-reference-topology.json`;
   - zones: `docs/mockups/sv-zones-topology.json`.
@@ -346,21 +344,21 @@ Choose each example and check the metrics, the events and Download config:
 
 ### 4. Speed, with the 1 MB input
 
-Measured in headless Chromium in the build container, from the click to the next frame:
+Measured in headless Chromium in the build container, on Build 199 and again on Build 200, from the click to the next frame:
 
 | Action | Time |
 |---|---|
-| Choose Fixed-length records | 190 to 310 ms (the first time includes building the line) |
-| Change TRUNCATE or Record length | about 200 to 230 ms |
-| Choose 1 MB line, no breaker | about 160 ms |
-| Choose Multiline syslog after it | about 20 ms |
-| Download results (8.5 MB) | 80 to 100 ms |
-| Evidence pack (2.5 MB) | about 170 ms; 1.5 s if it held every event |
+| Choose Fixed-length records | 190 to 340 ms (the first time includes building the line) |
+| Change TRUNCATE or Record length | 200 to 245 ms |
+| Choose 1 MB line, no breaker | 160 to 190 ms |
+| Choose Multiline syslog after it | 16 to 28 ms |
+| Download results (8.5 MB) | 80 to 115 ms |
+| Evidence pack (2.5 MB) | 165 to 180 ms; about 1.5 s if it held every event |
 
 ### 5. Widths
 
 | Width | Checked, for Event over TRUNCATE, Fixed-length records, 1 MB line, no breaker and CSV header per event |
 |---|---|
 | 1920, 1280, 768, 400 and 320 | All 14 buttons inside the bar and the note within it. The Record length field, the preview note, the rows and the cards stay inside the content. No sideways page scroll |
-| 1024 | The same, except the 9 px sideways scroll Build 199 already has |
+| 1024 | The same, except the 9 px sideways scroll Build 200 already has |
 | 400 | Each group label above its buttons; the note wraps; Record length below Event boundary |
