@@ -11952,7 +11952,370 @@ syncCanvasPanels();
 changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Docked Components and Inspector','From 1280 px, docks Components and the Inspector beside the canvas, with collapsible rails, a topology summary, Inspector resizing and remembered panel choices. Preserves narrow-screen and Focus canvas overlays.',true]);
 const build=document.querySelector('#topologyBuilder');build.dataset.buildNumber='197';build.dataset.buildDate='2026-10-17';document.title='Splunk Pipeline Explorer · Build 197 · 17 Oct 2026';
 const stamp=document.querySelector('.builderBuildStamp');if(stamp){stamp.querySelector('b').textContent='Build 197';stamp.setAttribute('aria-label','Build 197, dated 17 October 2026');const time=stamp.querySelector('time');if(time){time.dateTime='2026-10-17';time.textContent='17 Oct 2026'}}
-builderInfoText159.textContent=builderInfoText159.textContent.replace('Build 196','Build 197');
+builderInfoText159.textContent=builderInfoText159.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 197 · 17 Oct 2026');
+})();
+</script>
+<style id="builder-docked-fixes-v198-styles">
+/* builder-docked-fixes-v198: docked columns aren't overlays, so they mustn't hide the canvas help, its shortcuts or the minimap.
+   Older rules hide these whenever canvasPanelState.palette or .inspector is set, and docking keeps both set from 1280px. */
+@media (min-width:1280px){
+  #topologyBuilder.builderDocked197 .builderSpaceHelpPopover140{display:block!important}
+  #topologyBuilder.builderDocked197 .builderSpaceHelpPopover140[hidden],
+  #topologyBuilder.builderDocked197 .builderCanvas:has(.builderInspectorDrawer.open) .builderSpaceHelpPopover140{display:none!important}
+  #topologyBuilder.builderDocked197:not(.minimapHidden):not(.builderSpaceAutoMapHidden140) .builderMinimap{display:block!important}
+}
+@media (min-width:1280px) and (pointer:fine){
+  #topologyBuilder.builderDocked197 .builderNavigationHint{display:block!important}
+}
+</style>
+<script id="builder-docked-fixes-v198">
+(function(){
+/* Build 198 fix: the fit keeps clear of the first-visit help card by reserving its height at the bottom of the canvas. It used to
+   reserve a strip as wide as the card (about 380px), which left a docked or tablet-width canvas half its width for the topology. */
+const media=window.matchMedia('(min-width:761px)');
+const visibleBefore=builderVisibleRect163;
+builderVisibleRect163=function(...args){
+ const help=document.querySelector('.builderSpaceHelpPopover140'),shown=!!help&&!help.hidden&&getComputedStyle(help).display!=='none';
+ if(!media.matches||state.builderCanvasFocus||!shown)return visibleBefore(...args);
+ help.hidden=true;let rect;try{rect=visibleBefore(...args)}finally{help.hidden=false}
+ const r=rect.canvas,b=help.getBoundingClientRect();
+ const bottom=b.width>1&&b.bottom>r.top&&b.top<r.bottom?Math.max(rect.bottom,r.bottom-b.top+10):rect.bottom;
+ return {...rect,bottom,height:Math.max(1,r.height-rect.top-bottom)};
+};
+/* Build 198 fix: Esc closes the open Tools or Groups panel. Two faults in Build 140's handler: when docked it never runs, because
+   Build 95's Esc handler closes the palette or the Inspector and cancels the event, and docking keeps both open; and it closes the
+   first open <details> in the panels, which can be a section left open inside the closed Tools panel, such as Bulk edit.
+   This runs first, on window, and closes the panel itself, unless something above the panel takes the Esc. */
+window.addEventListener('keydown',event=>{
+ if(event.key!=='Escape'||event.defaultPrevented||state.view!=='builder'||state.builderCanvasFocus||!builderSpaceMedia140.matches)return;
+ const open=builderDensityPanels.querySelector(':scope>details[open]');if(!open)return;
+ // Below 1280px an open Components or Inspector drawer takes the Esc first, as before; docked, they are columns and don't.
+ if(!$('#topologyBuilder').classList.contains('builderDocked197')&&(canvasPanelState.palette||canvasPanelState.inspector))return;
+ if(document.querySelector('.builderObjectMenu:not([hidden]),.builderIssuePopover:not([hidden]),#builderImpactOverlay.open,#builderPresentationOverlay.open')||event.target.closest?.('details.builderMenu[open]'))return;
+ const inside=open.contains(document.activeElement);
+ event.preventDefault();open.open=false;builderSpaceGroupButton140.setAttribute('aria-expanded','false');builderDensitySync();
+ if(inside)builderDensityDock.querySelector(`:scope>[aria-controls="${open.id}"]`)?.focus();
+},true);
+})();
+</script>
+<style id="builder-menubar-v198-styles">
+/* builder-menubar-v198: from 761px, one menu bar (File, Edit, View, Arrange, Validate, Analyze, Help) and one toolbar. */
+.builderMenuBar198,.tbLead198,.tbValidate198,.mbPanelHead198{display:none}
+@media (min-width:761px){
+  /* Row 1: the menu bar takes the old action row's place beside the title. */
+  #topologyBuilder:not(.canvasFocus) .builderHead .builderActionWrap{display:none!important}
+  #topologyBuilder:not(.canvasFocus) .builderMenuBar198{display:flex;grid-column:2;grid-row:1;align-items:center;gap:2px;min-width:0;height:31px}
+  .builderMenuBar198 .mbMenus198{display:flex;align-items:center;gap:1px;min-width:0}
+  .builderMenuBar198 .builderMenu>summary{border-color:transparent!important;background:transparent!important;padding:5px 9px!important;min-height:0!important;height:28px;box-sizing:border-box;border-radius:6px!important;font:600 12.5px/1 system-ui,sans-serif!important;color:#d6e7ef!important;letter-spacing:0!important}
+  .builderMenuBar198 .builderMenu>summary:after{content:none!important}
+  .builderMenuBar198 .builderMenu>summary:hover,.builderMenuBar198 .builderMenu[open]>summary{background:#183343!important;border-color:#2f5a70!important;color:#fff!important}
+  .builderMenuBar198 .builderMenu>summary:focus-visible{outline:2px solid #57c7e8;outline-offset:1px}
+  .builderMenuBar198 .builderMenuItems{width:272px!important;max-height:none!important;overflow:auto!important;gap:0!important;padding:6px!important;box-sizing:border-box}
+  .builderMenuBar198 .mbStatus198{margin-left:auto;display:flex;align-items:center;gap:8px;padding-right:2px;font:600 12px/1 system-ui,sans-serif;color:#9fc1d0;white-space:nowrap}
+  .builderMenuBar198 .mbSaveState198.dirty198{color:#f1c76b}
+  .builderMenuBar198 .mbSave198{border:1px solid #3d6a80;border-radius:6px;background:#10283a;color:#e4f3f9;font:700 12px/1 system-ui,sans-serif;padding:6px 10px;cursor:pointer}
+  .builderMenuBar198 .mbSave198:hover,.builderMenuBar198 .mbSave198:focus-visible{border-color:#57c7e8;outline:none}
+  /* Menu rows: label on the left, a shortcut or count on the right. */
+  .mbItem198{display:flex;align-items:center;gap:10px;width:100%;min-height:30px;padding:6px 10px;border:0;border-radius:6px;background:transparent;color:#e3eff5;font:500 13px/1.25 system-ui,sans-serif;text-align:left;cursor:pointer;box-sizing:border-box}
+  .mbItem198:hover:not(:disabled),.mbItem198:focus-visible{background:#1b3a4c;outline:none}
+  .mbItem198:disabled{color:#6f8796;cursor:default}
+  .mbItem198 .mbLabel198{flex:1;min-width:0}
+  .mbItem198 kbd,.mbItem198 .mbAside198{font:600 11px/1 ui-monospace,Menlo,monospace;color:#8fb2c4;background:none;border:0;padding:0}
+  .mbItem198 .mbCheck198{width:14px;flex:0 0 14px;color:#57c7e8;font-weight:800}
+  /* In a menu with checkboxes, every label starts after the check column. */
+  .builderMenuItems:has(.mbCheck198) .mbItem198:not(:has(.mbCheck198)){padding-left:34px}
+  .mbItem198 small{display:block;margin-top:2px;color:#8fa9b8;font-size:11.5px;font-weight:400;white-space:normal}
+  .mbItem198.mbDanger198{color:#ffb4b4}
+  .mbSep198{height:1px;margin:5px 4px;border:0;background:#24465a}
+  .mbHeading198{padding:7px 10px 3px;color:#7fa6b8;font:700 10.5px/1.2 system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase}
+  .mbField198{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px;padding:4px 10px;color:#cfe2ec;font:500 12.5px/1.2 system-ui,sans-serif}
+  .mbField198 select{min-width:0;height:28px;border:1px solid #345166;border-radius:6px;background:#0a1924;color:#e3eff5;font:500 12.5px system-ui,sans-serif;padding:0 6px}
+  .mbNote198{padding:2px 10px 6px;color:#8fa9b8;font:400 11.5px/1.35 system-ui,sans-serif}
+  .mbGuide198{padding:4px 10px 8px;color:#cfe2ec;font:400 12px/1.45 system-ui,sans-serif}
+  .mbGuide198 b{display:block;margin-bottom:4px;color:#eef8fa}
+  /* Row 2: the plane bar becomes the toolbar. Visual order is set with order, whatever the DOM order. */
+  #topologyBuilder:not(.canvasFocus) .builderPlaneBar .tbLead198{display:flex;order:-1;align-items:center;gap:6px}
+  #topologyBuilder:not(.canvasFocus) .builderPlaneBar .unifiedPlaneChecks{order:0}
+  #topologyBuilder:not(.canvasFocus) .builderPlaneBar #builderSearchBar{order:1}
+  #topologyBuilder:not(.canvasFocus) .builderPlaneBar .tbValidate198{display:inline-flex;order:99;margin-left:auto}
+  #topologyBuilder:not(.canvasFocus) .builderPlaneBar .builderGroupingControl130,
+  #topologyBuilder:not(.canvasFocus) .builderPlaneBar .builderNavigation{display:none!important}
+  .tbGroup198{display:flex;align-items:center;gap:2px;padding:2px;border:1px solid #2a4b5e;border-radius:8px;background:#0b1a26}
+  .tbBtn198{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:28px;height:25px;padding:0 7px;border:0;border-radius:6px;background:transparent;color:#d9eaf2;font:700 13px/1 system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+  .tbBtn198:hover:not(:disabled),.tbBtn198:focus-visible{background:#1b3a4c;outline:none}
+  .tbBtn198:disabled{color:#5f7684;cursor:default}
+  .tbBtn198 span{font-size:12px;font-weight:600}
+  .tbZoomValue198{min-width:42px;text-align:center;color:#a9c4d2;font:600 11.5px/1 ui-monospace,Menlo,monospace}
+  .tbAdd198{height:29px;border:1px solid #3d7f8f;border-radius:8px;background:#123a46;color:#e6fbff;padding:0 11px;font-size:12.5px}
+  .tbAdd198[aria-expanded="true"]{border-color:#8cddcf}
+  .tbValidate198{align-items:center;gap:7px;height:29px;padding:0 11px;border:1px solid #6b5a2a;border-radius:999px;background:#1d1a10;color:#f3d98a;font:700 12px/1 system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+  .tbValidate198 i{width:8px;height:8px;border-radius:50%;background:currentColor}
+  .tbValidate198.ok198{border-color:#2f6b55;background:#0f2019;color:#8fe0b8}
+  .tbValidate198.err198{border-color:#7a3434;background:#241011;color:#ffb4b4}
+  .tbValidate198[aria-expanded="true"]{box-shadow:0 0 0 2px rgba(87,199,232,.35)}
+  .tbValidate198:focus-visible{outline:2px solid #57c7e8;outline-offset:2px}
+  /* The canvas's own controls move to the bars (Focus canvas keeps them). */
+  #topologyBuilder:not(.canvasFocus) .builderBottomControls,
+  #topologyBuilder:not(.canvasFocus) .builderDensityDock>.builderDensityToggle,
+  #topologyBuilder:not(.canvasFocus) .builderDensityDock>.builderSpaceGroupToggle140{display:none!important}
+  #topologyBuilder:not(.canvasFocus):not(.soarGuide198) #builderSoarGuide{display:none!important}
+  #topologyBuilder:not(.canvasFocus) .builderSpaceHelpPopover140{bottom:12px!important;left:12px!important}
+  /* Tools and Containers: a header with the panel's name and Close, in place of the dock buttons that toggled them. */
+  #topologyBuilder:not(.canvasFocus) .mbPanelHead198{display:flex;position:sticky;top:0;z-index:2;align-items:center;justify-content:space-between;gap:10px;box-sizing:border-box;width:calc(100% + 12px);max-width:none!important;margin:-6px -6px 6px;padding:7px 7px 7px 12px;border-bottom:1px solid #24465a;border-radius:9px 9px 0 0;background:#0d2130;color:#eef8fa;font:700 13px/1.2 system-ui,sans-serif}
+  .mbPanelClose198{flex:none;border:1px solid #3d6a80;border-radius:6px;background:#10283a;color:#e4f3f9;font:600 12px/1 system-ui,sans-serif;padding:6px 9px;cursor:pointer}
+  .mbPanelClose198:hover,.mbPanelClose198:focus-visible{border-color:#57c7e8;outline:none}
+  /* With the dock buttons gone, panels and drawers can use the canvas's width. */
+  #topologyBuilder:not(.canvasFocus) .builderDensityPanels{left:0!important}
+  #topologyBuilder.builderDocked197:not(.canvasFocus) .builderDensityPanels{width:min(600px,calc(var(--dock-canvas-width197,720px) - 28px))!important}
+  #topologyBuilder.builderDocked197:not(.canvasFocus) .builderInspectorDrawer{max-width:calc(100% - 24px)!important}
+}
+@media (min-width:1280px){.tbValidate198 .tbShort198{display:none}}
+/* Narrower desktops: icons only for undo and redo, no plane swatches, a shorter Validate label. */
+@media (min-width:761px) and (max-width:1279px){
+  .tbLead198 .tbBtn198 span{display:none}
+  #topologyBuilder:not(.canvasFocus) .builderPlaneBar .unifiedPlaneCheck i{display:none}
+  .tbValidate198 .tbLong198{display:none}
+}
+</style>
+<script id="builder-menubar-v198">
+(function(){
+/* Build 198: from 761px, one menu bar (File, Edit, View, Arrange, Validate, Analyze, Help) and one toolbar (undo and redo,
+   zoom, + Add, the planes, Find and the Validate status). Each new control delegates to an existing one, which stays where
+   earlier blocks keep it, hidden, so its handlers and the layers that move it keep working. */
+const media=window.matchMedia('(min-width:761px)'),root=$('#topologyBuilder'),head=$('.builderHead');
+const q=selector=>document.querySelector(selector);
+const text=el=>(el?.textContent||'').replace(/\s+/g,' ').trim();
+const docked=()=>root.classList.contains('builderDocked197');
+const after=(el,sep)=>{const t=text(el),i=t.indexOf(sep);return i<0?'':t.slice(i+sep.length).trim()};
+// History records a change around every click or change inside the Builder. A delegated action is two clicks (ours, then the
+// original's), so the outer one's commit is skipped: the original's own records the change, with its own label, or not at all
+// for Undo and Redo. The counter resets on the next tick in case the outer click wasn't recorded.
+let skipCommits=0;
+const commitBefore=commitBuilderHistory;commitBuilderHistory=function(...args){if(skipCommits>0){skipCommits--;return false}return commitBefore(...args)};
+const delegate=fn=>{skipCommits++;setTimeout(()=>{skipCommits=Math.max(0,skipCommits-1)},0);fn()};
+
+// ---- Menu bar: replaces the old action row beside the title.
+const bar=document.createElement('nav');bar.className='builderMenuBar198';bar.setAttribute('aria-label','Builder menus');
+const menusEl=document.createElement('div');menusEl.className='mbMenus198';
+const status=document.createElement('div');status.className='mbStatus198';
+status.innerHTML='<span class="mbSaveState198" role="status"></span><button type="button" class="mbSave198">Save</button>';
+bar.append(menusEl,status);
+const titleBox=head.querySelector(':scope > div:first-child');if(titleBox)titleBox.after(bar);else head.prepend(bar);
+
+const syncers=new Map();
+function menu(label){const items=makeBuilderMenu(label,menusEl),details=items.parentElement;details.classList.add('mb198');syncers.set(details,[]);return {items,details,sync:fn=>syncers.get(details).push(fn)}}
+function item(m,label,o={}){
+ const b=document.createElement('button');b.type='button';b.className='mbItem198'+(o.danger?' mbDanger198':'');
+ b.innerHTML=(o.check?'<span class="mbCheck198" aria-hidden="true"></span>':'')+'<span class="mbLabel198"></span>'+(o.keys?'<kbd></kbd>':'')+(o.aside?'<span class="mbAside198"></span>':'');
+ const lab=b.querySelector('.mbLabel198');lab.textContent=label;if(o.keys)b.querySelector('kbd').textContent=o.keys;
+ let small=null;if(o.note){small=document.createElement('small');lab.append(small)}
+ b.addEventListener('click',()=>{if(o.run)o.run();else{const orig=q(o.from);if(orig&&!orig.disabled)delegate(()=>orig.click())}});
+ m.items.append(b);
+ m.sync(()=>{const orig=o.from?q(o.from):null;
+  if(o.from)b.disabled=!orig||!!orig.disabled;if(o.enabled)b.disabled=!o.enabled();
+  if(small){const t=o.note(orig,b.disabled);small.textContent=t||'';small.hidden=!t}
+  if(o.aside)b.querySelector('.mbAside198').textContent=o.aside(orig)||'';
+  if(o.check){const on=!!o.check();b.setAttribute('role','menuitemcheckbox');b.setAttribute('aria-checked',String(on));b.querySelector('.mbCheck198').textContent=on?'✓':''}});
+ return b;
+}
+// A select in a menu mirrors the original select, and changing it changes the original.
+function field(m,label,from){
+ const wrap=document.createElement('label');wrap.className='mbField198';const span=document.createElement('span');span.textContent=label;const select=document.createElement('select');wrap.append(span,select);m.items.append(wrap);
+ select.addEventListener('change',()=>{const orig=q(from);if(!orig)return;delegate(()=>{orig.value=select.value;orig.dispatchEvent(new Event('input',{bubbles:true}));orig.dispatchEvent(new Event('change',{bubbles:true}))})});
+ m.sync(()=>{const orig=q(from);wrap.hidden=!orig;if(!orig)return;if(select.innerHTML!==orig.innerHTML)select.innerHTML=orig.innerHTML;select.value=orig.value;select.disabled=orig.disabled});
+}
+const sep=m=>{const hr=document.createElement('hr');hr.className='mbSep198';m.items.append(hr)};
+const heading=(m,t)=>{const h=document.createElement('div');h.className='mbHeading198';h.textContent=t;m.items.append(h)};
+const note=(m,fn)=>{const n=document.createElement('div');n.className='mbNote198';m.items.append(n);m.sync(()=>{const t=fn();n.textContent=t||'';n.hidden=!t})};
+
+// Tools and Containers keep their panels on the canvas; the menus open them at the right section.
+const densityPanels=['builderFindNavigate','builderRuleProfileDisclosure','builderReviewDisclosure','builderSecondaryTools','builderSpaceGroups140'];
+function openPanel(panelId,sectionId){
+ for(const id of densityPanels){const p=q('#'+id);if(p&&id!==panelId)p.open=false}
+ const panel=q('#'+panelId),section=sectionId?q('#'+sectionId):panel;if(!panel||!section)return;
+ panel.open=true;if(section.tagName==='DETAILS')section.open=true;
+ q('.builderSpaceGroupToggle140')?.setAttribute('aria-expanded',String(panelId==='builderSpaceGroups140'));
+ if(typeof builderDensitySync==='function')builderDensitySync();
+ // Scroll only vertically: some sections are wider than the panel, and scrollIntoView would also scroll sideways.
+ requestAnimationFrame(()=>{const box=q('.builderDensityPanels');if(box){const b=box.getBoundingClientRect(),s=section.getBoundingClientRect();if(s.top<b.top||s.bottom>b.bottom)box.scrollTop+=s.top-b.top-8;box.scrollLeft=0}
+  const target=[...section.querySelectorAll('summary,select,button,input,textarea')].find(el=>el!==panelClose&&!el.disabled&&el.getClientRects().length);(target||panelClose).focus({preventScroll:true})});
+}
+// The dock buttons opened and closed these panels. Without them, an open panel gets a header with its name and Close.
+const panelHead=document.createElement('div');panelHead.className='mbPanelHead198';panelHead.innerHTML='<b></b><button type="button" class="mbPanelClose198">Close ×</button>';
+const panelClose=panelHead.querySelector('button');
+function closePanels(){for(const id of densityPanels){const p=q('#'+id);if(p)p.open=false}q('.builderSpaceGroupToggle140')?.setAttribute('aria-expanded','false');if(typeof builderDensitySync==='function')builderDensitySync();q('.builderCanvas')?.focus({preventScroll:true})}
+panelClose.addEventListener('click',closePanels);
+document.addEventListener('toggle',event=>{const panel=event.target;if(!media.matches||!densityPanels.includes(panel.id)||!panel.open)return;const summary=panel.querySelector(':scope>summary');
+ panelHead.querySelector('b').textContent=text(summary?.querySelector('strong'))||text(summary)||'Tools';panelClose.setAttribute('aria-label','Close '+panelHead.querySelector('b').textContent);
+ if(summary)summary.after(panelHead);else panel.prepend(panelHead)},true);
+const compShown=()=>docked()?!root.classList.contains('dockLeftCollapsed197'):!!canvasPanelState.palette;
+const insShown=()=>docked()?!root.classList.contains('dockRightCollapsed197'):!!canvasPanelState.inspector;
+function toggleComponents(){if(docked())(compShown()?q('#builderPaletteDrawerClose'):q('.dockRailLeft197'))?.click();else q('#builderAddToggle')?.click()}
+function toggleInspector(){if(docked())(insShown()?q('#builderInspectorDrawerClose'):q('.dockRailRight197'))?.click();else q('#builderInspectorToggle')?.click()}
+function showSoarGuide(){const guide=q('#builderSoarGuide');if(!guide)return;root.classList.add('soarGuide198');guide.open=true;guide.querySelector('summary')?.focus()}
+document.addEventListener('toggle',event=>{if(event.target.id==='builderSoarGuide'&&!event.target.open)root.classList.remove('soarGuide198')},true);
+const describe=id=>()=>text(q('#'+id+' .builderMenuDescription167'));
+
+const file=menu('File');
+item(file,'Save',{from:'#builderSave'});
+sep(file);heading(file,'Saved topologies');
+field(file,'Topology','#builderSaved');
+item(file,'Load',{from:'#builderLoadSaved',note:(orig,off)=>off?text(q('.builderLoadReason163'))||orig?.title:''});
+sep(file);
+item(file,'Import JSON…',{from:'#builderImport'});
+item(file,'Import from architecture pack…',{from:'#builderImportPack125'});
+sep(file);heading(file,'Export');
+field(file,'Scope','#builderExportScope');
+note(file,()=>text(q('#builderExportScopeBar small')));
+item(file,'Export JSON',{from:'#builderExport'});
+item(file,'Architecture pack',{from:'#builderExportPack'});
+item(file,'Export SVG',{from:'#builderExportSvg'});
+item(file,'Export PNG',{from:'#builderExportPng'});
+item(file,'Print / present',{from:'#builderPrintPresent'});
+sep(file);
+item(file,'Use in explorer',{from:'#builderUse'});
+item(file,'Open in Failure Lab',{from:'#builderFailure'});
+sep(file);
+item(file,'Clear canvas…',{from:'#builderClear',danger:true});
+
+const edit=menu('Edit');
+item(edit,'Undo',{from:'#builderUndo',keys:'Ctrl Z'});
+item(edit,'Redo',{from:'#builderRedo',keys:'Ctrl Y'});
+// The old History button opened a popover under itself; from the menu, open the History drawer it linked to.
+item(edit,'History',{run:()=>openBuilderDrawer('history'),aside:()=>text(q('#builderHistoryCount'))});
+sep(edit);
+item(edit,'Find',{keys:'/',run:()=>{const input=q('#builderSearchInput');input?.focus();input?.select?.()}});
+sep(edit);
+item(edit,'Bulk edit…',{run:()=>openPanel('builderSecondaryTools','builderBulkEdit'),note:()=>after(q('#builderBulkEdit>summary'),'·')});
+item(edit,'Connection template…',{run:()=>openPanel('builderSecondaryTools','builderTemplateBar')});
+
+const view=menu('View');
+item(view,'Components',{check:compShown,run:toggleComponents});
+item(view,'Inspector',{check:insShown,run:toggleInspector});
+item(view,'Minimap',{check:()=>/hide/i.test(text(q('#builderMinimapToggle'))),run:()=>q('#builderMinimapToggle')?.click()});
+sep(view);
+item(view,'Zoom in',{keys:'+',run:()=>q('.builderMobileZoomButton[data-mobile-zoom="in"]')?.click()});
+item(view,'Zoom out',{keys:'-',run:()=>q('.builderMobileZoomButton[data-mobile-zoom="out"]')?.click()});
+item(view,'Fit to canvas',{from:'#builderFitView',keys:'0'});
+sep(view);
+item(view,'Focus canvas',{from:'#builderFocusToggle'});
+item(view,'Presentation',{from:'#builderPresentationToggle'});
+item(view,'Full screen',{from:'#builderFullscreenToggle'});
+
+const arrange=menu('Arrange');
+field(arrange,'Layout','#unifiedLayoutMode');
+field(arrange,'Group by','#builderGroupBy130');
+item(arrange,'Tidy layout',{from:'#builderAutoLayout',note:()=>'Arrange components by relationship depth.'});
+item(arrange,'Collapse or expand all hosts',{from:'#builderToggleHosts147'});
+sep(arrange);
+item(arrange,'Containers…',{run:()=>openPanel('builderSpaceGroups140')});
+item(arrange,'Layout profiles…',{run:()=>openPanel('builderSecondaryTools','builderProfileBar')});
+
+const validate=menu('Validate');
+field(validate,'Validate for','#builderRuleProfileSelect');
+sep(validate);
+item(validate,'Coverage',{from:'#builderCoverageToggle'});
+item(validate,'Review',{from:'#builderUnresolvedToggle',aside:orig=>(text(orig).match(/\d+/)||[''])[0]});
+item(validate,'Rules',{from:'#builderRulesToggle'});
+sep(validate);
+item(validate,'Route validation…',{run:()=>openPanel('builderSecondaryTools','builderRoutePanel'),note:()=>{const t=after(q('#builderRoutePanel>summary'),'·');return (t.match(/^\d+ errors? · \d+ review items?/)||[t])[0]}});
+
+const analyze=menu('Analyze');
+for(const [id,label] of [['builderTraceToggle','Trace path'],['builderLoadPath','Load selected path'],['builderInventoryToggle','Inventory'],['builderNetworkToggle','Network'],['builderStatsToggle','Statistics']])item(analyze,label,{from:'#'+id,note:describe(id)});
+sep(analyze);
+item(analyze,'Configuration draft…',{run:()=>openPanel('builderSecondaryTools','builderConfigDraft'),note:()=>{const t=after(q('#builderConfigDraft>summary'),'·');return /select an object/i.test(t)?'Select a component first':t}});
+
+const help=menu('Help');
+item(help,'Canvas controls and shortcuts',{run:()=>q('.builderSpaceHelp140')?.click()});
+item(help,'SOAR playbooks guide',{run:showSoarGuide,enabled:()=>!!q('#builderSoarGuide'),aside:()=>after(q('#builderSoarGuide>summary'),'·').replace(/\s*ⓘ$/,''),note:(orig,off)=>off?'Shown when the topology has a SOAR platform.':''});
+sep(help);
+item(help,'About Builder',{run:()=>q('.builderInfo159')?.click()});
+
+// Fill each menu as it opens, and open bar menus below their own label, left-aligned.
+document.addEventListener('toggle',event=>{const d=event.target;if(!syncers.has(d)||!d.open)return;for(const fn of syncers.get(d))try{fn()}catch(error){console.error(error)}},true);
+function place(d){const body=d.querySelector('.builderMenuItems'),r=d.querySelector('summary').getBoundingClientRect(),top=Math.round(r.bottom+4);body.style.position='fixed';body.style.right='auto';body.style.maxHeight=Math.max(160,innerHeight-top-12)+'px';body.style.left=Math.max(8,Math.min(innerWidth-body.offsetWidth-8,r.left))+'px';body.style.top=top+'px'}
+const clampBefore=builderClampMenus163;builderClampMenus163=function(...args){const result=clampBefore(...args);for(const d of syncers.keys())if(d.open)place(d);return result};
+window.addEventListener('resize',()=>{for(const d of syncers.keys())if(d.open)place(d)});
+// Keyboard: ← → move between menus, ↓ ↑ move through items, Esc closes and returns to the menu's label.
+const items=d=>[...d.querySelectorAll('.mbItem198,.mbField198 select')].filter(el=>!el.disabled&&!el.closest('[hidden]'));
+menusEl.addEventListener('keydown',event=>{
+ const d=event.target.closest('details.mb198');if(!d)return;const onLabel=!!event.target.closest('summary'),labels=[...menusEl.querySelectorAll(':scope>details>summary')];
+ if(event.key==='ArrowRight'||event.key==='ArrowLeft'){if(event.target.tagName==='SELECT')return;event.preventDefault();const next=labels[(labels.indexOf(d.querySelector('summary'))+(event.key==='ArrowRight'?1:labels.length-1))%labels.length],wasOpen=d.open;d.open=false;next.focus();if(wasOpen){next.parentElement.open=true;requestAnimationFrame(()=>items(next.parentElement)[0]?.focus())}}
+ else if(event.key==='ArrowDown'||event.key==='ArrowUp'){if(event.target.tagName==='SELECT')return;event.preventDefault();if(onLabel){d.open=true;requestAnimationFrame(()=>{const list=items(d);(event.key==='ArrowDown'?list[0]:list[list.length-1])?.focus()})}else{const list=items(d),i=list.indexOf(document.activeElement);list[(i+(event.key==='ArrowDown'?1:list.length-1))%list.length]?.focus()}}
+ else if(event.key==='Escape'&&d.open){event.preventDefault();event.stopPropagation();d.open=false;d.querySelector('summary').focus()}
+});
+// With one bar menu open, pointing at another label opens that one instead.
+menusEl.addEventListener('mouseover',event=>{const label=event.target.closest('summary');if(!label)return;const open=menusEl.querySelector(':scope>details[open]');if(open&&open!==label.parentElement)label.parentElement.open=true});
+
+// Save state at the right of the menu bar.
+const saveState=status.querySelector('.mbSaveState198');
+status.querySelector('.mbSave198').addEventListener('click',()=>delegate(()=>q('#builderSave')?.click()));
+// "No unsaved changes" also contains "unsaved", so test for the clean state first.
+function syncSave(){const s=q('#builderSaveState'),t=text(s),dirty=/unsaved/i.test(t)&&!/\bno unsaved/i.test(t);saveState.textContent=dirty?'● Unsaved changes':'Saved';saveState.classList.toggle('dirty198',dirty);saveState.title=s?.title||t}
+
+// ---- Toolbar: the plane bar, with history, zoom and + Add in front and the Validate status at the end.
+const lead=document.createElement('div');lead.className='tbLead198';
+lead.innerHTML='<div class="tbGroup198" role="group" aria-label="History"><button type="button" class="tbBtn198" data-tb="undo">↶<span>Undo</span></button><button type="button" class="tbBtn198" data-tb="redo">↷<span>Redo</span></button></div>'+
+ '<div class="tbGroup198" role="group" aria-label="Zoom"><button type="button" class="tbBtn198" data-tb="out" aria-label="Zoom out" title="Zoom out">−</button><output class="tbZoomValue198">100%</output><button type="button" class="tbBtn198" data-tb="in" aria-label="Zoom in" title="Zoom in">+</button><button type="button" class="tbBtn198" data-tb="fit" title="Fit to canvas (0)">Fit</button></div>'+
+ '<button type="button" class="tbBtn198 tbAdd198" data-tb="add" title="Add a component (A on the canvas)" aria-expanded="false">＋ Add</button>';
+const chip=document.createElement('button');chip.type='button';chip.className='tbValidate198';chip.innerHTML='<i aria-hidden="true"></i><span class="tbLong198"></span><span class="tbShort198"></span>';
+lead.addEventListener('click',event=>{const b=event.target.closest('[data-tb]');if(!b||b.disabled)return;const k=b.dataset.tb;
+ if(k==='undo')delegate(()=>q('#builderUndo')?.click());else if(k==='redo')delegate(()=>q('#builderRedo')?.click());
+ else if(k==='out'||k==='in')q(`.builderMobileZoomButton[data-mobile-zoom="${k}"]`)?.click();
+ else if(k==='fit')q('#builderFitView')?.click();
+ else if(k==='add'){if(docked())openBuilderCanvasPalette({focus:true});else q('#builderAddToggle')?.click()}
+ syncToolbar()});
+chip.addEventListener('click',()=>{if(activeDrawerKind==='review')closeBuilderDrawer();else openBuilderDrawer('review')});
+function syncToolbar(){
+ for(const [key,id] of [['undo','#builderUndo'],['redo','#builderRedo']]){const b=lead.querySelector(`[data-tb="${key}"]`),orig=q(id);b.disabled=!orig||!!orig.disabled;const label=orig?.title||(key==='undo'?'Undo':'Redo');b.title=label;b.setAttribute('aria-label',label)}
+ lead.querySelector('.tbZoomValue198').textContent=text(q('#builderMobileZoomPercent'))||Math.round((state.builderViewport?.zoom||1)*100)+'%';
+ lead.querySelector('[data-tb="add"]').setAttribute('aria-expanded',String(!docked()&&q('#builderAddToggle')?.getAttribute('aria-expanded')==='true'));
+ const summary=q('.builderSpaceValidation140')?.closest('summary'),title=summary?.title||text(summary),errors=+(title.match(/(\d+) errors?/)||[0,0])[1],review=+(title.match(/(\d+) to review/)||[0,0])[1];
+ chip.classList.toggle('err198',errors>0);chip.classList.toggle('ok198',!errors&&!review);
+ chip.querySelector('.tbLong198').textContent=errors||review?`${errors} error${errors===1?'':'s'} · ${review} to review`:'Valid';
+ chip.querySelector('.tbShort198').textContent=errors?`${errors} error${errors===1?'':'s'}`:review?`${review} to review`:'Valid';
+ chip.setAttribute('aria-label',`Validation: ${errors} error${errors===1?'':'s'}, ${review} to review. Open Review.`);chip.title='Open Review';
+ chip.setAttribute('aria-expanded',String(activeDrawerKind==='review'));
+}
+function attach(){const planeBar=q('.builderPlaneBar');if(!planeBar)return;if(lead.parentElement!==planeBar)planeBar.prepend(lead);if(chip.parentElement!==planeBar)planeBar.append(chip)}
+// renderUnifiedPlaneControls rewrites the plane bar, so the toolbar's own controls go back in after it.
+const planesBefore=renderUnifiedPlaneControls;renderUnifiedPlaneControls=function(...args){const result=planesBefore(...args);attach();return result};
+let frame=0;const schedule=()=>{if(frame)return;frame=requestAnimationFrame(()=>{frame=0;attach();syncToolbar();syncSave()})};
+const renderBefore=renderBuilder;renderBuilder=function(...args){const result=renderBefore(...args);if(state.view==='builder')schedule();return result};
+const viewportBefore=applyBuilderViewport;applyBuilderViewport=function(...args){const result=viewportBefore(...args);if(state.view==='builder')schedule();return result};
+const drawerBefore=drawBuilderDrawer;drawBuilderDrawer=function(...args){const result=drawerBefore(...args);schedule();return result};
+const watch=(selector,options)=>{const el=q(selector);if(el)new MutationObserver(schedule).observe(el,options)};
+watch('#builderUndo',{attributes:true,attributeFilter:['disabled','title']});watch('#builderRedo',{attributes:true,attributeFilter:['disabled','title']});
+watch('#builderSaveState',{childList:true,characterData:true,subtree:true,attributes:true});
+watch('.builderMobileZoomControls',{childList:true,characterData:true,subtree:true});
+watch('#builderAddToggle',{attributes:true,attributeFilter:['aria-expanded']});
+const validateSummary=q('.builderSpaceValidation140')?.closest('summary');if(validateSummary)new MutationObserver(schedule).observe(validateSummary,{attributes:true,attributeFilter:['title'],childList:true,characterData:true,subtree:true});
+// The fit keeps 56px clear on the left for the dock buttons, which the menu bar replaces.
+const visibleBefore=builderVisibleRect163;
+builderVisibleRect163=function(...args){const rect=visibleBefore(...args);if(!media.matches||state.builderCanvasFocus)return rect;const left=16;return {...rect,left,width:Math.max(1,rect.canvas.width-left-rect.right)}};
+// Closing the palette or the Inspector returns focus to the bottom bar's "+ Add" or "Inspector", which the bars hide.
+// While the bars show, that focus goes to the canvas, or to the toolbar's + Add when it opened the palette over the canvas.
+// The same goes for the dock buttons, which the Build 198 Esc fix focuses when it closes their panel.
+const toCanvas=()=>q('.builderCanvas');
+for(const [orig,target] of [[q('#builderAddToggle'),()=>docked()?toCanvas():lead.querySelector('[data-tb="add"]')],[q('#builderInspectorToggle'),toCanvas],...[...document.querySelectorAll('.builderDensityToggle'),builderSpaceGroupButton140].map(b=>[b,toCanvas])]){if(!orig)continue;
+ orig.focus=function(options){if(media.matches&&state.view==='builder'&&!state.builderCanvasFocus)return target()?.focus(options);return HTMLElement.prototype.focus.call(this,options)}}// builderHeaderFit142 drops the two-row header when the old rows' controls fit in one; with the menu bar there are always two rows.
+const headerFitBefore=builderHeaderFit142;builderHeaderFit142=function(...args){const result=headerFitBefore(...args);if(media.matches&&state.view==='builder'&&!state.builderCanvasFocus)head.classList.add('builderTwoRows142');return result};
+attach();syncToolbar();syncSave();builderHeaderFit142();
+})();
+
+/* Keep the menu-opened SOAR guide interactive. The canvas pan listener captures
+   pointerdown outside buttons/inputs, including this details summary. */
+document.addEventListener('pointerdown',event=>{
+if(window.matchMedia('(min-width:761px)').matches&&state.view==='builder'&&!state.builderCanvasFocus&&document.querySelector('#topologyBuilder').classList.contains('soarGuide198')&&event.target.closest?.('#builderSoarGuide'))event.stopPropagation();
+},true);
+
+/* Build records follow the unmodified supplied prototypes. */
+(function(){
+const items=changeRegister.find(g=>g.group==='Explorer foundations')?.items;
+items?.push(['Builder menu bar and toolbar','From 761 px, one menu bar (File, Edit, View, Arrange, Validate, Analyze and Help) and one toolbar (undo and redo, zoom, + Add, the planes, Find and the Validate status) replace the two action rows and the canvas’s dock buttons, bottom bar, zoom and SOAR pill. Phones and Focus canvas are unchanged.',true]);
+items?.push(['Docked help, minimap and Esc fixes','When docked, the first-visit help card, its shortcuts and the minimap show again. The first fit keeps the topology above the help card, and Esc closes the open Tools or Groups panel.',true]);
+const build=document.querySelector('#topologyBuilder');build.dataset.buildNumber='198';build.dataset.buildDate='2026-10-17';document.title='Splunk Pipeline Explorer · Build 198 · 17 Oct 2026';
+builderInfoText159.textContent=builderInfoText159.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 198 · 17 Oct 2026');
 })();
 </script>
 </body>
