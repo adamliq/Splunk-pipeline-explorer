@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Inspector Tabs</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 199 TARGET · BUILD 198 + PROTOTYPE</span>
+ <h1>Builder: the Inspector in tabs</h1>
+ <p class="lede">The Inspector shows one thing at a time (a component, a link, a selection, a container or the topology) and splits it into tabs, like draw.io’s Format panel. Every control Build 198 shows is in exactly one tab. Every scene is the real Builder with the prototype block appended to Build 198; the “Today” scenes are Build 198 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>Where Build 198’s Inspector goes</h2>
+  <table>
+   <thead><tr><th>Today (Build 198)</th><th>Block</th><th>Goes to</th></tr></thead>
+   <tbody>
+    <tr><td>Inspector</td><td>Name, type, Make root, Remove</td><td>The title and the foot of every component tab; for a component only</td></tr>
+    <tr><td></td><td>Component identity; Splunk-managed details; Enterprise notes</td><td><b>Component</b></td></tr>
+    <tr><td></td><td>Indexer or search head cluster card</td><td><b>Component</b> for an indexer or a cluster member; <b>Settings</b> for the cluster itself</td></tr>
+    <tr><td></td><td>Connections list</td><td><b>Connections</b></td></tr>
+    <tr><td></td><td>Insert component on selected connection</td><td>Under a link’s title: “＋ Insert a component on this link”</td></tr>
+    <tr><td></td><td>Component capabilities; the planes note</td><td><b>Connections</b>; capabilities now always render</td></tr>
+    <tr><td></td><td>Type-specific cards (load balancer, SOAR, Stream, S3, Azure, Edge Processor, cluster settings)</td><td><b>Settings</b></td></tr>
+    <tr><td>“Advanced settings”</td><td>Pipeline sets, outbound handoff, reliability, owned stages</td><td><b>Settings</b></td></tr>
+    <tr><td></td><td>Deployment client or configuration; fleet management</td><td><b>Fleet</b></td></tr>
+    <tr><td></td><td>Interactive user access; identity provider settings</td><td><b>Access</b></td></tr>
+    <tr><td></td><td>Group container</td><td><b>Container</b>, when opened from Containers</td></tr>
+    <tr><td></td><td>A selected link’s card</td><td><b>Link</b>, <b>Assurance</b> and <b>Route</b>, titled with both ends</td></tr>
+    <tr><td>Tools</td><td>Bulk edit</td><td><b>Selection</b>, for good</td></tr>
+    <tr><td>Free place toolbar</td><td>Align, distribute</td><td><b>Selection</b></td></tr>
+    <tr><td></td><td>Snap to grid, grid spacing</td><td><b>Topology</b> › Grid</td></tr>
+    <tr><td>Menus</td><td>Layout, Group by, Tidy layout (Arrange); Validate for (Validate)</td><td>Also in <b>Topology</b>; the menus keep them</td></tr>
+    <tr><td>Nothing selected</td><td>Docked: Build 197’s topology summary. Drawer: “No component selected”, with Make root and Remove that do nothing</td><td><b>Topology</b></td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The rules in short</h2>
+  <dl>
+   <dt>One thing</dt><dd>A component, a link, a selection (two or more), a container (opened from Containers after the last selection) or, with nothing selected, the topology.</dd>
+   <dt>Tabs</dt><dd>A component or link tab shows only when it has content. The last one chosen is remembered, for components and for links.</dd>
+   <dt>Every control once</dt><dd>For each of the 46 component types, and for links on all three planes, every control Build 198 shows is in exactly one tab.</dd>
+   <dt>Marking</dt><dd>Blocks stay where the app’s renderers put them. After each render the block marks each with its tab, and CSS shows one tab. A block it doesn’t recognise goes to Settings.</dd>
+   <dt>Reveal</dt><dd>Anything that focuses or scrolls to a field in another tab, such as inspecting a finding, switches to that tab first.</dd>
+   <dt>History</dt><dd>A control here that works through an existing one records one change, under that control’s label.</dd>
+   <dt>Strip</dt><dd>It sticks under the panel header. ← → Home End move between tabs. When the tabs don’t fit, it scrolls to the selected one.</dd>
+   <dt>Free place</dt><dd>From 761 px the alignment bar leaves the toolbar: align and distribute go to Selection, snap and grid to Topology.</dd>
+   <dt>Phones</dt><dd>The sheet gets the same tabs. With nothing selected it stays dimmed, as in Build 198. Focus canvas keeps the tabs too.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-inspector-tabs.md</code> · Prototype: <code>docs/mockups/builder-inspector-tabs-prototype.css</code> and <code>.js</code>, appended to Build 198.</p>
+</div>
+<script>
+const SCENES=[{"id": "it-component", "img": "compare/inspector-tabs-component.png", "group": "target", "tab": "Component", "title": "1440 px, docked, Universal Forwarder 1 selected", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "Five tabs under the name", "text": "Component, Connections, Settings, Fleet and Access. A tab shows only when the component has something for it: a search head has no Fleet, a firewall no Access.", "x": 73.87, "y": 32.67, "box": [75.28, 31.0, 23.47, 3.33]}, {"n": 2, "head": "Component: what it is and where it runs", "text": "Name, environment, region, container, network zone, subnet, instances and host. For an indexer or a search head cluster member, its cluster membership too.", "x": 74.53, "y": 38.9, "box": [76.25, 35.67, 21.53, 40.44]}, {"n": 3, "head": "Make root and Remove stay under every tab", "text": "They belong to the component, so they show only when one component is selected.", "x": 74.53, "y": 79.78, "box": [76.25, 77.89, 21.53, 3.78]}]}, {"id": "it-connections", "img": "compare/inspector-tabs-connections.png", "group": "target", "tab": "Connections", "title": "1440 px, Universal Forwarder 1 · Connections", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "Connections: the links in and out", "text": "One row per link, with its direction and plane.", "x": 74.53, "y": 37.52, "box": [76.25, 35.67, 21.53, 15.44]}, {"n": 2, "head": "Component capabilities, every time", "text": "What it accepts data from and sends data to, and its fleet and access roles. Build 198 drew this card only after a full redraw, so selecting a component by clicking it left it out.", "x": 74.53, "y": 54.29, "box": [76.25, 52.44, 21.53, 23.11]}, {"n": 3, "head": "The note on the three relationship planes", "text": "Event data, fleet management and user logon are separate relationships.", "x": 74.53, "y": 82.89, "box": [76.25, 79.78, 21.53, 6.22]}]}, {"id": "it-settings", "img": "compare/inspector-tabs-settings.png", "group": "target", "tab": "Settings", "title": "1440 px, Universal Forwarder 1 · Settings", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "Settings: what Build 198 folded away", "text": "Pipeline sets, outbound handoff and reliability, from “Advanced settings and assurance”. The fold itself is gone: its blocks are spread across the tabs.", "x": 74.53, "y": 37.5, "box": [76.25, 35.67, 21.53, 6.11]}, {"n": 2, "head": "Owned stages, and every type-specific card", "text": "Load balancer, SOAR playbooks, Stream capture, S3 and Azure datasets, Edge Processor and cluster settings land here too, as does any card the tabs don’t recognise. A later build’s new card still shows.", "x": 74.53, "y": 63.09, "box": [76.25, 60.89, 21.53, 11.0]}]}, {"id": "it-fleet", "img": "compare/inspector-tabs-fleet.png", "group": "target", "tab": "Fleet", "title": "1440 px, Universal Forwarder 1 · Fleet", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "Fleet shows only where it applies", "text": "Deployment Server, the Universal and Heavy Forwarders, server classes and deployment apps.", "x": 73.87, "y": 32.67, "box": [75.28, 31.0, 23.47, 3.33]}, {"n": 2, "head": "Fleet: the deployment client", "text": "Matched server classes and expected apps, from the deployment server’s phone-home links.", "x": 74.53, "y": 38.4, "box": [76.25, 35.67, 21.53, 18.22]}, {"n": 3, "head": "Fleet management", "text": "Delivery health, management authority, deployment endpoint and port, phone-home interval, clientName, server classes, apps and versions.", "x": 74.53, "y": 58.8, "box": [76.25, 55.22, 21.53, 44.78]}]}, {"id": "it-access", "img": "compare/inspector-tabs-access.png", "group": "target", "tab": "Access", "title": "1440 px, Search Head 1 · Access", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "Four tabs: a search head has no Fleet", "text": "The last tab you chose is kept. Choose Access on one component and the next opens on Access too, if it has it.", "x": 73.87, "y": 32.67, "box": [75.28, 31.0, 23.47, 3.33]}, {"n": 2, "head": "Access: interactive user access", "text": "Authentication method, identity provider, MFA, access route, login endpoint, roles, session timeout, break-glass and audit evidence, with Remove access.", "x": 74.53, "y": 39.78, "box": [76.25, 35.67, 21.53, 51.44]}]}, {"id": "it-link", "img": "compare/inspector-tabs-link.png", "group": "target", "tab": "Link", "title": "1440 px, the link Universal Forwarder 1 → Indexer 1 selected", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "A link is titled with both ends", "text": "“Event data link”, then Universal Forwarder 1 → Indexer 1 and its label. Each end selects that component. Build 198 titled it “Indexer 1”.", "x": 74.53, "y": 25.67, "box": [76.25, 24.0, 21.53, 4.78]}, {"n": 2, "head": "Insert a component on this link", "text": "Build 198 offers this in the target’s connection list, which a link no longer shows. It opens the same chooser.", "x": 91.56, "y": 33.61, "box": [76.25, 32.0, 14.44, 3.22]}, {"n": 3, "head": "Link, Assurance and Route", "text": "The link card’s 31 controls in three tabs, the same on every plane.", "x": 73.87, "y": 38.0, "box": [75.28, 36.33, 23.47, 3.33]}, {"n": 4, "head": "Link: authentication, then the connection", "text": "The authentication summary with Set…, then protocol, endpoint, port, TLS, authentication, resource, activity, trigger, acknowledgement and direction.", "x": 74.53, "y": 43.61, "box": [76.25, 41.0, 21.53, 5.22]}]}, {"id": "it-assurance", "img": "compare/inspector-tabs-assurance.png", "group": "target", "tab": "Assurance", "title": "1440 px, the same link · Assurance", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "Assurance: the summary chips", "text": "Criticality, validation and availability at a glance.", "x": 74.53, "y": 43.0, "box": [76.25, 41.0, 21.53, 4.0]}, {"n": 2, "head": "Classification to notes", "text": "Flow classification and criticality, owner, availability and latency SLOs, retry policy, criticality, validation state, operational dependency and notes.", "x": 74.53, "y": 49.42, "box": [76.25, 46.89, 21.53, 42.22]}, {"n": 3, "head": "Focus target and Disconnect end every link tab", "text": "On Link, Assurance and Route alike.", "x": 74.53, "y": 92.11, "box": [76.25, 90.22, 21.53, 3.78]}]}, {"id": "it-route", "img": "compare/inspector-tabs-route.png", "group": "target", "tab": "Route", "title": "1440 px, the same link · Route", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "Route: connector routing", "text": "Line style, avoid component cards, label offsets, waypoints and Reset route.", "x": 74.53, "y": 43.74, "box": [76.25, 41.0, 21.53, 27.44]}, {"n": 2, "head": "Focus target and Disconnect", "text": "Always the last thing on a link tab.", "x": 74.53, "y": 71.33, "box": [76.25, 69.44, 21.53, 3.78]}]}, {"id": "it-selection", "img": "compare/inspector-tabs-selection.png", "group": "target", "tab": "Selection", "title": "1440 px, Free place layout, three forwarders Shift-clicked", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "Several selected: Selection", "text": "Build 198 showed the last component selected, and nothing else.", "x": 74.53, "y": 24.08, "box": [76.25, 22.11, 21.53, 6.56]}, {"n": 2, "head": "The selected items", "text": "A chip inspects that item alone.", "x": 74.53, "y": 36.44, "box": [76.25, 34.44, 21.53, 6.67]}, {"n": 3, "head": "Bulk edit, moved here from Tools", "text": "Edit › Bulk edit… opens this tab, and is disabled until two or more are selected. One Apply is one undo step.", "x": 74.53, "y": 45.41, "box": [76.25, 42.44, 21.53, 37.11]}, {"n": 4, "head": "Align and distribute", "text": "From the Free place alignment bar. In other layouts they are disabled, with “Use Free place layout”.", "x": 74.53, "y": 83.76, "box": [76.25, 80.89, 21.53, 19.11]}, {"n": 5, "head": "The toolbar stays on one line", "text": "In Build 198, Free place added the alignment bar to it, and it wrapped over the menu bar and onto the canvas.", "x": 76.39, "y": 12.11, "box": [1.67, 10.11, 96.67, 4.0]}]}, {"id": "it-topology", "img": "compare/inspector-tabs-topology.png", "group": "target", "tab": "Topology", "title": "1440 px, nothing selected", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "Nothing selected: the topology", "text": "Its title, and how many components and links it has.", "x": 74.53, "y": 24.78, "box": [76.25, 22.11, 21.53, 8.89]}, {"n": 2, "head": "Name", "text": "The diagram title, as the presentation pack sets it. Empty, it shows the default title.", "x": 74.53, "y": 40.56, "box": [76.25, 36.78, 21.53, 7.56]}, {"n": 3, "head": "Contents and findings", "text": "Components and links per plane, and the Validate count with Review. The count is the toolbar’s, so Validate doesn’t run again.", "x": 74.53, "y": 49.47, "box": [76.25, 45.67, 21.53, 19.0]}, {"n": 4, "head": "Validate for", "text": "The rule profile, as in the Validate menu.", "x": 74.53, "y": 71.0, "box": [76.25, 66.0, 21.53, 10.0]}, {"n": 5, "head": "Layout, Group by and Tidy layout", "text": "As in the Arrange menu. Each change is one undo step.", "x": 74.53, "y": 81.36, "box": [76.25, 77.33, 21.53, 20.11]}]}, {"id": "it-topology-end", "img": "compare/inspector-tabs-topology-end.png", "group": "target", "tab": "Topology, scrolled", "title": "1440 px, nothing selected, the Inspector scrolled to the end", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "The strip stays under the panel header", "text": "In every view, so a long tab keeps its tabs in reach.", "x": 73.87, "y": 22.44, "box": [75.28, 20.78, 23.47, 3.33]}, {"n": 2, "head": "Grid: snap and spacing", "text": "From the Free place alignment bar, which leaves the toolbar. They apply when you move components in Free place.", "x": 74.53, "y": 76.06, "box": [76.25, 73.56, 21.53, 16.67]}, {"n": 3, "head": "Where to go next", "text": "Select a component or link to inspect it; right-click a component for its actions.", "x": 74.53, "y": 93.17, "box": [76.25, 91.56, 21.53, 3.22]}]}, {"id": "it-container", "img": "compare/inspector-tabs-container.png", "group": "target", "tab": "Container", "title": "1440 px, the container “Sydney” opened from Containers", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "A container opened from Containers", "text": "Its name and member count. Build 198 kept the last component’s title, with the editor inside its folded “Advanced settings”.", "x": 74.53, "y": 24.08, "box": [76.25, 22.11, 21.53, 6.56]}, {"n": 2, "head": "The container editor", "text": "Name, boundary type, colour, description, members, Close editor and Remove group.", "x": 74.53, "y": 37.07, "box": [76.25, 34.44, 21.53, 32.78]}, {"n": 3, "head": "Select anything else and it closes", "text": "One click on its label here, or on its chip in Containers, opens it again.", "x": 43.78, "y": 36.67, "box": [24.86, 28.78, 37.85, 22.56]}]}, {"id": "it-1024", "img": "compare/inspector-tabs-1024.png", "group": "target", "tab": "1024 · drawer", "title": "1024 px, the Inspector drawer, Universal Forwarder 1 · Fleet", "w": 1024, "size": "1024 × 768", "items": [{"n": 1, "head": "Below 1280 px, the drawer has the same tabs", "text": "All five fit in the 340 px drawer.", "x": 63.35, "y": 38.28, "box": [65.33, 36.33, 33.01, 3.91]}, {"n": 2, "head": "The drawer opens over the canvas, as in Build 198", "text": "Close × returns focus to the canvas.", "x": 63.91, "y": 73.21, "box": [65.23, 17.84, 33.2, 73.83]}]}, {"id": "it-phone", "img": "compare/inspector-tabs-phone.png", "group": "target", "tab": "Phone", "title": "400 px, the Inspector sheet, Heavy Forwarder 1 · Connections", "w": 400, "size": "400 × 860", "items": [{"n": 1, "head": "Phones get the tabs too", "text": "In the Inspector sheet. At 320 px the strip scrolls to keep the selected tab in view.", "x": 92.79, "y": 54.59, "box": [0.25, 56.51, 99.5, 3.49]}]}, {"id": "today-link", "img": "compare/inspector-tabs-today-link.png", "group": "today", "tab": "Today · a link", "title": "Build 198 today: the link Universal Forwarder 1 → Indexer 1 selected", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "A link is titled with its target", "text": "Selecting Universal Forwarder 1 → Indexer 1 shows “Indexer 1”.", "x": 74.53, "y": 25.94, "box": [76.25, 24.67, 21.53, 2.56]}, {"n": 2, "head": "The target’s identity, not the link’s", "text": "Indexer 1’s name, environment, region and host.", "x": 74.53, "y": 34.46, "box": [76.25, 31.0, 21.53, 34.56]}, {"n": 3, "head": "Insert sits in the connection list", "text": "“Insert component on selected connection” is the target’s last connection row.", "x": 75.33, "y": 79.83, "box": [76.94, 78.22, 20.14, 3.22]}, {"n": 4, "head": "The link’s own fields are further down", "text": "In a 1,280 px card at the end of Indexer 1’s folded “Advanced settings and assurance”, after its peer membership.", "x": 74.53, "y": 86.31, "box": [76.25, 83.89, 21.53, 16.11]}]}, {"id": "today-component", "img": "compare/inspector-tabs-today-component.png", "group": "today", "tab": "Today · one column", "title": "Build 198 today: Universal Forwarder 1, “Advanced settings” open, scrolled", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "One long column", "text": "With “Advanced settings” open, Universal Forwarder 1 runs to 2,070 px: almost three Inspector heights at 1440 × 900.", "x": 74.53, "y": 34.73, "box": [76.25, 32.0, 21.53, 18.22]}, {"n": 2, "head": "“Advanced settings and assurance”", "text": "One fold for pipeline sets, handoff, reliability, owned stages, fleet, access and a selected link’s card.", "x": 74.53, "y": 53.78, "box": [76.25, 52.78, 21.53, 2.0]}, {"n": 3, "head": "Pipeline sets, handoff and reliability", "text": "In the tabs, these are Settings.", "x": 74.53, "y": 64.28, "box": [76.25, 61.22, 21.53, 6.11]}]}, {"id": "today-free", "img": "compare/inspector-tabs-today-free.png", "group": "today", "tab": "Today · Free place", "title": "Build 198 today: Free place layout at 1440 px", "w": 1440, "size": "1440 × 900", "items": [{"n": 1, "head": "Free place adds the alignment bar to the toolbar", "text": "“Arrange · 0 selected”, align, distribute and Snap to grid. At 1440 px the toolbar wraps to 85 px, over the menu bar and onto the canvas.", "x": 62.74, "y": 19.25, "box": [47.29, 7.44, 30.9, 9.44]}, {"n": 2, "head": "Find is squeezed to 90 px", "text": "The bar takes its room.", "x": 81.67, "y": 15.07, "box": [78.54, 10.56, 6.25, 3.11]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;img.alt=s.title;shot.style.maxWidth=s.w<1000?s.w+'px':'';shot.style.marginInline=s.w<1000?'auto':'';document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size+' viewport';
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 198 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
