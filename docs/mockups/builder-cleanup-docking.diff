@@ -82,8 +82,9 @@
 @@ -11792,7 +11757,6 @@
    /* Docking replaces the bottom-bar toggles and the old resize grip. */
    #topologyBuilder.builderDocked197 #builderAddToggle,
-   #topologyBuilder.builderDocked197 #builderInspectorToggle,
+-  #topologyBuilder.builderDocked197 #builderInspectorToggle,
 -  #topologyBuilder.builderDocked197 .builderInspector .builderSpaceResize140{display:none!important}
++  #topologyBuilder.builderDocked197 #builderInspectorToggle{display:none!important}
    /* Collapsed columns become 40px rails. */
    #topologyBuilder.builderDocked197.dockLeftCollapsed197 .dockRailLeft197,
    #topologyBuilder.builderDocked197.dockRightCollapsed197 .dockRailRight197{display:flex}

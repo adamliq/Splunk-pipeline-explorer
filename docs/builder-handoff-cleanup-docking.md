@@ -6,6 +6,8 @@
 
 **It can go in the same build as the Parsing laboratory block** ([`builder-handoff-parsing-lab-examples.md`](builder-handoff-parsing-lab-examples.md)), with one set of build records. The two touch different parts of the page, and the patch applies before or after the block is appended.
 
+**Corrected after Build 202.** Edit 5 first said to delete the handle's line. That left the rule's selector list ending in a comma, so the two toggles joined the next rule and lost their `display:none`. They stayed out of sight only because the bar they sit in is hidden as well. Build 202 made the edit correctly, and edit 5 and the patch now match it.
+
 **Tested first:** the edits were applied to Build 200 and run. The results under "Check before uploading" come from that run.
 
 ## Why
@@ -41,8 +43,11 @@ Five places, all deletions except one shortened selector. After them, `builderSp
    **Keep in this script:**
    - `builderSpaceInspectorWidth140` and `--builder-inspector-width-v140`: the docked Inspector's width and its resizer use them.
    - `builderSpaceWide140`: at 1680 px and wider it still keeps the selected component in view when the canvas narrows.
-5. **`<style id="builder-docked-panels-v197-styles">`:** delete the rule that hid the handle while docked:
-   `#topologyBuilder.builderDocked197 .builderInspector .builderSpaceResize140{display:none!important}`.
+5. **`<style id="builder-docked-panels-v197-styles">`:** take the handle out of the rule that hides the bottom-bar toggles while docked. The handle is the last of the rule's three selectors, so the declaration moves up to the second, and the rule reads:
+   ```
+   #topologyBuilder.builderDocked197 #builderAddToggle,
+   #topologyBuilder.builderDocked197 #builderInspectorToggle{display:none!important}
+   ```
 
 The page is 5,939 bytes smaller.
 
