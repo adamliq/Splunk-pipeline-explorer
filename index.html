@@ -12947,5 +12947,43 @@ const build=document.querySelector('#topologyBuilder');build.dataset.buildNumber
 builderInfoText159.textContent=builderInfoText159.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 202 · 18 Oct 2026');
 })();
 </script>
+<style id="builder-canvas-faults-v201-styles">
+/* Build 201, two canvas faults. From 761px a card is 224px tall and its chip box 38px, two rows. A zone chip that
+   didn't fit beside the region took a third row, and one wider than the card wrapped onto a second line; either ran
+   into the first stage row. Now each chip is one line, at most the card's width, ending with … if longer. The region
+   and the zone each count as at most half the row when the chips are placed, so the zone always fits beside the
+   region; then each grows towards its own width, and one that needs less than half gives the other the rest.
+   Chips that already fit in two rows keep their places. Phones are unchanged: there the card grows to fit.
+   No :has() on the chips: limiting the rule to cards with a zone chip that way made redraws up to 18ms slower. */
+@media (min-width:761px){
+  body[data-view="builder"] #topologyBuilder .builderNode>.unifiedNodeMeta>span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  body[data-view="builder"] #topologyBuilder .builderNode>.unifiedNodeMeta>span:is(:nth-child(2),:nth-child(3)){flex:1 1 calc(50% - 2px);max-width:max-content}
+}
+/* A container's collapse button: .unifiedGroupBox button put it at the left, over the container's name. It goes to the
+   top right, level with the name, and a long name ends with … before it. */
+#topologyBuilder .unifiedGroupBox .builderGroupCollapseButton{left:auto;right:8px}
+#topologyBuilder .unifiedGroupBox:has(>.builderGroupCollapseButton)>[data-unified-group]{max-width:calc(100% - 48px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+</style>
+<script id="builder-canvas-faults-v201">
+(function(){
+/* Build 201: a card chip or container name cut short with … shows its full text as a tooltip. The title is set on
+   hover, so it follows whatever text the card has by then, and only where the text doesn't fit. A title set by other
+   code is left alone. */
+const selector='.builderCanvas .unifiedNodeMeta>span,.builderCanvas .unifiedGroupBox>[data-unified-group]';
+document.addEventListener('pointerover',event=>{
+ const el=event.target.closest?.(selector);if(!el)return;
+ const full=el.textContent.trim(),cut=el.scrollWidth>el.clientWidth+1,ours=el.dataset.cutTitle201==='1';
+ if(cut&&(!el.title||ours)){el.title=full;el.dataset.cutTitle201='1'}
+ else if(!cut&&ours){el.removeAttribute('title');delete el.dataset.cutTitle201}
+});
+})();
+</script>
+<script id="builder-canvas-faults-records-v203">
+(function(){
+changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Canvas chips and container names','From 761px a card’s chips keep to two rows, so a long region or zone no longer covers the first stage row. A chip or container name that doesn’t fit ends with … and shows its full text on hover. A container’s collapse button sits at its top right instead of over its name.',true]);
+const build=document.querySelector('#topologyBuilder');build.dataset.buildNumber='203';build.dataset.buildDate='2026-10-18';document.title='Splunk Pipeline Explorer · Build 203 · 18 Oct 2026';
+builderInfoText159.textContent=builderInfoText159.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 203 · 18 Oct 2026');
+})();
+</script>
 </body>
 </html>
