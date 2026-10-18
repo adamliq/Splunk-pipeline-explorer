@@ -1,0 +1,89 @@
+--- a/index.html
++++ b/index.html
+@@ -4924,25 +4924,6 @@
+ .topologyBuilder #builderPalettePin126{min-width:44px}
+ .topologyBuilder #builderPalettePin126[aria-pressed="true"]{border-color:#8cddcf;background:#174a43;color:#e1fff1}
+ .topologyBuilder.canvasPalettePinned #builderAddToggle[aria-pressed="true"]{border-color:#8cddcf!important}
+-@media(min-width:761px){
+-  .topologyBuilder.canvasFirst.canvasPalettePinned:not(.canvasFocus) .builderGrid{
+-    grid-template-columns:minmax(255px,300px) minmax(0,1fr)!important
+-  }
+-  .topologyBuilder.canvasFirst.canvasPalettePinned.canvasInspectorPinned:not(.canvasFocus) .builderGrid{
+-    grid-template-columns:minmax(255px,290px) minmax(0,1fr) minmax(275px,305px)!important
+-  }
+-  .topologyBuilder.canvasFirst.canvasPalettePinned:not(.canvasFocus) .builderPalette{
+-    display:block!important;position:sticky!important;grid-column:1;grid-row:1;align-self:start;
+-    top:12px!important;left:auto!important;right:auto!important;bottom:auto!important;
+-    width:auto!important;max-width:none!important;height:clamp(480px,calc(100dvh - 130px),760px)!important;
+-    max-height:none;visibility:visible!important;z-index:3;overflow-y:auto;
+-    border:0;border-right:1px solid #46667a;border-radius:0;box-shadow:none
+-  }
+-  .topologyBuilder.canvasFirst.canvasPalettePinned:not(.canvasFocus) .builderWorkspace{grid-column:2!important;grid-row:1;min-width:0}
+-  .topologyBuilder.canvasFirst.canvasPalettePinned.canvasInspectorPinned:not(.canvasFocus) .builderInspector{
+-    grid-column:3!important;grid-row:1
+-  }
+-}
+ @media(pointer:coarse){.topologyBuilder #builderPalettePin126{min-height:40px}}
+ </style>
+ <script id="builder-palette-pin-v126">
+@@ -6530,26 +6511,12 @@
+  body[data-view="builder"].builderPageFocus .shell>header,body[data-view="builder"].builderPageFocus .shell>.toolbar{display:none!important}
+  body[data-view="builder"].builderPageFocus{overflow:hidden}
+ }
+-@media(min-width:1680px){
+- body[data-view="builder"] .topologyBuilder.canvasFirst.canvasPanelInspectorOpen:not(.canvasFocus) .builderGrid{grid-template-columns:minmax(0,1fr) var(--builder-inspector-width-v140,340px)!important}
+- body[data-view="builder"] .topologyBuilder.canvasFirst.canvasInspectorPinned:not(.canvasFocus) .builderGrid{grid-template-columns:minmax(0,1fr) var(--builder-inspector-width-v140,340px)!important}
+- body[data-view="builder"] .topologyBuilder.canvasFirst.canvasPanelInspectorOpen:not(.canvasFocus) .builderWorkspace{grid-column:1!important;grid-row:1}
+- body[data-view="builder"] .topologyBuilder.canvasFirst.canvasPanelInspectorOpen:not(.canvasFocus) .builderInspector{display:block!important;position:relative!important;grid-column:2!important;grid-row:1!important;top:auto!important;right:auto!important;bottom:auto!important;left:auto!important;width:var(--builder-inspector-width-v140,340px)!important;height:calc(100dvh - var(--builder-canvas-top-v140,100px) - 12px)!important;max-height:none;box-shadow:none;border-radius:0}
+- body[data-view="builder"] .topologyBuilder.canvasFirst.canvasPalettePinned.canvasPanelInspectorOpen:not(.canvasFocus) .builderGrid{grid-template-columns:minmax(255px,290px) minmax(0,1fr) var(--builder-inspector-width-v140,340px)!important}
+- body[data-view="builder"] .topologyBuilder.canvasFirst.canvasPalettePinned.canvasInspectorPinned:not(.canvasFocus) .builderGrid{grid-template-columns:minmax(255px,290px) minmax(0,1fr) var(--builder-inspector-width-v140,340px)!important}
+- body[data-view="builder"] .topologyBuilder.canvasFirst.canvasPalettePinned.canvasPanelInspectorOpen:not(.canvasFocus) .builderWorkspace{grid-column:2!important}
+- body[data-view="builder"] .topologyBuilder.canvasFirst.canvasPalettePinned.canvasPanelInspectorOpen:not(.canvasFocus) .builderInspector{grid-column:3!important}
+- body[data-view="builder"] .topologyBuilder.canvasFirst.canvasInspectorPinned:not(.canvasFocus) .builderInspector{width:var(--builder-inspector-width-v140,340px)!important;height:calc(100dvh - var(--builder-canvas-top-v140,100px) - 12px)!important;overflow-y:auto}
+- body[data-view="builder"] .topologyBuilder.canvasFirst.canvasPalettePinned.canvasInspectorPinned:not(.canvasFocus) .builderInspector{grid-column:3!important}
+- body[data-view="builder"] .builderInspector .builderSpaceResize140{display:block;position:sticky;top:42px;left:0;width:8px;height:50px;float:left;margin-left:-14px;z-index:10;cursor:ew-resize;background:#426779;border-radius:0 6px 6px 0}
+- body[data-view="builder"] .topologyBuilder.canvasFirst.canvasPalettePinned:not(.canvasFocus) .builderPalette{height:calc(100dvh - var(--builder-canvas-top-v140,100px) - 12px)!important}
+-}
+ @media(min-width:761px) and (max-width:1439px){
+  body[data-view="builder"] .builderHead{grid-template-columns:auto minmax(0,1fr);height:80px}
+  body[data-view="builder"] .builderHead .builderActionWrap{grid-column:2;grid-row:1}
+  body[data-view="builder"] .builderHead .builderPlaneBar{grid-column:1/-1;grid-row:2}
+ }
+-@media(max-width:760px){.builderSpaceSave140,.builderSpaceHelp140,.builderSpaceHelpPopover140,.builderSpaceGroupToggle140,.builderSpaceResize140{display:none!important}}
++@media(max-width:760px){.builderSpaceSave140,.builderSpaceHelp140,.builderSpaceHelpPopover140,.builderSpaceGroupToggle140{display:none!important}}
+ </style>
+ <script id="builder-canvas-space-v140">
+ /* Reclaim the desktop viewport without changing the mobile Builder DOM. */
+@@ -6563,7 +6530,6 @@
+ const builderSpaceGroupButton140=document.createElement('button');builderSpaceGroupButton140.type='button';builderSpaceGroupButton140.className='builderSpaceGroupToggle140';builderSpaceGroupButton140.dataset.icon='▦';builderSpaceGroupButton140.title='Containers';builderSpaceGroupButton140.setAttribute('aria-label','Containers');builderSpaceGroupButton140.setAttribute('aria-controls','builderSpaceGroups140');builderSpaceGroupButton140.setAttribute('aria-expanded','false');
+ const builderSpaceHelp140=document.createElement('button');builderSpaceHelp140.type='button';builderSpaceHelp140.className='builderSpaceHelp140';builderSpaceHelp140.textContent='?';builderSpaceHelp140.title='Canvas controls and shortcuts';builderSpaceHelp140.setAttribute('aria-label','Canvas controls and shortcuts');builderSpaceHelp140.setAttribute('aria-expanded','false');
+ const builderSpaceHelpPopover140=document.createElement('div');builderSpaceHelpPopover140.className='builderSpaceHelpPopover140';builderSpaceHelpPopover140.hidden=true;
+-const builderSpaceResize140=document.createElement('span');builderSpaceResize140.className='builderSpaceResize140';builderSpaceResize140.setAttribute('role','separator');builderSpaceResize140.setAttribute('aria-label','Resize Inspector');builderSpaceResize140.setAttribute('aria-orientation','vertical');builderSpaceResize140.tabIndex=0;
+ let builderSpaceFit140=false,builderSpaceSize140=0,builderSpaceManualMap140=false,builderSpaceSyncing140=false;
+ let builderSpaceInspectorWidth140=340;try{builderSpaceInspectorWidth140=Math.max(300,Math.min(560,Number(localStorage.getItem('splunkPipelineExplorer.inspectorWidth.v1'))||340))}catch{}
+ builderSpaceRoot140.style.setProperty('--builder-inspector-width-v140',builderSpaceInspectorWidth140+'px');
+@@ -6577,7 +6543,7 @@
+ $('#builderMinimapToggle')?.addEventListener('click',event=>{if(builderSpaceRoot140.classList.contains('builderSpaceAutoMapHidden140')){event.preventDefault();event.stopImmediatePropagation();builderSpaceManualMap140=true;builderSpaceRoot140.classList.remove('builderSpaceAutoMapHidden140');const button=$('#builderMinimapToggle');button.textContent='Hide minimap';button.title='Hide topology minimap';button.setAttribute('aria-pressed','true')}else builderSpaceManualMap140=true},true);
+ const builderSpaceApplyBefore140=applyBuilderViewport;applyBuilderViewport=function(...args){const result=builderSpaceApplyBefore140(...args);if(builderSpaceMedia140.matches&&state.view==='builder')requestAnimationFrame(builderSpaceAutoMap140);return result};
+ function builderSpaceRail140(){const dock=builderDensityDock,panels=builderDensityPanels;if(!dock||!panels)return;const icons=['⌕','▤','◇','⚒'];[...dock.querySelectorAll(':scope > .builderDensityToggle')].forEach((button,i)=>{button.dataset.icon=icons[i]||'•';button.setAttribute('aria-label',button.title||button.textContent.trim());if(i===2){let badge=button.querySelector('.builderSpaceRailCount140');if(!badge){badge=document.createElement('span');badge.className='builderSpaceRailCount140';button.appendChild(badge)}badge.textContent=String(builderFindingSummary().review)}});const validation=builderFindingSummary(),summary=validateItems.parentElement.querySelector('summary');if(summary){let badge=summary.querySelector('.builderSpaceValidation140');if(!badge){badge=document.createElement('span');badge.className='builderSpaceValidation140';summary.appendChild(badge)}badge.textContent=validation.errors?validation.errors+' errors':validation.review?validation.review+' to review':'✓';badge.classList.toggle('valid',!validation.errors);summary.title=`${validation.errors} errors · ${validation.review} to review`}if(!builderSpaceGroup140.isConnected)panels.appendChild(builderSpaceGroup140);if(!builderSpaceGroupButton140.isConnected)dock.insertBefore(builderSpaceGroupButton140,panels);const group=$('#builderGroupBar');if(group&&group.parentElement!==builderSpaceGroup140)builderSpaceGroup140.appendChild(group)}
+-function builderSpaceAttach140(){document.body.dataset.view=state.view;if(!builderSpaceMedia140.matches){if(builderSpacePlaneMarker140.isConnected&&builderSpacePlane140.parentElement!==builderSpacePlaneMarker140.parentElement)builderSpacePlaneMarker140.after(builderSpacePlane140);builderSpaceTitle140.textContent=builderSpaceTitleText140;builderSpaceRoot140.classList.remove('builderSpaceAutoMapHidden140');builderSpaceFocusChrome140();return}if(state.view!=='builder')return;const head=$('.builderHead'),wrap=$('.builderActionWrap');if(builderSpacePlane140.parentElement!==head)head.insertBefore(builderSpacePlane140,wrap);builderSpaceTitle140.textContent='Builder';builderSpaceTitle140.title=builderSpaceTitleText140;const primary=$('.builderDensityHeaderPrimary');if(primary&&builderSpaceSave140.parentElement!==primary)primary.appendChild(builderSpaceSave140);const status=$('#builderSaveState');if(status){builderSpaceSave140.textContent=/unsaved/i.test(status.textContent)?'● Unsaved':'● Saved';builderSpaceSave140.title=status.title||status.textContent}builderSpaceRail140();if(!builderSpaceHelpPopover140.isConnected)builderSpaceCanvas140.appendChild(builderSpaceHelpPopover140);const hint=$('.builderNavigationHint');if(hint&&hint.parentElement!==builderSpaceHelpPopover140)builderSpaceHelpPopover140.appendChild(hint);if(builderBottomBar.isConnected&&builderSpaceHelp140.parentElement!==builderBottomBar)builderBottomBar.insertBefore(builderSpaceHelp140,builderBottomBar.querySelector('.builderMobileZoomControls'));const inspector=$('#builderCanvasInspector');if(inspector&&builderSpaceResize140.parentElement!==inspector)inspector.prepend(builderSpaceResize140);builderSpaceSchedule140()}
++function builderSpaceAttach140(){document.body.dataset.view=state.view;if(!builderSpaceMedia140.matches){if(builderSpacePlaneMarker140.isConnected&&builderSpacePlane140.parentElement!==builderSpacePlaneMarker140.parentElement)builderSpacePlaneMarker140.after(builderSpacePlane140);builderSpaceTitle140.textContent=builderSpaceTitleText140;builderSpaceRoot140.classList.remove('builderSpaceAutoMapHidden140');builderSpaceFocusChrome140();return}if(state.view!=='builder')return;const head=$('.builderHead'),wrap=$('.builderActionWrap');if(builderSpacePlane140.parentElement!==head)head.insertBefore(builderSpacePlane140,wrap);builderSpaceTitle140.textContent='Builder';builderSpaceTitle140.title=builderSpaceTitleText140;const primary=$('.builderDensityHeaderPrimary');if(primary&&builderSpaceSave140.parentElement!==primary)primary.appendChild(builderSpaceSave140);const status=$('#builderSaveState');if(status){builderSpaceSave140.textContent=/unsaved/i.test(status.textContent)?'● Unsaved':'● Saved';builderSpaceSave140.title=status.title||status.textContent}builderSpaceRail140();if(!builderSpaceHelpPopover140.isConnected)builderSpaceCanvas140.appendChild(builderSpaceHelpPopover140);const hint=$('.builderNavigationHint');if(hint&&hint.parentElement!==builderSpaceHelpPopover140)builderSpaceHelpPopover140.appendChild(hint);if(builderBottomBar.isConnected&&builderSpaceHelp140.parentElement!==builderBottomBar)builderBottomBar.insertBefore(builderSpaceHelp140,builderBottomBar.querySelector('.builderMobileZoomControls'));builderSpaceSchedule140()}
+ const builderSpaceSwitchBefore140=switchView;switchView=function(...args){const result=builderSpaceSwitchBefore140(...args);builderSpaceAttach140();if(builderSpaceMedia140.matches&&state.view==='builder'&&scrollY)window.scrollTo({top:0,behavior:'instant'});return result};
+ const builderSpaceRenderBefore140=renderBuilder;renderBuilder=function(...args){const result=builderSpaceRenderBefore140(...args);if(state.view==='builder')requestAnimationFrame(()=>{builderSpaceAttach140();builderSpaceFocusChrome140();builderSpaceAutoMap140()});return result};
+ const builderSpacePanelsBefore140=syncCanvasPanels;syncCanvasPanels=function(...args){const priorWidth=builderSpaceCanvas140.clientWidth,result=builderSpacePanelsBefore140(...args);if(state.view==='builder'){builderSpaceSchedule140();if(builderSpaceWide140.matches&&canvasPanelState.inspector){requestAnimationFrame(()=>{const after=builderSpaceCanvas140.clientWidth;if(priorWidth!==after&&state.builderSelected){const selected=$('#builderTree .builderNode.selected');if(selected){const r=selected.getBoundingClientRect(),c=builderSpaceCanvas140.getBoundingClientRect();if(r.right>c.right-20){state.builderViewport.x-=r.right-c.right+30;applyBuilderViewport()}}}})}}return result};
+@@ -6592,7 +6558,6 @@
+ builderSpaceHelp140.onclick=()=>{builderSpaceHelpPopover140.hidden=!builderSpaceHelpPopover140.hidden;builderSpaceHelp140.setAttribute('aria-expanded',String(!builderSpaceHelpPopover140.hidden));try{localStorage.setItem('splunkPipelineExplorer.canvasHelpSeen.v1','true')}catch{}};
+ /* v163: only explicit Got it dismissal persists; no delayed legacy popup. */
+ setTimeout(()=>{if(state.view==='builder'&&builderSpaceMedia140.matches&&!builderHelpDismissed163){builderSpaceHelpPopover140.hidden=false;builderSpaceHelp140.setAttribute('aria-expanded','true')}},500);
+-let builderSpaceResizePointer140=null;builderSpaceResize140.addEventListener('pointerdown',event=>{if(!builderSpaceWide140.matches)return;builderSpaceResizePointer140={id:event.pointerId,x:event.clientX,width:builderSpaceInspectorWidth140};builderSpaceResize140.setPointerCapture(event.pointerId);event.preventDefault()});builderSpaceResize140.addEventListener('pointermove',event=>{if(!builderSpaceResizePointer140||event.pointerId!==builderSpaceResizePointer140.id)return;builderSpaceInspectorWidth140=Math.max(300,Math.min(560,builderSpaceResizePointer140.width+builderSpaceResizePointer140.x-event.clientX));builderSpaceRoot140.style.setProperty('--builder-inspector-width-v140',builderSpaceInspectorWidth140+'px')});builderSpaceResize140.addEventListener('pointerup',()=>{builderSpaceResizePointer140=null;try{localStorage.setItem('splunkPipelineExplorer.inspectorWidth.v1',String(builderSpaceInspectorWidth140))}catch{}});builderSpaceResize140.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight'].includes(event.key))return;event.preventDefault();builderSpaceInspectorWidth140=Math.max(300,Math.min(560,builderSpaceInspectorWidth140+(event.key==='ArrowLeft'?12:-12)));builderSpaceRoot140.style.setProperty('--builder-inspector-width-v140',builderSpaceInspectorWidth140+'px');try{localStorage.setItem('splunkPipelineExplorer.inspectorWidth.v1',String(builderSpaceInspectorWidth140))}catch{}});
+ window.addEventListener('resize',builderSpaceSchedule140);builderSpaceMedia140.addEventListener('change',()=>requestAnimationFrame(builderSpaceAttach140));builderSpaceWide140.addEventListener('change',builderSpaceSchedule140);
+ if(typeof ResizeObserver==='function'){const observer=new ResizeObserver(builderSpaceSchedule140);observer.observe($('.builderHead'));observer.observe(builderDensityDock);observer.observe($('.builderWorkspace'))}
+ builderSpaceAttach140();changeRegister.find(group=>group.group==='Explorer foundations')?.items.push(['Full-screen Builder workspace','Use the desktop viewport for the canvas, place navigation in a rail and keep the compact actions at the canvas edge.',true]);if(state.view==='changes')renderChanges();
+@@ -11792,7 +11757,6 @@
+   /* Docking replaces the bottom-bar toggles and the old resize grip. */
+   #topologyBuilder.builderDocked197 #builderAddToggle,
+   #topologyBuilder.builderDocked197 #builderInspectorToggle,
+-  #topologyBuilder.builderDocked197 .builderInspector .builderSpaceResize140{display:none!important}
+   /* Collapsed columns become 40px rails. */
+   #topologyBuilder.builderDocked197.dockLeftCollapsed197 .dockRailLeft197,
+   #topologyBuilder.builderDocked197.dockRightCollapsed197 .dockRailRight197{display:flex}
