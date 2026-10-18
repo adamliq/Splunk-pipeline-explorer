@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Builder Canvas Faults</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,752px) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 201 TARGET · BUILD 200 + PROTOTYPE</span>
+ <h1>Builder: two canvas faults</h1>
+ <p class="lede">Two faults on the Builder canvas, both in Build 200. A card whose chips wrapped to a third row drew its container chip over its first stage row; now the chips keep to two rows, and the stage rows start below them. A container’s − collapse button covered the start of its name, so “Sydney” read “−dney”; now it sits at the top right. Every scene is the real Builder with the prototype block appended to Build 200; the “Today” scenes are Build 200 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>Which cards change</h2>
+  <table>
+   <thead><tr><th>A card’s chips in Build 200, from 761 px</th><th>With the fix</th></tr></thead>
+   <tbody>
+    <tr><td>The region fits beside Env; the zone has the second row</td><td>Unchanged</td></tr>
+    <tr><td>The region starts the second row and the zone fits beside it</td><td>Unchanged</td></tr>
+    <tr><td>Only Env and the region</td><td>Unchanged</td></tr>
+    <tr><td>Beside “Env · Test”, the one Env chip under 84 px, a region wider than 98 px</td><td>It stays beside Env, ending with …, instead of starting the second row</td></tr>
+    <tr><td><b>The region starts the second row and the zone doesn’t fit beside it:</b> the zone takes a third row, over the first stage row</td><td>The zone moves up beside the region. Each gets up to half the row; one that needs less keeps its width and the other takes the rest. Each ends with … if it is longer</td></tr>
+    <tr><td><b>A zone wider than the card:</b> it wraps inside its chip, and its second line covers the first stage row</td><td>One line, ending with …</td></tr>
+    <tr><td>Below 761 px</td><td>Unchanged: the card grows to fit its chips</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The rules in short</h2>
+  <dl>
+   <dt>Cause, chips</dt><dd>From 761 px a card is 224 px tall and its chip box 38 px, room for two rows. Nothing stopped a third row, or a chip’s second line, from running into the stage rows.</dd>
+   <dt>Why not grow</dt><dd>The layout places cards, containers, lanes and links on the 224 px height, so the chips keep to the two rows they have instead.</dd>
+   <dt>Chips</dt><dd>One line each, at most the card’s width, ending with … when longer.</dd>
+   <dt>Region and zone</dt><dd>Both count as at most half the row while the chips are placed, so the zone always fits beside the region. Then each grows to its own width, and the shorter gives the longer the rest of the row.</dd>
+   <dt>Tooltips</dt><dd>A chip or container name that ends with … shows its full text when you point at it. A tooltip set elsewhere, such as an S3 region’s, is kept.</dd>
+   <dt>Cause, button</dt><dd><code>.unifiedGroupBox button</code> sets left: 8px on every button in a container, and it outranks <code>.builderGroupCollapseButton</code>, so the − sat at the left, on the name.</dd>
+   <dt>The − button</dt><dd>At the top right, 8 px in, level with the name. A name stops 48 px short of the container’s width, so it ends with … before the button.</dd>
+   <dt>Unchanged</dt><dd>Phones; zoomed out, where chips are hidden as before; card sizes and every position on the canvas.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-canvas-faults.md</code> · Prototype: <code>docs/mockups/builder-canvas-faults-prototype.css</code> and <code>.js</code>, appended to Build 200.</p>
+</div>
+<script>
+const SCENES=[{"id": "zones-fixed", "img": "compare/canvas-faults-chips.png", "group": "target", "tab": "Chips", "title": "1440 px, zones topology: two cards whose zone took a third row", "w": 752, "size": "1440 × 900", "items": [{"n": 1, "head": "Two rows, always", "text": "Melbourne doesn’t fit beside Env · Production, so it starts the second row, and the zone chip now fits beside it.", "x": 38.79, "y": 44.8, "box": [15.56, 43.26, 22.34, 5.12]}, {"n": 2, "head": "The zone ends with …", "text": "Melbourne keeps its width and Zone · Melbourne collection takes the rest of the row. Point at it and its tooltip has the whole name.", "x": 74.34, "y": 44.82, "box": [68.22, 46.23, 12.23, 2.56]}, {"n": 3, "head": "The stage rows stay put", "text": "The first stage row starts below the chips, as on every card whose chips fit. The card stays 224 px tall.", "x": 36.11, "y": 50.88, "box": [15.56, 48.92, 22.34, 3.91]}, {"n": 4, "head": "Cards that fit are unchanged", "text": "Heavy Forwarder 1’s region fits beside Env, so its zone keeps the second row to itself, as in Build 200.", "x": 76.73, "y": 80.93, "box": [58.11, 79.65, 16.62, 2.56]}, {"n": 5, "head": "Both long: half each", "text": "AWS ap-southeast-2 and Zone · AWS VPC are both wider than half the row, so each gets half, ending with … where it is cut.", "x": 33.88, "y": 77.96, "box": [15.56, 76.68, 22.34, 5.12]}]}, {"id": "containers-fixed", "img": "compare/canvas-faults-containers.png", "group": "target", "tab": "Containers", "title": "1440 px, reference topology with two containers", "w": 752, "size": "1440 × 900", "items": [{"n": 1, "head": "− at the top right", "text": "Level with the name, inside the container’s border. Collapse works as before.", "x": 35.9, "y": 4.58, "box": [38.83, 3.1, 2.93, 2.96]}, {"n": 2, "head": "The name reads in full", "text": "Sydney · Region, not −dney · Region.", "x": 31.32, "y": 4.92, "box": [14.36, 3.1, 14.49, 3.64]}, {"n": 3, "head": "Group 1 · Region", "text": "Every container’s name starts where it did; only the button moved.", "x": 74.19, "y": 4.92, "box": [56.91, 3.1, 14.89, 3.64]}, {"n": 4, "head": "Universal Forwarder 2", "text": "Its container chip, Zone · Group 1, now fits beside Melbourne, ending with … where it is cut. Source acquisition is clear.", "x": 77.76, "y": 52.09, "box": [59.44, 50.81, 22.34, 5.12]}]}, {"id": "long-name-fixed", "img": "compare/canvas-faults-long-name.png", "group": "target", "tab": "Long name", "title": "1440 px, a container called “Melbourne production data centre”", "w": 752, "size": "1440 × 900", "items": [{"n": 1, "head": "A long name ends with …", "text": "It stops before the button. Point at it and its tooltip has the whole name and type.", "x": 12.28, "y": 4.92, "box": [14.36, 3.1, 23.14, 3.64]}, {"n": 2, "head": "The button stays clear", "text": "The name can never reach it, however long it is.", "x": 43.8, "y": 4.58, "box": [38.83, 3.1, 2.93, 2.96]}]}, {"id": "zones-today", "img": "compare/canvas-faults-chips-today.png", "group": "today", "tab": "Chips today", "title": "Build 200 today: the same two cards", "w": 752, "size": "1440 × 900", "items": [{"n": 1, "head": "A third row", "text": "Zone · Melbourne network takes a third chip row and draws over Event emission, the first stage row.", "x": 38.97, "y": 50.47, "box": [15.56, 49.19, 21.68, 2.56]}, {"n": 2, "head": "A third row, on two lines", "text": "Zone · Melbourne collection is wider than the card, so it also wraps inside its chip, over Listener &amp; framing.", "x": 82.24, "y": 53.94, "box": [58.11, 49.19, 22.34, 4.31]}]}, {"id": "containers-today", "img": "compare/canvas-faults-containers-today.png", "group": "today", "tab": "Containers today", "title": "Build 200 today: the same two containers", "w": 752, "size": "1440 × 900", "items": [{"n": 1, "head": "− covers the name", "text": "“Sydney · Region” reads “−dney · Region”.", "x": 12.31, "y": 4.58, "box": [14.36, 3.1, 2.93, 2.96]}, {"n": 2, "head": "Group 1 too", "text": "“Group 1 · Region” reads “−oup 1 · Region”.", "x": 54.87, "y": 4.58, "box": [56.91, 3.1, 2.93, 2.96]}, {"n": 3, "head": "Zone · Group 1 over Source acquisition", "text": "The container chip takes a third row and covers the first stage row.", "x": 78.34, "y": 58.02, "box": [59.44, 56.74, 13.03, 2.56]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;img.alt=s.title;shot.style.maxWidth=s.w+'px';document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size+' viewport, canvas only';
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 200 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>

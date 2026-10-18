@@ -1,0 +1,15 @@
+/* Build 201, two canvas faults. From 761px a card is 224px tall and its chip box 38px, two rows. A zone chip that
+   didn't fit beside the region took a third row, and one wider than the card wrapped onto a second line; either ran
+   into the first stage row. Now each chip is one line, at most the card's width, ending with … if longer. The region
+   and the zone each count as at most half the row when the chips are placed, so the zone always fits beside the
+   region; then each grows towards its own width, and one that needs less than half gives the other the rest.
+   Chips that already fit in two rows keep their places. Phones are unchanged: there the card grows to fit.
+   No :has() on the chips: limiting the rule to cards with a zone chip that way made redraws up to 18ms slower. */
+@media (min-width:761px){
+  body[data-view="builder"] #topologyBuilder .builderNode>.unifiedNodeMeta>span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  body[data-view="builder"] #topologyBuilder .builderNode>.unifiedNodeMeta>span:is(:nth-child(2),:nth-child(3)){flex:1 1 calc(50% - 2px);max-width:max-content}
+}
+/* A container's collapse button: .unifiedGroupBox button put it at the left, over the container's name. It goes to the
+   top right, level with the name, and a long name ends with … before it. */
+#topologyBuilder .unifiedGroupBox .builderGroupCollapseButton{left:auto;right:8px}
+#topologyBuilder .unifiedGroupBox:has(>.builderGroupCollapseButton)>[data-unified-group]{max-width:calc(100% - 48px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
