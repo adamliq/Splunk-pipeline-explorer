@@ -1,0 +1,24 @@
+/* Build 204: the list of next components that opens from a card's Event data handle. It floats above the canvas, docked
+   panels and Focus canvas, anchored to the card. */
+.addNext204{position:fixed;z-index:1200;box-sizing:border-box;width:264px;max-width:calc(100vw - 16px);max-height:min(430px,calc(100vh - 16px));overflow:auto;border:1px solid #2c5068;border-radius:10px;padding:8px;background:#0b1822;box-shadow:0 16px 40px rgba(0,0,0,.55),0 0 0 1px rgba(87,199,232,.08);color:#dbe9f2;font-size:12px;line-height:1.35}
+.addNext204:focus{outline:none}
+.addNextHead204{display:grid;gap:1px;margin:2px 6px 8px}
+.addNextHead204 span{color:#8aa4b6;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+.addNextHead204 b{overflow:hidden;color:#eef6fa;font-size:13px;text-overflow:ellipsis;white-space:nowrap}
+.addNextList204{display:grid;gap:2px}
+.addNextList204 button{display:flex;gap:9px;align-items:stretch;width:100%;border:1px solid transparent;border-radius:7px;padding:7px 8px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.addNextList204 button:hover{border-color:#2b4d63;background:#11273a}
+.addNextList204 button:focus-visible{border-color:#57c7e8;background:#11273a;outline:none;box-shadow:0 0 0 2px rgba(87,199,232,.35)}
+.addNextList204 i{flex:0 0 4px;border-radius:2px;background:var(--node)}
+.addNextList204 span{display:grid;gap:2px;min-width:0}
+.addNextList204 b{color:#eef6fa;font-weight:650}
+.addNextList204 small{color:#93abbb;font-size:11px}
+.addNextFoot204{margin:8px 6px 2px;color:#8aa4b6;font-size:11px}
+/* Reaching a card's handles. They hang 5 px below the card, so a pointer moving down to them crossed a gap that ended the
+   hover and hid them; the strip above the row bridges it. And the next card in a column can cover them, all but 1 px in
+   Free place, so a card comes to the front while the pointer is on it, one of its handles has keyboard focus, or a
+   connection starts from it: the redraw that starts one gives the hover to whichever card is on top under the pointer.
+   :where() keeps it below the search, statistics and drag highlights. */
+.topologyBuilder .unifiedNodeWrap>.builderConnectionHandles::before{content:'';position:absolute;left:0;right:0;bottom:100%;height:6px}
+.unifiedNodeWrap:where(:hover,:has(>.builderConnectionHandles :is(.connectionHandle.active,:focus-visible))){z-index:4}
+@media (prefers-reduced-motion:no-preference){.addNext204{animation:addNextIn204 .12s ease-out}@keyframes addNextIn204{from{opacity:0;transform:translateY(-3px)}}}

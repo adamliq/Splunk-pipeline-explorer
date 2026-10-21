@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Builder Add Next</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,754px) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 204 TARGET · BUILD 203 + PROTOTYPE</span>
+ <h1>Builder: add the next component from a handle</h1>
+ <p class="lede">Click a card’s Event data handle and a list opens: the components that card can send event data to, each with the protocol its link will carry. Choose one and it is added after the card, already connected, in one step. The connection the handle starts is still there, so clicking another card’s handle connects the two as before. Testing found three faults in reaching the handles on Build 203; the same block fixes them. Every scene is the real Builder with the prototype block appended to Build 203; the “Today” scenes are Build 203 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>What each list offers</h2>
+  <table>
+   <thead><tr><th>After a</th><th>The list, with each link’s protocol</th></tr></thead>
+   <tbody>
+    <tr><td>SQL Database</td><td>DB Connect on Heavy Forwarder <small>JDBC over database-native TCP/TLS</small></td></tr>
+    <tr><td>DB Connect on Heavy Forwarder</td><td>Indexer <small>Splunk-to-Splunk 9997 from hosting HF</small><br>Splunk Cloud indexing <small>Splunk-to-Splunk 9997 from hosting HF</small></td></tr>
+    <tr><td>Windows Event Log</td><td>Universal Forwarder <small>WinEventLog input</small><br>Heavy Forwarder <small>WinEventLog input</small><br>Indexer <small>WinEventLog input</small><br>Splunk Cloud indexing <small>WinEventLog input</small></td></tr>
+    <tr><td>File Source</td><td>Universal Forwarder <small>File monitor input</small><br>Heavy Forwarder <small>File monitor input</small><br>Indexer <small>File monitor input</small><br>Splunk Cloud indexing <small>File monitor input</small></td></tr>
+    <tr><td>Script Source</td><td>Universal Forwarder <small>Scripted input · inputs.conf</small><br>Heavy Forwarder <small>Configured handoff</small><br>Indexer <small>Configured handoff</small><br>Splunk Cloud indexing <small>Configured handoff</small></td></tr>
+    <tr><td>API Source</td><td>API Collector <small>REST/HTTPS polling</small><br>AWS Lambda <small>REST/HTTPS collection</small><br>Azure Function <small>REST/HTTPS collection</small><br>Heavy Forwarder <small>REST modular input</small><br>Indexer <small>REST modular input</small><br>Splunk Cloud indexing <small>REST modular input</small></td></tr>
+    <tr><td>API Collector</td><td>HEC Endpoint <small>Configured handoff</small><br>Heavy Forwarder <small>HEC HTTPS 8088</small><br>Ingest Processor <small>HEC HTTPS 8088</small><br>Indexer <small>HEC HTTPS 8088</small><br>Load Balancer <small>HEC HTTPS 8088</small><br>Splunk Cloud indexing <small>HEC HTTPS 8088</small></td></tr>
+    <tr><td>AWS Lambda</td><td>HEC Endpoint <small>HEC HTTPS 8088</small><br>Heavy Forwarder <small>Direct HEC HTTPS 8088</small><br>Ingest Processor <small>Direct HEC HTTPS 8088</small><br>Indexer <small>Direct HEC HTTPS 8088</small><br>Load Balancer <small>HEC HTTPS 8088</small><br>Splunk Cloud indexing <small>Direct HEC HTTPS 8088</small></td></tr>
+    <tr><td>Azure Function</td><td>HEC Endpoint <small>HEC HTTPS 8088</small><br>Heavy Forwarder <small>Direct HEC HTTPS 8088</small><br>Ingest Processor <small>Direct HEC HTTPS 8088</small><br>Indexer <small>Direct HEC HTTPS 8088</small><br>Load Balancer <small>HEC HTTPS 8088</small><br>Splunk Cloud indexing <small>Direct HEC HTTPS 8088</small></td></tr>
+    <tr><td>HEC Endpoint</td><td>Heavy Forwarder <small>HEC-admitted event stream</small><br>Ingest Processor <small>HEC-admitted event stream</small><br>Indexer <small>HEC-admitted event stream</small><br>Splunk Cloud indexing <small>HEC-admitted event stream</small></td></tr>
+    <tr><td>Syslog Source</td><td>Syslog Server <small>TCP/TLS or UDP</small><br>Heavy Forwarder <small>Configured handoff</small><br>Indexer <small>Configured handoff</small><br>Edge Processor <small>Syslog to Edge Processor</small><br>Load Balancer <small>Syslog UDP 514 · TCP 514</small></td></tr>
+    <tr><td>HEC Client</td><td>HEC Endpoint <small>HEC HTTPS 8088</small><br>Heavy Forwarder <small>HEC HTTPS 8088</small><br>Ingest Processor <small>HEC HTTPS 8088</small><br>Indexer <small>HEC HTTPS 8088</small><br>Edge Processor <small>HEC HTTPS to Edge Processor</small><br>Load Balancer <small>HEC HTTPS 8088</small><br>Splunk Cloud indexing <small>HEC HTTPS 8088</small></td></tr>
+    <tr><td>Syslog Server</td><td>Universal Forwarder <small>File handoff</small><br>Heavy Forwarder <small>Configured handoff</small><br>Indexer <small>Configured handoff</small><br>Edge Processor <small>Syslog to Edge Processor</small><br>Splunk Cloud indexing <small>Configured handoff</small></td></tr>
+    <tr><td>Universal Forwarder</td><td>Heavy Forwarder <small>Splunk-to-Splunk</small><br>Ingest Processor <small>Splunk-to-Splunk</small><br>Indexer <small>Splunk-to-Splunk</small><br>Edge Processor <small>Splunk forwarder to Edge Processor</small><br>Splunk Cloud indexing <small>Splunk-to-Splunk</small></td></tr>
+    <tr><td>Heavy Forwarder</td><td>Ingest Processor <small>Splunk-to-Splunk</small><br>Indexer <small>Splunk-to-Splunk</small><br>Edge Processor <small>Splunk forwarder to Edge Processor</small><br>Splunk Cloud indexing <small>Splunk-to-Splunk</small></td></tr>
+    <tr><td>Ingest Processor</td><td>Amazon S3 <small>Amazon S3 API</small><br>Amazon S3 Dataset <small>HTTPS (Amazon S3 dataset write)</small><br>Azure Storage Dataset <small>HTTPS (Azure Blob Storage REST)</small><br>Splunk Cloud indexing <small>Configured handoff</small></td></tr>
+    <tr><td>Indexer</td><td>Search Head <small>Search dispatch</small></td></tr>
+    <tr><td>Edge Processor</td><td>Indexer <small>Configured handoff</small><br>Amazon S3 Dataset <small>HTTPS (Amazon S3 dataset write)</small><br>Azure Storage Dataset <small>HTTPS (Azure Blob Storage REST)</small><br>Splunk Cloud indexing <small>Configured handoff</small></td></tr>
+    <tr><td>Splunk Cloud indexing</td><td>Search Head <small>Search dispatch</small><br>Splunk Cloud Search <small>Splunk Cloud search</small><br>Splunk Cloud ES search head <small>Splunk Cloud search</small></td></tr>
+    <tr><td>Splunk Cloud ES search head</td><td>Splunk SOAR · Cloud <small>ES findings to SOAR</small><br>Splunk SOAR · On-premises <small>ES findings to SOAR</small></td></tr>
+    <tr><td>Load Balancer</td><td>Syslog Server <small>Syslog UDP 514 · TCP 514</small><br>HEC Endpoint <small>HEC HTTPS 8088</small><br>Heavy Forwarder <small>Syslog UDP 514 · TCP 514</small><br>Indexer <small>Syslog UDP 514 · TCP 514</small><br>Edge Processor <small>Syslog UDP 514 · TCP 514</small></td></tr>
+    <tr><td>Amazon S3, Search Head, Amazon S3 Dataset, Splunk Cloud Search, Azure Storage Dataset</td><td>No list: they send event data on to nothing the Builder allows. The handle only starts a connection, as before</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The rules in short</h2>
+  <dl>
+   <dt>Opens</dt><dd>Click a card’s Event data handle, or Tab to it and press Enter. The connection starts as before; the list opens beside it.</dd>
+   <dt>Offers</dt><dd>What the Builder’s live check lets the card send to, in the palette’s order. Not Splunk Cloud indexing after a Syslog Source, which validation rejects.</dd>
+   <dt>Adds</dt><dd>The component on its own, then connected exactly as the handles connect two cards. Selected and focused; one history step; the status line says what was added and how it connects.</dd>
+   <dt>Where</dt><dd>Auto, horizontal and vertical layouts place it as any card after another. In Free place: one column after the sender, level with it, or the first free place below.</dd>
+   <dt>Closes</dt><dd>Esc, or the active handle clicked again: closes and cancels. Another card’s Event data handle: connects. A click elsewhere: closes, the connection stays pending.</dd>
+   <dt>Handles</dt><dd>A strip bridges the 5 px gap above them. The card under the pointer, whose handle has keyboard focus, or that a connection starts from, comes to the front.</dd>
+   <dt>Palette</dt><dd>“Compatible next component” lists and adds the same way.</dd>
+   <dt>Unchanged</dt><dd>Fleet and Access handles, a Search Head’s handle, phones, Focus canvas and every other view.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-add-next.md</code> · Prototype: <code>docs/mockups/builder-add-next-prototype.css</code> and <code>.js</code>, appended to Build 203.</p>
+</div>
+<script>
+const SCENES=[{"id": "add-next-list", "img": "compare/add-next-list.png", "group": "target", "tab": "The list", "title": "Universal Forwarder 1’s Event data handle, clicked", "w": 754, "size": "1440 × 900", "crop": "canvas", "items": [{"n": 1, "head": "The Event data handle", "text": "Click it, or Tab to it and press Enter. The connection starts as before, and the list opens below the handle.", "x": 22.94, "y": 40.58, "box": [25.86, 38.9, 13.26, 3.36]}, {"n": 2, "head": "Add after Universal Forwarder 1", "text": "The list names the card it adds after. The first choice has focus: ↓ ↑ Home End move, Enter adds, Esc closes and cancels.", "x": 55.4, "y": 47.04, "box": [21.88, 44.82, 31.03, 4.44]}, {"n": 3, "head": "Only what it can send to", "text": "The components Universal Forwarder 1 can send event data to, from the Builder’s own live check, in the palette’s order.", "x": 56.32, "y": 53.63, "box": [21.09, 50.34, 32.63, 6.59]}, {"n": 4, "head": "The protocol, before you add", "text": "Each choice shows the protocol its link will carry, as the link will be labelled.", "x": 56.32, "y": 74.23, "box": [21.09, 70.93, 32.63, 6.59]}, {"n": 5, "head": "Splunk Cloud indexing", "text": "Added as an Indexer hosted in Splunk Cloud, the way the palette adds it.", "x": 56.32, "y": 81.09, "box": [21.09, 77.79, 32.63, 6.59]}, {"n": 6, "head": "Or connect", "text": "The connection is still pending, so clicking another card’s Event data handle connects the two, as before, and closes the list.", "x": 55.4, "y": 87.48, "box": [21.88, 85.46, 31.03, 4.04]}, {"n": 7, "head": "Another card’s handle", "text": "Indexer 1’s Event data handle, shown for the pending connection as before.", "x": 74.93, "y": 36.54, "box": [68.3, 38.9, 13.26, 3.36]}]}, {"id": "add-next-added", "img": "compare/add-next-added.png", "group": "target", "tab": "Added", "title": "Heavy Forwarder chosen", "w": 754, "size": "1440 × 900", "crop": "canvas", "items": [{"n": 1, "head": "Heavy Forwarder 2", "text": "Added after Universal Forwarder 1 and already connected. It alone is selected, with focus; the layout places it as it places any card after another.", "x": 74.93, "y": 39.64, "box": [62.33, 41.45, 25.2, 30.15]}, {"n": 2, "head": "Splunk-to-Splunk", "text": "The link carries the protocol the list showed. It shares a trunk with the link to Indexer 1, also Splunk-to-Splunk, so one label names both.", "x": 53.65, "y": 28.13, "box": [46.29, 30.28, 14.72, 8.61]}, {"n": 3, "head": "Said in the status line", "text": "One Undo removes it: the history entry is “Add Heavy Forwarder after Universal Forwarder 1”.", "x": 71.35, "y": 88.76, "box": [26.79, 86.68, 42.44, 4.17]}, {"n": 4, "head": "The sender", "text": "No longer selected. On Build 203 the card selected before an add keeps the selection tick.", "x": 18.38, "y": 32.3, "box": [19.89, 24.76, 25.2, 30.15]}]}, {"id": "add-next-ingest", "img": "compare/add-next-ingest.png", "group": "target", "tab": "Ingest Processor", "title": "An Ingest Processor’s list (default topology)", "w": 754, "size": "1440 × 900", "crop": "canvas", "items": [{"n": 1, "head": "Its own list", "text": "Every component lists what the Builder lets it send to. An Ingest Processor writes to Amazon S3, S3 and Azure datasets, and Splunk Cloud.", "x": 22.94, "y": 44.62, "box": [25.86, 42.93, 13.26, 3.36]}, {"n": 2, "head": "No self-managed Indexer", "text": "The Builder refuses one after an Ingest Processor, so it isn’t offered.", "x": 56.32, "y": 57.67, "box": [21.09, 54.37, 32.63, 6.59]}, {"n": 3, "head": "Each with its protocol", "text": "Here HTTPS to the Azure Blob Storage REST API.", "x": 56.32, "y": 71.4, "box": [21.09, 68.1, 32.63, 6.59]}, {"n": 4, "head": "Splunk Cloud indexing works", "text": "Its own add refuses an Ingest Processor (it checks the sender against a self-managed Indexer first). The list adds it, then connects it as the handles do.", "x": 56.32, "y": 78.26, "box": [21.09, 74.97, 32.63, 6.59]}]}, {"id": "add-next-free", "img": "compare/add-next-free.png", "group": "target", "tab": "Free place", "title": "Free place: the pointer on Universal Forwarder 1’s handle", "w": 754, "size": "1440 × 900", "crop": "canvas", "items": [{"n": 1, "head": "In front of the card below", "text": "Universal Forwarder 2 sits 6 px below. The card under the pointer now comes to the front, so its handles can be clicked.", "x": 57.03, "y": 48.65, "box": [40.45, 46.97, 13.26, 3.36]}, {"n": 2, "head": "Reached slowly too", "text": "A 6 px strip under the card keeps the handles shown while the pointer crosses the gap to them.", "x": 61.19, "y": 25.2, "box": [34.48, 16.15, 25.2, 30.15]}, {"n": 3, "head": "Universal Forwarder 2", "text": "Its top is under the handles while Universal Forwarder 1 has the pointer. Move onto its body, or come from the side, to reach it.", "x": 61.19, "y": 66.7, "box": [34.48, 47.11, 25.2, 30.15]}]}, {"id": "add-next-vertical", "img": "compare/add-next-vertical.png", "group": "target", "tab": "Vertical", "title": "Vertical layout: the list beside the card", "w": 754, "size": "1440 × 900", "crop": "canvas", "items": [{"n": 1, "head": "Beside the card", "text": "Here the next components go below, so the list opens to the right of the card, or to its left when there’s no room.", "x": 59.68, "y": 61.19, "box": [42.18, 12.11, 35.01, 47.64]}, {"n": 2, "head": "The same handle", "text": "Opened the same way. The list keeps its side while you pan, and closes if the card leaves the canvas.", "x": 20.29, "y": 44.62, "box": [21.88, 42.93, 13.26, 3.36]}]}, {"id": "add-next-palette", "img": "compare/add-next-palette.png", "group": "target", "tab": "Palette", "title": "The palette’s “Compatible next component”, Ingest Processor selected", "w": 280, "size": "1440 × 900", "crop": "palette", "items": [{"n": 1, "head": "The same list", "text": "The palette’s suggestions come from the same live check: no Indexer, and Splunk Cloud indexing.", "x": 50.0, "y": 46.57, "box": [5.36, 48.65, 89.29, 34.81]}, {"n": 2, "head": "The same add", "text": "Its buttons add the same way: connected, selected, one history step.", "x": 64.32, "y": 78.75, "box": [8.93, 75.96, 50.36, 5.58]}]}, {"id": "add-next-free-today", "img": "compare/add-next-free-today.png", "group": "today", "tab": "Free place today", "title": "Build 203: the pointer on Universal Forwarder 1’s handle", "w": 754, "size": "1440 × 900", "crop": "canvas", "items": [{"n": 1, "head": "Under the card below", "text": "Universal Forwarder 1’s handles fall under Universal Forwarder 2, which comes later on the page. A click there lands on Universal Forwarder 2 and can drag it.", "x": 57.03, "y": 48.65, "box": [40.45, 46.97, 13.26, 3.36]}, {"n": 2, "head": "Its handles instead", "text": "Universal Forwarder 2 takes the pointer and shows its own handles. In this layout 6 of the reference topology’s 11 Event data handles can’t be clicked.", "x": 57.03, "y": 79.61, "box": [40.45, 77.93, 13.26, 3.36]}]}, {"id": "add-next-reconnect-today", "img": "compare/add-next-reconnect-today.png", "group": "today", "tab": "Click again today", "title": "Build 203: Universal Forwarder 1’s active handle clicked again", "w": 844, "size": "1440 × 900", "crop": "dialog", "items": [{"n": 1, "head": "Reconnect to itself", "text": "Clicking the active handle should cancel, as the canvas help says. For a card with an incoming link, Build 203 opens this preview of a link from the card to itself.", "x": 62.7, "y": 6.99, "box": [3.67, 5.57, 56.75, 2.84]}, {"n": 2, "head": "A route it won’t remove", "text": "It lists the card’s whole route as removed …", "x": 18.66, "y": 72.39, "box": [3.44, 58.77, 30.45, 27.25]}, {"n": 3, "head": "Detections it won’t degrade", "text": "… and six detections as degraded or blind.", "x": 94.7, "y": 45.58, "box": [3.44, 40.64, 93.13, 16.47]}, {"n": 4, "head": "Nothing to confirm", "text": "Reconnect component changes nothing: the connection is just cancelled. The connection stays pending until then.", "x": 87.5, "y": 91.66, "box": [78.44, 94.08, 18.13, 4.03]}]}, {"id": "add-next-palette-today", "img": "compare/add-next-palette-today.png", "group": "today", "tab": "Palette today", "title": "Build 203: the same palette list", "w": 280, "size": "1440 × 900", "crop": "palette", "items": [{"n": 1, "head": "Indexer, refused", "text": "The list reads the capability table, not the live check. Indexer is refused when clicked: “Ingest Processor writes to its Splunk Cloud stack’s indexes or to Amazon S3, not to self-managed Indexers.”", "x": 37.64, "y": 65.67, "box": [8.93, 62.88, 23.93, 5.58]}, {"n": 2, "head": "No Splunk Cloud indexing", "text": "Which an Ingest Processor can send to.", "x": 50.0, "y": 84.85, "box": [5.36, 48.65, 89.29, 34.81]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;img.alt=s.title;shot.style.maxWidth=s.w+'px';document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size+' viewport, '+s.crop+' only';
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 203 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
