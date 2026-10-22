@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Build 206 Small Fixes</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 206 TARGET · BUILD 205 + PROTOTYPE</span>
+ <h1>Small fixes: Focus canvas, the page’s width and two labels</h1>
+ <p class="lede">Three fixes. In Focus canvas, the palette and the Inspector open in front of the canvas instead of behind it. The page no longer scrolls sideways at any width. And Build 140’s save label and the canvas help card say the right thing. Every target scene is the real explorer with the prototype applied to Build 205; the “Today” scenes are Build 205 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>Where the page scrolled sideways on Build 205</h2>
+  <table>
+   <thead><tr><th>What</th><th>Where</th><th>Cause</th><th>Fix</th></tr></thead>
+   <tbody>
+    <tr><td>The capacity model</td><td>821–1,039 px, every view that shows it: up to 193 px</td><td>Three columns that need about 1,040 px of window</td><td>server.conf goes under the other two, 821–1,080 px</td></tr>
+    <tr><td>The view switcher</td><td>821–1,000 px, every view but the Builder and OV: up to 174 px</td><td>It keeps its full width in the toolbar’s grid. Below about 1,300 px the pipeline filter shrinks instead, to 26 px</td><td>The toolbar wraps: the switcher takes a second row, the filter keeps its width</td></tr>
+    <tr><td></td><td>521–700 px, OV included: up to 161 px</td><td>Its buttons don’t wrap</td><td>Its buttons wrap</td></tr>
+    <tr><td>The Failure Lab</td><td>320–820 px: up to 1,430 px</td><td>Its one column grows to the propagation map’s full width</td><td>The map scrolls in its own box</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The fixes in short</h2>
+  <dl>
+   <dt>Focus canvas</dt><dd>The palette and the Inspector open in front of the full-screen canvas: z-index 105, between the canvas (100) and the focus bar (110). They start 8 px below the bar, wherever it ends, and stop above the bottom controls. Phones keep their sheet, which was already in front.</dd>
+   <dt>The toolbar</dt><dd>From 821 px it wraps: one row while the search box, the pipeline filter and the view switcher fit, then the switcher on a second row. The filter keeps its width. From 521 to 820 px the switcher’s buttons wrap.</dd>
+   <dt>The capacity model</dt><dd>From 821 to 1,080 px, server.conf goes under the other two.</dd>
+   <dt>The Failure Lab</dt><dd>Below 821 px the propagation map scrolls in its own box, not the page.</dd>
+   <dt>The save label</dt><dd>Build 140’s label reads the save status’s dirty class, so it says Saved after a save. Today it is hidden at every width.</dd>
+   <dt>The help card</dt><dd>“Shift+Space extend selection”.</dd>
+   <dt>Unchanged</dt><dd>At 1,320, 1,440 and 1,920 px every element in the seven main views lays out exactly as on Build 205. The Builder’s and OV’s own toolbars are untouched.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-small-fixes.md</code> · Prototype: <code>docs/mockups/small-fixes-prototype.css</code> and <code>.js</code>, appended to Build 205, and the three edits in <code>docs/mockups/small-fixes.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "fx-inspector", "img": "compare/small-fixes-inspector.png", "group": "target", "tab": "Focus canvas · Inspector", "title": "Focus canvas, a component selected", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "In front of the canvas", "text": "The Inspector opens over the full-screen canvas, as it does outside Focus canvas.", "x": 87.64, "y": 45.71, "box": [75.83, 7.11, 23.61, 85.78]}, {"n": 2, "head": "Below the focus bar", "text": "It starts 8 px under the bar. The bar wraps as the window narrows, 48 px tall from 1,280 px, 68 at 1,024 and 82 at 800, and the Inspector follows it.", "x": 61.87, "y": 3.56, "box": [0.56, 0.89, 98.89, 5.33]}, {"n": 3, "head": "Close works", "text": "On Build 205 the Inspector’s header was under the focus bar too. Now every control in it can be reached.", "x": 85.97, "y": 9.89, "box": [84.03, 8.33, 3.89, 3.11]}, {"n": 4, "head": "Above the bottom controls", "text": "It ends above ＋ Add, Inspector and Show minimap.", "x": 13.72, "y": 93.22, "box": [5.07, 95.0, 17.29, 3.56]}]}, {"id": "fx-palette", "img": "compare/small-fixes-palette.png", "group": "target", "tab": "Focus canvas · ＋ Add", "title": "Focus canvas, ＋ Add", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "The palette, in front", "text": "＋ Add opens it over the canvas, below the focus bar. A component added from it is selected, and its Inspector opens, also in front.", "x": 10.97, "y": 41.42, "box": [0.56, 7.11, 20.83, 85.78]}, {"n": 2, "head": "＋ Add", "text": "In Focus canvas’s bottom bar.", "x": 7.08, "y": 93.22, "box": [5.07, 95.0, 4.03, 3.56]}]}, {"id": "fx-1024", "img": "compare/small-fixes-1024.png", "group": "target", "tab": "1,024 px", "title": "The top of the Flow view at 1,024 px", "w": 1024, "h": 948, "zoom": 1, "size": "1024 × 1000", "crop": "top of the page", "items": [{"n": 1, "head": "One row: search and filter", "text": "When the search box, the pipeline filter and the view switcher don’t fit in one row, below about 1,310 px, the switcher moves to a second row.", "x": 33.96, "y": 13.45, "box": [3.91, 11.08, 66.8, 4.75]}, {"n": 2, "head": "The filter keeps its width", "text": "248 px, so “All pipelines” can be read. On Build 205 it was squeezed to 26 px.", "x": 83.98, "y": 13.45, "box": [71.88, 11.08, 24.22, 4.75]}, {"n": 3, "head": "The switcher, on one line", "text": "All nine views, with Failure Lab on one line.", "x": 70.78, "y": 19.36, "box": [3.91, 16.98, 68.95, 4.75]}, {"n": 4, "head": "server.conf under the rest", "text": "From 821 to 1,080 px the capacity model’s three columns don’t fit, so server.conf goes below the other two, as it does below 821 px.", "x": 50.0, "y": 93.35, "box": [4.2, 89.87, 91.6, 6.96]}]}, {"id": "fx-600", "img": "compare/small-fixes-600.png", "group": "target", "tab": "600 px", "title": "The toolbar at 600 px", "w": 600, "h": 315, "zoom": 1, "size": "600 × 900", "crop": "toolbar", "items": [{"n": 1, "head": "The switcher wraps", "text": "From 521 to 820 px the toolbar is one column. The switcher’s buttons now wrap onto a second line rather than running off the page.", "x": 68.2, "y": 78.57, "box": [4.5, 65.71, 91.0, 25.71]}, {"n": 2, "head": "Within the toolbar", "text": "The search box and the filter are the toolbar’s width again.", "x": 59.1, "y": 37.94, "box": [4.5, 30.79, 91.0, 14.29]}]}, {"id": "fx-failure", "img": "compare/small-fixes-failure.png", "group": "target", "tab": "Failure Lab · 400 px", "title": "The Failure Lab at 400 px", "w": 400, "h": 860, "zoom": 1, "size": "400 × 860", "crop": "viewport", "items": [{"n": 1, "head": "The map scrolls in its own box", "text": "The page is 400 px wide. The propagation map scrolls sideways inside its frame, as it does on wider screens.", "x": 50.0, "y": 39.13, "box": [12.0, 25.81, 76.0, 26.63]}]}, {"id": "fx-help", "img": "compare/small-fixes-help.png", "group": "target", "tab": "Help card", "title": "The canvas help card, shown on a first visit", "w": 398, "h": 154, "zoom": 2, "size": "1440 × 900", "crop": "help card", "items": [{"n": 1, "head": "Shift+Space extend selection", "text": "What Shift+Space does: it adds the focused component or connection to the selection, as Shift-click does.", "x": 68.28, "y": 59.42, "box": [26.63, 55.84, 37.19, 7.14]}]}, {"id": "fx-inspector-today", "img": "compare/small-fixes-inspector-today.png", "group": "today", "tab": "Today: Inspector", "title": "Build 205: Focus canvas, a component selected", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Selected", "text": "The component is selected, and the Inspector is open: aria-hidden is false.", "x": 43.47, "y": 14.6, "box": [38.54, 9.0, 9.86, 18.67]}, {"n": 2, "head": "Behind the canvas", "text": "The Inspector is here, under the full-screen canvas: its z-index is 42, the canvas’s 100. A click here lands on the canvas.", "x": 87.64, "y": 46.89, "box": [75.83, 0.89, 23.61, 92.0]}, {"n": 3, "head": "Under the focus bar", "text": "Its header, with Close, starts at the top of the window, under the focus bar.", "x": 85.97, "y": 3.67, "box": [84.03, 2.11, 3.89, 3.11]}]}, {"id": "fx-palette-today", "img": "compare/small-fixes-palette-today.png", "group": "today", "tab": "Today: ＋ Add", "title": "Build 205: Focus canvas, ＋ Add", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Behind the canvas", "text": "＋ Add opens the palette here, also under the canvas.", "x": 12.15, "y": 37.76, "box": [1.74, 1.0, 20.83, 91.89]}, {"n": 2, "head": "Seems to do nothing", "text": "So in Focus canvas, ＋ Add and Inspector appear not to work.", "x": 7.08, "y": 93.22, "box": [5.07, 95.0, 4.03, 3.56]}]}, {"id": "fx-1024-today", "img": "compare/small-fixes-1024-today.png", "group": "today", "tab": "Today: 1,024 px", "title": "Build 205: the top of the Flow view at 1,024 px", "w": 1024, "h": 872, "zoom": 1, "size": "1024 × 1000", "crop": "top of the page", "items": [{"n": 1, "head": "Squeezed to 26 px", "text": "The pipeline filter shows only its arrow. It starts to shrink below about 1,300 px.", "x": 30.76, "y": 15.88, "box": [29.49, 12.04, 2.54, 7.68]}, {"n": 2, "head": "Past the window", "text": "The switcher keeps its full width, so Changes runs past the edge, and Failure Lab takes two lines.", "x": 94.29, "y": 15.88, "box": [89.94, 12.5, 8.69, 6.77]}, {"n": 3, "head": "Cut off", "text": "The capacity model’s three columns need about 1,040 px of window, so server.conf runs out of its box. The page scrolls 9 px sideways here, and 193 px at 840 px.", "x": 84.47, "y": 89.68, "box": [71.78, 86.58, 25.39, 6.19]}]}, {"id": "fx-600-today", "img": "compare/small-fixes-600-today.png", "group": "today", "tab": "Today: 600 px", "title": "Build 205: the toolbar at 600 px", "w": 600, "h": 301, "zoom": 1, "size": "600 × 900", "crop": "toolbar", "items": [{"n": 1, "head": "Past the window", "text": "The switcher doesn’t wrap: at 600 px it runs 101 px past the window, and the page scrolls sideways.", "x": 97.5, "y": 79.9, "box": [4.5, 68.77, 95.5, 22.26]}, {"n": 2, "head": "Wider than the toolbar", "text": "The toolbar’s one column is as wide as the switcher, so the search box and the filter overhang it too.", "x": 97.5, "y": 39.7, "box": [4.5, 32.23, 95.5, 14.95]}]}, {"id": "fx-failure-today", "img": "compare/small-fixes-failure-today.png", "group": "today", "tab": "Today: Failure Lab", "title": "Build 205: the Failure Lab at 400 px", "w": 400, "h": 860, "zoom": 1, "size": "400 × 860", "crop": "viewport", "items": [{"n": 1, "head": "Past the window", "text": "The propagation map doesn’t scroll in its frame. The lab grows to the map’s full width, so the page is 1,750 px wide and scrolls 1,350 px sideways, and the text around the map runs off the screen too.", "x": 91.18, "y": 35.64, "box": [12.0, 22.33, 88.0, 26.63]}]}, {"id": "fx-help-today", "img": "compare/small-fixes-help-today.png", "group": "today", "tab": "Today: help card", "title": "Build 205: the canvas help card", "w": 398, "h": 154, "zoom": 2, "size": "1440 × 900", "crop": "help card", "items": [{"n": 1, "head": "Shift+Space add", "text": "Shift+Space doesn’t add a component: it extends the selection.", "x": 51.96, "y": 59.42, "box": [26.63, 55.84, 21.11, 7.14]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size+' viewport'+(s.crop==='viewport'?'':', '+s.crop+' only');
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 205 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>

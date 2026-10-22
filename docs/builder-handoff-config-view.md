@@ -455,7 +455,7 @@ After the block pair:
 
 ## Found while testing (not changed)
 
-1. **At 1024 px the page is 9 px wider than the window** (1033 px) in every view that shows the topology chips row. This happens on Build 204 too. The Config view hides that row.
+1. **At 1024 px the page is 9 px wider than the window** (1033 px) in every view that shows the capacity model (`.parallelPanel`), whose three columns need about 1,040 px of window. This happens on Build 204 too. The Config view hides the capacity model. (Corrected: this note first blamed the topology chips row, which scrolls in its own box. The fix is in [`builder-handoff-small-fixes.md`](builder-handoff-small-fixes.md).)
 2. **The fixed Matrix header doesn't follow the page.**
    - `.matrixWrap` is its own scrolling box, so a sticky header sticks within it, and the box only scrolls sideways.
    - Making the header follow the page needs the box either not to scroll, or to scroll both ways with a height of its own.

@@ -141,7 +141,7 @@ Four are built: the docked layout (Build 197), one menu bar and one toolbar (Bui
 - **Phones:**
   - the menu bar was never designed for phone widths, so phones keep the older controls;
   - with nothing selected, the Inspector sheet opens at 45% opacity with `pointer-events:none`, so a tap on it reaches the canvas behind. The same on Builds 203 and 205.
-- **At 1024 px the page is 9 px wider than the window** in Flow, Operate and Matrix, on Builds 203 and 205. The Config view hides the topology chips row that causes it, and fits.
+- **At 1024 px the page is 9 px wider than the window** in Flow, Operate and Matrix, on Builds 203 and 205. The capacity model (`.parallelPanel`) causes it. The Config view hides the capacity model, and fits. (Corrected: this note first blamed the topology chips row. The fix is in [`builder-handoff-small-fixes.md`](builder-handoff-small-fixes.md).)
 - **Wording:**
   - Build 140's hidden "● Unsaved" label still says Unsaved after a save;
   - the help card's "Shift+Space add" would read better as "Shift+Space extend selection".
