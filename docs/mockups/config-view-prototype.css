@@ -1,0 +1,128 @@
+/* Build 205: the Config view. Its panel of files sits above the view's Matrix, whose rows list the files' lines; the
+   component strip stays, compact, and the column of the component chosen in it is picked out. */
+body.configView205 :is(.topologyBar,.parallelPanel,.context,#routeDiagram,#parallelAccuracy){display:none!important}
+body.configView205 .componentStrip{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-bottom:14px}
+body.configView205 .component{padding:8px 12px}
+body.configView205 .component :is(small,em,.count){display:none}
+.configStripLabel205{margin:4px 0 8px;color:var(--muted);font-size:.8rem}
+.configStripLabel205 b{color:var(--text)}
+.propsMap205{margin:0 0 14px;border:1px solid var(--line);border-radius:13px;background:#0b1620;overflow:hidden}
+#configView205[hidden],.configStripLabel205[hidden]{display:none!important}
+.propsMap205.propsDrop205{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(87,199,232,.18)}
+.propsHead205{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px 18px;padding:14px 16px;background:#0d1a26;border-bottom:1px solid var(--line)}
+.propsMap205.propsEmpty205 .propsHead205{border-bottom:0}
+.propsTitle205{display:grid;gap:3px;min-width:0}
+.propsTitle205 small{color:var(--cyan);font-size:.66rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.propsTitle205 strong{overflow:hidden;color:var(--text);font-size:.98rem;text-overflow:ellipsis;white-space:nowrap}
+.propsTitle205 span{color:var(--muted);font-size:.78rem}
+.propsError205{color:var(--red);font-style:normal}
+.propsActions205{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
+.propsActions205 label{display:flex;align-items:center;gap:7px;color:#aab9c8;font-size:.74rem;white-space:nowrap}
+.propsActions205 select{max-width:220px;border:1px solid #2a4154;border-radius:8px;padding:6px 8px;background:#08131d;color:#dbe9f2;font:inherit;font-size:.74rem}
+.propsOnly205 input{accent-color:var(--green)}
+.propsSummary205{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.propsSummary205 span{border:1px solid var(--line);border-radius:99px;padding:4px 10px;color:#b8c9d7;font-size:.72rem}
+.propsSummary205 b{color:var(--text)}
+.propsSummary205 [data-tone=stage]{border-color:rgba(87,199,232,.45);background:rgba(87,199,232,.08)}
+.propsSummary205 [data-tone=search]{border-color:rgba(169,150,255,.45)}
+.propsSummary205 [data-tone=own]{border-color:rgba(243,189,97,.45)}
+.propsSummary205 [data-tone=bad]{border-color:rgba(241,122,122,.5);background:rgba(241,122,122,.07)}
+.propsTabs205{display:flex;align-items:flex-end;flex-wrap:wrap;gap:4px 6px;padding:10px 16px 0;border-bottom:1px solid var(--line)}
+.propsTabs205 [role=tab]{display:inline-flex;align-items:center;gap:8px;margin-bottom:-1px;border:1px solid transparent;border-bottom:0;border-radius:9px 9px 0 0;padding:8px 12px;background:transparent;color:#aab9c8;font:inherit;font-size:.78rem;cursor:pointer}
+.propsTabs205 [role=tab]:hover{color:var(--text)}
+.propsTabs205 [role=tab][aria-selected=true]{border-color:var(--line);background:#0b1620;color:var(--text);box-shadow:inset 0 2px 0 var(--cyan)}
+.propsTabs205 [role=tab]:focus-visible{outline:2px solid var(--cyan);outline-offset:-2px}
+.propsTabs205 [role=tab] small{color:var(--muted);font-size:.68rem}
+.propsTabsEnd205{display:flex;flex-wrap:wrap;gap:6px 14px;margin-left:auto;padding:0 0 9px}
+.propsLink205{border:0;padding:0;background:none;color:var(--cyan);font:inherit;font-size:.72rem;cursor:pointer}
+.propsLink205:hover,.propsLink205:focus-visible{text-decoration:underline;outline:none}
+/* A file's letter: I for inputs.conf, P for props.conf, T for transforms.conf. */
+.propsFile205{display:inline-grid;place-items:center;flex:none;width:17px;height:17px;border-radius:4px;background:var(--file,#57c7e8);color:#06121b;font:800 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;font-style:normal}
+.propsFile205[data-file=inputs]{--file:#66e0a3}
+.propsFile205[data-file=transforms]{--file:#b4a7f5}
+/* The files of the kind on show, highest precedence first: the first one's lines win. */
+.cfFiles205{display:grid;gap:4px;margin:0;padding:10px 16px;border-bottom:1px solid var(--line);list-style:none;font-size:.76rem}
+.cfFiles205 li{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;min-width:0}
+.cfFiles205 b{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#16293a;color:var(--text);font-size:.68rem}
+.cfPath205{overflow-wrap:anywhere;color:var(--text);font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
+.cfPlace205{color:var(--muted)}
+.cfFiles205 select{border:1px solid #2a4154;border-radius:7px;padding:3px 6px;background:#08131d;color:#dbe9f2;font:inherit;font-size:.72rem}
+.cfWins205{border:1px solid rgba(102,224,163,.45);border-radius:99px;padding:1px 8px;color:var(--green);font-size:.68rem}
+.cfFileHead205{display:flex;align-items:center;gap:10px;margin-top:8px;padding:6px 16px;background:#0d1a26;color:var(--text);font:600 12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;position:sticky;top:0;z-index:1}
+.cfFileHead205 b{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#16293a;font-size:.68rem}
+.cfFileHead205 small{color:var(--muted);font:inherit;font-weight:400}
+.propsLines205{max-height:min(470px,62vh);margin:0;padding:6px 0;overflow:auto;list-style:none;font-size:.76rem}
+.propsLine205{display:grid;grid-template-columns:34px minmax(0,1fr) minmax(0,auto) 116px;align-items:center;gap:2px 12px;min-height:27px;padding:2px 16px}
+.propsLine205:hover{background:#0e1d2a}
+.propsLine205>code{overflow:hidden;color:#c5e6f5;font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;text-overflow:ellipsis;white-space:nowrap}
+.propsK205{color:#e8f4fb;font-weight:600}
+.propsV205{color:#9fd4ea}
+.propsN205{color:#5d7183;font:11.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right}
+.propsLine205:is([data-kind=comment],[data-kind=continuation])>code{color:#6f8496}
+.propsLine205[data-kind=stanza]{margin-top:6px;border-top:1px solid #1a2b3a;padding-top:6px}
+.propsLine205[data-kind=stanza]>code{color:var(--amber);font-weight:700}
+.propsStanzaKind205{grid-column:3/5;color:var(--muted);font-size:.72rem;text-align:right}
+.propsTo205{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0}
+.propsStage205{display:inline-flex;align-items:center;gap:7px;max-width:100%;border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);border-radius:99px;padding:3px 10px 3px 4px;background:color-mix(in srgb,var(--accent) 9%,#08131d);color:#dbe9f2;font:inherit;font-size:.72rem;white-space:nowrap;cursor:pointer}
+.propsStage205:hover,.propsStage205:focus-visible{border-color:var(--accent);outline:none}
+.propsStage205 b{border-radius:99px;padding:1px 6px;background:color-mix(in srgb,var(--accent) 28%,#08131d);color:#fff;font:700 10.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+.propsSame205{color:#6f8496;font:600 11px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap}
+.propsAlso205{color:var(--muted);font-size:.68rem;white-space:nowrap}
+.propsTag205{border:1px solid var(--line);border-radius:99px;padding:3px 10px;color:#aab9c8;font-size:.72rem;white-space:nowrap}
+.propsTag205[data-tone=search]{border-color:rgba(169,150,255,.45);color:#cfc4ff}
+.propsTag205[data-tone=bad]{border-color:rgba(241,122,122,.5);color:#f6b4b4}
+.propsTiers205{display:flex;justify-content:flex-end;gap:4px}
+.propsTiers205 i{min-width:26px;border-radius:5px;padding:1px 4px;background:#0a1520;font:700 10px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;font-style:normal;text-align:center}
+.propsTiers205 i.yes,.propsEffect205.yes{color:var(--green)}
+.propsTiers205 i.maybe,.propsEffect205.maybe{color:var(--amber)}
+.propsTiers205 i.none{color:#4d5f70}
+.propsEffect205,.propsWhere205{font-size:.72rem;font-weight:700;text-align:right;white-space:nowrap}
+.propsEffect205.none{color:var(--red)}
+.propsWhere205{color:#b4a7f5;font-weight:600}
+.propsNote205{grid-column:2/5;margin:0 0 4px;color:#a4b4c2;font-size:.72rem;line-height:1.45}
+.propsLine205:is([data-area=unknown],[data-area=invalid],[data-area=misplaced],[data-area=elsewhere]) .propsNote205{color:#f0b8b8}
+.propsLine205.noEffect205>code{opacity:.5}
+.propsLine205.noEffect205 .propsK205{text-decoration:line-through;text-decoration-color:rgba(241,122,122,.7)}
+.propsLine205.overridden205>code{opacity:.45}
+/* The lines in the Matrix rows of the stages that apply them, and the deployed tier's column picked out. */
+#matrixBody tr.propsHit205{background:rgba(87,199,232,.045)}
+#matrixBody tr.propsHit205>td:first-child{box-shadow:inset 3px 0 0 var(--cyan)}
+.propsRowLines205{display:grid;justify-items:start;gap:3px;width:0;min-width:100%;margin-top:8px}
+.propsRowLine205{display:flex;align-items:center;gap:7px;min-width:0;max-width:100%;overflow:hidden;border:1px solid #23506a;border-radius:6px;padding:2px 7px;background:#0a1d2a;color:#cfe9f6;font:11.5px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;text-align:left;cursor:pointer}
+.propsRowLine205:hover,.propsRowLine205:focus-visible{border-color:var(--cyan);outline:none}
+.propsRowLine205 b{flex:none;color:var(--cyan)}
+.propsRowLine205 .propsFile205{width:15px;height:15px;font-size:9px}
+.propsRowLine205 code{min-width:0;overflow:hidden;font:inherit;text-overflow:ellipsis;white-space:nowrap}
+.propsRowLine205.also205{border-style:dashed;background:transparent}
+.propsRowLine205.own205{border-color:rgba(243,189,97,.5)}
+.propsRowLine205.noEffect205{border-color:rgba(241,122,122,.45);color:#8d9eac}
+.propsRowLine205.noEffect205 code{text-decoration:line-through;text-decoration-color:rgba(241,122,122,.7)}
+.propsRowMore205{border:0;padding:2px 0;background:none;color:var(--cyan);font-size:.72rem;cursor:pointer}
+#matrix .propsCol205{background:rgba(87,199,232,.07);box-shadow:inset 1px 0 0 rgba(87,199,232,.3),inset -1px 0 0 rgba(87,199,232,.3)}
+#matrix th.propsCol205{color:var(--cyan)}
+/* The Matrix's header sat 75px down its own scrolling box, the toolbar's offset, so it covered stages 1 and 2. */
+.matrixWrap th{top:0}
+/* Eleven component columns, with the Search Head's, fit the table at 1440px when they keep 8px a side. */
+#matrix :is(th:nth-child(n+4),td.yn){padding-left:8px;padding-right:8px}
+/* The stage's detail. */
+#dProps205[hidden]{display:none}
+.propsDetail205{display:grid;gap:6px}
+.propsDetailLine205{display:grid;grid-template-columns:20px minmax(0,1fr);align-items:baseline;gap:2px 10px;border:1px solid #203345;border-radius:9px;padding:8px 10px;background:#07111a}
+.propsDetailLine205 code{color:#c5e6f5;font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere}
+.propsDetailKeys205{display:block;margin-top:3px;color:#9fd4ea;font-size:11.5px;white-space:pre-wrap}
+.propsDetailLine205 small,.propsDetailLine205 .propsNote205{grid-column:2;color:var(--muted);font-size:.72rem}
+.propsDetailLine205.noEffect205{border-color:rgba(241,122,122,.4)}
+.propsDetailLine205.noEffect205 .propsK205{text-decoration:line-through;text-decoration-color:rgba(241,122,122,.7)}
+.propsActs205{margin:9px 0 0;color:#a4b4c2;font-size:.78rem;line-height:1.5}
+@keyframes propsFlash205{from{background:rgba(87,199,232,.3)}to{background:transparent}}
+.propsFlash205{animation:propsFlash205 1.8s ease-out}
+@media (prefers-reduced-motion:reduce){.propsFlash205{animation:none;outline:2px solid var(--cyan);outline-offset:-2px}}
+@media (max-width:780px){
+ .propsLine205{grid-template-columns:30px minmax(0,1fr);padding:4px 12px}
+ .propsLine205>.propsTo205,.propsLine205>.propsTiers205,.propsLine205>.propsEffect205,.propsLine205>.propsWhere205,.propsStanzaKind205,.propsNote205{grid-column:2/3;justify-content:flex-start;text-align:left}
+ .propsActions205 select{max-width:100%}
+ .propsTabs205{flex-wrap:nowrap;overflow-x:auto;padding-inline:12px}
+ .propsTabs205 [role=tab]{flex:none}
+ .propsTabs205 [role=tab] small{display:none}
+ .propsTabsEnd205{flex:none;margin-left:12px}
+}
