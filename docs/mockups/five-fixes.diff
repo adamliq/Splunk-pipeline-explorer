@@ -1,0 +1,14 @@
+--- a/index.html
++++ b/index.html
+@@ -1717 +1717 @@
+- inspector.style.opacity=n?'1':'.45';inspector.style.pointerEvents=n?'auto':'none';
++ 
+@@ -13629 +13629 @@
+-  if(input.path&&!st.keys.get('sourcetype')){const src=sourceStanza(input.path);if(src){const line=src.keys.get('sourcetype');note+=`${note?' ':''}Its source type, ${line.value}, comes from ${fileLabel(fileById(line.fid))} line ${line.n}.`}}
++  if(input.path&&!st.keys.get('sourcetype')){const src=sourceMatch(input.path);if(src.note)note+=`${note?' ':''}${src.note}`}
+@@ -13632 +13632 @@
+-const sourceStanza=path=>kindFiles('props').flatMap(f=>f.doc.stanzas).find(s=>s.kind==='source'&&s.name.slice(8)===path&&s.keys.get('sourcetype'));
++const sourceMatch=path=>window.configSourceMatches206?.(path,kindFiles('props').flatMap(f=>f.doc.stanzas).filter(s=>s.kind==='source'),line=>`${fileLabel(fileById(line.fid))} line ${line.n}`)||{note:'',types:null};
+@@ -13651 +13651 @@
+- for(const st of inputs){const set=st.keys.get('sourcetype')?.value,src=st.input?.path&&sourceStanza(st.input.path);st.types=set?one(set):src?one(src.keys.get('sourcetype').value):null}
++ for(const st of inputs){const set=st.keys.get('sourcetype')?.value,src=!set&&st.input?.path?sourceMatch(st.input.path).types:null;st.types=set?one(set):src?(src.forEach(v=>found.add(v)),new Set(src)):null}

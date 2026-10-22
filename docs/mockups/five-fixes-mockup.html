@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Build 206 Five Fixes</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 206 TARGET · BUILD 205 + PROTOTYPE</span>
+ <h1>Five fixes: Esc, the selection, syslog to Splunk Cloud, the Inspector and [source::] stanzas</h1>
+ <p class="lede">Four fixes in the Builder and one in the Config view. Esc cancels a pending connection. A component added from the palette is the only one selected. A Syslog Source can no longer be linked to Splunk Cloud indexing. The Inspector is usable with nothing selected at every width. And a monitor finds the props.conf [source::] stanzas whose wildcards match its files. Every target scene is the real explorer with the prototype applied to Build 205; the “Today” scenes are Build 205 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>The five faults on Build 205</h2>
+  <table>
+   <thead><tr><th>Fault</th><th>What you see</th><th>Cause</th><th>Fix</th></tr></thead>
+   <tbody>
+    <tr><td>1. Esc and a pending connection</td><td>Once the add-next list has closed, Esc clears the selection and leaves the connection pending</td><td>No Esc handler knew about the connection outside the list</td><td>Esc cancels it first, and keeps the selection</td></tr>
+    <tr><td>2. The tick after a palette add</td><td>The card selected before keeps the selection tick and border</td><td>The palette’s adds set the selected card but not the multi-selection</td><td>Every add makes the new card the only one selected</td></tr>
+    <tr><td>3. Syslog Source → Splunk Cloud indexing</td><td>The handles and the palette make the link, then validation rejects it</td><td>The capability check passed it, and Build 148 adds Splunk Cloud indexing without the check</td><td>Refused when it is made; a link already in a file is kept, marked and fixable</td></tr>
+    <tr><td>4. The Inspector with nothing selected</td><td>Below 1,280 px it opens at 45% opacity and clicks go through it</td><td>The first renderBuilderInspector dims it; Build 197 undid that only when docked</td><td>The dimming is removed</td></tr>
+    <tr><td>5. The Config view’s [source::] stanzas</td><td>A monitor finds its stanza only when the stanza is its path, character for character</td><td>An exact string comparison</td><td>Splunk’s match language: ..., *, regular expressions, priority, then ASCII order</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The fixes in short</h2>
+  <dl>
+   <dt>Esc</dt><dd>Esc cancels a connection waiting for its other end and keeps the selection, as Esc in the add-next list does. An open menu or popover, and a text field, still take the Esc first. With nothing pending, Esc is as before.</dd>
+   <dt>Adding</dt><dd>A component added from the palette, by click or drag, is the only one selected.</dd>
+   <dt>Syslog to Cloud</dt><dd>A Syslog Source can’t be linked to Splunk Cloud indexing: the handles and drags refuse, with the reason, and a palette click adds Splunk Cloud indexing unconnected and says why. A file that already has the link loads with it, and Build 148 marks it and offers “Insert Syslog Server between them”.</dd>
+   <dt>The Inspector</dt><dd>Opaque, and taking clicks and taps, whatever is selected, at every width.</dd>
+   <dt>[source::]</dt><dd>“...” is any run of characters, “*” any run within one path segment, “.” a dot, and the rest a regular expression, matched case-sensitively against the whole path. A monitor’s path can use “...” and “*” too, or name a directory. The stanza with the higher priority wins (100 for a literal one, 0 for a pattern, unless set), then the one first in ASCII order.</dd>
+   <dt>Unchanged</dt><dd>The Builder’s other Esc handling, the add-next list, what a Syslog Source can send to otherwise, the docked Inspector, and the Config view’s notes for a stanza that is the monitor’s path.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-five-fixes.md</code> · Prototype: <code>docs/mockups/five-fixes-prototype.js</code>, appended to Build 205, and the four edits in <code>docs/mockups/five-fixes.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "ff-esc", "img": "compare/five-fixes-esc.png", "group": "target", "tab": "Esc", "title": "Esc while a connection waits for its other end", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Connection cancelled", "text": "Universal Forwarder 1’s handle was clicked, then Indexer 1. Esc cancels the connection and says so, as Esc in the add-next list does.", "x": 41.39, "y": 89.22, "box": [41.88, 87.22, 12.15, 4.0]}, {"n": 2, "head": "Still selected", "text": "Indexer 1 stays selected and ticked. A second Esc clears the selection, as Esc did before.", "x": 65.62, "y": 43.67, "box": [52.43, 37.44, 13.19, 24.89]}, {"n": 3, "head": "The Inspector stays", "text": "It keeps showing Indexer 1. At 1,024 px the drawer stays open too.", "x": 87.01, "y": 39.99, "box": [75.21, 15.22, 23.61, 82.56]}]}, {"id": "ff-tick", "img": "compare/five-fixes-tick.png", "group": "target", "tab": "Palette add", "title": "Universal Forwarder 1 selected, then Heavy Forwarder from the palette", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "The only card selected", "text": "Heavy Forwarder 2, just added, has the selection tick and border.", "x": 65.62, "y": 53.11, "box": [52.43, 46.89, 13.19, 24.89]}, {"n": 2, "head": "Nothing left behind", "text": "Universal Forwarder 1, selected before the add, is clear.", "x": 43.4, "y": 39.33, "box": [30.21, 33.11, 13.19, 24.89]}, {"n": 3, "head": "Matches the Inspector", "text": "The Inspector shows the card that has the tick.", "x": 87.01, "y": 35.86, "box": [75.21, 15.22, 23.61, 82.56]}]}, {"id": "ff-syslog", "img": "compare/five-fixes-syslog.png", "group": "target", "tab": "Syslog → Splunk Cloud", "title": "Firewalls and network devices (a Syslog Source) connecting to Splunk Cloud indexing", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Refused, with the reason", "text": "The link isn’t made. The status gives Build 148’s advice: send syslog through a Syslog Server and forwarder, or HEC.", "x": 20.98, "y": 88.5, "box": [22.36, 85.78, 34.44, 5.44]}, {"n": 2, "head": "Stays unconnected", "text": "With no link, there is nothing to mark “not allowed” and no error.", "x": 60.95, "y": 70.03, "box": [52.71, 66.56, 7.36, 13.89]}, {"n": 3, "head": "Marked while connecting", "text": "While the Syslog Source connects, this handle is disabled, with the reason as its tooltip, as for other links the Builder can’t carry.", "x": 53.08, "y": 81.67, "box": [54.44, 80.89, 3.89, 1.56]}, {"n": 4, "head": "0 errors", "text": "Validation has nothing to report.", "x": 84.92, "y": 12.11, "box": [87.01, 11.44, 10.49, 1.33]}]}, {"id": "ff-sheet", "img": "compare/five-fixes-sheet.png", "group": "target", "tab": "Inspector · phone", "title": "A phone, nothing selected, Inspector opened", "w": 390, "h": 844, "zoom": 1, "size": "390 × 844", "crop": "viewport", "items": [{"n": 1, "head": "Opaque", "text": "With nothing selected, the sheet shows the topology at full strength.", "x": 82.0, "y": 58.03, "box": [0.0, 40.05, 100.0, 59.95]}, {"n": 2, "head": "Takes taps", "text": "The topology’s name can be edited, and every control in the sheet takes taps.", "x": 71.79, "y": 68.19, "box": [6.41, 66.47, 87.18, 3.44]}]}, {"id": "ff-drawer", "img": "compare/five-fixes-drawer.png", "group": "target", "tab": "Inspector · 1,024 px", "title": "1,024 px, nothing selected, Inspector opened", "w": 1024, "h": 800, "zoom": 1, "size": "1024 × 800", "crop": "viewport", "items": [{"n": 1, "head": "Opaque below 1,280 px too", "text": "From 761 to 1,279 px the Inspector is a drawer over the canvas. With nothing selected it was dimmed in the same way.", "x": 81.84, "y": 39.59, "box": [65.23, 17.12, 33.2, 74.88]}, {"n": 2, "head": "Takes clicks", "text": "Its fields and buttons take clicks.", "x": 88.92, "y": 46.81, "box": [67.68, 45.0, 28.32, 3.62]}]}, {"id": "ff-source", "img": "compare/five-fixes-source.png", "group": "target", "tab": "Config · [source::]", "title": "The Config view: inputs.conf, with props.conf [source::] stanzas that use wildcards", "w": 1388, "h": 522, "zoom": 1, "size": "1440 × 1000", "crop": "inputs.conf lines", "items": [{"n": 1, "head": "A pattern", "text": "[source::.../fw-*.log] matches every file this monitor reads. [source::/var/log/acme/...] does too, and the first in ASCII order wins.", "x": 61.98, "y": 27.22, "box": [0.07, 23.95, 99.86, 10.92]}, {"n": 2, "head": "As before", "text": "The stanza is the monitor’s path exactly, so the note reads as on Build 205. Its priority, 10, beats /var/log/acme/....", "x": 61.98, "y": 45.04, "box": [0.07, 41.76, 99.86, 10.92]}, {"n": 3, "head": "A directory", "text": "Three stanzas match files under /var/log/acme. Ranked: proxy/*.csv (priority 10), then .../fw-*.log, then /var/log/acme/... for the rest.", "x": 61.98, "y": 63.83, "box": [0.07, 59.58, 99.86, 14.18]}, {"n": 4, "head": "Windows paths", "text": "In a stanza, \\\\ stands for one backslash.", "x": 61.98, "y": 83.93, "box": [0.07, 80.65, 99.86, 10.92]}]}, {"id": "ff-esc-today", "img": "compare/five-fixes-esc-today.png", "group": "today", "tab": "Today: Esc", "title": "Build 205: Esc while a connection waits for its other end", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Still connecting", "text": "After Esc the status still reads “Event data: choose the destination handle”. The next handle clicked connects to Universal Forwarder 1.", "x": 37.04, "y": 89.22, "box": [37.85, 87.22, 20.14, 4.0]}, {"n": 2, "head": "Handles still out", "text": "Every card keeps its handles showing. Only clicking Universal Forwarder 1’s handle again ends the connection.", "x": 43.4, "y": 43.67, "box": [30.21, 37.44, 13.19, 24.89]}, {"n": 3, "head": "The selection goes instead", "text": "Esc cleared the selection, so the Inspector shows the topology. At 1,024 px it closed the drawer too.", "x": 87.01, "y": 39.99, "box": [75.21, 15.22, 23.61, 82.56]}]}, {"id": "ff-tick-today", "img": "compare/five-fixes-tick-today.png", "group": "today", "tab": "Today: palette add", "title": "Build 205: Universal Forwarder 1 selected, then Heavy Forwarder from the palette", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "The tick stays here", "text": "Universal Forwarder 1 keeps the selection tick and green border, as if it were still selected.", "x": 43.4, "y": 39.33, "box": [30.21, 33.11, 13.19, 24.89]}, {"n": 2, "head": "Selected, no tick", "text": "Heavy Forwarder 2 is the card selected: the Inspector shows it.", "x": 65.62, "y": 53.11, "box": [52.43, 46.89, 13.19, 24.89]}]}, {"id": "ff-syslog-today", "img": "compare/five-fixes-syslog-today.png", "group": "today", "tab": "Today: syslog → Cloud", "title": "Build 205: Firewalls and network devices connecting to Splunk Cloud indexing", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Made, then flagged", "text": "The handles connect them, and Build 148 draws the link red and dashed: “Syslog → Splunk Cloud: not allowed”.", "x": 28.99, "y": 38.06, "box": [26.6, 34.44, 4.79, 7.22]}, {"n": 2, "head": "1 error", "text": "Validation then reports it.", "x": 85.5, "y": 12.11, "box": [87.5, 11.44, 10.0, 1.33]}, {"n": 3, "head": "“Connected”", "text": "The status says the link was made.", "x": 20.98, "y": 88.5, "box": [22.36, 85.78, 34.44, 5.44]}]}, {"id": "ff-sheet-today", "img": "compare/five-fixes-sheet-today.png", "group": "today", "tab": "Today: phone", "title": "Build 205: a phone, nothing selected, Inspector opened", "w": 390, "h": 844, "zoom": 1, "size": "390 × 844", "crop": "viewport", "items": [{"n": 1, "head": "45% opacity", "text": "Build 205’s first Inspector code dims it whenever no component is selected.", "x": 82.0, "y": 58.03, "box": [0.0, 40.05, 100.0, 59.95]}, {"n": 2, "head": "Taps go through", "text": "A tap on the sheet reaches the canvas behind it: here, the zoom controls.", "x": 52.31, "y": 68.36, "box": [47.18, 66.0, 10.26, 4.74]}]}, {"id": "ff-drawer-today", "img": "compare/five-fixes-drawer-today.png", "group": "today", "tab": "Today: 1,024 px", "title": "Build 205: 1,024 px, nothing selected, Inspector opened", "w": 1024, "h": 800, "zoom": 1, "size": "1024 × 800", "crop": "viewport", "items": [{"n": 1, "head": "See-through", "text": "The cards behind show through the drawer, and clicks on it go to the canvas.", "x": 81.84, "y": 39.59, "box": [65.23, 17.12, 33.2, 74.88]}]}, {"id": "ff-source-today", "img": "compare/five-fixes-source-today.png", "group": "today", "tab": "Today: [source::]", "title": "Build 205: the same files in the Config view", "w": 1388, "h": 437, "zoom": 1, "size": "1440 × 1000", "crop": "inputs.conf lines", "items": [{"n": 1, "head": "Not found", "text": "Build 205 matched a [source::] stanza only when its text was the monitor’s path exactly.", "x": 61.98, "y": 31.01, "box": [0.07, 28.6, 99.86, 8.01]}, {"n": 2, "head": "The one match", "text": "Its stanza is spelled as the monitor’s path.", "x": 61.98, "y": 48.54, "box": [0.07, 44.62, 99.86, 13.04]}, {"n": 3, "head": "Nothing for a directory", "text": "Nor for the Windows path below.", "x": 61.98, "y": 68.54, "box": [0.07, 66.13, 99.86, 8.01]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size+' viewport'+(s.crop==='viewport'?'':', '+s.crop+' only');
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 205 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
