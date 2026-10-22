@@ -3175,7 +3175,7 @@ const renderBeforeIssueNavigator=renderBuilder;renderBuilder=function(){renderBe
 /* Shift-click extends a selection. One edit produces one undoable history entry. */
 state.builderBulkEdges=[];
 const bulkPanel=document.createElement('details');bulkPanel.id='builderBulkEdit';bulkPanel.className='builderBulkEdit';bulkPanel.innerHTML='<summary>Bulk edit <span id="builderBulkCount"></span></summary><div class="builderBulkBody"><label>Objects<select id="builderBulkKind"><option value="nodes">Components</option><option value="edges">Connections</option></select></label><label>Field<select id="builderBulkField"></select></label><label>New value<span id="builderBulkValueWrap"></span></label><button type="button" id="builderBulkApply">Apply to selected</button><small id="builderBulkHelp">Shift-click components or connections to extend the selection. Use Shift+Space from the keyboard.</small></div>';
-$('.builderWorkspace').insertBefore(bulkPanel,$('#builderIssueNavigator'));$('.builderNavigationHint')?.insertAdjacentHTML('beforeend',' · <b>Keyboard</b> arrows move · Enter actions · Shift+Space add');
+$('.builderWorkspace').insertBefore(bulkPanel,$('#builderIssueNavigator'));$('.builderNavigationHint')?.insertAdjacentHTML('beforeend',' · <b>Keyboard</b> arrows move · Enter actions · Shift+Space extend selection');
 const bulkKind=$('#builderBulkKind'),bulkField=$('#builderBulkField'),bulkValueWrap=$('#builderBulkValueWrap');
 const bulkFields={nodes:[['environment','Environment'],['region','Region']],edges:[['owner','Operational owner'],['validation','Validation state']]};
 function bulkEdgeKey(plane,id){return `${plane}:${id}`}
@@ -6543,7 +6543,7 @@ function builderSpaceAutoMap140(){if(!builderSpaceMedia140.matches||state.view!=
 $('#builderMinimapToggle')?.addEventListener('click',event=>{if(builderSpaceRoot140.classList.contains('builderSpaceAutoMapHidden140')){event.preventDefault();event.stopImmediatePropagation();builderSpaceManualMap140=true;builderSpaceRoot140.classList.remove('builderSpaceAutoMapHidden140');const button=$('#builderMinimapToggle');button.textContent='Hide minimap';button.title='Hide topology minimap';button.setAttribute('aria-pressed','true')}else builderSpaceManualMap140=true},true);
 const builderSpaceApplyBefore140=applyBuilderViewport;applyBuilderViewport=function(...args){const result=builderSpaceApplyBefore140(...args);if(builderSpaceMedia140.matches&&state.view==='builder')requestAnimationFrame(builderSpaceAutoMap140);return result};
 function builderSpaceRail140(){const dock=builderDensityDock,panels=builderDensityPanels;if(!dock||!panels)return;const icons=['⌕','▤','◇','⚒'];[...dock.querySelectorAll(':scope > .builderDensityToggle')].forEach((button,i)=>{button.dataset.icon=icons[i]||'•';button.setAttribute('aria-label',button.title||button.textContent.trim());if(i===2){let badge=button.querySelector('.builderSpaceRailCount140');if(!badge){badge=document.createElement('span');badge.className='builderSpaceRailCount140';button.appendChild(badge)}badge.textContent=String(builderFindingSummary().review)}});const validation=builderFindingSummary(),summary=validateItems.parentElement.querySelector('summary');if(summary){let badge=summary.querySelector('.builderSpaceValidation140');if(!badge){badge=document.createElement('span');badge.className='builderSpaceValidation140';summary.appendChild(badge)}badge.textContent=validation.errors?validation.errors+' errors':validation.review?validation.review+' to review':'✓';badge.classList.toggle('valid',!validation.errors);summary.title=`${validation.errors} errors · ${validation.review} to review`}if(!builderSpaceGroup140.isConnected)panels.appendChild(builderSpaceGroup140);if(!builderSpaceGroupButton140.isConnected)dock.insertBefore(builderSpaceGroupButton140,panels);const group=$('#builderGroupBar');if(group&&group.parentElement!==builderSpaceGroup140)builderSpaceGroup140.appendChild(group)}
-function builderSpaceAttach140(){document.body.dataset.view=state.view;if(!builderSpaceMedia140.matches){if(builderSpacePlaneMarker140.isConnected&&builderSpacePlane140.parentElement!==builderSpacePlaneMarker140.parentElement)builderSpacePlaneMarker140.after(builderSpacePlane140);builderSpaceTitle140.textContent=builderSpaceTitleText140;builderSpaceRoot140.classList.remove('builderSpaceAutoMapHidden140');builderSpaceFocusChrome140();return}if(state.view!=='builder')return;const head=$('.builderHead'),wrap=$('.builderActionWrap');if(builderSpacePlane140.parentElement!==head)head.insertBefore(builderSpacePlane140,wrap);builderSpaceTitle140.textContent='Builder';builderSpaceTitle140.title=builderSpaceTitleText140;const primary=$('.builderDensityHeaderPrimary');if(primary&&builderSpaceSave140.parentElement!==primary)primary.appendChild(builderSpaceSave140);const status=$('#builderSaveState');if(status){builderSpaceSave140.textContent=/unsaved/i.test(status.textContent)?'● Unsaved':'● Saved';builderSpaceSave140.title=status.title||status.textContent}builderSpaceRail140();if(!builderSpaceHelpPopover140.isConnected)builderSpaceCanvas140.appendChild(builderSpaceHelpPopover140);const hint=$('.builderNavigationHint');if(hint&&hint.parentElement!==builderSpaceHelpPopover140)builderSpaceHelpPopover140.appendChild(hint);if(builderBottomBar.isConnected&&builderSpaceHelp140.parentElement!==builderBottomBar)builderBottomBar.insertBefore(builderSpaceHelp140,builderBottomBar.querySelector('.builderMobileZoomControls'));builderSpaceSchedule140()}
+function builderSpaceAttach140(){document.body.dataset.view=state.view;if(!builderSpaceMedia140.matches){if(builderSpacePlaneMarker140.isConnected&&builderSpacePlane140.parentElement!==builderSpacePlaneMarker140.parentElement)builderSpacePlaneMarker140.after(builderSpacePlane140);builderSpaceTitle140.textContent=builderSpaceTitleText140;builderSpaceRoot140.classList.remove('builderSpaceAutoMapHidden140');builderSpaceFocusChrome140();return}if(state.view!=='builder')return;const head=$('.builderHead'),wrap=$('.builderActionWrap');if(builderSpacePlane140.parentElement!==head)head.insertBefore(builderSpacePlane140,wrap);builderSpaceTitle140.textContent='Builder';builderSpaceTitle140.title=builderSpaceTitleText140;const primary=$('.builderDensityHeaderPrimary');if(primary&&builderSpaceSave140.parentElement!==primary)primary.appendChild(builderSpaceSave140);const status=$('#builderSaveState');if(status){builderSpaceSave140.textContent=status.classList.contains('dirty')?'● Unsaved':'● Saved';builderSpaceSave140.title=status.title||status.textContent}builderSpaceRail140();if(!builderSpaceHelpPopover140.isConnected)builderSpaceCanvas140.appendChild(builderSpaceHelpPopover140);const hint=$('.builderNavigationHint');if(hint&&hint.parentElement!==builderSpaceHelpPopover140)builderSpaceHelpPopover140.appendChild(hint);if(builderBottomBar.isConnected&&builderSpaceHelp140.parentElement!==builderBottomBar)builderBottomBar.insertBefore(builderSpaceHelp140,builderBottomBar.querySelector('.builderMobileZoomControls'));builderSpaceSchedule140()}
 const builderSpaceSwitchBefore140=switchView;switchView=function(...args){const result=builderSpaceSwitchBefore140(...args);builderSpaceAttach140();if(builderSpaceMedia140.matches&&state.view==='builder'&&scrollY)window.scrollTo({top:0,behavior:'instant'});return result};
 const builderSpaceRenderBefore140=renderBuilder;renderBuilder=function(...args){const result=builderSpaceRenderBefore140(...args);if(state.view==='builder')requestAnimationFrame(()=>{builderSpaceAttach140();builderSpaceFocusChrome140();builderSpaceAutoMap140()});return result};
 const builderSpacePanelsBefore140=syncCanvasPanels;syncCanvasPanels=function(...args){const priorWidth=builderSpaceCanvas140.clientWidth,result=builderSpacePanelsBefore140(...args);if(state.view==='builder'){builderSpaceSchedule140();if(builderSpaceWide140.matches&&canvasPanelState.inspector){requestAnimationFrame(()=>{const after=builderSpaceCanvas140.clientWidth;if(priorWidth!==after&&state.builderSelected){const selected=$('#builderTree .builderNode.selected');if(selected){const r=selected.getBoundingClientRect(),c=builderSpaceCanvas140.getBoundingClientRect();if(r.right>c.right-20){state.builderViewport.x-=r.right-c.right+30;applyBuilderViewport()}}}})}}return result};
@@ -6551,7 +6551,7 @@ const builderSpaceFocusChecksSlot140=document.createComment('Plane controls orig
 $('.builderPlaneBar .unifiedPlaneChecks')?.before(builderSpaceFocusChecksSlot140);$('.builderDensityHeaderPrimary .builderHistoryControls')?.before(builderSpaceFocusHistorySlot140);
 function builderSpaceFocusChrome140(){const bar=$('.builderFocusBar'),plane=$('.builderPlaneBar'),active=builderSpaceMedia140.matches&&!!state.builderCanvasFocus;if(active){const fresh=plane.querySelector('.unifiedPlaneChecks'),old=bar.querySelector('.unifiedPlaneChecks');if(fresh){if(old&&old!==fresh)old.remove();bar.insertBefore(fresh,bar.querySelector('.builderFocusFinding'))}const history=$('.builderDensityHeaderPrimary .builderHistoryControls')||bar.querySelector('.builderHistoryControls');if(history&&history.parentElement!==bar)bar.insertBefore(history,bar.querySelector('.builderFocusFinding'))}else{const checks=bar.querySelector('.unifiedPlaneChecks');if(checks){if(builderSpaceFocusChecksSlot140.isConnected)builderSpaceFocusChecksSlot140.after(checks);else plane.prepend(checks)}const history=bar.querySelector('.builderHistoryControls');if(history){if(builderSpaceFocusHistorySlot140.isConnected)builderSpaceFocusHistorySlot140.after(history);else $('.builderDensityHeaderPrimary')?.prepend(history)}}}
 const builderSpaceFocusBefore140=toggleBuilderCanvasFocus;toggleBuilderCanvasFocus=function(...args){const result=builderSpaceFocusBefore140(...args);builderSpaceFocusChrome140();builderSpaceSchedule140();return result};
-const builderSpaceStatusObserver140=new MutationObserver(()=>{const s=$('#builderSaveState');if(!s)return;builderSpaceSave140.textContent=/unsaved/i.test(s.textContent)?'● Unsaved':'● Saved';builderSpaceSave140.title=s.title||s.textContent});if($('#builderSaveState'))builderSpaceStatusObserver140.observe($('#builderSaveState'),{childList:true,characterData:true,subtree:true});
+const builderSpaceStatusObserver140=new MutationObserver(()=>{const s=$('#builderSaveState');if(!s)return;builderSpaceSave140.textContent=s.classList.contains('dirty')?'● Unsaved':'● Saved';builderSpaceSave140.title=s.title||s.textContent});if($('#builderSaveState'))builderSpaceStatusObserver140.observe($('#builderSaveState'),{childList:true,characterData:true,subtree:true});
 builderSpaceGroupButton140.onclick=()=>{const open=!builderSpaceGroup140.open;for(const id of builderDensityPanelIds){const panel=$('#'+id);if(panel)panel.open=false}builderSpaceGroup140.open=open;builderSpaceGroupButton140.setAttribute('aria-expanded',String(open));builderDensitySync()};
 builderDensityDock.addEventListener('click',event=>{if(event.target.closest('.builderDensityToggle')){builderSpaceGroup140.open=false;builderSpaceGroupButton140.setAttribute('aria-expanded','false')}},true);
 document.addEventListener('keydown',event=>{if(state.view==='builder'&&builderSpaceMedia140.matches&&event.key==='Escape'&&!event.defaultPrevented){const open=builderDensityPanels.querySelector('details[open]');if(open){open.open=false;builderSpaceGroupButton140.setAttribute('aria-expanded','false');builderDensitySync();event.preventDefault()}}},true);
@@ -13989,6 +13989,68 @@ analyse();render();renderPanel();
 changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Config view','A Config view beside Matrix maps every line of uploaded inputs.conf, props.conf and transforms.conf files to the Matrix stage that applies it. Files of one kind merge in Splunk’s precedence order, and each line is checked against the component chosen in the strip. The Search Head joins the components with ten search-time stages, and the Matrix header no longer covers its first two rows.',true]);
 const build=document.querySelector('#topologyBuilder');build.dataset.buildNumber='205';build.dataset.buildDate='2026-10-22';document.title='Splunk Pipeline Explorer · Build 205 · 22 Oct 2026';
 builderInfoText159.textContent=builderInfoText159.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 205 · 22 Oct 2026');
+})();
+</script>
+<style id="small-fixes-v206-styles">
+/* Build 206: small fixes. */
+
+/* 1. Focus canvas: the palette and the Inspector open in front of the canvas. Build 140 made the canvas fill the window
+   there (position:fixed, z-index 100), and Build 95's panels have z-index 42, so they opened behind it. They now sit
+   between the canvas and the focus bar (z-index 110), from just below the bar to above the bottom controls. The bar
+   wraps as the window narrows, so the script keeps --focus-bar-bottom206 at its bottom edge. Phones keep their own
+   sheet. */
+@media (min-width:761px){
+ body[data-view="builder"] .topologyBuilder.canvasFocus.canvasFirst.canvasPanelInspectorOpen .builderInspector,
+ body[data-view="builder"] .topologyBuilder.canvasFocus.canvasFirst.canvasPanelPaletteOpen .builderPalette{position:fixed!important;z-index:105!important;top:calc(var(--focus-bar-bottom206,56px) + 8px)!important;bottom:64px!important;height:auto!important;max-height:none!important}
+}
+
+/* 2. The page fits the window at every width. */
+/* The toolbar, from 821 px: the search box, the pipeline filter and the view switcher shared one grid row. When they
+   didn't fit, below about 1,300 px, the switcher kept its full width and squeezed the filter, down to 26 px, and from
+   1,000 px down it ran past the window. Now the row wraps: the switcher moves to a second row when the three don't
+   fit, and the filter keeps its width. The Builder and OV views keep their own toolbar. */
+@media (min-width:821px){
+ body:not([data-view="builder"]):not([data-view="ov"]) .shell>.toolbar{display:flex;flex-wrap:wrap}
+ body:not([data-view="builder"]):not([data-view="ov"]) .shell>.toolbar>.search{flex:1 1 250px;min-width:0}
+ body:not([data-view="builder"]):not([data-view="ov"]) .shell>.toolbar>#pipelineFilter{flex:0 0 auto;width:auto;max-width:100%}
+ body:not([data-view="builder"]):not([data-view="ov"]) .shell>.toolbar>.seg{flex:0 1 auto;max-width:100%;flex-wrap:wrap}
+}
+/* From 521 to 820 px the toolbar is one column; the switcher's buttons now wrap instead of running off the page. The OV
+   view has its own toolbar from 761 px, and the Builder's switcher scrolls in its own box. */
+@media (min-width:521px) and (max-width:820px){
+ body:not([data-view="builder"]):not([data-view="ov"]) .shell>.toolbar>.seg{flex-wrap:wrap;min-width:0}
+}
+@media (min-width:521px) and (max-width:760px){
+ body[data-view="ov"] .shell>.toolbar>.seg{flex-wrap:wrap;min-width:0}
+}
+/* The capacity model, from 821 to 1,080 px: its three columns need about 1,040 px of window, so the server.conf box goes
+   under the other two, as it does below 821 px. */
+@media (min-width:821px) and (max-width:1080px){
+ .parallelPanel{grid-template-columns:minmax(0,1fr) auto}
+ .parallelConfig{grid-column:1/-1;border-left:0;border-top:1px solid var(--line);padding:11px 0 0}
+}
+/* The Failure Lab below 821 px: its single 1fr column grew to the propagation map's full width, up to 1,430 px past a
+   phone's edge. With min-width:0 the map scrolls in its own box, as it does on wider screens. */
+.failureLab.active>*{min-width:0}
+</style>
+<script id="small-fixes-v206">
+(function(){
+/* Build 206: in Focus canvas the palette and the Inspector start just below the focus bar. The bar wraps as the window
+   narrows (48 px tall at 1,280 px, 68 at 1,024, 82 at 800), so this keeps --focus-bar-bottom206 on #topologyBuilder at
+   its bottom edge. */
+const root=document.getElementById('topologyBuilder'),bar=root&&root.querySelector('.builderFocusBar');
+if(!bar||typeof ResizeObserver!=='function')return;
+const place=()=>{const r=bar.getBoundingClientRect();if(r.height)root.style.setProperty('--focus-bar-bottom206',Math.round(r.bottom)+'px')};
+new ResizeObserver(place).observe(bar);
+addEventListener('resize',place);
+place();
+})();
+</script>
+<script id="small-fixes-records-v206">
+(function(){
+changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Small fixes','In Focus canvas the palette and the Inspector open in front of the canvas, below the focus bar. The page no longer scrolls sideways at any width: the toolbar wraps, the capacity model puts server.conf on its own row up to 1,080 px, and on narrow screens the Failure Lab’s map scrolls in its own box. The canvas help card says Shift+Space extends the selection, and a hidden save label no longer says Unsaved after a save.',true]);
+const build=document.querySelector('#topologyBuilder');build.dataset.buildNumber='206';build.dataset.buildDate='2026-10-23';document.title='Splunk Pipeline Explorer · Build 206 · 23 Oct 2026';
+builderInfoText159.textContent=builderInfoText159.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 206 · 23 Oct 2026');
 })();
 </script>
 </body>
