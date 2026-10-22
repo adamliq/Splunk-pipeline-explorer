@@ -32,6 +32,8 @@ Paste both files as they are, make the three edits, then add the build records (
 
 **Measured on Build 205** in the nine views: Flow, Matrix, Config, Operate, Diagnose, Failure Lab, Changes, the Builder and OV. The widths were every 20 px from 320 to 1,480 px, then 1,700 and 1,920.
 
+**Also on all 28 OV pages,** from AV-1 to StdV-1, with the reference topology loaded, at 16 widths from 320 to 1,920 px. Each page overflows only where the view switcher does: by 161 px at 540, 101 at 600 and 1 at 700.
+
 | What | Where | Up to | Cause |
 |---|---|---|---|
 | The capacity model | 821–1,039 px, in Flow, Matrix and Operate | 193 px at 840 px; 9 px at 1,024 | `.parallelPanel`'s three columns (`minmax(250px,1fr) auto minmax(260px,auto)`) need about 1,040 px of window. They only stack below 821 px. |
@@ -197,6 +199,7 @@ Build 205 passes 8 of the 44:
 | Exit focus | The palette and Inspector are where they were before Focus canvas |
 | 400 px | The Inspector sheet is in front, as on Build 205 (information only) |
 | Sideways scroll | None in the nine views, every 20 px from 320 to 1,480 px, then 1,700 and 1,920 |
+| The 28 OV pages | All fit at 320, 400, 540, 600, 700, 760, 800, 820, 840, 900, 1,000, 1,024, 1,100, 1,280, 1,440 and 1,920 px. On Build 205 each overflows at 540, 600 and 700 px, by up to 161 px |
 | The pipeline filter | 248 px at 1,920, 1,440, 1,320, 1,300, 1,280, 1,024, 900 and 821 px |
 | The toolbar's rows | One row from 1,320 px; two at 1,300 px and below |
 | The capacity model | server.conf under the other two at 821, 900, 1,024 and 1,080 px; beside them at 1,081 and 1,200. Nothing overflows the panel |
