@@ -1,5 +1,5 @@
 (function(){
-/* Build 206: five fixes. Four are in the Builder: Esc and a pending connection, the selection after a palette add,
+/* Build 207: five fixes. Four are in the Builder: Esc and a pending connection, the selection after a palette add,
    Syslog Source → Splunk Cloud indexing, and the Inspector with nothing selected (an in-place edit). The fifth is in the
    Config view: props.conf [source::] stanzas match a monitor's files with Splunk's wildcards. */
 
@@ -63,7 +63,7 @@ if(typeof addBuilderNode==='function'){
 }
 
 // 5. The Config view: a monitor's files take the source type of the props.conf [source::] stanzas that match them, as
-// Splunk matches them. Build 205 matched a stanza only when its text was the monitor's path exactly. In a source::
+// Splunk matches them. Builds 205 and 206 matched a stanza only when its text was the monitor's path exactly. In a source::
 // pattern, "..." is any run of characters, "*" any run within one path segment and "." a dot; the rest is a regular
 // expression matched against the whole path, case-sensitively. A monitor's path can use "..." and "*" too, or name a
 // directory, whose files it reads. Of several stanzas that match a file, the one with the higher priority wins (100 for
@@ -119,7 +119,7 @@ function regex(p){
  try{return new RegExp('^(?:'+out+')$')}catch{return null}
 }
 const sample=M=>M.map(t=>t.k==='c'?t.c:'x').join('');
-window.configSourceMatches206=function(path,stanzas,where){
+window.configSourceMatches207=function(path,stanzas,where){
  // One entry per stanza name: its source type from the first stanza of that name that sets one, as Splunk's merge does.
  const byName=new Map();
  for(const st of stanzas){const name=st.name.slice(8);let e=byName.get(name);if(!e)byName.set(name,e={name});

@@ -1,18 +1,18 @@
 # Handoff: five fixes (Esc, the selection after an add, syslog to Splunk Cloud, the Inspector, [source::] stanzas)
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
-**Start from:** Build 205.
-**One new block, at the end of the page (before `</body>`):** `<script id="five-fixes-v206">`, containing [`docs/mockups/five-fixes-prototype.js`](mockups/five-fixes-prototype.js). There is no style block.
+**Start from:** Build 206.
+**One new block, at the end of the page (before `</body>`):** `<script id="five-fixes-v207">`, containing [`docs/mockups/five-fixes-prototype.js`](mockups/five-fixes-prototype.js). There is no style block.
 
-**Four in-place edits,** listed under "The edits". Each old string occurs exactly once in Build 205. They are also in [`docs/mockups/five-fixes.diff`](mockups/five-fixes.diff), a unified diff against Build 205's `index.html`.
+**Four in-place edits,** listed under "The edits". Each old string occurs exactly once in Build 206. They are also in [`docs/mockups/five-fixes.diff`](mockups/five-fixes.diff), a unified diff against Build 206's `index.html`.
 
 Paste the file as it is, make the four edits, then add the build records (see "Build records").
 
-**It can go in the same build as the small fixes** ([`builder-handoff-small-fixes.md`](builder-handoff-small-fixes.md)), with one set of build records. The two touch different code, and can go in in either order. Tested together, each passes all its checks.
+**Written for Build 205, now for Build 207.** Build 206 added the small fixes ([`builder-handoff-small-fixes.md`](builder-handoff-small-fixes.md)), which touch different code: the four edits apply to Build 206 unchanged, at the same lines. The block is now `five-fixes-v207`, and its matcher `configSourceMatches207`. See the Build 206 recheck ([`builder-handoff-build206.md`](builder-handoff-build206.md)).
 
-**Mockup (the target):** [`docs/mockups/five-fixes-mockup.html`](mockups/five-fixes-mockup.html). Six scenes have the fixes applied, and the six "Today" scenes are Build 205. The screenshots are `docs/mockups/compare/five-fixes-*.png`.
+**Mockup (the target):** [`docs/mockups/five-fixes-mockup.html`](mockups/five-fixes-mockup.html). Six scenes have the fixes applied to Build 206, and the six "Today" scenes are Build 206. The screenshots are `docs/mockups/compare/five-fixes-*.png`.
 
-**Tested first:** the block and the edits were applied to Build 205 and run, alone and with the small fixes. The results under "Check before uploading" come from those runs.
+**Tested first:** the block and the edits were applied to Build 206 and run. The results under "Check before uploading" come from that run. They were first tested on Build 205, alone and with the small fixes, with the same results.
 
 ## Why
 
@@ -68,7 +68,7 @@ The new card is selected, and the Inspector shows it. But the card selected befo
 - **The same with a container selected.**
 
 **The cause:**
-- **Build 205's first `renderBuilderInspector` dims it.** That function (line 1715, in an unnamed script) sets `inspector.style.opacity` to `.45` and `pointerEvents` to `none` whenever no component is selected. It dates from when the Inspector had nothing to show then.
+- **The page's first `renderBuilderInspector` dims it.** That function (line 1715, in an unnamed script) sets `inspector.style.opacity` to `.45` and `pointerEvents` to `none` whenever no component is selected. It dates from when the Inspector had nothing to show then.
 - **Build 197 undid it only for the docked panels.** Its `!important` override, on `#topologyBuilder.builderDocked197 .builderInspector`, is why the Inspector is fine from 1,280 px.
 
 The Build 198, 203 and 205 rechecks reported this for phones only. It affects every width below the docked layout.
@@ -144,7 +144,7 @@ So files and saved topologies with the link load as before. Build 148 marks the 
 2. then ASCII order of the stanza names, the first winning.
 
 **The note on the monitor's line:**
-- **One stanza covers all its files:** "Its source type, X, comes from [source::P] in F line N." When the stanza is the monitor's path exactly, the note is Build 205's: "Its source type, X, comes from F line N."
+- **One stanza covers all its files:** "Its source type, X, comes from [source::P] in F line N." When the stanza is the monitor's path exactly, the note is as before: "Its source type, X, comes from F line N."
 - **A directory:** "Its files take source type X from [source::P] in F line N."
 - **Higher-ranked stanzas take some of its files:** "Files matching [source::Q] take source type Y (F line N); … The rest take X from [source::P] in F line N."
 - **Only some of its files match:** the same, ending "Its other files get no source type from props.conf."
@@ -159,7 +159,7 @@ So files and saved topologies with the link load as before. Build 148 marks the 
 
 ## The edits
 
-All four are in Build 205's `index.html`, and each old string occurs exactly once.
+All four are in Build 206's `index.html`, and each old string occurs exactly once. The line numbers are the same as in Build 205.
 
 **1. In the unnamed script with `renderBuilderInspector`, line 1717: remove the dimming.**
 ```
@@ -170,7 +170,7 @@ new: (nothing)
 **2. `<script id="config-view-v205">`, line 13632: the stanza lookup, now through the block's matcher.**
 ```
 old: const sourceStanza=path=>kindFiles('props').flatMap(f=>f.doc.stanzas).find(s=>s.kind==='source'&&s.name.slice(8)===path&&s.keys.get('sourcetype'));
-new: const sourceMatch=path=>window.configSourceMatches206?.(path,kindFiles('props').flatMap(f=>f.doc.stanzas).filter(s=>s.kind==='source'),line=>`${fileLabel(fileById(line.fid))} line ${line.n}`)||{note:'',types:null};
+new: const sourceMatch=path=>window.configSourceMatches207?.(path,kindFiles('props').flatMap(f=>f.doc.stanzas).filter(s=>s.kind==='source'),line=>`${fileLabel(fileById(line.fid))} line ${line.n}`)||{note:'',types:null};
 ```
 
 **3. The same script, line 13629, in `inputs(r)`: the monitor's note.**
@@ -206,7 +206,7 @@ After the edits, nothing refers to `sourceStanza`.
   - During a palette click (Build 115's `builderPaletteClickAdd`), it adds Splunk Cloud indexing unconnected and says why.
   - Otherwise, it refuses with the reason.
 
-**5. `window.configSourceMatches206(path, stanzas, where)`.** The Config view calls it from edits 2 to 4.
+**5. `window.configSourceMatches207(path, stanzas, where)`.** The Config view calls it from edits 2 to 4.
 - **`stanzas`:** the props.conf `[source::]` stanzas, highest precedence first.
 - **`where(line)`:** formats "F line N".
 - **What it does:**
@@ -221,22 +221,22 @@ After the edits, nothing refers to `sourceStanza`.
 After the block:
 - **`changeRegister`,** group "Explorer foundations":
   `['Five fixes','Esc cancels a pending connection in the Builder and keeps the selection. A component added from the palette is the only one selected. A Syslog Source can no longer be linked straight to Splunk Cloud indexing. The Inspector can be used with nothing selected at every width. In the Config view, a monitor finds the props.conf [source::] stanzas whose wildcards match its files.',true]`.
-- **`#topologyBuilder` `data-build-number` and `data-build-date`, the page title and the ⓘ text prefix,** as Build 205 did in `config-view-records-v205`. In the same build as the small fixes, set these once, for both.
+- **`#topologyBuilder` `data-build-number` and `data-build-date`, the page title and the ⓘ text prefix,** as Build 206 did in `small-fixes-records-v206`, with Build 207.
 
 ## Found while testing (not changed)
 
-1. **Esc with a menu open also clears the selection,** on Build 205 too. The menu closes, and Build 167's handler runs as well. With a connection pending, the connection stays, and the next Esc cancels it.
+1. **Esc with a menu open also clears the selection,** on Builds 205 and 206 too. The menu closes, and Build 167's handler runs as well. With a connection pending, the connection stays, and the next Esc cancels it.
 2. **Build 148 catches only a Syslog Source linked straight to Splunk Cloud indexing.** Syslog Source → load balancer → Splunk Cloud indexing isn't flagged.
 3. **The add-next list's own exclusion of Splunk Cloud indexing after a Syslog Source is now redundant.** It is harmless.
 4. **Matching [source::] stanzas doesn't consider the monitor's `whitelist` and `blacklist`.** The view reads the monitor's path only.
 
 ## Check before uploading
 
-Run with Build 205 + the block + the four edits, and with Build 205 as shipped for comparison.
+Run with Build 206 + the block + the four edits, and with Build 206 as shipped for comparison.
 
 ### 1. The fixes: 49 checks, all pass
 
-Build 205 passes 21 of the 49: those that check behaviour that should stay as it is.
+Build 206 passes 21 of the 49, as Build 205 did: those that check behaviour that should stay as it is.
 
 | Check | Result |
 |---|---|
@@ -247,7 +247,7 @@ Build 205 passes 21 of the 49: those that check behaviour that should stay as it
 | Esc with nothing pending | Clears the selection, as before |
 | Esc in Focus canvas | Cancels the connection, and stays in Focus canvas |
 | Adds | After a palette click, a click with "New unconnected", a drag onto the canvas, a compatible-next button and the add-next list, the new card alone is selected and ticked |
-| The capability check | Refuses Splunk Cloud indexing after a Syslog Source, with the reason. Everything else a Syslog Source can send to is as on Build 205. A Syslog Server and a Universal Forwarder still can |
+| The capability check | Refuses Splunk Cloud indexing after a Syslog Source, with the reason. Everything else a Syslog Source can send to is as on Build 206. A Syslog Server and a Universal Forwarder still can |
 | Handles | While a Syslog Source connects, the Splunk Cloud handle is disabled, with the reason as its title. Connecting is refused, with the reason, and leaves no link. A Syslog Server still connects |
 | Drag | Dragging the Splunk Cloud card onto the Syslog Source is refused |
 | Palette | With a Syslog Source selected, Splunk Cloud indexing shows "adds unconnected", with the reason. A click adds it unconnected and says why; a drop onto the Syslog Source is refused |
@@ -257,26 +257,26 @@ Build 205 passes 21 of the 49: those that check behaviour that should stay as it
 | The Inspector, docked at 1,440 px | Unchanged |
 | [source::], seven monitors | A pattern over all its files, first in ASCII order. A stanza that is its path exactly, with priority 10: the note as before. A directory, with three stanzas in rank order. A monitor with its own `sourcetype`: no note. No match: no note. A regular expression stanza: some files. A Windows path |
 | Following a source type | Lists the monitors whose files take it, and those that may |
-| The built-in example | Its notes are as on Build 205 |
+| The built-in example | Its notes are as on Build 206 |
 | The matcher on its own | `*` stays in one segment and `...` crosses them; case counts; literal 100 beats a pattern, priority 101 beats a literal; ASCII order, then priority; a broken regular expression matches nothing; alternation |
 | Page errors | None |
 
 ### 2. With the small fixes
 
-Build 205 with both handoffs' blocks and edits:
-- these 49 checks: 49 pass;
-- the small fixes' 44 checks: 44 pass.
+Build 206 has the small fixes. With the five fixes added, the small fixes' 44 checks still pass: 44 of 44.
 
 ### 3. Regression
+
+Against Build 206:
 
 | Suite | Result |
 |---|---|
 | View text, every view | 97 of 97 the same |
 | OV pages and Validate | 87 of 87 the same |
-| Config view | 49 of 49, alone and with the small fixes |
+| Config view | 49 of 49 |
 | Add the next component from a card's handle | 58 of 58 |
-| Menu bar actions | The same output as Build 205 |
-| Parsing laboratory | 68 of 68. "Click to next frame" for fixed-length records took 308 ms, against 329 on Build 205 (limit 1,000). Run alongside five other suites, it once took 1,261 ms |
+| Menu bar actions | The same output as Build 206 |
+| Parsing laboratory | 68 of 68. "Click to next frame" for fixed-length records took 347 ms, against 318 on Build 206 (limit 1,000) |
 | Canvas card views | 123, unchanged |
-| The space and connector tools | The same output as Build 205, alone and with the small fixes |
+| The space and connector tools | The same output as Build 206 |
 | Page errors | None |
