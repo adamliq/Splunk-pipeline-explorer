@@ -1,0 +1,40 @@
+/* move-tools-v208: route validation, the configuration draft, the connection template and the layout profiles leave the
+   Tools panel for tabs of their own in the Builder's drawer. The Tools panel goes from 761 px up; on phones, More keeps
+   its Tools disclosure, with a button for each tab. */
+@media(min-width:761px){#builderSecondaryTools{display:none!important}}
+#builderSecondaryTools>summary em{display:none}
+.mtLaunch208{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.mtLaunch208 button{min-height:36px;border:1px solid #3a5a6c;border-radius:7px;background:#0c2230;color:#d4e7ef;padding:7px 9px;text-align:left;font-size:.66rem;font-weight:650;cursor:pointer}
+
+/* Ten tabs: as many columns as fit, so two rows in a 600 px drawer and three or four on a phone. */
+#builderInspectorDrawer .builderDrawerTabs{grid-template-columns:repeat(auto-fill,minmax(86px,1fr))}
+@media(max-width:760px){#builderInspectorDrawer .builderDrawerTabs{grid-template-columns:repeat(auto-fill,minmax(72px,1fr))}}
+
+/* A tool shows on its own tab only, and fills the drawer's width. */
+#builderInspectorDrawer .mtPanel208[hidden]{display:none!important}
+#builderInspectorDrawer .mtPanel208{margin:0;padding:0;border:0;border-radius:0;background:none;min-width:0;max-width:100%}
+#builderInspectorDrawer .mtPanel208>summary,#builderInspectorDrawer .mtPanel208>strong{display:block;margin:0 0 8px;padding:0;list-style:none;pointer-events:none;color:#dceaf0;font-size:.76rem;font-weight:700;letter-spacing:0;text-transform:none}
+#builderInspectorDrawer .mtPanel208>summary::-webkit-details-marker{display:none}
+#builderInspectorDrawer .mtPanel208>summary span{display:block;margin:3px 0 0;font-size:.64rem;font-weight:400}
+
+/* Route validation: the drawer scrolls, so the list needs no box of its own. */
+#builderInspectorDrawer .builderRouteList{max-height:none;margin-top:0}
+
+/* The configuration draft, headed with what it is for. */
+#builderInspectorDrawer .builderConfigDraft.mtPanel208>summary span{display:inline;margin:0 0 0 4px;color:#91afbf}
+#builderInspectorDrawer .builderConfigInner{border-top:0;padding:0}
+
+/* The connection template: the template, then source → target, then the button, the defaults and the fields. */
+#builderInspectorDrawer .builderTemplateBar{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center}
+#builderInspectorDrawer .builderTemplateBar>strong,#builderInspectorDrawer #builderTemplateSelect,#builderInspectorDrawer .builderTemplateMeta,#builderInspectorDrawer .builderTemplateEditor{grid-column:1/-1}
+#builderInspectorDrawer .builderTemplateArrow{display:block}
+#builderInspectorDrawer .builderTemplateApply{grid-column:1/-1;justify-self:start}
+#builderInspectorDrawer .builderTemplateEditor{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));margin-top:2px}
+#builderInspectorDrawer .builderTemplateEditor label.wide,#builderInspectorDrawer .builderTemplateEditor .builderTemplateHelp{grid-column:1/-1}
+
+/* The layout profiles: the profile and its purpose, then every action, whatever the window's width. */
+#builderInspectorDrawer .builderProfileBar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+#builderInspectorDrawer .builderProfileBar>strong,#builderInspectorDrawer .builderProfileMeta,#builderInspectorDrawer .builderProfileHelp{flex:1 0 100%}
+#builderInspectorDrawer .builderProfileSelect,#builderInspectorDrawer .builderProfileKind{flex:1 1 260px;min-width:0}
+#builderInspectorDrawer .builderProfileBar .builderBtn,#builderInspectorDrawer .builderProfileBar .profileSecondary{display:inline-block;width:auto}
+#builderInspectorDrawer .builderProfileMeta{display:flex;flex-wrap:wrap;justify-self:auto;white-space:normal}

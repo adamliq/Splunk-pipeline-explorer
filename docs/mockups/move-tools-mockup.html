@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tools Move to Drawer</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 208 TARGET · BUILD 207 + PROTOTYPE</span>
+ <h1>Move the rest of Tools: four tools, four drawer tabs</h1>
+ <p class="lede">Route validation, the configuration draft, the connection template and the layout profiles leave the Tools panel, which scrolled sideways, for tabs in the Builder’s drawer, beside Review, Rules, Inventory, Trace and History. The menus open each tab, and each tool fits the drawer at every width. Every target scene is the real explorer with the prototype applied to Build 207; the “Today” scenes are Build 207 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>What Build 207 does</h2>
+  <table>
+   <thead><tr><th>Fault</th><th>What you see</th><th>Cause</th><th>Fix</th></tr></thead>
+   <tbody>
+    <tr><td>The Tools panel scrolls sideways</td><td>Its four tools are 853 px wide in a 600 px panel (461 px at 1,024 px). The connection template’s target and third column, and the layout profile’s actions, are cut off</td><td>Each tool’s grid was made for the page’s full width, then put in the panel</td><td>Each tool gets a drawer tab, laid out for the drawer’s width</td></tr>
+    <tr><td>Two panels for one job</td><td>Tools and the Inspect topology drawer both open over the canvas from the menus</td><td>Tools predates the drawer and the menu bar</td><td>One drawer, ten tabs</td></tr>
+    <tr><td>Hidden profile actions</td><td>Below 1,061 px, Duplicate, Rename and Delete are hidden</td><td>The profile bar’s rule for narrow windows</td><td>In the drawer, all five show at every width</td></tr>
+    <tr><td>Phones: Tools out of date</td><td>Lists Bulk edit and “5 tools”, and stacks four tools in More</td><td>Bulk edit moved to the Inspector in Build 199</td><td>Four buttons, one per tab</td></tr>
+    <tr><td>The drawer closes at once after a card click</td><td>The first tab opened from a menu or the review pill right after a card click closes again</td><td>The fast selection path doesn’t record the selection, so the drawer’s own redraw opens the Inspector, which closes the drawer</td><td>Opening the drawer records the selection first</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The design in short</h2>
+  <dl>
+   <dt>Routes</dt><dd>Route validation, beside Coverage, Review and Rules. Validate › Route validation… opens it.</dd>
+   <dt>Config draft</dt><dd>The configuration draft for the component or link selected, beside Inventory and Trace. Analyze › Configuration draft… opens it.</dd>
+   <dt>Templates</dt><dd>The connection template. Edit › Connection template… opens it.</dd>
+   <dt>Layouts</dt><dd>The layout profiles. Arrange › Layout profiles… opens it.</dd>
+   <dt>Fitting</dt><dd>Each tool lays itself out for the drawer’s width, from 600 px down to the 300 px the drawer can be dragged to, and on phones. Nothing scrolls sideways.</dd>
+   <dt>Phones</dt><dd>More’s Tools disclosure keeps a button for each of the four tabs.</dd>
+   <dt>Unchanged</dt><dd>What each tool does, the menus’ items and notes, the drawer’s other six tabs, and the drawer closing when something is selected from it.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-move-tools.md</code> · Prototype: <code>docs/mockups/move-tools-prototype.css</code> and <code>move-tools-prototype.js</code>, appended to Build 207, and the four edits in <code>docs/mockups/move-tools.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "mt-templates", "img": "compare/move-tools-templates.png", "group": "target", "tab": "Connection template", "title": "Edit › Connection template… opens the drawer at Templates", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Four new tabs", "text": "Routes, Config draft, Templates and Layouts join Coverage, Review, Rules, Inventory, Trace and History. Ten tabs take two rows.", "x": 59.79, "y": 27.0, "box": [33.26, 21.33, 26.53, 7.56]}, {"n": 2, "head": "The whole form fits", "text": "The template, then source → target, laid out for the drawer’s width. In the Tools panel the target was cut off.", "x": 64.49, "y": 40.72, "box": [33.12, 39.11, 40.21, 3.22]}, {"n": 3, "head": "The third column", "text": "TLS and Owner, past the Tools panel’s edge on Build 207, show in full.", "x": 66.81, "y": 58.07, "box": [60.28, 54.67, 13.06, 11.33]}, {"n": 4, "head": "Works as before", "text": "Create relationship makes the same link, with the same details and message, as on Build 207.", "x": 43.47, "y": 45.11, "box": [33.12, 43.22, 9.24, 3.78]}]}, {"id": "mt-layouts", "img": "compare/move-tools-layouts.png", "group": "target", "tab": "Layout profiles", "title": "Arrange › Layout profiles… opens the Layouts tab", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Profile and purpose", "text": "Side by side, each wide enough for “Logical architecture”.", "x": 53.23, "y": 36.67, "box": [33.12, 35.0, 40.21, 3.33]}, {"n": 2, "head": "Every action", "text": "Save view, + New, Duplicate, Rename and Delete, at every width. Below 1,061 px Build 207 hid the last three.", "x": 56.6, "y": 40.94, "box": [33.12, 39.22, 23.47, 3.44]}, {"n": 3, "head": "The profile’s state", "text": "Saved or unsaved, how many profiles, and what they share.", "x": 58.05, "y": 44.83, "box": [33.12, 43.56, 40.21, 2.56]}]}, {"id": "mt-routes", "img": "compare/move-tools-routes.png", "group": "target", "tab": "Route validation", "title": "Validate › Route validation… opens the Routes tab, beside Review and Rules", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "With the other checks", "text": "Coverage, Review, Rules and Routes: what the Validate menu opens.", "x": 57.67, "y": 23.11, "box": [33.26, 21.33, 26.53, 3.56]}, {"n": 2, "head": "The same counts", "text": "The menu item’s note still gives them: 0 errors · 15 review items.", "x": 58.05, "y": 32.87, "box": [33.12, 31.22, 40.21, 4.11]}, {"n": 3, "head": "Click to inspect", "text": "An issue selects its component and shows it in the Inspector, closing the drawer as a Review item does.", "x": 66.1, "y": 39.0, "box": [33.12, 36.11, 40.21, 5.78]}]}, {"id": "mt-draft", "img": "compare/move-tools-draft.png", "group": "target", "tab": "Configuration draft", "title": "Universal Forwarder 1 clicked, then Analyze › Configuration draft…", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "A card click, then a menu", "text": "On Build 207 the drawer opened and closed at once when a tab was opened right after a card click. Now it stays.", "x": 29.58, "y": 38.51, "box": [25.62, 40.0, 13.19, 24.78]}, {"n": 2, "head": "For the selection", "text": "The draft is for the component or link selected, as before.", "x": 63.28, "y": 32.22, "box": [33.12, 31.22, 40.21, 2.0]}, {"n": 3, "head": "Copy and download", "text": "Copy draft, Download Markdown and Download JSON, as before.", "x": 58.05, "y": 43.78, "box": [33.12, 42.11, 40.21, 3.33]}, {"n": 4, "head": "Wrapped to fit", "text": "Each .conf section wraps its lines at the drawer’s width.", "x": 62.08, "y": 55.89, "box": [33.12, 46.44, 40.21, 18.89]}]}, {"id": "mt-1024", "img": "compare/move-tools-1024.png", "group": "target", "tab": "1,024 px", "title": "1,024 px: Arrange › Layout profiles…", "w": 1024, "h": 800, "zoom": 1, "size": "1024 × 800", "crop": "viewport", "items": [{"n": 1, "head": "The same drawer", "text": "Below 1,280 px the drawer is 600 px wide over the canvas, as for Review.", "x": 68.16, "y": 79.75, "box": [38.87, 17.25, 58.59, 80.12]}, {"n": 2, "head": "All five actions", "text": "Duplicate, Rename and Delete show here too.", "x": 72.95, "y": 46.06, "box": [39.94, 44.12, 33.01, 3.88]}]}, {"id": "mt-phone", "img": "compare/move-tools-phone.png", "group": "target", "tab": "Phone · More", "title": "A phone: More › Tools", "w": 390, "h": 844, "zoom": 1, "size": "390 × 844", "crop": "viewport", "items": [{"n": 1, "head": "Tools stays in More", "text": "Phones keep the older controls, so More keeps its Tools disclosure.", "x": 76.67, "y": 67.3, "box": [16.15, 63.15, 75.64, 8.29]}, {"n": 2, "head": "One button per tab", "text": "Each closes More and opens the drawer at its tab.", "x": 53.97, "y": 78.2, "box": [18.72, 72.87, 70.51, 10.66]}]}, {"id": "mt-phone-drawer", "img": "compare/move-tools-phone-drawer.png", "group": "target", "tab": "Phone · drawer", "title": "A phone: More › Tools › Connection template", "w": 390, "h": 844, "zoom": 1, "size": "390 × 844", "crop": "viewport", "items": [{"n": 1, "head": "Four to a row", "text": "Ten tabs in three rows.", "x": 50.13, "y": 42.48, "box": [9.23, 36.37, 81.79, 12.2]}, {"n": 2, "head": "Fits the phone", "text": "Source and target share a row; the fields take one column where two don’t fit.", "x": 50.13, "y": 86.91, "box": [8.72, 51.07, 82.82, 48.93]}]}, {"id": "mt-templates-today", "img": "compare/move-tools-templates-today.png", "group": "today", "tab": "Today: template", "title": "Build 207: Edit › Connection template…", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "The Tools panel", "text": "600 px wide, with each of its four tools laid out 853 px wide, so it scrolls sideways.", "x": 43.19, "y": 20.94, "box": [22.36, 16.22, 41.67, 78.67]}, {"n": 2, "head": "Cut off", "text": "The target is cut at the panel’s edge.", "x": 62.22, "y": 34.78, "box": [60.97, 36.56, 10.42, 3.22]}, {"n": 3, "head": "The third column", "text": "TLS and Owner are past the edge.", "x": 59.72, "y": 51.04, "box": [62.5, 48.11, 18.54, 5.33]}]}, {"id": "mt-layouts-today", "img": "compare/move-tools-layouts-today.png", "group": "today", "tab": "Today: layouts", "title": "Build 207: Arrange › Layout profiles…", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "A grid too wide", "text": "The layout profile’s grid leaves a blank band, and pushes the profile to the edge.", "x": 43.19, "y": 79.16, "box": [22.36, 16.22, 41.67, 78.67]}, {"n": 2, "head": "Out of sight", "text": "The purpose, Save view, + New, Duplicate, Rename and Delete are all past the panel’s edge.", "x": 62.83, "y": 78.78, "box": [69.51, 71.22, 11.53, 15.11]}]}, {"id": "mt-1024-today", "img": "compare/move-tools-1024-today.png", "group": "today", "tab": "Today: 1,024 px", "title": "Build 207: 1,024 px, Arrange › Layout profiles…", "w": 1024, "h": 800, "zoom": 1, "size": "1024 × 800", "crop": "viewport", "items": [{"n": 1, "head": "A letter per line", "text": "At 461 px, the template’s heading gets a column 11 px wide.", "x": 9.06, "y": 32.89, "box": [4.98, 2.12, 58.3, 73.25]}, {"n": 2, "head": "Cut off", "text": "The purpose is cut at the edge and the actions are past it. Below 1,061 px Duplicate, Rename and Delete are hidden anyway.", "x": 48.01, "y": 79.62, "box": [32.52, 77.75, 16.31, 3.75]}]}, {"id": "mt-phone-today", "img": "compare/move-tools-phone-today.png", "group": "today", "tab": "Today: phone", "title": "Build 207: a phone, More › Tools", "w": 390, "h": 844, "zoom": 1, "size": "390 × 844", "crop": "viewport", "items": [{"n": 1, "head": "Out of date", "text": "It still lists Bulk edit and says “5 tools”: bulk edit moved to the Inspector in Build 199.", "x": 38.85, "y": 52.12, "box": [16.15, 44.08, 75.64, 10.31]}, {"n": 2, "head": "All four stacked", "text": "Open, the four tools add 1,100 px to More, whose list grows from 872 to 1,981 px.", "x": 71.6, "y": 73.07, "box": [18.72, 71.21, 70.51, 28.79]}]}, {"id": "mt-cardclick-today", "img": "compare/move-tools-cardclick-today.png", "group": "today", "tab": "Today: card click", "title": "Build 207: Heavy Forwarder 1 clicked, then Validate › Review", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Clicked", "text": "Heavy Forwarder 1, selected with the mouse.", "x": 24.7, "y": 48.56, "box": [25.62, 39.89, 13.19, 24.78]}, {"n": 2, "head": "Then Review", "text": "Validate › Review, or this pill: the drawer opened and closed at once. A second try opens it. The same for every tab.", "x": 84.08, "y": 12.17, "box": [85.14, 10.56, 13.19, 3.22]}, {"n": 3, "head": "Only the Inspector", "text": "The drawer’s own redraw took the click for a new selection and opened the Inspector, which closes the drawer.", "x": 95.62, "y": 25.94, "box": [76.25, 24.67, 21.53, 2.56]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size+' viewport';
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 207 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>

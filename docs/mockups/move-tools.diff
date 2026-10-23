@@ -1,0 +1,14 @@
+--- a/index.html
++++ b/index.html
+@@ -12154 +12154 @@
+-item(edit,'Connection template…',{run:()=>openPanel('builderSecondaryTools','builderTemplateBar')});
++item(edit,'Connection template…',{run:()=>openBuilderDrawer('templates')});
+@@ -12176 +12176 @@
+-item(arrange,'Layout profiles…',{run:()=>openPanel('builderSecondaryTools','builderProfileBar')});
++item(arrange,'Layout profiles…',{run:()=>openBuilderDrawer('layouts')});
+@@ -12185 +12185 @@
+-item(validate,'Route validation…',{run:()=>openPanel('builderSecondaryTools','builderRoutePanel'),note:()=>{const t=after(q('#builderRoutePanel>summary'),'·');return (t.match(/^\d+ errors? · \d+ review items?/)||[t])[0]}});
++item(validate,'Route validation…',{run:()=>openBuilderDrawer('routes'),note:()=>{const t=after(q('#builderRoutePanel>summary'),'·');return (t.match(/^\d+ errors? · \d+ review items?/)||[t])[0]}});
+@@ -12190 +12190 @@
+-item(analyze,'Configuration draft…',{run:()=>openPanel('builderSecondaryTools','builderConfigDraft'),note:()=>{const t=after(q('#builderConfigDraft>summary'),'·');return /select an object/i.test(t)?'Select a component first':t}});
++item(analyze,'Configuration draft…',{run:()=>openBuilderDrawer('draft'),note:()=>{const t=after(q('#builderConfigDraft>summary'),'·');return /select an object/i.test(t)?'Select a component first':t}});
