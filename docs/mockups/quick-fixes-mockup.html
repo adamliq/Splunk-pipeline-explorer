@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Builder Quick Fixes</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 209 TARGET · BUILD 208 + PROTOTYPE</span>
+ <h1>Quick fixes: the Splunk-to-Splunk port, Esc, syslog behind a load balancer, the drawer’s title</h1>
+ <p class="lede">Four items from the Build 208 recheck’s list, numbered as there. New Splunk-to-Splunk links get port 9997. Esc closes what’s open and keeps the selection. An Indexer behind a load balancer can’t become Splunk Cloud indexing, and a syslog pool says why. The drawer is titled “Topology tools”. Every target scene is the real explorer with the prototype applied to Build 208; the “Today” scenes are Build 208 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>What Build 208 does</h2>
+  <table>
+   <thead><tr><th>Fault</th><th>What you see</th><th>Cause</th><th>Fix</th></tr></thead>
+   <tbody>
+    <tr><td>1. New Splunk-to-Splunk links get port 0</td><td>Port 0 on every new forwarder or indexer link. The configuration draft asks to confirm it, and the SV views list it as not set</td><td>The port is read from the link’s label, and “Splunk-to-Splunk” has no number in it</td><td>“Splunk-to-Splunk” gives 9997 (edit 1)</td></tr>
+    <tr><td>15. Esc with a menu open also clears the selection</td><td>The drawer, a menu, the Containers panel or, below 1,280 px, Components closes, and the selection goes with it. On a phone, More stays open</td><td>Build 167 clears the selection on every Esc, and the handlers that close a menu or panel let the key go on</td><td>When Esc closes something, the selection stays. On a phone, Esc closes More and Planes</td></tr>
+    <tr><td>16. Syslog Source → load balancer → Splunk Cloud indexing</td><td>An Indexer behind a syslog load balancer converts to Splunk Cloud. The errors say to link straight to Splunk Cloud, which syslog can’t</td><td>Conversion isn’t checked, and the load balancer gives the same reason for every pool</td><td>Converting a pooled Indexer is refused, and a syslog pool gives the syslog reason (edit 2)</td></tr>
+    <tr><td>19. The drawer’s title</td><td>“Inspect topology”, above History, Templates and Layouts</td><td>The title Build 86 gave the drawer; Build 208 moved the tools in and kept it</td><td>“Topology tools”</td></tr>
+    <tr><td>Found while testing: the Splunk Cloud buttons</td><td>Blank bars in the Inspector</td><td>Build 148 styled only their margin, so they took light text on the browser’s grey</td><td>The Builder’s dark button style</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The design in short</h2>
+  <dl>
+   <dt>Port</dt><dd>A link labelled Splunk-to-Splunk gets port 9997. A port stored in a file, 0 included, stays as stored.</dd>
+   <dt>Esc</dt><dd>Closes the menu, panel, popover, overlay or drawer that’s open, and keeps the selection. With nothing open, it clears the selection, as before.</dd>
+   <dt>Phones</dt><dd>Esc closes More and Planes, and keeps the selection.</dd>
+   <dt>Below 1,280 px</dt><dd>Components open over the canvas counts as open, so Esc closes it and keeps the selection. With the Inspector open over the canvas, Esc still clears the selection, which closes it.</dd>
+   <dt>Splunk Cloud</dt><dd>An Indexer in a load balancer’s pool can’t be converted to Splunk Cloud indexing. The status says why.</dd>
+   <dt>Syslog</dt><dd>A load balancer that passes syslog refuses Splunk Cloud with the syslog reason: when linking, in validation and for files.</dd>
+   <dt>Title</dt><dd>The drawer is “Topology tools”.</dd>
+   <dt>Unchanged</dt><dd>Every other port, the HEC load balancer’s reason, an Indexer fed straight by a Syslog Source (Build 148 flags it), and everything the drawer and menus do.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-quick-fixes.md</code> · Prototype: <code>docs/mockups/quick-fixes-prototype.css</code> and <code>quick-fixes-prototype.js</code>, appended to Build 208, and the two edits in <code>docs/mockups/quick-fixes.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "qf-port", "img": "compare/quick-fixes-port.png", "group": "target", "tab": "1 · Port", "title": "The built-in topology’s Universal Forwarder 1 → Indexer 1, selected", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Labelled Splunk-to-Splunk", "text": "Like every link from a forwarder or an indexer to a forwarder, an indexer or an Ingest Processor.", "x": 85.94, "y": 29.85, "box": [76.25, 22.11, 21.53, 13.11]}, {"n": 2, "head": "Port 9997", "text": "Read from the label, as HEC’s 8088 is. The configuration draft no longer asks to confirm it, and SV-1, SV-3, SV-6 and SV-10c count it as declared.", "x": 85.22, "y": 65.94, "box": [76.25, 64.33, 10.56, 3.22]}, {"n": 3, "head": "New links too", "text": "Linking a Universal Forwarder to an Indexer, a Heavy Forwarder to an Indexer or a Universal Forwarder to a Heavy Forwarder gives the same.", "x": 59.44, "y": 56.16, "box": [56.94, 58.11, 5.0, 0.89]}]}, {"id": "qf-esc", "img": "compare/quick-fixes-esc.png", "group": "target", "tab": "15 · Esc", "title": "Universal Forwarder 1 clicked, Validate › Review, then Esc", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "The drawer closes", "text": "The focus goes back to Validate, which opened it.", "x": 23.09, "y": 10.73, "box": [20.9, 6.22, 4.38, 3.11]}, {"n": 2, "head": "Still selected", "text": "Esc closed the drawer, so the selection stays. The next Esc clears it.", "x": 29.98, "y": 52.78, "box": [30.9, 44.11, 13.19, 24.78]}, {"n": 3, "head": "The Inspector stays on it", "text": "The same with a menu, a side panel such as Containers, a popover or an overlay open.", "x": 96.06, "y": 25.94, "box": [76.25, 24.67, 21.53, 2.56]}]}, {"id": "qf-phone", "img": "compare/quick-fixes-phone.png", "group": "target", "tab": "15 · Phone", "title": "A phone: Universal Forwarder 1 selected, More opened, then Esc", "w": 390, "h": 844, "zoom": 1, "size": "390 × 844", "crop": "viewport", "items": [{"n": 1, "head": "More closes", "text": "Esc closes More, and Planes. Build 208 left them open.", "x": 84.31, "y": 6.81, "box": [81.79, 1.42, 12.56, 4.15]}, {"n": 2, "head": "Still selected", "text": "Universal Forwarder 1 keeps its selection. The next Esc clears it.", "x": 68.12, "y": 55.27, "box": [35.38, 48.58, 29.23, 13.39]}]}, {"id": "qf-convert", "img": "compare/quick-fixes-convert.png", "group": "target", "tab": "16 · Convert", "title": "Syslog Source → Load Balancer → Indexer: Convert to Splunk Cloud indexing", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "A button you can read", "text": "Build 148’s Splunk Cloud buttons were light text on light grey: blank bars.", "x": 95.1, "y": 41.5, "box": [77.71, 39.78, 16.25, 3.44]}, {"n": 2, "head": "Refused, with the reason", "text": "Indexer 1 is in Load Balancer 1’s pool, and the pool passes syslog, which Splunk Cloud doesn’t take.", "x": 33.82, "y": 87.67, "box": [34.86, 84.11, 26.11, 7.11]}, {"n": 3, "head": "Still an Indexer", "text": "Nothing changes. Taken out of the pool, it converts as before.", "x": 70.62, "y": 50.6, "box": [58.96, 46.67, 10.42, 19.67]}, {"n": 4, "head": "0 errors", "text": "The topology stays as valid as it was.", "x": 84.43, "y": 12.17, "box": [85.69, 10.56, 12.64, 3.22]}]}, {"id": "qf-file", "img": "compare/quick-fixes-file.png", "group": "target", "tab": "16 · File", "title": "A file holding Syslog Source → Load Balancer → Splunk Cloud, opened", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "The syslog reason", "text": "The link from the load balancer is dropped, as on Build 208, and the notice now says why in syslog terms.", "x": 33.82, "y": 86.78, "box": [34.86, 82.33, 26.11, 8.89]}, {"n": 2, "head": "No pool", "text": "Load Balancer 1 keeps its client, Syslog Source 1.", "x": 63.97, "y": 42.21, "box": [50.9, 32.11, 11.88, 22.44]}, {"n": 3, "head": "Unlinked", "text": "Splunk Cloud stays in the topology, with nothing sending to it.", "x": 29.72, "y": 65.29, "box": [30.9, 58.56, 11.88, 22.44]}]}, {"id": "qf-title", "img": "compare/quick-fixes-title.png", "group": "target", "tab": "19 · Title", "title": "Validate › Review: the drawer", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Topology tools", "text": "A title for checks, analyses and editing aids. Screen readers hear “Topology tools”, and “Close topology tools” for its Close button.", "x": 42.64, "y": 18.33, "box": [33.26, 17.22, 7.5, 2.22]}, {"n": 2, "head": "More than inspection", "text": "History, Templates and Layouts: since Build 208 the drawer holds the tools too.", "x": 49.9, "y": 31.02, "box": [40.0, 25.33, 19.79, 3.56]}]}, {"id": "qf-port-today", "img": "compare/quick-fixes-port-today.png", "group": "today", "tab": "Today: port", "title": "Build 208: the built-in topology’s Universal Forwarder 1 → Indexer 1", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Port 0", "text": "The label has no number, so no port is read from it. The configuration draft asks to confirm it, the SV views list it as not set, and rule PR-ENT-02 is advisory.", "x": 85.22, "y": 65.94, "box": [76.25, 64.33, 10.56, 3.22]}, {"n": 2, "head": "Splunk-to-Splunk", "text": "The protocol is known; only the port isn’t.", "x": 85.94, "y": 29.85, "box": [76.25, 22.11, 21.53, 13.11]}]}, {"id": "qf-esc-today", "img": "compare/quick-fixes-esc-today.png", "group": "today", "tab": "Today: Esc", "title": "Build 208: Universal Forwarder 1 clicked, Validate › Review, then Esc", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Deselected", "text": "The same Esc closed the drawer and cleared the selection.", "x": 29.98, "y": 52.78, "box": [30.9, 44.11, 13.19, 24.78]}, {"n": 2, "head": "Back to the topology", "text": "As after a click on the empty canvas.", "x": 96.06, "y": 26.56, "box": [76.25, 22.11, 21.53, 8.89]}, {"n": 3, "head": "Not only the drawer", "text": "Also a menu, when the focus isn’t in it, and the Containers panel.", "x": 23.09, "y": 10.73, "box": [20.9, 6.22, 4.38, 3.11]}]}, {"id": "qf-phone-today", "img": "compare/quick-fixes-phone-today.png", "group": "today", "tab": "Today: phone", "title": "Build 208: a phone, Universal Forwarder 1 selected, More opened, then Esc", "w": 390, "h": 844, "zoom": 1, "size": "390 × 844", "crop": "viewport", "items": [{"n": 1, "head": "More stays open", "text": "Nothing closes it on Esc.", "x": 87.9, "y": 8.44, "box": [13.59, 6.16, 80.77, 65.05]}, {"n": 2, "head": "Deselected underneath", "text": "Esc cleared the selection instead.", "x": 68.12, "y": 80.04, "box": [35.38, 73.34, 29.23, 13.39]}]}, {"id": "qf-convert-today", "img": "compare/quick-fixes-convert-today.png", "group": "today", "tab": "Today: convert", "title": "Build 208: the same conversion, then Validate › Route validation…", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Converted", "text": "Indexer 1 became Splunk Cloud indexing, behind a load balancer that passes syslog.", "x": 96.06, "y": 27.0, "box": [76.25, 24.67, 21.53, 4.67]}, {"n": 2, "head": "The wrong advice", "text": "“Link straight to Splunk Cloud”: a Syslog Source linked straight to Splunk Cloud indexing is refused too.", "x": 72.93, "y": 39.0, "box": [33.12, 36.11, 40.21, 5.78]}, {"n": 3, "head": "Nothing about syslog", "text": "The second error is about TLS. Build 148’s syslog notice, with “Insert Syslog Server between them”, looks only at a link from a Syslog Source itself.", "x": 72.93, "y": 51.89, "box": [33.12, 49.0, 40.21, 5.78]}, {"n": 4, "head": "2 errors", "text": "Route validation lists them as three entries.", "x": 84.43, "y": 12.17, "box": [85.69, 10.56, 12.64, 3.22]}]}, {"id": "qf-file-today", "img": "compare/quick-fixes-file-today.png", "group": "today", "tab": "Today: file", "title": "Build 208: the same file, opened", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "The same wrong advice", "text": "The link is dropped, saying to link straight to Splunk Cloud.", "x": 33.82, "y": 87.67, "box": [34.86, 84.11, 26.11, 7.11]}, {"n": 2, "head": "Unlinked", "text": "As now.", "x": 29.72, "y": 65.29, "box": [30.9, 58.56, 11.88, 22.44]}]}, {"id": "qf-title-today", "img": "compare/quick-fixes-title-today.png", "group": "today", "tab": "Today: title", "title": "Build 208: Validate › Review", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Inspect topology", "text": "The title the drawer was given when Build 86 made it.", "x": 44.11, "y": 18.33, "box": [33.26, 17.22, 8.68, 2.22]}, {"n": 2, "head": "Not inspection", "text": "History, Templates and Layouts don’t inspect anything.", "x": 49.9, "y": 31.02, "box": [40.0, 25.33, 19.79, 3.56]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size+' viewport';
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 208 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>

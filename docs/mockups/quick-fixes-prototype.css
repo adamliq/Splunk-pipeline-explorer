@@ -1,0 +1,5 @@
+/* quick-fixes-v209: Build 148's buttons in its Splunk Cloud sections (Convert to Splunk Cloud indexing, Convert back to
+   self-managed Indexer, Insert Syslog Server between them) took the section's light text on the browser's light grey
+   button, so they read as blank bars. */
+.builderCloudInspector148 button{border:1px solid #477189;border-radius:6px;background:#123447;color:#d7edf4;padding:6px 10px;font:inherit;font-size:.7rem;font-weight:650;cursor:pointer}
+.builderCloudInspector148 button:hover{border-color:#67c6d8;background:#154455}

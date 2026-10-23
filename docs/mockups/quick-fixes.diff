@@ -1,0 +1,8 @@
+--- a/index.html
++++ b/index.html
+@@ -2308 +2308 @@
+-function inferredRelationshipPort(value=''){const text=String(value).toLowerCase();if(text.includes('9997'))return 9997;if(text.includes('8088')||text.includes('hec'))return 8088;if(text.includes('8089')||text.includes('management'))return 8089;if(text.includes('8000')||text.includes('splunk web'))return 8000;if(text.includes('https')||text.includes('rest')||text.includes('s3'))return 443;return 0}
++function inferredRelationshipPort(value=''){const text=String(value).toLowerCase();if(text.includes('9997')||text.includes('splunk-to-splunk'))return 9997;if(text.includes('8088')||text.includes('hec'))return 8088;if(text.includes('8089')||text.includes('management'))return 8089;if(text.includes('8000')||text.includes('splunk web'))return 8000;if(text.includes('https')||text.includes('rest')||text.includes('s3'))return 443;return 0}
+@@ -9868 +9868 @@
+- if(member&&managed(other))return{valid:false,reason:`Splunk Cloud already balances its own inputs. Link straight to ${name(other)}.`};
++ if(member&&managed(other))return{valid:false,reason:lb.lbServes==='syslog'?`${name(lb)} passes syslog, and syslog can't go directly to Splunk Cloud. Send it through a Syslog Server and forwarder or HEC.`:`Splunk Cloud already balances its own inputs. Link straight to ${name(other)}.`};
