@@ -12151,7 +12151,7 @@ sep(edit);
 item(edit,'Find',{keys:'/',run:()=>{const input=q('#builderSearchInput');input?.focus();input?.select?.()}});
 sep(edit);
 item(edit,'Bulk edit…',{run:()=>openPanel('builderSecondaryTools','builderBulkEdit'),note:()=>after(q('#builderBulkEdit>summary'),'·')});
-item(edit,'Connection template…',{run:()=>openPanel('builderSecondaryTools','builderTemplateBar')});
+item(edit,'Connection template…',{run:()=>openBuilderDrawer('templates')});
 
 const view=menu('View');
 item(view,'Components',{check:compShown,run:toggleComponents});
@@ -12173,7 +12173,7 @@ item(arrange,'Tidy layout',{from:'#builderAutoLayout',note:()=>'Arrange componen
 item(arrange,'Collapse or expand all hosts',{from:'#builderToggleHosts147'});
 sep(arrange);
 item(arrange,'Containers…',{run:()=>openPanel('builderSpaceGroups140')});
-item(arrange,'Layout profiles…',{run:()=>openPanel('builderSecondaryTools','builderProfileBar')});
+item(arrange,'Layout profiles…',{run:()=>openBuilderDrawer('layouts')});
 
 const validate=menu('Validate');
 field(validate,'Validate for','#builderRuleProfileSelect');
@@ -12182,12 +12182,12 @@ item(validate,'Coverage',{from:'#builderCoverageToggle'});
 item(validate,'Review',{from:'#builderUnresolvedToggle',aside:orig=>(text(orig).match(/\d+/)||[''])[0]});
 item(validate,'Rules',{from:'#builderRulesToggle'});
 sep(validate);
-item(validate,'Route validation…',{run:()=>openPanel('builderSecondaryTools','builderRoutePanel'),note:()=>{const t=after(q('#builderRoutePanel>summary'),'·');return (t.match(/^\d+ errors? · \d+ review items?/)||[t])[0]}});
+item(validate,'Route validation…',{run:()=>openBuilderDrawer('routes'),note:()=>{const t=after(q('#builderRoutePanel>summary'),'·');return (t.match(/^\d+ errors? · \d+ review items?/)||[t])[0]}});
 
 const analyze=menu('Analyze');
 for(const [id,label] of [['builderTraceToggle','Trace path'],['builderLoadPath','Load selected path'],['builderInventoryToggle','Inventory'],['builderNetworkToggle','Network'],['builderStatsToggle','Statistics']])item(analyze,label,{from:'#'+id,note:describe(id)});
 sep(analyze);
-item(analyze,'Configuration draft…',{run:()=>openPanel('builderSecondaryTools','builderConfigDraft'),note:()=>{const t=after(q('#builderConfigDraft>summary'),'·');return /select an object/i.test(t)?'Select a component first':t}});
+item(analyze,'Configuration draft…',{run:()=>openBuilderDrawer('draft'),note:()=>{const t=after(q('#builderConfigDraft>summary'),'·');return /select an object/i.test(t)?'Select a component first':t}});
 
 const help=menu('Help');
 item(help,'Canvas controls and shortcuts',{run:()=>q('.builderSpaceHelp140')?.click()});
@@ -14221,6 +14221,103 @@ window.configSourceMatches207=function(path,stanzas,where){
 changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Five fixes','Esc cancels a pending connection in the Builder and keeps the selection. A component added from the palette is the only one selected. A Syslog Source can no longer be linked straight to Splunk Cloud indexing. The Inspector can be used with nothing selected at every width. In the Config view, a monitor finds the props.conf [source::] stanzas whose wildcards match its files.',true]);
 const build=document.querySelector('#topologyBuilder');build.dataset.buildNumber='207';build.dataset.buildDate='2026-10-23';document.title='Splunk Pipeline Explorer · Build 207 · 23 Oct 2026';
 builderInfoText159.textContent=builderInfoText159.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 207 · 23 Oct 2026');
+})();
+</script>
+<style id="move-tools-v208-styles">
+/* move-tools-v208: route validation, the configuration draft, the connection template and the layout profiles leave the
+   Tools panel for tabs of their own in the Builder's drawer. The Tools panel goes from 761 px up; on phones, More keeps
+   its Tools disclosure, with a button for each tab. */
+@media(min-width:761px){#builderSecondaryTools{display:none!important}}
+#builderSecondaryTools>summary em{display:none}
+.mtLaunch208{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.mtLaunch208 button{min-height:36px;border:1px solid #3a5a6c;border-radius:7px;background:#0c2230;color:#d4e7ef;padding:7px 9px;text-align:left;font-size:.66rem;font-weight:650;cursor:pointer}
+
+/* Ten tabs: as many columns as fit, so two rows in a 600 px drawer and three or four on a phone. */
+#builderInspectorDrawer .builderDrawerTabs{grid-template-columns:repeat(auto-fill,minmax(86px,1fr))}
+@media(max-width:760px){#builderInspectorDrawer .builderDrawerTabs{grid-template-columns:repeat(auto-fill,minmax(72px,1fr))}}
+
+/* A tool shows on its own tab only, and fills the drawer's width. */
+#builderInspectorDrawer .mtPanel208[hidden]{display:none!important}
+#builderInspectorDrawer .mtPanel208{margin:0;padding:0;border:0;border-radius:0;background:none;min-width:0;max-width:100%}
+#builderInspectorDrawer .mtPanel208>summary,#builderInspectorDrawer .mtPanel208>strong{display:block;margin:0 0 8px;padding:0;list-style:none;pointer-events:none;color:#dceaf0;font-size:.76rem;font-weight:700;letter-spacing:0;text-transform:none}
+#builderInspectorDrawer .mtPanel208>summary::-webkit-details-marker{display:none}
+#builderInspectorDrawer .mtPanel208>summary span{display:block;margin:3px 0 0;font-size:.64rem;font-weight:400}
+
+/* Route validation: the drawer scrolls, so the list needs no box of its own. */
+#builderInspectorDrawer .builderRouteList{max-height:none;margin-top:0}
+
+/* The configuration draft, headed with what it is for. */
+#builderInspectorDrawer .builderConfigDraft.mtPanel208>summary span{display:inline;margin:0 0 0 4px;color:#91afbf}
+#builderInspectorDrawer .builderConfigInner{border-top:0;padding:0}
+
+/* The connection template: the template, then source → target, then the button, the defaults and the fields. */
+#builderInspectorDrawer .builderTemplateBar{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center}
+#builderInspectorDrawer .builderTemplateBar>strong,#builderInspectorDrawer #builderTemplateSelect,#builderInspectorDrawer .builderTemplateMeta,#builderInspectorDrawer .builderTemplateEditor{grid-column:1/-1}
+#builderInspectorDrawer .builderTemplateArrow{display:block}
+#builderInspectorDrawer .builderTemplateApply{grid-column:1/-1;justify-self:start}
+#builderInspectorDrawer .builderTemplateEditor{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));margin-top:2px}
+#builderInspectorDrawer .builderTemplateEditor label.wide,#builderInspectorDrawer .builderTemplateEditor .builderTemplateHelp{grid-column:1/-1}
+
+/* The layout profiles: the profile and its purpose, then every action, whatever the window's width. */
+#builderInspectorDrawer .builderProfileBar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+#builderInspectorDrawer .builderProfileBar>strong,#builderInspectorDrawer .builderProfileMeta,#builderInspectorDrawer .builderProfileHelp{flex:1 0 100%}
+#builderInspectorDrawer .builderProfileSelect,#builderInspectorDrawer .builderProfileKind{flex:1 1 260px;min-width:0}
+#builderInspectorDrawer .builderProfileBar .builderBtn,#builderInspectorDrawer .builderProfileBar .profileSecondary{display:inline-block;width:auto}
+#builderInspectorDrawer .builderProfileMeta{display:flex;flex-wrap:wrap;justify-self:auto;white-space:normal}
+</style>
+<script id="move-tools-v208">
+(function(){
+/* Build 208: the rest of Tools moves out. Route validation, the configuration draft, the connection template and the
+   layout profiles become tabs in the Builder's drawer, beside Coverage, Review, Rules, Inventory, Trace and History,
+   which the menus already open there. Each tool lays itself out to the drawer's width, so nothing scrolls sideways:
+   in the Tools panel the four were 853 px wide in a 600 px panel. The menus open each tool's tab (four in-place edits),
+   and the Tools panel goes. Phones keep More's Tools disclosure, with a button for each tab. */
+const drawer=document.getElementById('builderInspectorDrawer');
+if(!drawer||typeof drawerKinds==='undefined'||typeof openBuilderDrawer!=='function'||typeof setDrawerFlags!=='function')return;
+const body=drawer.querySelector('.builderDrawerBody'),strip=drawer.querySelector('.builderDrawerTabs');
+// kind, tab label, the tool's element, its name, and the tab it follows.
+const TOOLS=[['routes','Routes','builderRoutePanel','Route validation','rules'],
+ ['draft','Config draft','builderConfigDraft','Configuration draft','trace'],
+ ['templates','Templates','builderTemplateBar','Connection template','history'],
+ ['layouts','Layouts','builderProfileBar','Layout profiles','templates']];
+for(const [kind,label,id,,after] of TOOLS){
+ const tool=document.getElementById(id);if(!tool)continue;
+ // renderSecondaryTools puts every listed tool back in the Tools panel on each redraw.
+ if(typeof secondaryToolIds!=='undefined'){const i=secondaryToolIds.indexOf(id);if(i>=0)secondaryToolIds.splice(i,1)}
+ tool.classList.add('mtPanel208');tool.hidden=true;body.append(tool);
+ if(tool.tagName==='DETAILS')tool.open=true; // route validation keeps its open state through redraws
+ drawerKinds.push([kind,label,id,null]);
+ const tab=document.createElement('button');tab.type='button';tab.dataset.drawerKind=kind;tab.textContent=label;tab.onclick=()=>openBuilderDrawer(kind,false);
+ const prev=strip.querySelector(`[data-drawer-kind="${after}"]`);if(prev)prev.after(tab);else strip.append(tab);
+}
+// Show only the open tab's tool.
+const flagsBefore=setDrawerFlags;
+setDrawerFlags=function(kind){flagsBefore(kind);for(const [k,,id] of TOOLS){const tool=document.getElementById(id);if(tool)tool.hidden=k!==kind}};
+// A fault this also fixes: a card click selects through selectBuilderObjectFast, which opens the Inspector without
+// recording the selection where Build 95's renderBuilder looks for changes. The drawer's own redraw then took the
+// selection for a new one, opened the Inspector again, and that closed the drawer: the first tab opened after a card
+// click closed at once. Opening the drawer now records the selection first. A selection made while the drawer is open
+// still closes it and shows the Inspector, as before.
+if(typeof lastDrawerSelection!=='undefined'){const openBefore=openBuilderDrawer;
+ openBuilderDrawer=function(...args){lastDrawerSelection=`${state.builderSelected}|${state.builderSelectedEdge?.plane||''}|${state.builderSelectedEdge?.id||''}`;return openBefore.apply(this,args)}}
+
+// Phones: More's Tools disclosure lists the four tabs.
+const tools=document.getElementById('builderSecondaryTools'),toolsBody=document.getElementById('builderSecondaryToolsBody');
+if(tools&&toolsBody){
+ const line=tools.querySelector(':scope>summary span');if(line)line.textContent='Route validation · configuration draft · templates · layouts';
+ const launch=document.createElement('div');launch.className='mtLaunch208';
+ launch.innerHTML=TOOLS.map(([kind,,,name])=>`<button type="button" data-mt-kind="${kind}">${name}</button>`).join('');
+ launch.addEventListener('click',event=>{const button=event.target.closest('[data-mt-kind]');if(!button)return;const more=button.closest('.builderMobileMore');if(more)more.open=false;openBuilderDrawer(button.dataset.mtKind)});
+ toolsBody.append(launch);
+}
+if(typeof renderBuilder==='function'&&state.view==='builder')renderBuilder();
+})();
+</script>
+<script id="move-tools-records-v208">
+(function(){
+changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Tools in the drawer','Route validation, the configuration draft, the connection template and the layout profiles are tabs in the Builder’s drawer, beside Review, Rules, Inventory, Trace and History, and the menus open them there. Each fits the drawer at every width, so nothing scrolls sideways, and the Tools panel is gone; on phones, More › Tools opens the four tabs. The drawer no longer closes at once when it is opened right after a card click.',true]);
+const build=document.querySelector('#topologyBuilder');build.dataset.buildNumber='208';build.dataset.buildDate='2026-10-23';document.title='Splunk Pipeline Explorer · Build 208 · 23 Oct 2026';
+builderInfoText159.textContent=builderInfoText159.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 208 · 23 Oct 2026');
 })();
 </script>
 </body>
