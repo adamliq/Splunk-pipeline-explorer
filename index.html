@@ -2305,7 +2305,7 @@ const relationshipAckValues=['Indexer acknowledgement','HEC acknowledgement','Ap
 const relationshipDirectionValues=['Unidirectional','Bidirectional','Request-response'];
 const relationshipCriticalityValues=['Critical','High','Medium','Low'];
 const relationshipValidationValues=['Validated','Review','Failed','Unknown'];
-function inferredRelationshipPort(value=''){const text=String(value).toLowerCase();if(text.includes('9997'))return 9997;if(text.includes('8088')||text.includes('hec'))return 8088;if(text.includes('8089')||text.includes('management'))return 8089;if(text.includes('8000')||text.includes('splunk web'))return 8000;if(text.includes('https')||text.includes('rest')||text.includes('s3'))return 443;return 0}
+function inferredRelationshipPort(value=''){const text=String(value).toLowerCase();if(text.includes('9997')||text.includes('splunk-to-splunk'))return 9997;if(text.includes('8088')||text.includes('hec'))return 8088;if(text.includes('8089')||text.includes('management'))return 8089;if(text.includes('8000')||text.includes('splunk web'))return 8000;if(text.includes('https')||text.includes('rest')||text.includes('s3'))return 443;return 0}
 function defaultRelationshipDetails(edge){const plane=edge.plane,protocol=edge.label||'Configured relationship',port=inferredRelationshipPort(protocol),target=edge.target,relation=edge.relation||{};return{protocol,endpoint:plane==='management'?(relation.targetUri||componentInstanceLabel(target)):plane==='authentication'?(relation.endpoint||componentInstanceLabel(target)):componentInstanceLabel(target),port:plane==='management'?(Number(relation.port)||8089):port,tls:/udp|file handoff/i.test(protocol)?'Not applicable':'Required',acknowledgement:plane==='data'?(target.ack?'Indexer acknowledgement':'None'):plane==='management'?'Application response':'Session established',direction:plane==='data'?'Unidirectional':'Request-response',owner:typeof responsibilityOwner==='function'?responsibilityOwner(target):'Unassigned',availabilitySlo:99.9,latencySloSeconds:plane==='data'?60:30,retryPolicy:plane==='data'?(target.persistent?'Durable queue and retry':'Sender retry policy'):'Client retry with backoff',criticality:'High',validation:'Review',dependency:plane==='management'?'Configuration currency':plane==='authentication'?'Administrative access':'Downstream collection and detection',notes:''}}
 function sanitizeRelationshipDetails(value,defaults){const source=value&&typeof value==='object'?value:{},text=(key,max)=>typeof source[key]==='string'?source[key].trim().slice(0,max):defaults[key],number=(key,min,max)=>Number.isFinite(Number(source[key]))?Math.max(min,Math.min(max,Number(source[key]))):defaults[key];return{protocol:text('protocol',120)||defaults.protocol,endpoint:text('endpoint',200)||defaults.endpoint,port:number('port',0,65535),tls:relationshipTlsValues.includes(source.tls)?source.tls:defaults.tls,acknowledgement:relationshipAckValues.includes(source.acknowledgement)?source.acknowledgement:defaults.acknowledgement,direction:relationshipDirectionValues.includes(source.direction)?source.direction:defaults.direction,owner:text('owner',120)||defaults.owner,availabilitySlo:number('availabilitySlo',0,100),latencySloSeconds:number('latencySloSeconds',0,86400),retryPolicy:text('retryPolicy',160)||defaults.retryPolicy,criticality:relationshipCriticalityValues.includes(source.criticality)?source.criticality:defaults.criticality,validation:relationshipValidationValues.includes(source.validation)?source.validation:defaults.validation,dependency:text('dependency',180)||defaults.dependency,notes:text('notes',400)}}
 function relationshipDetailsStore(edge){return edge.plane==='data'?edge.target:edge.relation}
@@ -9865,7 +9865,7 @@ function check(a,b,plane='data',value){const lb=is(a)?a:b,other=is(a)?b:a;if(is(
  const s=value||((!builderLbMembers(lb).length&&!builderLbClients(lb).length)?(plane==='management'?'deployment':infer(other)||lb.lbServes):lb.lbServes)||'syslog',label=name(lb),kind=serves[s],member=plane==='management'?other.type==='ds':is(a);
  if(plane==='data'&&['uf','hf'].includes(a.type))return{valid:false,reason:`Forwarders balance across receivers themselves (autoLB). Link ${name(a)} straight to the indexers, or use indexer discovery.`};
  if((plane==='management')!==(s==='deployment'))return{valid:false,reason:`${label} serves ${kind}: draw its links on the ${s==='deployment'?'Fleet management':'Event data'} plane.`};
- if(member&&managed(other))return{valid:false,reason:`Splunk Cloud already balances its own inputs. Link straight to ${name(other)}.`};
+ if(member&&managed(other))return{valid:false,reason:lb.lbServes==='syslog'?`${name(lb)} passes syslog, and syslog can't go directly to Splunk Cloud. Send it through a Syslog Server and forwarder or HEC.`:`Splunk Cloud already balances its own inputs. Link straight to ${name(other)}.`};
  if(!(member?members[s]:clients[s]).includes(other.type))return{valid:false,reason:`${label} serves ${kind}, so it can't take ${name(other)}.`};
  const pool=builderLbMembers(lb).filter(n=>n.id!==other.id);if(member&&pool.some(n=>n.type!==other.type))return{valid:false,reason:`A pool holds one kind of component. ${label} already pools ${builderComponents[pool[0].type]?.name||pool[0].type}s.`};
  if(plane==='data'&&(member?builderLbClients(lb).some(c=>!(builderDataCapabilities[c.type]||[]).includes(other.type)):pool.some(m=>!(builderDataCapabilities[other.type]||[]).includes(m.type))))return{valid:false,reason:`${name(other)} cannot link directly to every member of ${label}.`};
@@ -14318,6 +14318,73 @@ if(typeof renderBuilder==='function'&&state.view==='builder')renderBuilder();
 changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Tools in the drawer','Route validation, the configuration draft, the connection template and the layout profiles are tabs in the Builder’s drawer, beside Review, Rules, Inventory, Trace and History, and the menus open them there. Each fits the drawer at every width, so nothing scrolls sideways, and the Tools panel is gone; on phones, More › Tools opens the four tabs. The drawer no longer closes at once when it is opened right after a card click.',true]);
 const build=document.querySelector('#topologyBuilder');build.dataset.buildNumber='208';build.dataset.buildDate='2026-10-23';document.title='Splunk Pipeline Explorer · Build 208 · 23 Oct 2026';
 builderInfoText159.textContent=builderInfoText159.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 208 · 23 Oct 2026');
+})();
+</script>
+<style id="quick-fixes-v209-styles">
+/* quick-fixes-v209: Build 148's buttons in its Splunk Cloud sections (Convert to Splunk Cloud indexing, Convert back to
+   self-managed Indexer, Insert Syslog Server between them) took the section's light text on the browser's light grey
+   button, so they read as blank bars. */
+.builderCloudInspector148 button{border:1px solid #477189;border-radius:6px;background:#123447;color:#d7edf4;padding:6px 10px;font:inherit;font-size:.7rem;font-weight:650;cursor:pointer}
+.builderCloudInspector148 button:hover{border-color:#67c6d8;background:#154455}
+</style>
+<script id="quick-fixes-v209">
+(function(){
+/* Build 209: quick fixes. Esc closes the menu, panel, popover or drawer that's open and keeps the selection. An
+   indexer behind a load balancer can't be converted to Splunk Cloud. The drawer is titled "Topology tools". Two
+   in-place edits go with this block: new Splunk-to-Splunk links get port 9997 (inferredRelationshipPort), and a load
+   balancer that passes syslog refuses Splunk Cloud with the syslog reason (its check). */
+
+// Esc: Build 167 clears the selection on every Esc, after whatever was open has closed on the same key. A capture
+// listener notes whether a menu, panel, popover or the drawer was open when Esc went down, and then the selection
+// stays. With nothing open, Esc clears the selection as before. Below 1,280 px Components opens over the canvas and
+// counts too; the Inspector there doesn't: Esc still clears the selection, which closes it.
+const shown=el=>!!el&&!el.hidden&&el.getClientRects().length>0;
+const componentsOver=()=>typeof canvasPanelState!=='undefined'&&!!canvasPanelState.palette&&!document.getElementById('topologyBuilder')?.classList.contains('builderDocked197');
+// Menus and panels are <details>. Build 198 closes an open side panel in a window capture listener that runs before
+// this one, so their open state is read from toggle events, which arrive after the key's handlers: a panel closed by
+// this Esc still counts, as shown or not when it opened.
+const openDetails=new Map(),note=d=>{if(d.open)openDetails.set(d,shown(d));else openDetails.delete(d)};
+document.querySelectorAll('details[open]').forEach(note);
+document.addEventListener('toggle',e=>{if(e.target instanceof HTMLDetailsElement)note(e.target)},true);
+const detailLayers='.builderMenu,.builderDensityPanels details,#builderSpaceGroups140,.builderMobileMore,.builderMobilePlanes';
+const otherLayers='#builderObjectMenu,#builderIssuePopover,.builderHistoryPopover163,.builderReport163,#builderHeaderInfoPopover,#builderImpactOverlay.open';
+const layerOpen=()=>(typeof activeDrawerKind!=='undefined'&&!!activeDrawerKind)||!!state.builderPresentation?.open||componentsOver()
+ ||[...openDetails].some(([d,was])=>d.isConnected&&d.matches(detailLayers)&&(d.open?shown(d):was))
+ ||[...document.querySelectorAll(otherLayers)].some(shown);
+let escClosesLayer=false;
+addEventListener('keydown',e=>{if(e.key!=='Escape'||state.view!=='builder')return;escClosesLayer=layerOpen();if(escClosesLayer)setTimeout(()=>{escClosesLayer=false})},true);
+if(typeof clearSelection167==='function'){const clearBefore=clearSelection167;
+ clearSelection167=function(...args){if(escClosesLayer)return;return clearBefore.apply(this,args)}}
+// Phones: Esc closes More and the planes menu too.
+document.addEventListener('keydown',e=>{if(e.key!=='Escape'||state.view!=='builder')return;const open=[...document.querySelectorAll('.builderMobileMore[open],.builderMobilePlanes[open]')];
+ if(!open.length)return;for(const d of open)d.open=false;e.preventDefault()});
+
+// Syslog behind a load balancer. Linking and files already refuse Splunk Cloud as a load balancer's member, and for a
+// syslog pool they now give the syslog reason (an in-place edit to the load balancer's check). Converting an indexer
+// to Splunk Cloud was the one way left to put it behind one, and it wasn't flagged as syslog. While the indexer is a
+// load balancer's member, conversion is refused, and says why.
+const isCloud=n=>!!n&&typeof builderIsCloudIndexer148==='function'&&builderIsCloudIndexer148(n);
+const name=n=>typeof componentInstanceLabel==='function'?componentInstanceLabel(n):n.instanceName||n.type;
+const poolOf=node=>state.builderNodes.find(n=>n.type==='loadBalancer'&&typeof builderLbMembers==='function'&&builderLbMembers(n).some(m=>m.id===node.id));
+if(typeof builderCloudConvert148==='function'){const convertBefore=builderCloudConvert148;
+ builderCloudConvert148=function(node,...rest){const lb=node?.type==='idx'&&!isCloud(node)?poolOf(node):null;
+  if(!lb)return convertBefore.call(this,node,...rest);
+  builderStatus(lb.lbServes==='syslog'?`${name(node)} is behind ${name(lb)}, which passes syslog. Syslog can't go directly to Splunk Cloud: send it through a Syslog Server and forwarder or HEC.`
+   :`${name(node)} is behind ${name(lb)}, and Splunk Cloud balances its own inputs. Take ${name(node)} out of ${name(lb)}'s pool first.`,'error')}}
+
+// The drawer holds checks, analyses and editing aids, so it's titled for all of them.
+const drawer=document.getElementById('builderInspectorDrawer');
+if(drawer){const title=drawer.querySelector('.builderDrawerTop strong');if(title)title.textContent='Topology tools';
+ drawer.setAttribute('aria-label','Topology tools');drawer.querySelector('#builderDrawerClose')?.setAttribute('aria-label','Close topology tools')}
+})();
+</script>
+<script id="quick-fixes-records-v209">
+(function(){
+const group=changeRegister.find(g=>g.group==='Explorer foundations');
+if(group)group.items.push(['Quick fixes','New Splunk-to-Splunk links get port 9997. In the Builder, Esc closes the menu, panel or drawer that is open and keeps the selection, and on phones it closes More. An Indexer behind a load balancer can no longer be converted to Splunk Cloud indexing, and a load balancer that passes syslog refuses Splunk Cloud with the syslog reason. The drawer is titled Topology tools, and the Splunk Cloud buttons in the Inspector can be read.',true]);
+const root=document.getElementById('topologyBuilder');if(root){root.dataset.buildNumber='209';root.dataset.buildDate='2026-10-23'}
+document.title='Splunk Pipeline Explorer · Build 209 · 23 Oct 2026';
+const info=document.getElementById('builderInfoText159');if(info)info.textContent=info.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 209 · 23 Oct 2026');
 })();
 </script>
 </body>
