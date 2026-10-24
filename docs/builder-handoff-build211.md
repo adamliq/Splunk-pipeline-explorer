@@ -73,7 +73,7 @@ Numbered as in the list of fixes made after Build 205. Items 1 to 9 and 11 to 14
 
 ### Found since, not done
 
-Items 15, 16 and 19 are done, in Build 209, and 18, 25 and 26 in Build 211. Items 28 to 33 are new, from the toolbar, lanes and labels handoff's "Found while testing". Build 211 runs the code they were found on, and item 28 was tried again on it.
+Items 15, 16 and 19 are done, in Build 209, and 18, 25 and 26 in Build 211. Items 28 to 33 are new, from the toolbar, lanes and labels handoff's "Found while testing". Build 211 runs the code they were found on, and item 28 was tried again on it. Item 34 was found after the recheck, checking how a link is selected.
 
 | # | Fault | Found by |
 |---|---|---|
@@ -90,6 +90,7 @@ Items 15, 16 and 19 are done, in Build 209, and 18, 25 and 26 in Build 211. Item
 | 31 | Build 151 raises canvas text under 11.5 px to 11.5 px after the redraw (`polishBuilderText`, line 8057), so anything measured during a redraw sees text at its first size. Build 211 draws a container's name at its final size from the start; other text may have the same issue | The toolbar, lanes and labels |
 | 32 | On a phone, Group by: Region or Environment lanes overlap. The phone's one column keeps cards in tier order, not by region, so a region's lane runs round other regions' cards, and four region titles sit under a card | The toolbar, lanes and labels |
 | 33 | On a touch screen, in the vertical layout, a card's handle rows, which always show, reach over the card below, up to 109 px, and over the title of the Tier lane below: four of the six on a phone. Type headers and the room for labels allow for the rows; Tier titles don't | The toolbar, lanes and labels |
+| 34 | With a mouse, clicking a link's label, or the issue badge on it, does nothing: the link isn't selected, the Inspector doesn't show it, and the badge's findings don't open. Clicking the line itself works, and so does tapping a label on a phone. On Build 211 at 1,440 px, 0 of 8 label clicks and 0 of 11 badge clicks selected their link (zoomed out, 0 of 11 badges); Build 210 the same. Pressing a label starts a label drag (`builder-relationship-routing-controls`, line 2577), and its release always redraws the canvas, even when the label didn't move, so the label is replaced before the click reaches it. The badge sits inside the label, so a press on it starts the same drag. Tried on Build 211: redrawing only when the label moved, and leaving presses on a badge to the badge, makes 8 of 8 label clicks select their link and 11 of 11 badge clicks open its findings, at 100 % and zoomed out, with dragging a label as before | Checking link selection |
 
 ### Left as they are by design
 
