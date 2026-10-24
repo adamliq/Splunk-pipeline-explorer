@@ -2453,7 +2453,7 @@ state.builderVisiblePlanes=state.builderVisiblePlanes||{data:true,management:tru
 function unifiedBuilderPositions(){const nodes=state.builderNodes,byId=new Map(nodes.map(n=>[n.id,n])),memo=new Map(),depth=n=>{if(memo.has(n.id))return memo.get(n.id);const parent=byId.get(n.parent),value=parent?depth(parent)+1:0;memo.set(n.id,value);return value},levels=new Map();nodes.forEach(n=>{const d=depth(n),list=levels.get(d)||[];list.push(n);levels.set(d,list)});const rank={authUser:0,ds:1,windowsEvent:2,fileSource:3,scriptSource:4,apiSource:5,sqlDatabase:6,syslogSource:7,hecClient:8,dbConnect:15,apiCollector:16,syslog:17,uf:20,hf:21,ip:22,idx:23,s3:30,search:31},positions=new Map(),maxRows=Math.max(1,...[...levels.values()].map(v=>v.length)),maxDepth=Math.max(0,...levels.keys());[...levels.entries()].forEach(([d,list])=>list.sort((a,b)=>(rank[a.type]??18)-(rank[b.type]??18)||a.id-b.id).forEach((n,i)=>positions.set(n.id,{x:48+d*270,y:58+i*188+(maxRows-list.length)*94})));return{positions,width:Math.max(620,48+(maxDepth+1)*270+230),height:Math.max(430,58+maxRows*188+80)}}
 function unifiedConnectorPath(a,b){const ax=a.x+190,ay=a.y+71,bx=b.x,by=b.y+71;if(bx>ax){const bend=Math.max(45,(bx-ax)*.46);return`M${ax} ${ay} C${ax+bend} ${ay} ${bx-bend} ${by} ${bx} ${by}`}const sx=a.x+95,sy=a.y+142,tx=b.x+95,ty=b.y,offset=Math.max(55,Math.abs(tx-sx)*.35+40);return`M${sx} ${sy} C${sx+offset} ${sy+55} ${tx-offset} ${ty-55} ${tx} ${ty}`}
 function unifiedNodeMarkup(node,pos){const m=builderComponents[node.type],lane=node.sets===2&&['uf','hf','idx'].includes(node.type),managed=state.builderRelations.filter(r=>r.to===node.id).length,auth=state.builderAuthRelations.filter(r=>r.to===node.id).length,handles=[];if(state.builderVisiblePlanes.data&&!['ds','authUser','authProviderCloud','authProviderOnPrem'].includes(node.type))handles.push(connectionHandle('data',node.id));if(state.builderVisiblePlanes.management&&['ds','uf','hf'].includes(node.type))handles.push(connectionHandle('management',node.id));if(state.builderVisiblePlanes.authentication&&(node.type==='authUser'||isAuthProviderType(node.type)||authManageableTypes.has(node.type)))handles.push(connectionHandle('authentication',node.id));return`<div class="unifiedNodeWrap" style="left:${pos.x}px;top:${pos.y}px" data-unified-node-wrap="${node.id}"><button class="builderNode ${node.id===state.builderSelected?'selected':''}" style="--node:${m.color}" data-builder-node="${node.id}" draggable="true" aria-grabbed="false"><span class="builderNodeEventStatus ${node.eventStatus==='broken'?'broken':node.eventStatus==='degraded'?'degraded':''}"></span><small>${builderEscape(m.type||'Architecture component')}</small><strong>${builderEscape(componentInstanceLabel(node))}</strong><div class="unifiedNodeMeta"><span>${builderEscape(node.environment||'Unspecified')}</span><span>${builderEscape(node.region||'Unspecified')}</span><span>${builderEscape(networkNodeZone(node))}</span></div>${lane?'<span class="builderLanes"><span class="builderLane">P1</span><span class="builderLane">P2</span></span>':m.stages.slice(0,2).map(s=>`<span class="builderStageMini">${builderEscape(s)}</span>`).join('')}${managed?`<span class="builderNodeManagement">${managed} management link${managed===1?'':'s'}</span>`:''}${auth?`<span class="builderNodeAuthentication">${auth} authentication link${auth===1?'':'s'}</span>`:''}<span class="builderBand">${builderEscape(m.type)}${lane?' · 2 sets':''}</span></button><div class="builderConnectionHandles">${handles.join('')}</div></div>`}
-function unifiedGroupMarkup(group,positions){const members=state.builderNodes.filter(n=>n.groupId===group.id&&positions.has(n.id));if(!members.length)return'';const xs=members.map(n=>positions.get(n.id).x),ys=members.map(n=>positions.get(n.id).y),left=Math.min(...xs)-18,top=Math.min(...ys)-28,right=Math.max(...xs)+208,bottom=Math.max(...ys)+176;return`<div class="unifiedGroupBox ${state.builderSelectedGroup===group.id?'selected':''}" data-group-container="${group.id}" style="--group:${group.color};left:${left}px;top:${top}px;width:${right-left}px;height:${bottom-top}px"><button data-unified-group="${group.id}">${builderEscape(group.name)} · ${builderEscape(group.type)}</button></div>`}
+function unifiedGroupMarkup(group,positions){const members=state.builderNodes.filter(n=>n.groupId===group.id&&positions.has(n.id));if(!members.length)return'';const xs=members.map(n=>positions.get(n.id).x),ys=members.map(n=>positions.get(n.id).y),left=Math.min(...xs)-18,top=Math.min(...ys)-28,right=Math.max(...xs)+208,bottom=Math.max(...ys)+242;return`<div class="unifiedGroupBox ${state.builderSelectedGroup===group.id?'selected':''}" data-group-container="${group.id}" style="--group:${group.color};left:${left}px;top:${top}px;width:${right-left}px;height:${bottom-top}px"><button data-unified-group="${group.id}">${builderEscape(group.name)} · ${builderEscape(group.type)}</button></div>`}
 function unifiedEdgeMarkup(item,positions){if(!state.builderVisiblePlanes[item.plane])return'';const from=positions.get(item.from),to=positions.get(item.to);if(!from||!to)return'';const d=unifiedConnectorPath(from,to),meta=connectionPlaneMeta[item.plane],selected=state.builderSelectedEdge?.plane===item.plane&&String(state.builderSelectedEdge.id)===String(item.id),edge=item.edge,details=ensureRelationshipDetails(edge),title=`${componentInstanceLabel(edge.source)} → ${componentInstanceLabel(edge.target)} · ${details.protocol}${details.port?` :${details.port}`:''} · TLS ${details.tls}`;return`<path class="unifiedConnector ${item.plane} ${selected?'selected':''}" d="${d}" data-edge-plane="${item.plane}" data-edge-id="${item.id}" marker-end="url(#unified-${item.plane}-arrow)"><title>${builderEscape(title)}</title></path><path class="unifiedConnectorHit" d="${d}" data-edge-plane="${item.plane}" data-edge-id="${item.id}"><title>${builderEscape(title)}</title></path>`}
 function renderUnifiedPlaneControls(){const bar=document.querySelector('.builderPlaneBar');if(!bar)return;bar.className='builderPlaneBar unifiedPlaneBar';bar.innerHTML=`<div class="unifiedPlaneChecks" aria-label="Visible relationship planes">${[['data','Event data'],['management','Fleet management'],['authentication','Interactive authentication']].map(([key,label])=>`<label class="unifiedPlaneCheck ${key}"><input type="checkbox" data-visible-plane="${key}" ${state.builderVisiblePlanes[key]?'checked':''}><i></i>${label}</label>`).join('')}</div><span class="unifiedPlaneHint">One component node · overlaid relationship planes</span>`;$$('[data-visible-plane]').forEach(input=>input.onchange=()=>{state.builderVisiblePlanes[input.dataset.visiblePlane]=input.checked;if(!Object.values(state.builderVisiblePlanes).some(Boolean))state.builderVisiblePlanes[input.dataset.visiblePlane]=true;state.builderConnectionDraft=null;state.builderSelectedEdge=null;renderBuilder()})}
 function renderUnifiedBuilderCanvas(){const root=$('#builderTree');if(!root)return;renderUnifiedPlaneControls();const layout=unifiedBuilderPositions(),edges=builderTraceEdges('all'),visibleCount=edges.filter(e=>state.builderVisiblePlanes[e.plane]).length;root.className='unifiedBuilderRoot';root.style.setProperty('--world-width',`${layout.width}px`);root.style.setProperty('--world-height',`${layout.height}px`);/* v161: index the freshly written canvas before hot wrappers run */ builderWriteCanvas161(root,`<div class="unifiedBuilderWorld" style="width:${layout.width}px;height:${layout.height}px"><svg class="unifiedConnectorLayer" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}" aria-label="Overlaid data, management and authentication relationships"><defs><marker id="unified-data-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#57c7e8"/></marker><marker id="unified-management-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2dd4bf"/></marker><marker id="unified-authentication-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#d28df5"/></marker></defs>${edges.map(e=>unifiedEdgeMarkup(e,layout.positions)).join('')}</svg>${state.builderGroups.map(g=>unifiedGroupMarkup(g,layout.positions)).join('')}${state.builderNodes.map(n=>unifiedNodeMarkup(n,layout.positions.get(n.id))).join('')}${!state.builderNodes.length?'<div class="unifiedPlaneEmpty">Add a source, collector, processor or destination from the palette.</div>':!visibleCount?'<div class="unifiedPlaneEmpty">No relationships exist on the visible planes.</div>':''}</div>`);$('#builderCanvasTitle').textContent=`Unified topology · ${state.builderNodes.length} components · ${edges.length} relationships`;$('.builderDragHelp').textContent='Drag a component onto another for data flow · use coloured handles for any relationship plane';$$('[data-builder-node]').forEach(node=>{node.onclick=()=>{state.builderSelected=+node.dataset.builderNode;renderBuilder()};node.addEventListener('dragstart',()=>{state.builderPlane='data'},{capture:true})});wireBuilderDrag();$$('[data-connection-plane]').forEach(handle=>handle.onclick=e=>{e.stopPropagation();beginBuilderConnection(handle.dataset.connectionPlane,+handle.dataset.connectionNode)});$$('.unifiedConnector,.unifiedConnectorHit').forEach(edge=>{edge.onclick=e=>{e.stopPropagation();selectBuilderEdge(edge.dataset.edgePlane,edge.dataset.edgePlane==='data'?+edge.dataset.edgeId:edge.dataset.edgeId)}});$$('[data-unified-group]').forEach(button=>button.onclick=e=>{e.stopPropagation();state.builderSelectedGroup=button.dataset.unifiedGroup;renderBuilder()});decorateCapabilityCandidates();decorateRelationshipAssurance();requestAnimationFrame(()=>renderBuilderMinimap())}
@@ -4487,7 +4487,7 @@ function builderV124ClearDrop124(id,wrap){
     current=builderCardBox(id,positions),other=state.builderNodes.filter(node=>node.id!==id&&positions.has(node.id))
       .map(node=>({node,box:builderCardBox(node.id,positions)}));
   const hit=(x,y)=>other.find(({box})=>x<box.x+box.w+16&&x+current.w>box.x-16&&
-    y<box.y+box.h+16&&y+current.h>box.y-16);
+    y<box.y+box.h+30&&y+current.h>box.y-30);
   const first=hit(current.x,current.y);if(!first)return;
   const candidates=[];
   for(let radius=20;radius<=1200;radius+=20){
@@ -13095,7 +13095,7 @@ addEventListener('keydown',e=>{
 // In Free place, the new card goes one column after its sender, level with it, or lower if a card is already there.
 function placeAfter(source,added){
  ensureFreePositions();const P=state.builderFreePositions,s=P[source.id];if(!s)return;
- const W=190,H=224,GAP=24,others=Object.entries(P).filter(([id])=>Number(id)!==added.id).map(([,p])=>p),x=s.x+W+130;let y=s.y;
+ const W=190,H=224,GAP=30,others=Object.entries(P).filter(([id])=>Number(id)!==added.id).map(([,p])=>p),x=s.x+W+130;let y=s.y;
  const taken=y=>others.some(p=>x<p.x+W+GAP&&x+W+GAP>p.x&&y<p.y+H+GAP&&y+H+GAP>p.y);
  for(let i=0;i<50&&taken(y);i++)y+=H+GAP;P[added.id]={x,y};
 }
@@ -13780,7 +13780,7 @@ function bindPanel(){
 // A line's stage, in the view's Matrix: scrolled to just under the toolbar and flashed. A stage the search or pipeline
 // filter hides opens in its detail instead.
 function showStage(id){const row=document.querySelector(`#matrixBody tr[data-id="${id}"]`);if(!row){openDetail(id);return}
- const toolbar=document.querySelector('.toolbar').getBoundingClientRect().bottom;scrollTo({top:row.getBoundingClientRect().top+scrollY-toolbar-16,behavior:'smooth'});flash(row)}
+ const bar=document.querySelector('.toolbar'),toolbar=getComputedStyle(bar).position==='sticky'?bar.getBoundingClientRect().bottom:0;scrollTo({top:row.getBoundingClientRect().top+scrollY-toolbar-16-(document.querySelector('#matrix thead')?.offsetHeight||0),behavior:'smooth'});flash(row)}
 // A line in the panel, on its kind's tab.
 function showLine(id){const f=fileById(id.split(':')[0]);if(!f)return;if(pm.tab!==f.kind){pm.tab=f.kind;renderPanel()}
  const li=panel.querySelector(`[data-line="${id}"]`);if(!li)return;const list=li.closest('.propsLines205'),toolbar=document.querySelector('.toolbar').getBoundingClientRect().bottom;
@@ -14385,6 +14385,136 @@ if(group)group.items.push(['Quick fixes','New Splunk-to-Splunk links get port 99
 const root=document.getElementById('topologyBuilder');if(root){root.dataset.buildNumber='209';root.dataset.buildDate='2026-10-23'}
 document.title='Splunk Pipeline Explorer · Build 209 · 23 Oct 2026';
 const info=document.getElementById('builderInfoText159');if(info)info.textContent=info.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 209 · 23 Oct 2026');
+})();
+</script>
+<style id="room-and-header-v210-styles">
+/* room-and-header-v210. A container's name above the links (layer 1), still under the cards (layer 3): in the vertical
+   layout and in Free place, the link from the card above runs through the name. The box no longer makes its own layer,
+   so the name can rise above the links while the box's border and fill stay under them. */
+.unifiedGroupBox{z-index:auto}
+.unifiedGroupBox>button[data-unified-group]{z-index:2}
+/* The copy of the Matrix header that follows the page, fixed under the toolbar while the real header is above it. Its
+   cells take the real cells' widths. */
+.matrixFollow210{position:fixed;z-index:14;overflow:hidden;box-shadow:0 8px 14px -6px rgba(0,0,0,.55)}
+.matrixFollow210[hidden]{display:none}
+.matrixFollow210 table{table-layout:fixed;min-width:0;will-change:transform}
+.matrixFollow210 th{box-sizing:border-box;position:static}
+</style>
+<script id="room-and-header-v210">
+(function(){
+/* Build 210: room on the canvas, and a Matrix header that follows the page. In Free place, a card stacked under another
+   keeps room for the handle row below a card: 30 px, or where the rows always show, their depth and 6 px more. A
+   container's name keeps clear of the card above it, in every layout. The Matrix header stays under the toolbar while the
+   page scrolls. Four in-place edits go with this block: Free place's drop clearance and the add-next spacing (30 px below
+   a card), the container box's depth, and the Config view's scroll to a stage. */
+const CARD_W=190,CARD_H=224,HANDLES=30,CLEAR=6,NAME_ABOVE=39,BOX_BELOW=18;
+
+// A card's height, and how far below it its handle rows reach where they always show. Above 760 px a card is 224 px tall;
+// on a phone it is as tall as its content, 142 to 280 px in the topologies tested. With a mouse the rows show only with
+// the pointer on the card; on a touch screen they always show, under the card, 31 to 109 px deep. Read from the card on
+// the canvas; a card not drawn yet counts as 224 px with no rows.
+function cardDepth(id){
+ const wrap=document.querySelector(`#builderTree [data-unified-node-wrap="${id}"]`),card=wrap?.querySelector('.builderNode');
+ if(!card?.offsetHeight)return{h:CARD_H,rows:0};
+ const rows=wrap.querySelector(':scope>.builderConnectionHandles');
+ if(!rows||getComputedStyle(rows).position==='absolute')return{h:card.offsetHeight,rows:0};
+ const zoom=state.builderViewport?.zoom||1;
+ return{h:card.offsetHeight,rows:Math.max(0,Math.ceil((rows.getBoundingClientRect().bottom-card.getBoundingClientRect().bottom)/zoom))}}
+
+// Free place starts from the base layout: above 760 px rows 230 px apart, 6 px between 224 px cards; on a phone one
+// column, cards 188 px apart, so taller ones overlap. Rows move down, together and in order, until every card has room
+// below it before the next card in its column: 30 px for the handle row that shows with the pointer on a card, or where
+// the rows always show, their depth and 6 px more, as they hang 6 px below their own card.
+function rowsApart(positions){
+ const cards=[...positions.entries()];if(cards.length<2)return;
+ const rows=[...new Set(cards.map(([,p])=>p.y))].sort((a,b)=>a-b),placed=[];let shift=0;
+ for(const y of rows){const row=cards.filter(([,p])=>p.y===y);let top=y+shift;
+  for(const [,p] of row)for(const q of placed)if(Math.abs(q.x-p.x)<CARD_W)top=Math.max(top,q.end);
+  shift=top-y;for(const [id,p] of row){const d=cardDepth(id);p.y=top;placed.push({x:p.x,end:top+d.h+Math.max(HANDLES,d.rows?d.rows+CLEAR:0)})}}}
+
+// A container's name sits on its box's top edge, 39 px above its top card. Rows move down until the name is 6 px clear of
+// what is above it in the container's columns: a card and, where they always show, its handle rows, or the box of the
+// container that card is in. Done top to bottom, as each move takes the containers below it down too.
+function roomForNames(layout){
+ const positions=layout.positions,groups=state.builderGroups||[];if(!groups.length)return;
+ const boxed=new Set(groups.map(g=>g.id)),done=new Set();
+ for(;;){let next=null;
+  for(const g of groups){if(done.has(g.id))continue;const members=state.builderNodes.filter(n=>n.groupId===g.id&&positions.has(n.id));
+   if(!members.length){done.add(g.id);continue}const top=Math.min(...members.map(n=>positions.get(n.id).y));if(!next||top<next.top)next={g,members,top}}
+  if(!next)break;done.add(next.g.id);
+  const xs=next.members.map(n=>positions.get(n.id).x),left=Math.min(...xs)-18,right=Math.max(...xs)+CARD_W+18;let above=-Infinity;
+  for(const n of state.builderNodes){const p=positions.get(n.id);if(!p||n.groupId===next.g.id||p.y>=next.top||p.x+CARD_W<=left||p.x>=right)continue;
+   const d=cardDepth(n.id);above=Math.max(above,p.y+d.h+Math.max(boxed.has(n.groupId)?BOX_BELOW:0,d.rows))}
+  const need=Math.ceil(above+CLEAR-(next.top-NAME_ABOVE));if(!(need>0))continue;
+  for(const p of positions.values())if(p.y>=next.top)p.y+=need;
+  if(typeof layout.bandY==='number'&&layout.bandY>=next.top)layout.bandY+=need;
+  if(typeof layout.height==='number')layout.height+=need}}
+
+// The horizontal and vertical layouts (and the phone's) get the room. During a redraw Build 163 hands back the same layout
+// for every call, so each layout's positions get it once.
+const roomed=new WeakSet();
+if(typeof unifiedBuilderPositions==='function'){const positionsBefore=unifiedBuilderPositions;
+ unifiedBuilderPositions=function(...args){const layout=positionsBefore.apply(this,args);
+  if(layout?.positions&&!roomed.has(layout.positions)&&resolvedUnifiedLayoutMode()!=='free'){roomed.add(layout.positions);roomForNames(layout)}
+  return layout}}
+// Free place's starting positions get both: room under each card, then room for the names. Every Free place redraw asks
+// for them (ensureFreePositions) but uses them only for a card with no place yet; with none, they are left as they are.
+let ensuring=false;
+if(typeof ensureFreePositions==='function'){const ensureBefore=ensureFreePositions;
+ ensureFreePositions=function(...args){ensuring=true;try{return ensureBefore.apply(this,args)}finally{ensuring=false}}}
+if(typeof automaticPositionsForFree==='function'){const freeBefore=automaticPositionsForFree;
+ automaticPositionsForFree=function(...args){const layout=freeBefore.apply(this,args);
+  if(ensuring&&typeof cleanFreePosition==='function'&&state.builderNodes.every(n=>cleanFreePosition(state.builderFreePositions?.[n.id])))return layout;
+  if(layout?.positions&&!roomed.has(layout.positions)){roomed.add(layout.positions);rowsApart(layout.positions);roomForNames(layout)}
+  return layout}}
+
+// A container's box ends 18 px below its lowest card. Above 760 px every card is 224 px tall, and the box is drawn that
+// deep (an edit). On a phone a card is as tall as its content, and joining a container adds the container's chip to it in
+// the same redraw, so once a redraw is done each box is fitted to its cards as drawn.
+function fitBoxes(){
+ for(const box of document.querySelectorAll('#builderTree .unifiedGroupBox[data-group-container]')){
+  const cards=state.builderNodes.filter(n=>String(n.groupId)===box.dataset.groupContainer)
+   .map(n=>document.querySelector(`#builderTree [data-unified-node-wrap="${n.id}"] .builderNode`)).filter(card=>card?.offsetHeight);
+  if(!cards.length||!box.offsetHeight)continue;
+  const rect=box.getBoundingClientRect(),scale=rect.height/box.offsetHeight||1;
+  const height=(Math.max(...cards.map(card=>card.getBoundingClientRect().bottom))-rect.top)/scale+BOX_BELOW;
+  if(Math.abs(height-box.offsetHeight)>0.5)box.style.height=Math.round(height*100)/100+'px'}}
+if(typeof renderBuilder==='function'){const renderBefore=renderBuilder;
+ renderBuilder=function(...args){const result=renderBefore.apply(this,args);if(state.builderGroups?.length)fitBoxes();return result}}
+
+// The Matrix box scrolls sideways, so its header's sticky position only works inside the box, which is as tall as the
+// table. A copy of the header, fixed under the toolbar, shows while the real one is above that line and the table's rows
+// are still below it. It follows the box's sideways scroll and copies its column widths.
+const matrix=document.getElementById('matrix'),table=matrix?.querySelector('table');
+if(matrix&&table?.tHead){
+ const follow=document.createElement('div');follow.className='matrixFollow210';follow.setAttribute('aria-hidden','true');follow.hidden=true;
+ const copy=document.createElement('table');follow.append(copy);matrix.append(follow);
+ const toolbar=document.querySelector('.toolbar');let stale=true,queued=false;
+ const line=()=>toolbar&&toolbar.getClientRects().length&&getComputedStyle(toolbar).position==='sticky'?Math.max(0,toolbar.getBoundingClientRect().bottom):0;
+ const sync=()=>{queued=false;
+  if(!matrix.getClientRects().length){follow.hidden=true;return}
+  const top=line(),head=table.tHead.getBoundingClientRect(),rows=table.getBoundingClientRect();
+  if(!(head.top<top&&rows.bottom>top+head.height)){follow.hidden=true;return}
+  if(stale){copy.replaceChildren(table.tHead.cloneNode(true));stale=false}
+  const real=table.tHead.rows[0]?.cells||[],cells=copy.tHead?.rows[0]?.cells||[];
+  for(let i=0;i<cells.length;i++){const w=real[i]?.getBoundingClientRect().width;if(w)cells[i].style.width=cells[i].style.minWidth=cells[i].style.maxWidth=w+'px'}
+  const box=matrix.getBoundingClientRect();follow.hidden=false;
+  follow.style.top=top+'px';follow.style.left=box.left+matrix.clientLeft+'px';follow.style.width=matrix.clientWidth+'px';
+  copy.style.width=table.offsetWidth+'px';copy.style.transform=`translateX(${-matrix.scrollLeft}px)`};
+ const schedule=()=>{if(!queued){queued=true;requestAnimationFrame(sync)}};
+ new MutationObserver(()=>{stale=true;schedule()}).observe(table.tHead,{childList:true,subtree:true,attributes:true,characterData:true});
+ addEventListener('scroll',schedule,{passive:true});addEventListener('resize',schedule);matrix.addEventListener('scroll',schedule,{passive:true});
+ if(typeof ResizeObserver==='function'){const watch=new ResizeObserver(schedule);watch.observe(table);watch.observe(matrix)}}
+
+if(typeof renderBuilder==='function'&&state.view==='builder')renderBuilder();
+})();
+</script>
+<script id="room-and-header-records-v210">
+(function(){
+changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Room on the canvas, and a Matrix header that follows the page',"In Free place, cards start with room below them for their handle rows, on phones too, and a dropped card or one added from a handle keeps 30 px from the card above. A container's name keeps clear of the card above it, in every layout, and its box reaches below its lowest card. The Matrix header stays under the toolbar while the page scrolls, in the Matrix and Config views.",true]);
+const root=document.getElementById('topologyBuilder');if(root){root.dataset.buildNumber='210';root.dataset.buildDate='2026-10-24'}
+document.title='Splunk Pipeline Explorer · Build 210 · 24 Oct 2026';
+const info=document.getElementById('builderInfoText159');if(info)info.textContent=info.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 210 · 24 Oct 2026');
 })();
 </script>
 </body>
