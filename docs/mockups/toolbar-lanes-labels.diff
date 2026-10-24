@@ -1,0 +1,5 @@
+--- a/index.html
++++ b/index.html
+@@ -7874 +7874 @@
+- const nodeBadges=[.../* v161: indexed canvas query */ builderQueryAll161($('#builderTree'),'.builderNodeIssueMarker')].map(m=>{const r=m.getBoundingClientRect();return{id:Number(m.closest('[data-unified-node-wrap]')?.dataset.unifiedNodeWrap),x:(r.left-origin.left)/zoom,y:(r.top-origin.top)/zoom,w:r.width/zoom,h:r.height/zoom}});
++ const nodeBadges=[.../* v161: indexed canvas query */ builderQueryAll161($('#builderTree'),'.builderNodeIssueMarker')].map(m=>{const r=m.getBoundingClientRect();return{id:Number(m.closest('[data-unified-node-wrap]')?.dataset.unifiedNodeWrap),x:(r.left-origin.left)/zoom,y:(r.top-origin.top)/zoom,w:r.width/zoom,h:r.height/zoom}}).concat(typeof builderLabelObstacles211==='function'?builderLabelObstacles211():[]);

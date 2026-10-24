@@ -1,0 +1,18 @@
+/* toolbar-lanes-labels-v211. 18: from 821 px the toolbar keeps to one row. The views that don't fit go into a More menu
+   at the end of the switcher, in their order; More takes the current view's name when it holds the current view. */
+.shell>.toolbar>.seg>.segOut211{display:none}
+.shell>.toolbar>.seg>.segMore211::after{content:"\25BE";margin-left:6px;font-size:.8em}
+.segMenu211{position:absolute;z-index:16;display:flex;flex-direction:column;min-width:160px;padding:3px;background:#08131d;border:1px solid #294052;border-radius:10px;box-shadow:var(--shadow)}
+.segMenu211[hidden]{display:none}
+.segMenu211 button{border:0;background:transparent;padding:8px 12px;border-radius:7px;text-align:left;cursor:pointer;color:var(--muted)}
+.segMenu211 button:hover,.segMenu211 button:focus-visible{background:#132636;color:var(--text)}
+.segMenu211 button.active{background:#183043;color:var(--text)}
+/* 25: Group by. A lane's title keeps to one line, ending with … when it doesn't fit, and shows its full text on hover. */
+.unifiedBuilderWorld .builderTierLane130>strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:auto}
+/* A Component type box no longer makes its own layer, so its header can sit over the links (layer 1), still under the
+   cards (layer 3), as containers' names do; its border and fill stay under the links. */
+.unifiedBuilderWorld .builderTypeBox130{z-index:auto}
+.unifiedBuilderWorld .builderTypeBox130>.builderTypeHeader130{z-index:2;max-width:calc(100% - 16px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 26. Build 151 raises canvas text under 11.5 px to 11.5 px once a redraw is done, after the labels are placed. A
+   container's name (9.3 px) is drawn at 11.5 px from the start, so labels keep clear of the name as it ends up. */
+#builderTree .unifiedGroupBox>button[data-unified-group]{font-size:11.5px}

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Toolbar, Lanes and Labels</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 211 TARGET · BUILD 210 + PROTOTYPE</span>
+ <h1>The toolbar on one row, Group by lanes that reach their cards, and labels clear of group headers</h1>
+ <p class="lede">Items 18, 25 and 26 from the Build 210 recheck’s list. From 821 px the toolbar keeps to one row, with a More menu for the views that don’t fit. Group by lanes and Component type boxes reach below their cards, and type headers keep clear of the card above. Route labels and issue badges keep clear of containers’ names and collapse buttons and of type headers. Every target scene is the real explorer with the prototype applied to Build 210; the “Today” scenes are Build 210 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>What Build 210 does</h2>
+  <table>
+   <thead><tr><th>Fault</th><th>What you see</th><th>Cause</th><th>Fix</th></tr></thead>
+   <tbody>
+    <tr><td>18. The toolbar takes two rows from 821 to 1,309 px</td><td>The nine view buttons wrap onto a second row; the toolbar, which sticks to the top of the page, is 129 px tall instead of 73</td><td>Build 206 made the toolbar a wrapping row: the search box (250 px or more), the filter (248 px) and the 706 px switcher need a 1,310 px window</td><td>The views that don’t fit go into a More menu at the end of the switcher, in their order. More takes the current view’s name when it holds it</td></tr>
+    <tr><td>25. Group by: lanes and boxes end short of their cards</td><td>The Management band ends 31 px above its cards, type boxes 39 px, Region and Environment lanes 24 px; six type headers sit under the card above; lane titles run under cards. On a phone, type boxes 68 px short to 43 past</td><td>Build 130 sizes lanes and boxes for 175 px cards (cards are 224 px, on a phone as tall as their content). The type header starts 30 px above its card, with rows 24 px apart. Lanes are drawn under cards</td><td>Each lane ends 18 px below its lowest card and each box 10 px, as drawn, and again when a card changes size. Rows move to clear type headers. Titles keep to one line</td></tr>
+    <tr><td>26. A container’s collapse button can cover a link’s label</td><td>In 21 cases, 13 labels have text under a container’s name, its collapse button or a type header, and 3 issue badges; zoomed out, 5 badges</td><td>Since Build 210 names and collapse buttons are drawn over links. Build 156’s label placement knows nothing of them, and a link from the card above into a container’s top card runs under the name for its whole length</td><td>The gap above a group’s header holds the label of a link coming in from above (rows move). Labels and badges keep clear of names, collapse buttons and type headers (one edit)</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The design in short</h2>
+  <dl>
+   <dt>Toolbar</dt><dd>From 821 px, in every view but the Builder and OV, one row. The search box keeps at least 250 px and the filter its width; views that don’t fit go into More, in their order: eight at 1,300 px, five at 1,024, two at 821.</dd>
+   <dt>More</dt><dd>A menu under More. It takes the current view’s name when the current view is in it. Choosing a view returns focus to More; Esc or a click elsewhere closes it.</dd>
+   <dt>Lanes and boxes</dt><dd>A lane ends 18 px below its lowest card, a Component type box 10 px, whatever the card’s height, fitted again when a card changes size.</dd>
+   <dt>Type headers</dt><dd>Keep 6 px clear of the card above: rows move down, the group’s row and every row below it together. Drawn over links, under cards.</dd>
+   <dt>Titles</dt><dd>One line, ending with … when they don’t fit; hover shows the whole title.</dd>
+   <dt>Labels</dt><dd>Keep clear of containers’ names and collapse buttons and of type headers, as they do of cards. Where a link comes into a group’s top card from directly above, the gap above the header holds its label: 34 px.</dd>
+   <dt>Badges</dt><dd>A badge on a link’s midpoint that would sit under one of those controls, or on another label, moves along its link to the nearest clear spot.</dd>
+   <dt>Unchanged</dt><dd>With no Group by and no containers every card is where Build 210 puts it; from 1,310 px and at 820 px and below the toolbar is as before; the Builder and OV keep their own toolbars; Free place.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-toolbar-lanes-labels.md</code> · Prototype: <code>docs/mockups/toolbar-lanes-labels-prototype.css</code> and <code>toolbar-lanes-labels-prototype.js</code>, appended to Build 210, and the edit in <code>docs/mockups/toolbar-lanes-labels.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "tl-toolbar", "img": "compare/toolbar-lanes-labels-toolbar.png", "group": "target", "tab": "18 · Toolbar", "title": "The Matrix view at 1,024 px", "w": 1024, "h": 640, "zoom": 1, "size": "1024 × 640", "crop": "viewport", "items": [{"n": 1, "head": "One row", "text": "The search box, the pipeline filter and the view switcher keep to one row from 821 px: the toolbar is 73 px tall, as it is from 1,310 px.", "x": 10.13, "y": 19.92, "box": [2.54, 14.22, 94.92, 11.41]}, {"n": 2, "head": "The views that fit", "text": "At 1,024 px, five: Flow to OV, in their order. The search box keeps at least 250 px and the filter its width.", "x": 72.71, "y": 15.59, "box": [56.84, 17.03, 31.74, 5.78]}, {"n": 3, "head": "More", "text": "Holds the views that don’t fit: here Operate, Diagnose, Failure Lab and Changes.", "x": 92.14, "y": 24.84, "box": [88.57, 17.03, 7.13, 5.78]}]}, {"id": "tl-menu", "img": "compare/toolbar-lanes-labels-menu.png", "group": "target", "tab": "18 · More", "title": "The same, More open", "w": 1024, "h": 640, "zoom": 1, "size": "1024 × 640", "crop": "viewport", "items": [{"n": 1, "head": "The rest, in order", "text": "The menu opens under More. Choosing a view shows it, closes the menu and puts focus back on More. Esc or a click elsewhere closes it.", "x": 78.83, "y": 36.41, "box": [80.08, 23.75, 15.62, 25.31]}]}, {"id": "tl-changes", "img": "compare/toolbar-lanes-labels-changes.png", "group": "target", "tab": "18 · Current view", "title": "Changes chosen from the menu", "w": 1024, "h": 640, "zoom": 1, "size": "1024 × 640", "crop": "viewport", "items": [{"n": 1, "head": "More takes its name", "text": "When the current view is in the menu, More shows its name and is marked as current, so the switcher always says where you are.", "x": 90.77, "y": 24.84, "box": [85.84, 17.03, 9.86, 5.78]}]}, {"id": "tl-tier", "img": "compare/toolbar-lanes-labels-tier.png", "group": "target", "tab": "25 · Tier", "title": "Group by: Tier, 1,440 px, zoomed out to 38 %: the Management band, along the bottom", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Down past the cards", "text": "The Management band now ends 18 px below its lowest card, here Authentication Provider · Cloud 1, as every lane does. In Build 210 it ended 31 px above the cards’ bottoms.", "x": 66.81, "y": 74.02, "box": [64.31, 63.44, 5.0, 9.44]}]}, {"id": "tl-type", "img": "compare/toolbar-lanes-labels-type.png", "group": "target", "tab": "25 · Component type", "title": "Group by: Component type, 1,440 px, zoomed to 90 %: the Universal Forwarder box under Heavy Forwarder 1", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Clear of the card above", "text": "Rows move down until each type header is 6 px clear of the card above, here Heavy Forwarder 1, or of its box. The header is drawn over links, still under cards, as containers’ names are.", "x": 39.6, "y": 52.61, "box": [40.21, 51.33, 10.21, 2.56]}, {"n": 2, "head": "Down past the card", "text": "Each type box ends 10 px below its lowest card (Build 210: 39 px above its bottom).", "x": 50.92, "y": 51.32, "box": [39.38, 23.44, 13.12, 27.33]}]}, {"id": "tl-region", "img": "compare/toolbar-lanes-labels-region.png", "group": "target", "tab": "25 · Region", "title": "Group by: Region, 1,440 px: the Security operations lane", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "One line", "text": "The title keeps to one line and ends with … where it doesn’t fit; hover shows it all. It no longer runs under the card.", "x": 35.77, "y": 39.17, "box": [36.88, 38.22, 13.75, 1.89]}, {"n": 2, "head": "18 px below", "text": "Region and Environment lanes end 18 px below their lowest card (Build 210: 24 px above its bottom).", "x": 43.75, "y": 67.86, "box": [35.9, 36.89, 15.69, 31.44]}]}, {"id": "tl-label", "img": "compare/toolbar-lanes-labels-label.png", "group": "target", "tab": "26 · Label", "title": "The vertical layout, Heavy Forwarder 1 in a container named Sydney: the link from AWS Lambda 1", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Above the name", "text": "The gap above a container holds the label of a link coming in from the card above: rows move down until there are 34 px between that card and the name.", "x": 43.28, "y": 52.67, "box": [44.44, 51.44, 9.72, 2.44]}, {"n": 2, "head": "Nothing under the name", "text": "Labels keep clear of containers’ names and collapse buttons and of type headers, as they do of cards, and so do their issue badges.", "x": 38.8, "y": 56.5, "box": [39.93, 55.0, 7.57, 3.0]}]}, {"id": "tl-phone", "img": "compare/toolbar-lanes-labels-phone.png", "group": "target", "tab": "25 · Phone", "title": "A 390 px phone, Group by: Component type: the Universal Forwarder box", "w": 390, "h": 844, "zoom": 1, "size": "390 × 844", "crop": "viewport", "items": [{"n": 1, "head": "Clear on a phone", "text": "The header clears Heavy Forwarder 1 and its handle rows, which a touch screen always shows. The rows move once per redraw, so the cards and the boxes drawn after them agree.", "x": 74.37, "y": 56.58, "box": [29.23, 55.09, 41.79, 2.96]}, {"n": 2, "head": "Fitted to the cards", "text": "A box is fitted to its cards as drawn, and again whenever one changes size: a phone’s cards are as tall as their content.", "x": 28.05, "y": 81.61, "box": [25.9, 54.03, 53.85, 45.97]}]}, {"id": "tl-toolbar-today", "img": "compare/toolbar-lanes-labels-toolbar-today.png", "group": "today", "tab": "Today: toolbar", "title": "Build 210: the Matrix view at 1,024 px", "w": 1024, "h": 640, "zoom": 1, "size": "1024 × 640", "crop": "viewport", "items": [{"n": 1, "head": "A second row", "text": "The view switcher, 706 px wide, wraps onto its own row below 1,310 px.", "x": 38.38, "y": 34.3, "box": [3.91, 25.16, 68.95, 7.03]}, {"n": 2, "head": "129 px tall", "text": "The toolbar sticks to the top of the page, so the extra row covers 56 px more of every view as it scrolls.", "x": 10.13, "y": 24.3, "box": [2.54, 14.22, 94.92, 20.16]}]}, {"id": "tl-tier-today", "img": "compare/toolbar-lanes-labels-tier-today.png", "group": "today", "tab": "Today: Tier", "title": "Build 210: Group by: Tier, zoomed out to 38 %: the Management band", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Short of its cards", "text": "Build 130 sizes lanes for 175 px cards; cards are 224 px tall, so the band stops 31 px above their bottoms.", "x": 66.81, "y": 71.57, "box": [64.31, 63.44, 5.0, 9.44]}]}, {"id": "tl-type-today", "img": "compare/toolbar-lanes-labels-type-today.png", "group": "today", "tab": "Today: Component type", "title": "Build 210: Group by: Component type, the Universal Forwarder box", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Under the card above", "text": "The header starts 30 px above its card, and rows are 24 px apart: Heavy Forwarder 1 hides it, and takes its clicks.", "x": 39.6, "y": 52.72, "box": [40.21, 51.44, 10.21, 2.56]}, {"n": 2, "head": "Short of the card", "text": "Type boxes end 39 px above their cards’ bottoms.", "x": 50.92, "y": 49.89, "box": [39.38, 27.0, 13.12, 22.44]}]}, {"id": "tl-region-today", "img": "compare/toolbar-lanes-labels-region-today.png", "group": "today", "tab": "Today: Region", "title": "Build 210: Group by: Region, the Security operations lane", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Under the card", "text": "Lanes are drawn under cards, and this title, two lines long, runs under Administrator 1.", "x": 35.77, "y": 42.5, "box": [36.88, 40.56, 13.75, 3.89]}, {"n": 2, "head": "Short of the card", "text": "The lane ends 24 px above the card’s bottom.", "x": 43.75, "y": 65.6, "box": [35.9, 39.22, 15.69, 26.78]}]}, {"id": "tl-label-today", "img": "compare/toolbar-lanes-labels-label-today.png", "group": "today", "tab": "Today: label", "title": "Build 210: the vertical layout, the same container", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Name over label", "text": "Since Build 210 the name and collapse button are drawn over links, and the label sits in the same 45 px gap: the name covers its start, the button its end.", "x": 43.28, "y": 55.89, "box": [44.44, 54.67, 9.72, 2.44]}]}, {"id": "tl-phone-today", "img": "compare/toolbar-lanes-labels-phone-today.png", "group": "today", "tab": "Today: phone", "title": "Build 210: a 390 px phone, Group by: Component type", "w": 390, "h": 844, "zoom": 1, "size": "390 × 844", "crop": "viewport", "items": [{"n": 1, "head": "Under the card above", "text": "Heavy Forwarder 1 covers the Universal Forwarder header.", "x": 74.37, "y": 56.58, "box": [29.23, 55.09, 41.79, 2.96]}, {"n": 2, "head": "A fixed depth", "text": "Boxes are drawn for 175 px cards: from 68 px short of a phone’s cards to 43 px past them.", "x": 28.05, "y": 81.61, "box": [25.9, 54.03, 53.85, 45.97]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size+' viewport';
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 210 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
