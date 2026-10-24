@@ -119,5 +119,5 @@ Labelled as in the look at them after Build 211.
 | D3 | A light canvas. The app is dark only; a Light or Dark choice for Export SVG and PNG first | Large; light export small to medium |
 | D4 | The palette: hiding groups you don't use; icon tiles, once there are icons | Small to medium |
 | D5 | Preset zoom levels on the zoom readout: 50 to 200 %, Fit and Zoom to selection | Small |
-| D6 | Small jumps where links cross, on screen and in exports. Prototyped next, against Build 212 | Medium |
+| D6 | Small jumps where links cross, on screen and in exports. Prototyped against Build 212: [`builder-handoff-line-jumps.md`](builder-handoff-line-jumps.md) | Medium |
 | D7 | Keyboard shortcuts in every toolbar tooltip and on the search box, and every key in the help | Small |

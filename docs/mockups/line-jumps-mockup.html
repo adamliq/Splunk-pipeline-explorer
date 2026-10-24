@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Line Jumps</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 213 TARGET · BUILD 212 + PROTOTYPE</span>
+ <h1>Line jumps where links cross</h1>
+ <p class="lede">D6 from the Build 212 recheck’s list of draw.io suggestions. Where a link’s horizontal run crosses another link’s vertical run, the horizontal one jumps over it with a small arc, on the canvas and in every export, and View › Line jumps turns them off. Every target scene is the real explorer with the prototype applied to Build 212; the “Today” scene is Build 212 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>What Build 212 does</h2>
+  <table>
+   <thead><tr><th>Suggestion</th><th>What you see</th><th>How links are drawn</th><th>Design</th></tr></thead>
+   <tbody>
+    <tr><td>D6. Jumps where links cross</td><td>Where two links cross, nothing shows which way each goes: in the zones topology lines cross once in the horizontal layout, 4 times in the vertical and 6 times in Free place; its export of Free place has 10 crossings</td><td>Each link is drawn on its own, as straight runs with small rounded corners, so nothing looks at two links at once. Exports draw their own copy</td><td>The horizontal link of each crossing jumps over the vertical one with a small arc, on the canvas and in every export, with View › Line jumps to turn them off</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The design in short</h2>
+  <dl>
+   <dt>Jump</dt><dd>An arc 10 px wide and 5 px high on the horizontal run, rising above it whichever way the link goes, as Visio draws them. The vertical link is unchanged.</dd>
+   <dt>Crossings</dt><dd>Only real crossings, clear of corners: more than 8 px from both runs’ ends, so an arc never runs into a corner or an arrowhead; that leaves 3 of the zones topology’s 11 flat. Links that share a trunk, meet end-on or join another don’t jump. Crossings closer than an arc share one wider arc.</dd>
+   <dt>Where</dt><dd>The canvas in every layout, at any zoom, on phones and touch screens; during a drag the arcs follow the routes at every frame. Export SVG and PNG, the presentation and the architecture pack.</dd>
+   <dt>Switch</dt><dd>View › Line jumps, on by default, kept in the browser. Off, everything is as on Build 212.</dd>
+   <dt>Unchanged</dt><dd>Labels and issue badges sit where Build 212 puts them. Clicking a link, selection and hover work as before.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-line-jumps.md</code> · Prototype: <code>docs/mockups/line-jumps-prototype.js</code>, appended to Build 212, and the menu edit in <code>docs/mockups/line-jumps.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "lj-free", "img": "compare/line-jumps-free.png", "group": "target", "tab": "D6 · Jumps", "title": "The zones topology in Free place, 1,440 px: where links cross", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "A jump", "text": "Where a link’s horizontal run crosses another link’s vertical run, the horizontal one jumps over it: an arc 10 px wide and 5 px high.", "x": 43.75, "y": 63.9, "box": [45.49, 60.0, 0.69, 1.0]}, {"n": 2, "head": "Every crossing", "text": "Every crossing clear of a corner has one: 5 in this layout. An issue badge on a crossing, as just left of this arc, covers it as it covers the crossing today.", "x": 71.53, "y": 77.18, "box": [69.86, 72.78, 0.69, 1.0]}]}, {"id": "lj-close", "img": "compare/line-jumps-close.png", "group": "target", "tab": "D6 · Close up", "title": "The same crossing at 160 %", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Over, not through", "text": "The arc rises above the run whichever way the link goes. The link underneath is unchanged.", "x": 45.14, "y": 59.33, "box": [47.36, 55.44, 1.11, 1.56]}, {"n": 2, "head": "Clear of corners", "text": "A crossing within 8 px of either run’s end, a corner or an arrowhead, gets no arc. Links that share a trunk, or join one, don’t jump.", "x": 42.14, "y": 44.11, "box": [41.04, 31.78, 13.75, 24.67]}]}, {"id": "lj-menu", "img": "compare/line-jumps-menu.png", "group": "target", "tab": "D6 · The switch", "title": "The View menu", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Line jumps", "text": "On by default, and ticked when they’re on. Off, the canvas and every export are as on Build 212. The browser keeps the choice.", "x": 33.09, "y": 22.22, "box": [14.1, 20.56, 17.92, 3.33]}]}, {"id": "lj-export", "img": "compare/line-jumps-export.png", "group": "target", "tab": "D6 · Export", "title": "Export SVG of the same layout, shown on its own", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Exports too", "text": "Export SVG and PNG, the presentation and the architecture pack’s diagrams have the arcs, on dashed links as on solid ones. With no crossings an export is unchanged.", "x": 69.24, "y": 78.56, "box": [66.04, 82.56, 0.69, 1.0]}]}, {"id": "lj-free-today", "img": "compare/line-jumps-free-today.png", "group": "today", "tab": "Today", "title": "Build 212: the same view", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Flat crossings", "text": "The lines cross flat, so a crossing reads like a junction where links meet.", "x": 43.75, "y": 63.9, "box": [45.49, 60.0, 0.69, 1.0]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size+' viewport';
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 212 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
