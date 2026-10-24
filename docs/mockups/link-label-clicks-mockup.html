@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Link Label Clicks</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 212 TARGET · BUILD 211 + EDITS</span>
+ <h1>Clicking a link’s label or issue badge</h1>
+ <p class="lede">Item 34 from the Build 211 recheck’s list. A click on a link’s label selects the link and shows it in the Inspector, as a click on its line does, and a click on its issue badge selects the link and opens its findings. Every target scene is the real explorer with the five edits applied to Build 211; the “Today” scenes are Build 211 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>What Build 211 does</h2>
+  <table>
+   <thead><tr><th>Fault</th><th>What you see</th><th>Cause</th><th>Fix</th></tr></thead>
+   <tbody>
+    <tr><td>34. Clicking a link’s label, or its issue badge, does nothing</td><td>With a mouse, 0 of 8 label clicks select their link and 0 of 11 badge clicks open its findings, at 100 % and zoomed out. A click that moves 1 or 2 px moves the label and adds an undo step. Tapping a label on a phone works</td><td>A press on a label starts a label drag, and its release always redraws the canvas, replacing the label before the click arrives. Badges sit inside labels. The label’s click also turned an additional data link’s text id into a number</td><td>Redraw only after a real drag, which starts at 3 px. Leave presses on a badge to the badge, which now selects its link before opening its findings. Read link ids as a click on the line does</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The design in short</h2>
+  <dl>
+   <dt>Label</dt><dd>A click selects the link, as a click on its line does: the Inspector shows it, opening over the canvas below 1,280 px, and the canvas draws the link as selected.</dd>
+   <dt>Badge</dt><dd>A click selects the link and opens its review findings beside the badge, with Open Review drawer. Below 1,280 px the Inspector stays closed so it doesn’t cover the findings; opening it shows the link.</dd>
+   <dt>Drag</dt><dd>A press on a label becomes a drag once the pointer has moved 3 px. Less is a click: the label stays put, and nothing goes into the undo history.</dd>
+   <dt>Ids</dt><dd>Additional data links (“data-rel-…”) are read as a click on the line reads them, so their labels select them too.</dd>
+   <dt>Unchanged</dt><dd>A drag once started, a click on a line, Enter on a focused badge, a card’s badge, and touch.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-link-label-clicks.md</code> · The edits: <code>docs/mockups/link-label-clicks.diff</code>, against Build 211.</p>
+</div>
+<script>
+const SCENES=[{"id": "lc-label", "img": "compare/link-label-clicks-label.png", "group": "target", "tab": "34 · Label", "title": "Clicking the label of Universal Forwarder 1 → Indexer 1, 1,440 px", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Click the label", "text": "A click on a link’s label selects the link, as a click on its line does. A press becomes a drag only once the pointer has moved 3 px.", "x": 43.78, "y": 52.78, "box": [39.93, 55.22, 7.71, 2.44]}, {"n": 2, "head": "The link in the Inspector", "text": "The Inspector shows the link, with its Link, Assurance and Route tabs. Below 1,280 px it opens over the canvas.", "x": 74.74, "y": 23.55, "box": [76.25, 22.11, 21.53, 6.56]}, {"n": 3, "head": "Drawn as selected", "text": "The canvas draws the link as selected, as for a click on its line.", "x": 40.48, "y": 60.0, "box": [39.44, 59.56, 8.61, 0.89]}]}, {"id": "lc-badge", "img": "compare/link-label-clicks-badge.png", "group": "target", "tab": "34 · Badge", "title": "Clicking the issue badge on Firewalls and network devices → Syslog Server 1, 1,440 px", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Click the badge", "text": "A press on the badge is the badge’s own: the label doesn’t start a drag.", "x": 39.81, "y": 49.89, "box": [41.94, 48.67, 1.53, 2.44]}, {"n": 2, "head": "The link’s findings", "text": "The badge opens the link’s review findings beside it, with Open Review drawer, as a card’s badge does.", "x": 66.63, "y": 57.67, "box": [44.1, 49.44, 21.88, 16.44]}, {"n": 3, "head": "And the link selected", "text": "The badge selects its link too, so the Inspector shows it. Below 1,280 px the Inspector stays closed, so it doesn’t cover the findings.", "x": 74.74, "y": 23.55, "box": [76.25, 22.11, 21.53, 6.56]}]}, {"id": "lc-zoomed", "img": "compare/link-label-clicks-zoomed.png", "group": "target", "tab": "34 · Zoomed out", "title": "Zoomed out to fit: labels are hidden and badges sit on their links", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "At any zoom", "text": "Every link badge opens its findings, zoomed out as at 100 %.", "x": 30.31, "y": 36.17, "box": [30.0, 39.67, 0.62, 1.0]}, {"n": 2, "head": "Beside the badge", "text": "The findings open beside the badge, and the Inspector shows the link.", "x": 53.71, "y": 48.67, "box": [31.18, 40.44, 21.88, 16.44]}]}, {"id": "lc-additional", "img": "compare/link-label-clicks-additional.png", "group": "target", "tab": "34 · Additional link", "title": "The zones topology: the label of an additional data link (data-rel-1)", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Additional links too", "text": "An additional data link’s id is text, “data-rel-1”. The label reads it as a click on the line does, so it selects the link.", "x": 45.31, "y": 56.98, "box": [41.46, 51.11, 7.71, 2.44]}, {"n": 2, "head": "In the Inspector", "text": "The Inspector shows the additional link.", "x": 74.74, "y": 23.55, "box": [76.25, 22.11, 21.53, 6.56]}]}, {"id": "lc-label-today", "img": "compare/link-label-clicks-label-today.png", "group": "today", "tab": "Today: label", "title": "Build 211: the same click on the label", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Nothing happens", "text": "The press starts a label drag, and its release redraws the canvas, replacing the label before the click arrives.", "x": 43.78, "y": 61.09, "box": [39.93, 55.22, 7.71, 2.44]}, {"n": 2, "head": "Still the topology", "text": "The Inspector keeps showing what it showed.", "x": 74.74, "y": 23.55, "box": [76.25, 22.11, 21.53, 6.56]}]}, {"id": "lc-badge-today", "img": "compare/link-label-clicks-badge-today.png", "group": "today", "tab": "Today: badge", "title": "Build 211: the same click on the badge", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Nothing happens", "text": "The badge sits inside the label, so its press starts the same drag, and its own click never runs.", "x": 42.71, "y": 53.31, "box": [41.94, 48.67, 1.53, 2.44]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size+' viewport';
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 211 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
