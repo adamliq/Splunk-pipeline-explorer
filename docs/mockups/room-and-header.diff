@@ -1,0 +1,14 @@
+--- a/index.html
++++ b/index.html
+@@ -2456 +2456 @@
+-function unifiedGroupMarkup(group,positions){const members=state.builderNodes.filter(n=>n.groupId===group.id&&positions.has(n.id));if(!members.length)return'';const xs=members.map(n=>positions.get(n.id).x),ys=members.map(n=>positions.get(n.id).y),left=Math.min(...xs)-18,top=Math.min(...ys)-28,right=Math.max(...xs)+208,bottom=Math.max(...ys)+176;return`<div class="unifiedGroupBox ${state.builderSelectedGroup===group.id?'selected':''}" data-group-container="${group.id}" style="--group:${group.color};left:${left}px;top:${top}px;width:${right-left}px;height:${bottom-top}px"><button data-unified-group="${group.id}">${builderEscape(group.name)} · ${builderEscape(group.type)}</button></div>`}
++function unifiedGroupMarkup(group,positions){const members=state.builderNodes.filter(n=>n.groupId===group.id&&positions.has(n.id));if(!members.length)return'';const xs=members.map(n=>positions.get(n.id).x),ys=members.map(n=>positions.get(n.id).y),left=Math.min(...xs)-18,top=Math.min(...ys)-28,right=Math.max(...xs)+208,bottom=Math.max(...ys)+242;return`<div class="unifiedGroupBox ${state.builderSelectedGroup===group.id?'selected':''}" data-group-container="${group.id}" style="--group:${group.color};left:${left}px;top:${top}px;width:${right-left}px;height:${bottom-top}px"><button data-unified-group="${group.id}">${builderEscape(group.name)} · ${builderEscape(group.type)}</button></div>`}
+@@ -4490 +4490 @@
+-    y<box.y+box.h+16&&y+current.h>box.y-16);
++    y<box.y+box.h+30&&y+current.h>box.y-30);
+@@ -13098 +13098 @@
+- const W=190,H=224,GAP=24,others=Object.entries(P).filter(([id])=>Number(id)!==added.id).map(([,p])=>p),x=s.x+W+130;let y=s.y;
++ const W=190,H=224,GAP=30,others=Object.entries(P).filter(([id])=>Number(id)!==added.id).map(([,p])=>p),x=s.x+W+130;let y=s.y;
+@@ -13783 +13783 @@
+- const toolbar=document.querySelector('.toolbar').getBoundingClientRect().bottom;scrollTo({top:row.getBoundingClientRect().top+scrollY-toolbar-16,behavior:'smooth'});flash(row)}
++ const bar=document.querySelector('.toolbar'),toolbar=getComputedStyle(bar).position==='sticky'?bar.getBoundingClientRect().bottom:0;scrollTo({top:row.getBoundingClientRect().top+scrollY-toolbar-16-(document.querySelector('#matrix thead')?.offsetHeight||0),behavior:'smooth'});flash(row)}

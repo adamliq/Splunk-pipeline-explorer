@@ -1,0 +1,11 @@
+/* room-and-header-v210. A container's name above the links (layer 1), still under the cards (layer 3): in the vertical
+   layout and in Free place, the link from the card above runs through the name. The box no longer makes its own layer,
+   so the name can rise above the links while the box's border and fill stay under them. */
+.unifiedGroupBox{z-index:auto}
+.unifiedGroupBox>button[data-unified-group]{z-index:2}
+/* The copy of the Matrix header that follows the page, fixed under the toolbar while the real header is above it. Its
+   cells take the real cells' widths. */
+.matrixFollow210{position:fixed;z-index:14;overflow:hidden;box-shadow:0 8px 14px -6px rgba(0,0,0,.55)}
+.matrixFollow210[hidden]{display:none}
+.matrixFollow210 table{table-layout:fixed;min-width:0;will-change:transform}
+.matrixFollow210 th{box-sizing:border-box;position:static}
