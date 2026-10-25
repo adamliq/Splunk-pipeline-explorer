@@ -1,0 +1,11 @@
+/* Canvas text drawn at its final size from the start (fault 31). Build 151's polish (polishBuilderText) raises canvas
+   text under 11.5 px to 11.5 px a frame after each redraw, so whatever is measured during a redraw sees this text at
+   its first size: a collapsed container's box grows from 92 to 103 px after it, and a card with an "incoming data
+   routes" badge by 3.4 px. Drawn at 11.5 px here, it leaves the polish nothing to raise. An !important rule still
+   wins, as it does over the polish's inline size (an Azure card's text, a federated managed card's facts). */
+#topologyBuilder #builderTree :is(.lbBadges186>span,.lbFacts186>span,.lbAddress186,.lbFooter186),
+#topologyBuilder #builderTree :is(.managedBadge176,.esEdition179,.managedFacts176>span,.managedAddress176,.managedFooter176),
+#topologyBuilder #builderTree :is(.deploymentConfigCanvas>summary,.deploymentConfigCanvas>small,.deploymentCanvasGroup>strong,.deploymentConfigArrow,.deploymentConfigChip),
+#topologyBuilder #builderTree :is(.builderHostHeader147>strong,.builderHostHeader147>small,.builderHostHeader147>span,.builderHostCard147 span),
+#topologyBuilder #builderTree :is(.builderTierLane130>strong,.builderUnconnectedLane,.builderMultiInputBadge,.builderGroupCollapseButton),
+#topologyBuilder #builderTree .collapsedGroupProxy>:is(small,strong,span,em){font-size:11.5px}

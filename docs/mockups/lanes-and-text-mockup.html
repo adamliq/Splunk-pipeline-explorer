@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lanes And Text</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 215 TARGET · BUILD 214 + PROTOTYPE</span>
+ <h1>Lanes round every page’s cards, and canvas text at its final size</h1>
+ <p class="lede">Faults 41 and 31 from the Build 214 recheck. Export SVG and the architecture pack draw each page’s Group by lanes round that page’s own cards, and the canvas draws its text at its final size from the start, so nothing grows a frame after a redraw. Every target scene is the real explorer with the fixes applied to Build 214; the “Today” scenes are Build 214 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>What Build 214 does</h2>
+  <table>
+   <thead><tr><th>Fault</th><th>What you see</th><th>Why</th><th>Fix</th></tr></thead>
+   <tbody>
+    <tr><td>41. Lanes on a page of one part of the topology miss its cards</td><td>On a page of one region, the lanes are where the whole topology’s cards would be; on every page, each card hangs 14 px below its lane; a collapsed container’s card is in no lane</td><td>Build 130 draws the lanes from the whole topology’s layout, put back once the page is made, and in the legend’s group, 30 px above the cards</td><td>The lanes are worked out in the page’s own scope and drawn in the cards’ group, 6 px higher for their labels</td></tr>
+    <tr><td>31. Some canvas text grows a frame after each redraw</td><td>A collapsed container’s box is 92 px, then 103; card text starts at 7.7 to 11.2 px</td><td>The polish raises canvas text under 11.5 px a frame after the redraw; these elements’ CSS draws them smaller</td><td>One style block draws that text at 11.5 px from the start</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The fix in short</h2>
+  <dl>
+   <dt>Lanes</dt><dd>Export SVG’s and the architecture pack’s Group by lanes come from the page’s own layout and components and are drawn in the cards’ group, so every page’s cards are inside their own lanes, and each lane counts the cards in it.</dd>
+   <dt>Collapsed</dt><dd>A collapsed container’s card is in a lane, and counted there.</dd>
+   <dt>Text</dt><dd>Canvas text the polish raised a frame later is drawn at 11.5 px from the start; nothing on the canvas changes size after a redraw.</dd>
+   <dt>Unchanged</dt><dd>The settled canvas; the whole topology’s exports apart from their lanes; Azure cards’ and federated managed cards’ 9 and 10 px text; and the polish outside the canvas.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-lanes-and-text.md</code> · Prototype: one edit and <code>docs/mockups/lanes-and-text-prototype.css</code>, appended to Build 214, both in <code>docs/mockups/lanes-and-text.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "pack-fix", "img": "compare/lanes-and-text-pack-fix.png", "group": "target", "tab": "41 · A page’s lanes", "title": "The architecture pack’s “Region · Melbourne” page, grouped by tier, at 1:1", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Round the page’s own cards", "text": "Each lane wraps the cards this page draws, worked out from the page’s own layout and drawn in the cards’ group.", "x": 36.18, "y": 48.16, "box": [28.47, 17.44, 15.42, 28.44]}, {"n": 2, "head": "Every card in its lane", "text": "Syslog Server 2 is inside Collection and counted there, with the lane’s label clear above it.", "x": 44.36, "y": 26.69, "box": [29.58, 19.22, 13.19, 24.89]}]}, {"id": "first-fix", "img": "compare/lanes-and-text-first-fix.png", "group": "target", "tab": "31 · First frame", "title": "The canvas as a redraw first draws it, before the polish runs, at 80 %", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Final size from the start", "text": "The collapsed container’s box is 103 px tall when drawn, as Build 214’s becomes a frame later, so its links are routed once.", "x": 56.67, "y": 24.8, "box": [45.06, 20.22, 10.56, 9.16]}, {"n": 2, "head": "Text at 11.5 px", "text": "Card text is drawn at the size the polish would raise it to, so nothing grows a frame later. Once settled, the canvas is Build 214’s.", "x": 55.93, "y": 40.49, "box": [45.67, 39.21, 9.33, 2.56]}]}, {"id": "pack-today", "img": "compare/lanes-and-text-pack-today.png", "group": "today", "tab": "Today · Lanes", "title": "Build 214: the same page", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "The whole topology’s places", "text": "The lanes are where the whole topology’s cards would be, and 30 px above even those, so this page’s cards are outside them.", "x": 36.18, "y": 70.94, "box": [28.47, 40.22, 15.42, 28.44]}, {"n": 2, "head": "Over the footer", "text": "The Sources lane runs down over the page’s footer, where the whole topology’s sources are.", "x": 23.21, "y": 83.97, "box": [6.25, 66.33, 15.42, 28.44]}]}, {"id": "first-today", "img": "compare/lanes-and-text-first-today.png", "group": "today", "tab": "Today · First frame", "title": "Build 214: the same redraw, before the polish", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "92 px, then 103", "text": "Its text starts at 7.7 to 10.9 px; a frame later the box grows and its links are routed again.", "x": 56.67, "y": 24.31, "box": [45.06, 20.22, 10.56, 8.18]}, {"n": 2, "head": "Smaller, then re-wrapped", "text": "The load balancer’s text starts at 9 to 10 px; a frame later it grows and its address wraps.", "x": 55.93, "y": 39.52, "box": [45.67, 38.97, 9.33, 1.11]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size+' viewport';
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 214 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>

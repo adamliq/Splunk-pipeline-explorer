@@ -1,0 +1,25 @@
+--- a/index.html
++++ b/index.html
+@@ -5417 +5417 @@
+-  const root=xml.documentElement,body=[...root.children].find(el=>el.localName==='g'&&el.hasAttribute('transform'));
++  const root=xml.documentElement,body=[...root.children].find(el=>el.localName==='g'&&el.querySelector(':scope > g > rect[width="190"]'));
+@@ -5419 +5419 @@
+-  const layout=unifiedBuilderPositions(),visible=state.builderNodes.filter(node=>scope.nodeIds.includes(node.id));
++  const {layout,visible}=withArchitectureExportScope(scope,()=>({layout:unifiedBuilderPositions(),visible:[...state.builderNodes]}));
+@@ -5422 +5422 @@
+-    const x=box?.x??30+index*320,y=box?.y??20,w=box?.w??46,h=box?.h??175;
++    const x=box?.x??30+index*320,y=box?box.y-6:20,w=box?.w??46,h=box?box.h+6:175;
+@@ -14901,0 +14902,13 @@
++<style id="canvas-text-v215">
++/* Canvas text drawn at its final size from the start (fault 31). Build 151's polish (polishBuilderText) raises canvas
++   text under 11.5 px to 11.5 px a frame after each redraw, so whatever is measured during a redraw sees this text at
++   its first size: a collapsed container's box grows from 92 to 103 px after it, and a card with an "incoming data
++   routes" badge by 3.4 px. Drawn at 11.5 px here, it leaves the polish nothing to raise. An !important rule still
++   wins, as it does over the polish's inline size (an Azure card's text, a federated managed card's facts). */
++#topologyBuilder #builderTree :is(.lbBadges186>span,.lbFacts186>span,.lbAddress186,.lbFooter186),
++#topologyBuilder #builderTree :is(.managedBadge176,.esEdition179,.managedFacts176>span,.managedAddress176,.managedFooter176),
++#topologyBuilder #builderTree :is(.deploymentConfigCanvas>summary,.deploymentConfigCanvas>small,.deploymentCanvasGroup>strong,.deploymentConfigArrow,.deploymentConfigChip),
++#topologyBuilder #builderTree :is(.builderHostHeader147>strong,.builderHostHeader147>small,.builderHostHeader147>span,.builderHostCard147 span),
++#topologyBuilder #builderTree :is(.builderTierLane130>strong,.builderUnconnectedLane,.builderMultiInputBadge,.builderGroupCollapseButton),
++#topologyBuilder #builderTree .collapsedGroupProxy>:is(small,strong,span,em){font-size:11.5px}
++</style>
