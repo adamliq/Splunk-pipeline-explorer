@@ -55,6 +55,12 @@ Over 30 scenarios, 1,557 canvas texts, of 17 kinds, change size this way. Code m
 
 Build 211 draws a container's name at 11.5 px from the start (line 14538); these were left. Where an `!important` rule sets the size, it wins over the polish's inline size, so the polish changes nothing: an Azure card's text (`builder-azure-storage-v194`, line 11315) and a federated managed card's facts (line 11737) stay at 9 or 10 px.
 
+> **Correction, from the collapsed-and-redraw handoff:** "first drawn … a frame later" says when the polish runs, not what is painted.
+> - The polish runs in the next frame's animation callbacks, and those run before the frame is painted.
+> - After a redraw from a click or a key, this text was laid out at the smaller sizes, and code measuring then saw them: Build 214 routed a collapsed container's links to the 92 px box. But it was not painted at them, and the second routing was done before the first paint too.
+> - Only a redraw that itself runs in an animation callback, as on crossing 760 px wide, was painted with the smaller text.
+> - The same goes for "Found while testing", 5: both routings are done before the first frame is painted.
+
 ## The fix
 
 - **Exported lanes are drawn round the page's own cards** (the three edits):

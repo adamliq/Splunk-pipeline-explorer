@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Collapsed And Redraw</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 216 TARGET · BUILD 215 + PROTOTYPE</span>
+ <h1>Collapsed containers, and redraws drawn right in their first frame</h1>
+ <p class="lede">Faults 42 to 46 from the Build 215 recheck. Exports draw each collapsed container in its own place, a collapsed container’s box keeps its “Expand” pill clear of its text, and a redraw is right from its first frame: text at its final size before anything measures it, one Highlight row, the canvas at its height, and a phone’s collapsed links on their cards. Every target scene is the real explorer with the fixes applied to Build 215; the “Today” scenes are Build 215 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>What Build 215 does</h2>
+  <table>
+   <thead><tr><th>Fault</th><th>What you see</th><th>Why</th><th>Fix</th></tr></thead>
+   <tbody>
+    <tr><td>42. Two collapsed containers export as one card</td><td>Export SVG of the current navigation view draws both collapsed cards in one place; grouped by tier, or with types collapsed, it throws</td><td>Each collapsed card is numbered from a Set’s <code>forEach</code>, whose second argument is the value again, not an index: every number is NaN</td><td>The cards are numbered from a list, each in turn</td></tr>
+    <tr><td>43. The “Expand” pill covers the container’s type</td><td>“REGION · COLLAPSED” runs under the pill</td><td>The pill is placed over the box’s top right, where the first line, at 11.5 px, now reaches</td><td>The box lays the pill out beside the first line, which wraps</td></tr>
+    <tr><td>44. Panel text raised a frame after each redraw</td><td>Code measuring the Builder after a redraw finds its new toolbar, menu and panel text at 7.8 to 9.9 px; crossing 760 px wide and back, two frames are painted with 143 texts at that size</td><td>The polish runs in the next frame’s animation callbacks, so a redraw that itself runs in one is polished a frame late</td><td>The polish runs as soon as the redraw’s task is done</td></tr>
+    <tr><td>45. With Group by on, the canvas shifts after each redraw</td><td>A second Highlight row; the canvas 43 px lower and 700 px tall, then 657 px</td><td>Build 131 misses the old row inside Build 163’s wrap; Build 140 measures the canvas’s top 30 ms after the redraw’s frame</td><td>Old rows are removed wherever they are; the top is measured in the redraw’s frame</td></tr>
+    <tr><td>46. A phone link misses its card</td><td>The link from Syslog Source 2 into a collapsed container starts 33.2 px below the card, after being routed twice</td><td>The routing finds the card in a layout worked out again, which on a phone is 88.9 px from where the card is drawn</td><td>Cards are found and measured as drawn</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The fix in short</h2>
+  <dl>
+   <dt>Exports</dt><dd>Each collapsed card in an export is numbered on its own, so each has its own place, and exports with collapsed types draw.</dd>
+   <dt>Expand</dt><dd>A collapsed container’s pill sits beside its first line, which wraps clear of it; the box is 120 px tall from the start.</dd>
+   <dt>Text</dt><dd>The polish runs as soon as the redraw’s task is done, so no code after it, and no frame, sees the smaller text.</dd>
+   <dt>Group by</dt><dd>One Highlight row; the canvas keeps its place through redraws, and its height follows its top in the same frame, so the Builder also opens where Fit puts the topology.</dd>
+   <dt>Phone links</dt><dd>A collapsed container’s links start and end 3 px off the cards as drawn, and are routed once.</dd>
+   <dt>Unchanged</dt><dd>The polish’s floors; Build 214’s second routing when a container’s box changes size; the settled Builder, once fitted; an export with one collapsed container.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-collapsed-and-redraw.md</code> · Prototype: seven edits, and <code>docs/mockups/collapsed-and-redraw-prototype.css</code> and <code>.js</code> appended to Build 215, all in <code>docs/mockups/collapsed-and-redraw.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "export-fix", "img": "compare/collapsed-and-redraw-export-fix.png", "group": "target", "tab": "42 · Two collapsed", "title": "Export SVG of the current navigation view, the Syslog Servers and the Universal Forwarders in two collapsed containers, at 1:1", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Each in its own place", "text": "Each collapsed container’s card is numbered on its own, so the layout places Syslog collection and Forwarders side by side.", "x": 58.4, "y": 44.83, "box": [51.81, 18.44, 13.19, 24.89]}, {"n": 2, "head": "Its links as on the canvas", "text": "The Aggregate link runs from one collapsed card to the other, and Forwarders feeds Indexer 1.", "x": 69.15, "y": 27.9, "box": [74.03, 18.44, 13.19, 24.89]}]}, {"id": "pill-fix", "img": "compare/collapsed-and-redraw-pill-fix.png", "group": "target", "tab": "43 · Expand pill", "title": "The Syslog Servers’ collapsed container on the canvas, at 200 %", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Beside the first line", "text": "The pill keeps its place, 10 px in from the box’s top right; the first line wraps beside it instead of running under it.", "x": 64.43, "y": 52.92, "box": [54.93, 50.33, 7.92, 5.17]}, {"n": 2, "head": "Two lines, from the start", "text": "“REGION · COLLAPSED” takes two lines, so the box is 120 px tall from its first frame, and its links are routed to it once.", "x": 38.65, "y": 54.83, "box": [39.79, 51.0, 14.3, 7.67]}]}, {"id": "groupby-fix", "img": "compare/collapsed-and-redraw-groupby-fix.png", "group": "target", "tab": "45 · Group by", "title": "Grouped by tier, after a redraw, at 1:1", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "One Highlight row", "text": "Build 131 removes the old row wherever it is, inside Build 163’s wrap too, so a redraw leaves one row.", "x": 23.2, "y": 17.28, "box": [25.62, 15.22, 48.47, 4.11]}, {"n": 2, "head": "A steady canvas", "text": "The canvas stays 180 px down and 700 px tall through every redraw. When its top does move, its height follows in the same frame.", "x": 73.31, "y": 95.83, "box": [21.74, 20.0, 52.36, 77.78]}]}, {"id": "export-today", "img": "compare/collapsed-and-redraw-export-today.png", "group": "today", "tab": "Today · Two collapsed", "title": "Build 215: the same export", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "One place for both", "text": "Both collapsed cards are numbered NaN, so the layout keeps one place for the two: Forwarders is drawn over Syslog collection.", "x": 58.4, "y": 44.83, "box": [51.81, 18.44, 13.19, 24.89]}, {"n": 2, "head": "A link to itself", "text": "The Aggregate link from Syslog collection to Forwarders starts and ends on the one card, so it loops over its top.", "x": 61.83, "y": 14.46, "box": [51.81, 18.44, 13.19, 24.89]}]}, {"id": "pill-today", "img": "compare/collapsed-and-redraw-pill-today.png", "group": "today", "tab": "Today · Expand pill", "title": "Build 215: the same box", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Over the text", "text": "The pill is placed over the box’s top right, and “REGION · COLLAPSED”, at 11.5 px since Build 215, runs under it.", "x": 64.43, "y": 54.81, "box": [54.93, 52.22, 7.92, 5.17]}]}, {"id": "groupby-today", "img": "compare/collapsed-and-redraw-groupby-today.png", "group": "today", "tab": "Today · Group by", "title": "Build 215: the same redraw", "w": 1440, "h": 900, "zoom": 1, "size": "1440 × 900", "crop": "viewport", "items": [{"n": 1, "head": "Two Highlight rows", "text": "Build 163 wraps the old row, so Build 131 no longer finds it to remove; each redraw shows the old row and the new one.", "x": 19.12, "y": 17.44, "box": [21.74, 15.22, 52.36, 8.89]}, {"n": 2, "head": "43 px lower, then shorter", "text": "The canvas is drawn 43 px lower and still 700 px tall, past the window’s foot, until Build 140 measures its top, 30 ms after the redraw’s frame, and it shrinks to 657 px.", "x": 73.31, "y": 95.95, "box": [21.74, 24.78, 52.36, 73.0]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size+' viewport';
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 215 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>

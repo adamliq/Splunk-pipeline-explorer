@@ -1,0 +1,8 @@
+/* Fault 43. A collapsed container's box lays its "Expand" pill out beside its first line, which wraps to keep clear of
+   it, instead of placing the pill over the line: at 11.5 px, the canvas's text size since Build 215, "REGION · COLLAPSED"
+   ran under it. The pill keeps its place, 10 px in from the box's top right; the name and the counts take the box's
+   full width. */
+#topologyBuilder #builderTree .collapsedGroupProxy{grid-template-columns:minmax(0,1fr) auto;column-gap:6px;align-content:start}
+#topologyBuilder #builderTree .collapsedGroupProxy>small{grid-area:1/1}
+#topologyBuilder #builderTree .collapsedGroupProxy>em{position:static;grid-area:1/2;align-self:start;margin:-3px -4px 0 0}
+#topologyBuilder #builderTree .collapsedGroupProxy>:is(strong,span){grid-column:1/-1}

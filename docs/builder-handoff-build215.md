@@ -102,6 +102,10 @@ Items 15, 16 and 19 are done, in Build 209, 18, 25 and 26 in Build 211, 34 in Bu
 | 45 | With Group by on, the canvas is drawn 700 px tall and is 657 px two frames later (zones topology, 1,440 × 900), from a step other than the polish | The lanes and text |
 | 46 | On a phone, with a container collapsed, one of its links is routed again a frame after each redraw, its start 7.9 px lower: in the zones topology with the Syslog Servers' container collapsed, the link at (150, 1490). The polish has no part in it. Build 214's block routes these links again from its resize observer, which also fires when it first observes a box | The lanes and text |
 
+> **Correction, from the collapsed-and-redraw handoff:** faults 44 and 46 happen before the first frame after a redraw is painted. A frame's animation callbacks and resize observers run before it is painted, so after a redraw from a click or a key, the polish (44) and the second routing (46) are done before anything is drawn. What is seen:
+> - **44:** smaller text only when the redraw itself runs in an animation callback, as on crossing 760 px wide: crossing and back, the two frames it redraws in are painted with 143 texts at the smaller size.
+> - **46:** the link starting 33.2 px below its card, where the second routing puts it. The first routing, which no frame shows, put it 25.2 px below.
+
 ### Left as they are by design
 
 - "Configured handoff" labels many pairs (the add-next handoff).
