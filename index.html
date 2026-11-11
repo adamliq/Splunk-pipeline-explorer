@@ -2844,7 +2844,7 @@ function architectureExportScopes(){const allIds=state.builderNodes.map(node=>no
 function architectureScopeByKey(key=state.builderExport.scope){const scopes=architectureExportScopes(),scope=scopes.find(item=>item.key===key&&item.available)||scopes[0];if(scope.key!==key)state.builderExport.scope=scope.key;return scope}
 function architectureScopeOptions(){return architectureExportScopes().map(scope=>`<option value="${scope.key}" ${scope.key===state.builderExport.scope?'selected':''} ${scope.available?'':'disabled'}>${builderEscape(scope.label)}</option>`).join('')}
 function architectureScopeEdgeAllowed(key,edgeKeys){return!edgeKeys?.length||edgeKeys.includes(key)}
-function withArchitectureExportScope(scope,callback){const saved={nodes:state.builderNodes,relations:state.builderRelations,auth:state.builderAuthRelations,groups:state.builderGroups,planes:state.builderVisiblePlanes},selected=new Set(scope.nodeIds||saved.nodes.map(node=>node.id)),aggregateIds=new Set(scope.aggregateGroups||[]),memberProxy=new Map(),proxies=[];builderComponents.__collapsedExport={name:'Collapsed group',type:'COLLAPSED GROUP',color:'#a996ff',stages:['Aggregate component view','Expand in Builder for detail']};aggregateIds.forEach((groupId,index)=>{const group=saved.groups.find(item=>item.id===groupId),members=saved.nodes.filter(node=>node.groupId===groupId&&selected.has(node.id));if(!group||!members.length)return;const id=-100000-index,mappedRegions=[...new Set(members.map(node=>node.region||'Unspecified'))],mappedEnvironments=[...new Set(members.map(node=>node.environment||'Unspecified'))];members.forEach(node=>memberProxy.set(node.id,id));const incoming=members.map(node=>node.parent).find(parent=>selected.has(parent)&&!members.some(member=>member.id===parent));proxies.push({id,type:'__collapsedExport',instanceName:group.name,parent:incoming??null,sets:1,transport:'Aggregate',ack:false,persistent:false,eventStatus:'healthy',region:mappedRegions.length===1?mappedRegions[0]:'Multiple regions',environment:mappedEnvironments.length===1?mappedEnvironments[0]:'Multiple environments',groupId:null,exportMemberCount:members.length})});const mapEndpoint=id=>memberProxy.get(id)??id,kept=saved.nodes.filter(node=>selected.has(node.id)&&!memberProxy.has(node.id)).map(node=>{const key=`data:${node.id}`,parent=selected.has(node.parent)&&architectureScopeEdgeAllowed(key,scope.edgeKeys)?mapEndpoint(node.parent):null;return{...node,parent}});proxies.forEach(proxy=>{if(proxy.parent!==null)proxy.parent=mapEndpoint(proxy.parent)});const nodeIds=new Set([...kept.map(node=>node.id),...proxies.map(node=>node.id)]);kept.forEach(node=>{node.parent=nodeIds.has(node.parent)?node.parent:null});const dedupe=(items,plane)=>{const seen=new Set();return items.filter(item=>selected.has(item.from)&&selected.has(item.to)&&architectureScopeEdgeAllowed(`${plane}:${item.id}`,scope.edgeKeys)).map(item=>({...item,from:mapEndpoint(item.from),to:mapEndpoint(item.to)})).filter(item=>{if(item.from===item.to)return false;const key=`${item.from}:${item.to}`;if(seen.has(key))return false;seen.add(key);return true})};state.builderNodes=[...kept,...proxies];state.builderRelations=dedupe(saved.relations,'management');state.builderAuthRelations=dedupe(saved.auth,'authentication');state.builderGroups=saved.groups.filter(group=>(!scope.groupIds||scope.groupIds.includes(group.id))&&!aggregateIds.has(group.id)&&state.builderNodes.some(node=>node.groupId===group.id));if(scope.planes)state.builderVisiblePlanes={data:false,management:false,authentication:false,...scope.planes};try{return callback({components:state.builderNodes.length,relationships:builderTraceEdges('all').filter(edge=>state.builderVisiblePlanes[edge.plane]).length})}finally{state.builderNodes=saved.nodes;state.builderRelations=saved.relations;state.builderAuthRelations=saved.auth;state.builderGroups=saved.groups;state.builderVisiblePlanes=saved.planes;delete builderComponents.__collapsedExport}}
+function withArchitectureExportScope(scope,callback){const saved={nodes:state.builderNodes,relations:state.builderRelations,auth:state.builderAuthRelations,groups:state.builderGroups,planes:state.builderVisiblePlanes},selected=new Set(scope.nodeIds||saved.nodes.map(node=>node.id)),aggregateIds=new Set(scope.aggregateGroups||[]),memberProxy=new Map(),proxies=[];builderComponents.__collapsedExport={name:'Collapsed group',type:'COLLAPSED GROUP',color:'#a996ff',stages:['Aggregate component view','Expand in Builder for detail']};[...aggregateIds].forEach((groupId,index)=>{const group=saved.groups.find(item=>item.id===groupId),members=saved.nodes.filter(node=>node.groupId===groupId&&selected.has(node.id));if(!group||!members.length)return;const id=-100000-index,mappedRegions=[...new Set(members.map(node=>node.region||'Unspecified'))],mappedEnvironments=[...new Set(members.map(node=>node.environment||'Unspecified'))];members.forEach(node=>memberProxy.set(node.id,id));const incoming=members.map(node=>node.parent).find(parent=>selected.has(parent)&&!members.some(member=>member.id===parent));proxies.push({id,type:'__collapsedExport',instanceName:group.name,parent:incoming??null,sets:1,transport:'Aggregate',ack:false,persistent:false,eventStatus:'healthy',region:mappedRegions.length===1?mappedRegions[0]:'Multiple regions',environment:mappedEnvironments.length===1?mappedEnvironments[0]:'Multiple environments',groupId:null,exportMemberCount:members.length})});const mapEndpoint=id=>memberProxy.get(id)??id,kept=saved.nodes.filter(node=>selected.has(node.id)&&!memberProxy.has(node.id)).map(node=>{const key=`data:${node.id}`,parent=selected.has(node.parent)&&architectureScopeEdgeAllowed(key,scope.edgeKeys)?mapEndpoint(node.parent):null;return{...node,parent}});proxies.forEach(proxy=>{if(proxy.parent!==null)proxy.parent=mapEndpoint(proxy.parent)});const nodeIds=new Set([...kept.map(node=>node.id),...proxies.map(node=>node.id)]);kept.forEach(node=>{node.parent=nodeIds.has(node.parent)?node.parent:null});const dedupe=(items,plane)=>{const seen=new Set();return items.filter(item=>selected.has(item.from)&&selected.has(item.to)&&architectureScopeEdgeAllowed(`${plane}:${item.id}`,scope.edgeKeys)).map(item=>({...item,from:mapEndpoint(item.from),to:mapEndpoint(item.to)})).filter(item=>{if(item.from===item.to)return false;const key=`${item.from}:${item.to}`;if(seen.has(key))return false;seen.add(key);return true})};state.builderNodes=[...kept,...proxies];state.builderRelations=dedupe(saved.relations,'management');state.builderAuthRelations=dedupe(saved.auth,'authentication');state.builderGroups=saved.groups.filter(group=>(!scope.groupIds||scope.groupIds.includes(group.id))&&!aggregateIds.has(group.id)&&state.builderNodes.some(node=>node.groupId===group.id));if(scope.planes)state.builderVisiblePlanes={data:false,management:false,authentication:false,...scope.planes};try{return callback({components:state.builderNodes.length,relationships:builderTraceEdges('all').filter(edge=>state.builderVisiblePlanes[edge.plane]).length})}finally{state.builderNodes=saved.nodes;state.builderRelations=saved.relations;state.builderAuthRelations=saved.auth;state.builderGroups=saved.groups;state.builderVisiblePlanes=saved.planes;delete builderComponents.__collapsedExport}}
 function decorateArchitectureSvg(source,scope,counts,titleOverride=''){const parser=new DOMParser(),doc=parser.parseFromString(source,'image/svg+xml');if(doc.querySelector('parsererror'))throw new Error('The scoped architecture diagram could not be rendered.');const root=doc.documentElement,title=titleOverride||`Splunk Pipeline Explorer · ${scope.label}`,titleNode=doc.querySelector('#diagram-title-text'),accessible=doc.querySelector('#diagram-title'),description=doc.querySelector('#diagram-desc'),subtitles=[...doc.querySelectorAll('.subtitle')];if(titleNode)titleNode.textContent=title;if(accessible)accessible.textContent=title;if(description)description.textContent=`${scope.label}. ${counts.components} components and ${counts.relationships} relationships.`;if(subtitles[0])subtitles[0].textContent=`${scope.label} · ${counts.components} components · ${counts.relationships} relationships`;if(subtitles[1])subtitles[1].textContent=`Generated ${new Date().toISOString()} · Scope: ${scope.label}`;root.setAttribute('data-export-scope',scope.key);root.setAttribute('preserveAspectRatio','xMidYMid meet');return'<?xml version="1.0" encoding="UTF-8"?>'+new XMLSerializer().serializeToString(root)}
 function architectureSvgForScope(scope,titleOverride=''){if(!scope?.nodeIds?.length)throw new Error('The selected export scope contains no components.');return withArchitectureExportScope(scope,counts=>decorateArchitectureSvg(builderDiagramSvgBeforeNavigationExport(),scope,counts,titleOverride))}
 builderDiagramSvg=function(){return architectureSvgForScope(architectureScopeByKey())};
@@ -5466,7 +5466,7 @@ function builderGroupingChrome131(){
   if(desktop){control.classList.remove('mobileQuick131');bar.querySelector('.unifiedPlaneChecks')?.after(control)}
   else{control.classList.add('mobileQuick131');workspace.insertBefore(control,canvas)}
   const active=state.builderGrouping.mode!=='none'||builderHighlightTypes130.size>0;
-  $$('.builderWorkspace>.builderGroupChips130').filter(element=>element!==chips).forEach(element=>element.remove());
+  $$('.builderWorkspace .builderGroupChips130').filter(element=>element!==chips).forEach(element=>element.remove());
   if(chips&&active){chips.classList.add('groupStrip131');workspace.insertBefore(chips,canvas);chips.querySelectorAll('.builderGroupAction130').forEach(button=>chips.querySelector('span')?.after(button))}
   else if(chips){chips.classList.remove('groupStrip131');if(panel&&chips.parentElement!==panel)panel.appendChild(chips)}
   chips?.querySelectorAll('.builderGroupChip130').forEach(chip=>chip.setAttribute('aria-pressed',String(builderHighlightTypes130.has(chip.dataset.groupType))));
@@ -6545,7 +6545,7 @@ const builderSpaceApplyBefore140=applyBuilderViewport;applyBuilderViewport=funct
 function builderSpaceRail140(){const dock=builderDensityDock,panels=builderDensityPanels;if(!dock||!panels)return;const icons=['⌕','▤','◇','⚒'];[...dock.querySelectorAll(':scope > .builderDensityToggle')].forEach((button,i)=>{button.dataset.icon=icons[i]||'•';button.setAttribute('aria-label',button.title||button.textContent.trim());if(i===2){let badge=button.querySelector('.builderSpaceRailCount140');if(!badge){badge=document.createElement('span');badge.className='builderSpaceRailCount140';button.appendChild(badge)}badge.textContent=String(builderFindingSummary().review)}});const validation=builderFindingSummary(),summary=validateItems.parentElement.querySelector('summary');if(summary){let badge=summary.querySelector('.builderSpaceValidation140');if(!badge){badge=document.createElement('span');badge.className='builderSpaceValidation140';summary.appendChild(badge)}badge.textContent=validation.errors?validation.errors+' errors':validation.review?validation.review+' to review':'✓';badge.classList.toggle('valid',!validation.errors);summary.title=`${validation.errors} errors · ${validation.review} to review`}if(!builderSpaceGroup140.isConnected)panels.appendChild(builderSpaceGroup140);if(!builderSpaceGroupButton140.isConnected)dock.insertBefore(builderSpaceGroupButton140,panels);const group=$('#builderGroupBar');if(group&&group.parentElement!==builderSpaceGroup140)builderSpaceGroup140.appendChild(group)}
 function builderSpaceAttach140(){document.body.dataset.view=state.view;if(!builderSpaceMedia140.matches){if(builderSpacePlaneMarker140.isConnected&&builderSpacePlane140.parentElement!==builderSpacePlaneMarker140.parentElement)builderSpacePlaneMarker140.after(builderSpacePlane140);builderSpaceTitle140.textContent=builderSpaceTitleText140;builderSpaceRoot140.classList.remove('builderSpaceAutoMapHidden140');builderSpaceFocusChrome140();return}if(state.view!=='builder')return;const head=$('.builderHead'),wrap=$('.builderActionWrap');if(builderSpacePlane140.parentElement!==head)head.insertBefore(builderSpacePlane140,wrap);builderSpaceTitle140.textContent='Builder';builderSpaceTitle140.title=builderSpaceTitleText140;const primary=$('.builderDensityHeaderPrimary');if(primary&&builderSpaceSave140.parentElement!==primary)primary.appendChild(builderSpaceSave140);const status=$('#builderSaveState');if(status){builderSpaceSave140.textContent=status.classList.contains('dirty')?'● Unsaved':'● Saved';builderSpaceSave140.title=status.title||status.textContent}builderSpaceRail140();if(!builderSpaceHelpPopover140.isConnected)builderSpaceCanvas140.appendChild(builderSpaceHelpPopover140);const hint=$('.builderNavigationHint');if(hint&&hint.parentElement!==builderSpaceHelpPopover140)builderSpaceHelpPopover140.appendChild(hint);if(builderBottomBar.isConnected&&builderSpaceHelp140.parentElement!==builderBottomBar)builderBottomBar.insertBefore(builderSpaceHelp140,builderBottomBar.querySelector('.builderMobileZoomControls'));builderSpaceSchedule140()}
 const builderSpaceSwitchBefore140=switchView;switchView=function(...args){const result=builderSpaceSwitchBefore140(...args);builderSpaceAttach140();if(builderSpaceMedia140.matches&&state.view==='builder'&&scrollY)window.scrollTo({top:0,behavior:'instant'});return result};
-const builderSpaceRenderBefore140=renderBuilder;renderBuilder=function(...args){const result=builderSpaceRenderBefore140(...args);if(state.view==='builder')requestAnimationFrame(()=>{builderSpaceAttach140();builderSpaceFocusChrome140();builderSpaceAutoMap140()});return result};
+const builderSpaceRenderBefore140=renderBuilder;renderBuilder=function(...args){const result=builderSpaceRenderBefore140(...args);if(state.view==='builder')requestAnimationFrame(()=>{builderSpaceAttach140();builderSpaceFocusChrome140();builderSpaceMeasure140();builderSpaceAutoMap140()});return result};
 const builderSpacePanelsBefore140=syncCanvasPanels;syncCanvasPanels=function(...args){const priorWidth=builderSpaceCanvas140.clientWidth,result=builderSpacePanelsBefore140(...args);if(state.view==='builder'){builderSpaceSchedule140();if(builderSpaceWide140.matches&&canvasPanelState.inspector){requestAnimationFrame(()=>{const after=builderSpaceCanvas140.clientWidth;if(priorWidth!==after&&state.builderSelected){const selected=$('#builderTree .builderNode.selected');if(selected){const r=selected.getBoundingClientRect(),c=builderSpaceCanvas140.getBoundingClientRect();if(r.right>c.right-20){state.builderViewport.x-=r.right-c.right+30;applyBuilderViewport()}}}})}}return result};
 const builderSpaceFocusChecksSlot140=document.createComment('Plane controls original position'),builderSpaceFocusHistorySlot140=document.createComment('History controls original position');
 $('.builderPlaneBar .unifiedPlaneChecks')?.before(builderSpaceFocusChecksSlot140);$('.builderDensityHeaderPrimary .builderHistoryControls')?.before(builderSpaceFocusHistorySlot140);
@@ -13978,7 +13978,7 @@ filename = acme_geo.csv
 match_type = CIDR(ip)
 `};
 function loadExample(){pm.files=[];pm.seq=0;for(const [path,text] of Object.entries(example))addFile(confType(path,text),path.split('/').pop(),path,text);pm.tab='props';pm.focus='all';pm.error='';analyse();refresh()}
-window.configView205={parseConf,confType,placeOf,analyse,loadExample,example,linesByStage,propsStages,inputStages,hecTokenStages,transformsKeys,destStages,searchStages,
+window.configView205={parseConf,confType,placeOf,analyse,loadExample,example,linesByStage,propsStages,inputStages,hecTokenStages,transformsKeys,destStages,searchStages,effect,whyNot,shown,where,showLine,showStage,
  load(files){pm.files=[];pm.seq=0;for(const [path,text] of Object.entries(files)){const place=typeof text==='object'?text.place:null,body=typeof text==='object'?text.text:text;addFile(confType(path,body),path.split('/').pop(),path,body,place)}pm.tab=null;pm.focus='all';pm.error='';analyse();refresh()},
  readFiles};
 analyse();render();renderPanel();
@@ -14848,16 +14848,16 @@ const info=document.getElementById('builderInfoText159');if(info)info.textConten
    the canvas routes a link: out of the side that faces the other end, round the cards and collapsed containers in the
    way, with the same rounded corners. The line jumps block takes these links in too. */
 
-// A collapsed container's box is its proxy's; a card's is the canvas's, from builderCardBox. The proxy sits at its
-// members' top-left place; a card is found by its place in the layout.
+// A collapsed container's box is its proxy's; a card's is the card as drawn, at its wrap's place. The proxy sits at its
+// members' top-left place; a card is found by that place (a layout worked out again can differ on a phone: fault 46).
 function endBox(world,layout,point){
  if(point?.members?.length){const id=point.members[0].groupId,proxy=world.querySelector(`.collapsedGroupProxy[data-collapsed-group="${CSS.escape(String(id))}"]`);
   return {x:point.x,y:point.y,w:proxy?.offsetWidth||190,h:proxy?.offsetHeight||103}}
- for(const [id,place] of layout.positions)if(Math.abs(place.x-point.x)<.5&&Math.abs(place.y-point.y)<.5)return builderCardBox(id,layout.positions);
+ for(const wrap of world.querySelectorAll('.unifiedNodeWrap:not(.navHidden)')){const card=wrap.querySelector('.builderNode'),x=parseFloat(wrap.style.left),y=parseFloat(wrap.style.top);if(card?.offsetHeight&&Math.abs(x-point.x)<.5&&Math.abs(y-point.y)<.5)return {x,y,w:card.offsetWidth,h:card.offsetHeight}}
  return {x:point.x,y:point.y,w:190,h:224}}
 // The other cards and collapsed containers on the canvas, which a route goes round.
 function obstacles(world,layout,skip){const boxes=[];
- for(const node of state.builderNodes){const wrap=world.querySelector(`[data-unified-node-wrap="${node.id}"]`);if(!wrap||wrap.classList.contains('navHidden')||!layout.positions.has(node.id))continue;boxes.push(builderCardBox(node.id,layout.positions))}
+ for(const wrap of world.querySelectorAll('.unifiedNodeWrap:not(.navHidden)')){const card=wrap.querySelector('.builderNode');if(card?.offsetHeight)boxes.push({x:parseFloat(wrap.style.left)||0,y:parseFloat(wrap.style.top)||0,w:card.offsetWidth,h:card.offsetHeight})}
  for(const proxy of world.querySelectorAll('.collapsedGroupProxy'))boxes.push({x:parseFloat(proxy.style.left)||0,y:parseFloat(proxy.style.top)||0,w:proxy.offsetWidth||190,h:proxy.offsetHeight||103});
  return boxes.filter(box=>!skip.some(end=>Math.abs(end.x-box.x)<.5&&Math.abs(end.y-box.y)<.5))}
 // Which sides the link leaves and enters by: across when one box is clear of the other sideways, else down or up. On a
@@ -14918,6 +14918,439 @@ changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(["Lanes rou
 const root=document.getElementById('topologyBuilder');root.dataset.buildNumber='215';root.dataset.buildDate='2026-10-26';
 document.title='Splunk Pipeline Explorer · Build 215 · 26 Oct 2026';
 const info=document.getElementById('builderInfoText159');if(info)info.textContent=info.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 215 · 26 Oct 2026');
+})();
+</script>
+<style id="config-type-map-v217-styles">
+/* Build 217: the source type map, between the Config view's files and its Matrix. Five columns in processing order, the
+   cards in each from the files' stanzas and lines, and the joining lines drawn behind them. The panel's look: its file
+   letters, its stage chips' colours and its faded lines for no effect. */
+.tmMap217{margin:0 0 14px;border:1px solid var(--line);border-radius:13px;background:#0b1620;overflow:hidden}
+.tmMap217[hidden]{display:none!important}
+/* The page styles every header as a flex row with 20px under it; the map's headers set their own. */
+.tmMap217 header{margin:0}
+.tmHead217{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px 18px;padding:14px 16px;background:#0d1a26;border-bottom:1px solid var(--line)}
+.tmTitle217{display:grid;gap:3px;min-width:0;max-width:640px}
+.tmTitle217 small{color:var(--cyan);font-size:.66rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.tmTitle217 strong{color:var(--text);font-size:.98rem;overflow-wrap:anywhere}
+.tmTitle217>span{color:var(--muted);font-size:.78rem;line-height:1.45}
+.tmTypes217{display:flex;flex-wrap:wrap;gap:6px}
+.tmTypes217 button,.tmType217{border:1px solid #2a4154;border-radius:99px;padding:5px 11px;background:#08131d;color:#b8c9d7;font:inherit;font-size:.74rem;cursor:pointer}
+.tmTypes217 button:hover,.tmType217:hover{color:var(--text);border-color:#3c6a86}
+.tmTypes217 button[aria-pressed=true]{border-color:var(--cyan);background:rgba(87,199,232,.12);color:var(--text)}
+.tmType217{padding:1px 8px;font-size:.7rem}
+.tmMap217 button:focus-visible{outline:2px solid var(--cyan);outline-offset:1px}
+.tmSummary217{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:10px 16px;border-bottom:1px solid var(--line)}
+.tmSummary217 span{border:1px solid var(--line);border-radius:99px;padding:4px 10px;color:#b8c9d7;font-size:.72rem}
+.tmSummary217 b{color:var(--text)}
+.tmScroll217{overflow-x:auto;padding:14px 16px 16px}
+.tmGrid217{position:relative;display:grid;grid-template-columns:repeat(2,minmax(205px,1fr)) minmax(235px,1.2fr) repeat(2,minmax(205px,1fr));gap:16px 34px;align-items:start;min-width:1191px}
+.tmCol217{position:relative;z-index:1;display:grid;align-content:start;gap:10px;min-width:0}
+.tmColHead217{display:grid;gap:4px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.tmColHead217 h3{display:flex;align-items:center;gap:8px;margin:0;color:var(--text);font-size:.84rem}
+.tmColHead217 h3 b{display:inline-grid;place-items:center;width:19px;height:19px;border-radius:50%;background:#16293a;color:var(--cyan);font-size:.7rem}
+.tmColHead217 small{color:var(--muted);font-size:.7rem;line-height:1.4}
+.tmTiers217{display:flex;gap:4px}
+.tmTiers217 i{min-width:26px;border-radius:5px;padding:1px 4px;background:#0a1520;font:700 10px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;font-style:normal;text-align:center}
+.tmTiers217 i.yes{color:var(--green)}
+.tmTiers217 i.maybe{color:var(--amber)}
+.tmTiers217 i.none{color:#4d5f70}
+.tmTiers217 i.tmPicked217{box-shadow:inset 0 0 0 1px var(--cyan)}
+.tmCard217{display:grid;gap:6px;min-width:0;border:1px solid #203345;border-radius:10px;padding:8px 10px;background:#07111a;font-size:.74rem}
+/* A card's name, then where it is; when the column is too narrow for both, where it is goes under the name. */
+.tmCard217>header{display:flex;flex-wrap:wrap;align-items:flex-start;gap:2px 6px;min-width:0}
+.tmCard217>header>code{flex:1 1 auto;min-width:0;max-width:calc(100% - 22px);color:var(--amber);font:700 12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere}
+.tmAt217{display:flex;align-items:baseline;gap:6px;margin-left:auto;white-space:nowrap}
+.tmCard217>header>.propsFile205{margin-top:1px}
+.tmCard217 .propsFile205{width:16px;height:16px;font-size:9.5px}
+.tmFiles217{color:var(--muted);font-size:.66rem;white-space:nowrap}
+.tmSub217,.tmNote217,.tmWhy217{margin:0;color:#a4b4c2;font-size:.72rem;line-height:1.45}
+.tmNote217{color:#f0b8b8}
+.tmWhy217{color:var(--muted)}
+.tmOwn217>.tmWhy217{color:#e9c88c}
+.tmCard217 ul,.tmCard217 ol{display:grid;gap:3px;margin:0;padding:0;list-style:none}
+/* A setting: its stage, the line, and where it is; when the card is too narrow, where it is goes under the line. */
+.tmSet217{display:flex;flex-wrap:wrap;align-items:flex-start;gap:2px 6px}
+.tmSet217>.tmStage217{flex:none;min-width:24px;margin-top:1px}
+.tmSet217>code{flex:1 1 9em}
+.tmSet217>.tmRef217{margin-left:auto}
+/* A long value runs to three lines; the whole line is in its tooltip. */
+.tmSet217>code,.tmRun217 li>code,.tmIgnored217 code{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;min-width:0;overflow:hidden;color:#c5e6f5;font:11.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere}
+.tmRun217>div>code{flex:1 1 auto;min-width:0;overflow-wrap:anywhere;font:11.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+.tmSet217>code b,.tmRun217 code b{color:#e8f4fb;font-weight:600}
+.tmSet217>small{flex:1 0 100%;box-sizing:border-box;padding-left:30px;color:var(--muted);font-size:.68rem;line-height:1.4}
+.tmStage217{border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);border-radius:99px;padding:0 4px;background:color-mix(in srgb,var(--accent) 12%,#08131d);color:#dbe9f2;font:700 10px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;cursor:pointer}
+.tmStage217:hover{border-color:var(--accent)}
+.tmNoStage217{border-color:transparent;background:none;color:#4d5f70;text-align:center;cursor:default}
+.tmRef217{border:0;padding:0;background:none;color:#6f8496;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap;cursor:pointer}
+.tmRef217:hover{color:var(--cyan);text-decoration:underline}
+.tmRuns217{display:grid;gap:4px}
+.tmRuns217>ol{margin-left:24px;gap:5px}
+.tmRun217{display:grid;gap:2px;border-left:2px solid var(--violet);padding:2px 0 2px 8px}
+.tmRun217>div{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 6px;min-width:0}
+.tmRun217>div>.tmRef217{margin-left:auto}
+.tmRun217>div>code{color:#cfc4ff;font-weight:700}
+.tmRuns217,.tmRun217,.tmRun217 li{min-width:0}
+
+.tmDoes217{color:#cfc4ff;font-size:.7rem}
+.tmMissing217{border-left-color:var(--red);color:#f6b4b4}
+.tmNestedList217{flex:1 0 100%;box-sizing:border-box;display:grid;gap:2px;padding-left:30px}
+.tmNested217{color:#a4b4c2;font-size:.7rem;overflow-wrap:anywhere}
+.tmNested217 code{color:#cfc4ff;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+.tmHub217{border-color:rgba(87,199,232,.55);background:rgba(87,199,232,.06)}
+.tmHub217>header{justify-content:space-between}
+.tmHubName217{color:var(--text);font-size:1rem;line-height:1.3;overflow-wrap:anywhere}
+.tmTypeLabel217{color:var(--cyan);font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.tmWeb217{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;margin:0;border-top:1px solid #1a2b3a;padding-top:6px;color:var(--muted);font-size:.7rem;overflow-wrap:anywhere}
+.tmWeb217>b{flex:1 0 100%;color:#9fb2c2;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em}
+.tmIgnored217{display:grid;gap:3px;border-top:1px solid #1a2b3a;padding-top:6px}
+.tmIgnored217>b{color:#f6b4b4;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em}
+.tmIgnored217 li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 6px}
+.tmIgnored217 li small{grid-column:1/3;color:#f0b8b8;font-size:.68rem}
+.tmReceiver217{border-style:dashed}
+.tmOrigin217{border-color:rgba(169,150,255,.5)}
+.tmResult217{border-left:3px solid var(--result,#57c7e8)}
+.tmResult217>header strong{color:var(--text);font-size:.8rem}
+.tmResult217[data-result=index]{--result:var(--cyan)}
+.tmResult217[data-result=route]{--result:var(--blue)}
+.tmResult217[data-result=drop]{--result:var(--red)}
+.tmResult217[data-result=copy]{--result:var(--violet)}
+.tmResult217:is([data-result=meta],[data-result=field],[data-result=text]){--result:var(--amber)}
+.tmGlyph217{width:8px;height:8px;border-radius:50%;background:var(--result,#57c7e8);flex:none}
+.tmRefs217{display:flex;flex-wrap:wrap;gap:4px 10px;margin:0}
+.tmEmpty217{margin:0;border:1px dashed #203345;border-radius:10px;padding:10px;color:var(--muted);font-size:.72rem;line-height:1.45}
+.tmOff217{opacity:.45}
+.tmCard217.tmOff217 .tmOff217,.tmCard217.tmOff217 .tmSet217{opacity:1}
+.tmOwn217{border-color:rgba(243,189,97,.5)}
+.tmSet217.tmOff217 code b{text-decoration:line-through;text-decoration-color:rgba(241,122,122,.7)}
+/* The joining lines, behind the cards. */
+.tmEdges217{position:absolute;top:0;left:0;z-index:0;overflow:visible;pointer-events:none}
+.tmEdge217{fill:none;stroke-width:1.6;stroke:var(--edge,#5d7183)}
+.tmArrow217{fill:var(--edge,#5d7183)}
+:is(.tmEdge217,.tmArrow217)[data-edge=name]{--edge:var(--green)}
+:is(.tmEdge217,.tmArrow217)[data-edge=copy]{--edge:var(--violet)}
+:is(.tmEdge217,.tmArrow217)[data-edge=index]{--edge:var(--cyan)}
+:is(.tmEdge217,.tmArrow217)[data-edge=route]{--edge:var(--blue)}
+:is(.tmEdge217,.tmArrow217)[data-edge=drop]{--edge:var(--red)}
+:is(.tmEdge217,.tmArrow217):is([data-edge=meta],[data-edge=field],[data-edge=text]){--edge:var(--amber)}
+.tmEdge217[data-off]{opacity:.3}
+/* Below 900 px the columns stack, and each card says in words what the lines showed. */
+@media (max-width:900px){
+ .tmGrid217{grid-template-columns:minmax(0,1fr);min-width:0}
+ .tmEdges217,.tmLinesSay217{display:none}
+ .tmScroll217{padding:12px}
+}
+</style>
+<script id="config-type-map-v217">
+(function(){
+/* Build 217: the source type map. In the Config view, under the files, one source type at a time is followed through
+   Splunk's processing as the files configure it, in five columns: what reads it and names it, what parses it, the
+   index-time transforms its settings run, where its events go, and what searches add. A line joins each input,
+   [source::] stanza or copy to the source type it names, and each transform to what it does. Every setting sits in the
+   column of the Matrix stage the Config view gives it, is checked against the component chosen in the strip as the
+   panel's lines are, and leads to its line in the panel and its stage in the Matrix. Below 900 px the columns stack and
+   the joining lines go; each card says the same in words. */
+const cv=window.configView205,pm=state.configView205;
+if(!cv?.effect||!cv.showLine||!cv.showStage||!pm||typeof render!=='function')return;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=id=>String(id).padStart(2,'0'),stageById=id=>stages.find(s=>s.id===id);
+// A long name breaks after its separators before anywhere else.
+const breakable=s=>esc(s).replace(/([/:,_])(?![/_])/g,'$1<wbr>');
+const truthy=v=>/^(1|t|true|y|yes)$/i.test(String(v||'').trim());
+const SEARCH='Search-time processing',tcpin=stages.find(s=>s.name==='tcpin_queue')?.id;
+
+// The five columns, by the Matrix pipeline of a setting's stage.
+const PHASES=[
+ {key:'read',name:'Read',where:'Where the data is read: a forwarder, or the instance that runs the input'},
+ {key:'parse',name:'Parse',where:'The first full parsing tier: a Heavy Forwarder, or the indexer'},
+ {key:'transform',name:'Transform',where:'Index-time transforms, on the parsing tier'},
+ {key:'store',name:'Index or send',where:'Where its events go, and what is written with them'},
+ {key:'search',name:'Search',where:'Search time, on the search head'}];
+function phaseOf(id){const p=stageById(id)?.pipeline||'';
+ if(p===SEARCH)return'search';
+ if(p==='Typing pipeline')return'transform';
+ if(/^(TCP input handoff|Parsing handoff|Parsing pipeline|Merging handoff|Merging pipeline|Typing handoff)$/.test(p))return'parse';
+ if(/^(Indexing handoff|Forwarding pipeline|TCP output handoff|Indexing pipeline|Replication pipeline|Acknowledgement|Pipeline control|Post-index management)$/.test(p))return'store';
+ return'read'}
+
+// The files' stanzas, once each: the highest file's, with the winning line of every setting.
+const primaries=kind=>(pm.groups[kind]||[]).flatMap(f=>f.doc.stanzas).filter(st=>st.primary);
+const winners=st=>[...st.keys.values()].filter(r=>r&&!r.invalid);
+const fileOf=r=>pm.files.find(f=>f.id===r.fid);
+const stanzaLine=st=>fileOf(st)?.doc.lines.find(r=>r.kind==='stanza'&&r.stanza===st)||null;
+const staged=r=>r.m&&['stage','misplaced'].includes(r.m.area)&&r.m.stages?.length;
+const stageOf=r=>staged(r)?r.m.stages[0]:999;
+const inOrder=list=>[...list].sort((a,b)=>stageOf(a)-stageOf(b)||(a.fid===b.fid?a.n-b.n:0));
+const comp=()=>state.component||'all';
+
+// Everything the files say about one source type.
+function gather(T){
+ const P=primaries('props').filter(st=>st.types===null||st.types?.has(T)),I=primaries('inputs'),X=primaries('transforms');
+ const hub=P.find(st=>st.kind==='sourcetype'&&st.name===T)||null;
+ const inputs=I.filter(st=>st.types?.has(T)),receivers=I.filter(st=>tcpin&&st.input?.stages?.includes(tcpin));
+ const everyInput=I.find(st=>st.name==='default'&&winners(st).length)||null;
+ // What names it: an input's own sourcetype, a [source::] stanza its files match, a rule, or a copy of another one.
+ const sources=P.filter(st=>st.kind==='source'&&st.keys.get('sourcetype')?.value===T),rules=P.filter(st=>st.kind==='rule'&&st.keys.get('sourcetype')?.value===T);
+ const matches=(input,src)=>!!input.input?.path&&!input.keys.get('sourcetype')&&!!window.configSourceMatches207?.(input.input.path,[src],l=>cv.where(l))?.note;
+ const copies=[];
+ for(const st of X){if(st.keys.get('CLONE_SOURCETYPE')?.value!==T)continue;const role=pm.roles.get(st.name);
+  for(const u of role?.usedBy||[])copies.push({st,role,line:u.r,from:u.r.stanza.types?[...u.r.stanza.types].filter(t=>t!==T):null})}
+ // The settings of every props.conf stanza that acts on it, by column; those that act nowhere, and Splunk Web's.
+ const cols={read:[],parse:[],transform:[],store:[],search:[]},other=[];
+ for(const st of P){const by={};
+  for(const r of winners(st)){if(staged(r))(by[phaseOf(r.m.stages[0])]??=[]).push(r);else other.push(r)}
+  for(const [ph,lines] of Object.entries(by))cols[ph].push({st,lines:inOrder(lines)})}
+ return {T,P,hub,inputs,receivers,everyInput,sources,rules,matches,copies,cols,other,X}}
+
+// What a transform does to the events it matches, as a destination: an index, an output group, a drop, a copy, a
+// field, a rewrite. Search-time transforms and lookups have none.
+function outcomes(st,role){
+ if(!st||!role||role.search||role.lookup||role.area!=='stage')return[];
+ const v=k=>st.keys.get(k)?.value,dest=v('DEST_KEY'),fmt=v('FORMAT')||'',clone=v('CLONE_SOURCETYPE'),ingest=v('INGEST_EVAL');
+ if(clone)return [{kind:'copy',key:'copy:'+clone,title:`Copied as ${clone}`,type:clone}];
+ if(ingest){const out=[];for(const m of ingest.matchAll(/(?:^|,)\s*([A-Za-z_][\w:.-]*)\s*:?=(?!=)/g)){const f=m[1];
+   out.push(f==='index'?{kind:'index',key:'index:?',title:'Index set by an expression'}:f==='queue'?{kind:'drop',key:'queue:?',title:'Queue set by an expression'}:/^(host|source|sourcetype)$/.test(f)?{kind:'meta',key:'meta:'+f,title:`${f[0].toUpperCase()+f.slice(1)} set by an expression`}:f==='_raw'?{kind:'text',key:'text',title:'Text rewritten'}:/^_(TCP|SYSLOG)_ROUTING$/.test(f)?{kind:'route',key:'route:?',title:'Output set by an expression'}:f==='_time'?{kind:'meta',key:'time',title:'Timestamp set by an expression'}:{kind:'field',key:'field:'+f,title:`Indexed field ${f}`})}
+  return out}
+ if(dest==='queue')return [/^nullQueue$/i.test(fmt)?{kind:'drop',key:'drop',title:'Dropped'}:{kind:'route',key:'queue:'+fmt,title:`Sent to ${fmt}`}];
+ if(dest==='_MetaData:Index')return [{kind:'index',key:'index:'+fmt,title:`Index ${fmt}`}];
+ if(/^MetaData:(Host|Source|Sourcetype)$/.test(dest||''))return [{kind:'meta',key:'meta:'+dest+fmt,title:`${dest.slice(9)} set to ${fmt.replace(/^\w+::/,'')}`}];
+ if(/ROUTING$/.test(dest||''))return [{kind:'route',key:'route:'+fmt,title:`Sent to ${fmt.split(',').map(x=>x.trim()).filter(Boolean).join(' and ')}`}];
+ if(dest==='_raw')return [{kind:'text',key:'text',title:'Text rewritten'}];
+ if(dest==='_time')return [{kind:'meta',key:'time',title:'Timestamp rewritten'}];
+ if(dest==='_meta'||truthy(v('WRITE_META'))){const fields=fmt.match(/[\w.]+(?=::)/g)||['fields'];return fields.map(f=>({kind:'field',key:'field:'+f,title:`Indexed field ${f}`}))}
+ return[]}
+
+// The view: its own section between the files and the view's Matrix.
+const root=document.createElement('section');root.id='configTypeMap217';root.className='tmMap217';root.setAttribute('aria-label','Source type map');root.hidden=true;
+(document.getElementById('configView205')||document.getElementById('matrix'))?.after(root);
+
+// A setting, with its stage (to the Matrix) and its line (to the panel). Its tone is its verdict on the chosen component.
+const refText=r=>{const f=fileOf(r),dir=(f?.path||'').split('/').slice(-2,-1)[0];return `${dir||f?.name||''}:${r.n}`};
+// Each line's verdict, worked out once a draw.
+let effects=new Map();const effect=r=>{if(!effects.has(r))effects.set(r,cv.effect(r));return effects.get(r)};
+function tone(list){const v=list.map(effect);return v.length&&v.every(e=>e==='no')?'off':v.some(e=>e==='own')&&!v.some(e=>e&&e!=='no'&&e!=='own')?'own':''}
+function stageChip(id){const s=stageById(id);return s?`<button type="button" class="tmStage217" data-tm-stage="${id}" style="--accent:${colors[s.pipeline]||'#57c7e8'}" title="Stage ${pad(id)}, ${esc(s.name)}: show it in the Matrix">${pad(id)}</button>`:'<span class="tmStage217 tmNoStage217" aria-hidden="true">·</span>'}
+function lineRef(r){return`<button type="button" class="tmRef217" data-tm-line="${r.fid}:${r.n}" title="${esc(cv.where(r))}: show the line">${esc(refText(r))}</button>`}
+// A line's verdict on the chosen component, and why. The component's reason is the same for every line of a stage, so
+// a card gives it once when all its lines share it; a line's own reason (overridden, disabled, misplaced, unused) stays
+// on the line.
+const article=name=>/^(HEC|[AEIO])/.test(name||'')?'an':'a',onComp=()=>`${article(componentNames[comp()])} ${componentNames[comp()]}`;
+function verdict(r){const e=effect(r);
+ if(e==='own')return {e,comp:`On ${onComp()}, only for data it reads itself.`,mine:''};
+ if(e!=='no')return {e,comp:'',mine:''};
+ // A disabled input's card says so, once.
+ if(r.stanza?.disabledBy&&!r.overriddenBy)return {e,comp:'',mine:''};
+ if(r.m?.area==='misplaced'&&!r.overriddenBy)return {e,comp:'',mine:r.m.note||cv.whyNot(r)};
+ const why=cv.whyNot(r);return r.overriddenBy||r.stanza?.disabledBy||r.m?.unused?{e,comp:'',mine:why}:{e,comp:why,mine:''}}
+function shared(lines){const v=lines.map(verdict);if(!v.length||!v.every(x=>x.comp&&x.e===v[0].e))return'';
+ return v.every(x=>x.comp===v[0].comp)?v[0].comp:`None of these stages runs on ${onComp()}.`}
+function setting(r,extra='',quiet=false){const v=verdict(r),over=(r.overrides||[]).filter(x=>x.fid!==r.fid);
+ const note=[over.length?`Overrides ${over.map(x=>refText(x)).join(' and ')}.`:'',v.mine,quiet?'':v.comp,extra].filter(Boolean).join(' ');
+ return`<li class="tmSet217${v.e==='no'?' tmOff217':v.e==='own'?' tmOwn217':''}">${stageChip(staged(r)?r.m.stages[0]:null)}<code title="${esc(`${r.key} = ${cv.shown(r)}`)}"><b>${breakable(r.key)}</b> = ${esc(cv.shown(r))}</code>${lineRef(r)}${note?`<small>${esc(note)}</small>`:''}</li>`}
+// A card's lines, and the reason it gives once for all of them.
+function list(lines){const why=shared(lines);return {ul:`<ul>${lines.map(r=>setting(r,'',!!why)).join('')}</ul>`,why}}
+function stanzaHead(st,kind){const r=stanzaLine(st),files=[...new Set([...st.keys.values()].map(x=>x.fid))].length;
+ return`<header><i class="propsFile205" data-file="${kind}" title="${kind}.conf">${{inputs:'I',props:'P',transforms:'T'}[kind]}</i><code title="[${esc(st.name)}]">${st.implicit?'Global settings':`[${breakable(st.name)}]`}</code>${r||files>1?`<span class="tmAt217">${r?lineRef(r):''}${files>1?`<span class="tmFiles217">${files} files</span>`:''}</span>`:''}</header>`}
+function card({id,cls='',kind,st,title,sub,body='',note='',why='',off=''}){
+ return`<article class="tmCard217 ${cls}${off==='off'?' tmOff217':off==='own'?' tmOwn217':''}" ${id?`id="${esc(id)}"`:''} data-kind="${kind}">${st?stanzaHead(st,kind==='transforms'?'transforms':kind==='input'?'inputs':'props'):`<header>${title}</header>`}${sub?`<p class="tmSub217">${sub}</p>`:''}${why?`<p class="tmWhy217">${esc(why)}</p>`:''}${body}${note?`<p class="tmNote217">${note}</p>`:''}</article>`}
+
+// What a props.conf stanza is, for its card.
+function scope(st,T){return st.implicit?'Every source type: settings before the first stanza':st.kind==='default'?'Every source type':st.kind==='host'?`Events from host ${esc(st.name.slice(6))}, whatever their source type`:st.kind==='source'?(st.keys.get('sourcetype')?.value===T?`Names files ${esc(st.name.slice(8))} as ${esc(T)}`:`Events from ${esc(st.name.slice(8))}, whatever their source type`):st.kind==='rule'?`A source type rule naming ${esc(T)}`:''}
+
+let ids=0;const nid=p=>`tm${p}${++ids}`;
+function build(T){
+ ids=0;effects=new Map();const g=gather(T),edges=[],results=new Map(),cards={read:[],parse:[],transform:[],store:[],search:[]};
+ const hubId='tmHub217';
+ const result=(o,detail,refs=[])=>{let x=results.get(o.key);if(!x){x={...o,id:nid('R'),seq:results.size,details:[],refs:[]};results.set(o.key,x)}if(detail)x.details.push(detail);x.refs.push(...refs);return x};
+ // Read: the inputs, each with the [source::] stanzas its files match; rules; copies of other source types.
+ const shown=new Set();
+ const assigner=st=>{const lines=inOrder(winners(st).filter(r=>staged(r)&&phaseOf(r.m.stages[0])==='read'));edges.push({from:'src:'+st.name,to:hubId,kind:'name'});
+  const read=st.kind==='source'&&g.inputs.some(i=>g.matches(i,st));
+  const l=list(lines);return card({id:'src:'+st.name,kind:'props',st,sub:scope(st,T)+(st.kind==='source'&&!read&&g.inputs.length?'. No input in these files reads them':''),body:l.ul,why:l.why,off:tone(lines)})};
+ const inputNote=st=>st.disabledBy?`Disabled by ${lineRef(st.disabledBy)}, so it doesn’t run.`:'';
+ const inputSub=st=>st.input?.hec==='listener'?'The HTTP Event Collector listener: it takes the token’s events':st.input?.hec==='token'?`HEC token ${esc(st.name.slice(7))}: the events sent with it`:st.input?.path?`Reads ${esc(st.input.path)}`:esc(st.input?.label||'An input');
+ const hecTokens=g.inputs.filter(st=>st.input?.hec==='token');
+ for(const st of g.inputs){const id=nid('I'),lines=inOrder(winners(st)),own=st.keys.get('sourcetype');
+  const l=list(lines);cards.read.push(card({id,kind:'input',st,sub:inputSub(st),body:l.ul,why:l.why,note:inputNote(st),off:st.disabledBy?'off':tone(lines)}));
+  if(st.input?.hec==='listener'){for(const t of hecTokens)edges.push({from:id,to:'tok:'+t.name,kind:'match'});continue}
+  if(own?.value===T)edges.push({from:id,to:hubId,kind:'name'});
+  // The [source::] stanzas its files match, each under the input.
+  for(const src of g.sources)if(g.matches(st,src)){edges.push({from:id,to:'src:'+src.name,kind:'match'});if(!shown.has(src)){shown.add(src);cards.read.push(assigner(src))}}
+  // Where its events go, unless a transform says otherwise: the destination cards cite the input's lines.
+  if(!st.disabledBy){const who=`[${st.name}]`,ix=st.keys.get('index');
+   const allowed=st.input?.hec==='token'?(st.keys.get('indexes')?.value||'').split(',').map(x=>x.trim()).filter(x=>x&&x!==ix?.value):[];
+   if(ix)result({kind:'index',key:'index:'+ix.value,title:`Index ${ix.value}`},`Every event ${st.input?.hec==='token'?'sent with token '+st.name.slice(7):who+' reads'}, unless ${allowed.length?`the request names another index the token allows (${allowed.join(', ')}) or `:''}a transform changes it`,[ix]);
+   for(const k of ['_TCP_ROUTING','_SYSLOG_ROUTING','outputgroup']){const rt=st.keys.get(k);if(rt)result({kind:'route',key:'route:'+rt.value,title:`Sent to ${rt.value.split(',').map(x=>x.trim()).filter(Boolean).join(' and ')}`},`Every event ${st.input?.hec==='token'?'sent with token '+st.name.slice(7):who+' reads'}`,[rt])}}}
+ for(const st of [...g.sources,...g.rules])if(!shown.has(st)){shown.add(st);cards.read.push(assigner(st))}
+ for(const c of g.copies){const id=nid('C'),from=c.from?.length?c.from:null;
+  const l=list(inOrder(winners(c.st)));cards.read.push(card({id,cls:'tmOrigin217',kind:'transforms',st:c.st,sub:`Copies events of ${from?from.map(t=>`<button type="button" class="tmType217" data-tm-type="${esc(t)}">${esc(t)}</button>`).join(', '):'every source type its stanza covers'} as ${esc(T)}, after they are parsed. Run by ${lineRef(c.line)}`,body:l.ul,why:l.why,off:tone([stanzaLine(c.st)].filter(Boolean))}));
+  edges.push({from:id,to:hubId,kind:'copy'})}
+ if(g.everyInput){const lines=inOrder(winners(g.everyInput)),l=list(lines);cards.read.push(card({kind:'input',st:g.everyInput,sub:'Defaults for every input on the instance',body:l.ul,why:l.why,off:tone(lines)}))}
+ // Each props.conf stanza's settings, column by column; the [source::] stanzas that name it showed theirs to read.
+ const ownSub={read:()=>g.hub?.structured?`Structured data (${esc(g.hub.structured)}): parsed where the file is read`:'Applied where the data is read',store:()=>'Applied as the indexer writes its events'};
+ const stanzaCard=(ph,{st,lines})=>{const l=list(lines);return card({kind:'props',st,sub:st===g.hub?(ownSub[ph]?.()||''):scope(st,T),body:l.ul,why:l.why,off:tone(lines)})};
+ for(const item of g.cols.read)if(!shown.has(item.st))cards.read.push(stanzaCard('read',item));
+ if(!g.inputs.length&&!shown.size&&!g.copies.length)cards.read.push(`<p class="tmEmpty217">No input, [source::] stanza or rule in these files names ${esc(T)}.</p>`);
+ // Parse: from a forwarder it arrives on the receiving ports; then the source type, and its stanza's settings.
+ const forwarded=g.inputs.some(st=>!st.input?.hec);
+ if(forwarded)for(const st of g.receivers){const lines=inOrder(winners(st)),l=list(lines);cards.parse.push(card({kind:'input',st,cls:'tmReceiver217',sub:'Forwarded data arrives here, on the receiving tier',body:l.ul,why:l.why,note:inputNote(st),off:st.disabledBy?'off':tone(lines)}))}
+ const copyOnly=g.copies.length&&!g.inputs.length&&!shown.size;
+ const hubLines=g.cols.parse.find(x=>x.st===g.hub)?.lines||[],hubList=list(hubLines);
+ const hubOwn=new Set(g.hub?winners(g.hub):[]),web=g.other.filter(r=>r.m?.area==='web'&&hubOwn.has(r)),ignored=g.other.filter(r=>['unknown','elsewhere'].includes(r.m?.area));
+ const hubFiles=g.hub?new Set([...g.hub.keys.values()].map(x=>x.fid)).size:0;
+ const hubSays=[g.hub?`props.conf [${esc(T)}]${hubFiles>1?`, merged from ${hubFiles} files`:''}.`:`props.conf has no [${esc(T)}] stanza.`,
+  g.hub?.structured?`Structured data (${esc(g.hub.structured)}): it is parsed where the file is read, with the settings under Read, and isn’t parsed again here.`:'',
+  g.copies.length?copyOnly?`Its events are copies, made after parsing${hubLines.length?', so the parsing settings below don’t apply to them':''}.`:'Copies made by a transform skip parsing: these settings apply to the events its inputs read.':''].filter(Boolean).join(' ');
+ cards.parse.push(`<article class="tmCard217 tmHub217${copyOnly&&hubLines.length?' tmOff217':''}" id="${hubId}" data-kind="type"><header><span class="tmTypeLabel217">Source type</span>${g.hub&&stanzaLine(g.hub)?lineRef(stanzaLine(g.hub)):''}</header><strong class="tmHubName217">${esc(T)}</strong>
+  <p class="tmSub217">${hubSays}</p>${hubList.why?`<p class="tmWhy217">${esc(hubList.why)}</p>`:''}
+  ${hubLines.length?hubList.ul:g.hub&&!g.hub.structured&&!copyOnly?'<p class="tmEmpty217">No parsing settings: Splunk’s defaults apply.</p>':''}
+  ${web.length?`<p class="tmWeb217"><b>Splunk Web</b>${web.map(r=>`<span>${esc(r.key)} = ${esc(cv.shown(r))} ${lineRef(r)}</span>`).join('')}</p>`:''}
+  ${ignored.length?`<div class="tmIgnored217"><b>Ignored</b><ul>${ignored.map(r=>`<li><code>${breakable(r.key)} = ${esc(cv.shown(r))}</code>${lineRef(r)}<small>${esc(r.m.note||'')}</small></li>`).join('')}</ul></div>`:''}</article>`);
+ for(const item of g.cols.parse)if(item.st!==g.hub)cards.parse.push(stanzaCard('parse',item));
+ // Transform: each TRANSFORMS- and RULESET- line with the transforms.conf stanzas it runs, in the order it lists them.
+ for(const {st,lines} of g.cols.transform){const why=shared(lines);
+  const body=lines.map(r=>{
+   if(!r.refs||!/^(TRANSFORMS|RULESET)-/.test(r.key))return`<ul>${setting(r,'',!!why)}</ul>`;
+   const runs=r.refs.map(name=>{const x=g.X.find(s=>s.name===name),role=pm.roles.get(name);
+    if(!x||!role)return`<li class="tmRun217 tmMissing217"><code>[${esc(name)}]</code><small>Isn’t in transforms.conf, so this runs nothing for it.</small></li>`;
+    const id=nid('X'),line=stanzaLine(x),e=line?effect(line):null,outs=outcomes(x,role),key=['REGEX','SOURCE_KEY','INGEST_EVAL','DEST_KEY','FORMAT','CLONE_SOURCETYPE','WRITE_META'];
+    for(const o of outs)edges.push({from:id,to:result(o,`Events matching [${name}]`,[line].filter(Boolean)).id,kind:o.kind});
+    return`<li class="tmRun217${e==='no'?' tmOff217':''}" id="${id}"><div><code>[${breakable(name)}]</code>${line?lineRef(line):''}</div><small class="tmDoes217">${esc(role.label)}${role.search?'. It runs at search time; at index time it changes nothing.':''}</small><ul>${inOrder(winners(x).filter(k=>key.includes(k.key))).map(k=>`<li><code title="${esc(`${k.key} = ${cv.shown(k)}`)}"><b>${breakable(k.key)}</b> = ${esc(cv.shown(k))}</code></li>`).join('')}</ul></li>`}).join('');
+   return`<div class="tmRuns217">${`<ul>${setting(r,'',!!why)}</ul>`}<ol>${runs}</ol></div>`}).join('');
+  for(const r of lines)if(/^SEDCMD-/.test(r.key))edges.push({from:'set:'+r.fid+':'+r.n,to:result({kind:'text',key:'text',title:'Text rewritten'},`${r.key}`,[r]).id,kind:'text'});
+  cards.transform.push(card({kind:'props',st,sub:st===g.hub?`Run on ${esc(T)}’s events, on the parsing tier`:scope(st,T),body,why,off:tone(lines)}))}
+ if(!cards.transform.length)cards.transform.push(`<p class="tmEmpty217">No index-time transforms in these files act on ${esc(T)}.</p>`);
+ // Index or send: the destinations the inputs and transforms give it, then the settings the indexer applies.
+ const hasIndex=[...results.values()].some(x=>x.kind==='index'&&!x.key.endsWith('?'));
+ if(!hasIndex)Object.assign(result({kind:'index',key:'index:',title:copyOnly?'The index the events had':'The default index'},copyOnly?'Copies keep the index the events had when they were copied, unless a transform of this source type changes it':'No input or transform in these files sets the index, so Splunk uses the instance’s default, main unless set elsewhere'),{seq:-1});
+ for(const x of [...results.values()].sort((a,b)=>a.seq-b.seq)){
+  const off=x.refs.length&&x.refs.every(r=>effect(r)==='no');
+  cards.store.push(`<article class="tmCard217 tmResult217${off?' tmOff217':''}" id="${x.id}" data-kind="result" data-result="${x.kind}"><header><span class="tmGlyph217" aria-hidden="true"></span><strong>${esc(x.title)}</strong></header><p class="tmSub217">${[...new Set(x.details)].map(esc).join('. ')}.${x.type?` <button type="button" class="tmType217" data-tm-type="${esc(x.type)}">Follow ${esc(x.type)}</button>`:''}</p>${x.refs.length?`<p class="tmRefs217">${x.refs.map(lineRef).join('')}</p>`:''}</article>`)}
+ for(const item of g.cols.store)cards.store.push(stanzaCard('store',item));
+ // Search: the search-time settings, in the order Splunk applies them, with the transforms and lookups they name.
+ for(const {st,lines} of g.cols.search){const why=shared(lines);
+  const body=`<ul>${lines.map(r=>{if(!r.refs)return setting(r,'',!!why);
+   const runs=r.refs.map(name=>{const x=g.X.find(s=>s.name===name),role=pm.roles.get(name);if(!x||!role)return`<span class="tmMissing217">[${esc(name)}] isn’t in transforms.conf</span>`;const k=['REGEX','FORMAT','DELIMS','FIELDS','filename','collection','external_cmd'];
+    return`<span class="tmNested217"><code>[${esc(name)}]</code> ${esc(role.label.charAt(0).toLowerCase()+role.label.slice(1))}${winners(x).filter(y=>k.includes(y.key)).map(y=>`: <code>${esc(y.key)} = ${esc(cv.shown(y))}</code>`).join('')}</span>`}).join('');
+   return setting(r,'',!!why).replace(/<\/li>$/,`<div class="tmNestedList217">${runs}</div></li>`)}).join('')}</ul>`;
+  cards.search.push(card({kind:'props',st,sub:st===g.hub?`Applied when ${esc(T)}’s events are searched, in this order`:scope(st,T),body,why,off:tone(lines)}))}
+ if(!cards.search.length)cards.search.push(`<p class="tmEmpty217">No search-time settings in these files for ${esc(T)}: searches see the fields Splunk finds by itself.</p>`);
+ return {g,cards,edges}}
+
+// The columns' tiers: where their stages run, from the Matrix.
+function tiers(ph,g){const ids=new Set();
+ for(const it of g.cols[ph])it.lines.forEach(r=>ids.add(r.m.stages[0]));
+ if(ph==='read')g.inputs.forEach(st=>(st.input?.stages||[]).forEach(id=>ids.add(id)));
+ if(ph==='parse'&&!ids.size)['Line breaking & length control','Timestamp extraction'].forEach(n=>ids.add(stages.find(s=>s.name===n)?.id));
+ if(ph==='transform'&&!ids.size)ids.add(stages.find(s=>s.name==='Index-time transformations')?.id);
+ if(ph==='store')ids.add(stages.find(s=>s.name==='Searchable segmentation')?.id);
+ if(ph==='search')ids.add(stages.find(s=>s.pipeline===SEARCH)?.id);
+ const rank={no:0,conditional:1,required:2},best={uf:'no',hf:'no',idx:'no',sh:'no'};
+ for(const id of ids){const s=stageById(id);if(s)for(const k of Object.keys(best))if(rank[s[k]]>rank[best[k]])best[k]=s[k]}
+ return Object.entries(best).map(([k,v])=>`<i class="${v==='required'?'yes':v==='conditional'?'maybe':'none'}${comp()===k?' tmPicked217':''}" title="${componentNames[k]}: ${statusLabel(v)}">${({uf:'UF',hf:'HF',idx:'IDX',sh:'SH'})[k]}</i>`).join('')}
+
+let signature='',drawn=null,scrolled=0;
+root.addEventListener('scroll',e=>{if(e.target.classList?.contains('tmScroll217'))scrolled=e.target.scrollLeft},true);
+function draw(){
+ const on=state.view==='config'&&pm.files.length>0;if(root.hidden===on)root.hidden=!on;if(!on){signature='';drawn=null;return}
+ const T=pm.focus==='all'?null:pm.focus,sig=JSON.stringify([pm.files.map(f=>[f.id,f.place.layer,f.place.app]),pm.focus,comp(),pm.types]);
+ if(sig===signature)return;signature=sig;
+ const keep=scrolled;
+ const chips=`<div class="tmTypes217" role="group" aria-label="Source type to follow"><button type="button" data-tm-type="all" aria-pressed="${!T}">All source types</button>${pm.types.map(t=>`<button type="button" data-tm-type="${esc(t)}" aria-pressed="${t===T}">${esc(t)}</button>`).join('')}</div>`;
+ if(!pm.types.length){root.innerHTML=`<div class="tmHead217"><div class="tmTitle217"><small>Source type map</small><strong>No source type to follow</strong><span>These files name no source type. A props.conf source type stanza, or an input or [source::] stanza that sets one, gives the map a source type to follow.</span></div></div>`;drawn=null;bind();return}
+ if(!T){root.innerHTML=`<div class="tmHead217"><div class="tmTitle217"><small>Source type map</small><strong>Follow a source type through Splunk</strong><span>Choose one to see what reads it and names it, what parses it, the transforms it runs, where its events go and what searches add.</span></div>${chips}</div>`;drawn=null;bind();return}
+ const {g,cards,edges}=build(T);drawn={g,edges};
+ const count=(n,one,many)=>`${n} ${n===1?one:many}`;
+ const settings=ph=>g.cols[ph].reduce((n,it)=>n+it.lines.length,0),transforms=g.cols.transform.reduce((n,it)=>n+it.lines.reduce((m,r)=>m+(/^(TRANSFORMS|RULESET)-/.test(r.key)&&r.refs?r.refs.length:0),0),0);
+ const ignored=g.other.filter(r=>['unknown','elsewhere'].includes(r.m?.area)).length,destinations=cards.store.filter(c=>c.includes('tmResult217')).length;
+ const summary=[count(g.inputs.filter(st=>st.input?.hec!=='listener').length,'input','inputs'),g.copies.length?count(g.copies.length,'copy rule','copy rules'):'',settings('read')?count(settings('read'),'setting where it’s read','settings where it’s read'):'',count(settings('parse'),'parsing setting','parsing settings'),count(transforms,'index-time transform','index-time transforms'),count(destinations,'destination','destinations'),count(settings('search'),'search-time setting','search-time settings'),ignored?count(ignored,'ignored line','ignored lines'):''].filter(Boolean);
+ root.innerHTML=`<div class="tmHead217"><div class="tmTitle217"><small>Source type map</small><strong>How ${esc(T)} is processed</strong><span>From the inputs that read it to the searches that use it.<span class="tmLinesSay217"> Lines join what names it to it, and each transform to what it does.</span>${comp()!=='all'?` Faded settings have no effect on ${esc(onComp())}.`:''}</span></div>${chips}</div>
+ <p class="tmSummary217" aria-live="polite">${summary.map(s=>`<span>${s.replace(/^(\d+)/,'<b>$1</b>')}</span>`).join('')}</p>
+ <div class="tmScroll217"><div class="tmGrid217">${PHASES.map((p,i)=>`<section class="tmCol217" data-phase="${p.key}" aria-labelledby="tmCol217-${p.key}"><header class="tmColHead217"><h3 id="tmCol217-${p.key}"><b>${i+1}</b>${p.name}</h3><span class="tmTiers217">${tiers(p.key,g)}</span><small>${p.where}</small></header>${cards[p.key].join('')}</section>`).join('')}<svg class="tmEdges217" aria-hidden="true"></svg></div></div>`;
+ // The ids edges name before the cards had them: the [source::] cards, the HEC tokens, the SEDCMD lines.
+ root.querySelectorAll('[data-kind="input"]').forEach(el=>{const name=el.querySelector('header code')?.title.replace(/^\[|\]$/g,'');if(name?.startsWith('http://'))el.dataset.tmToken=name});
+ root.querySelectorAll('.tmSet217').forEach(li=>{const b=li.querySelector('[data-tm-line]');if(b)li.dataset.tmSet=b.dataset.tmLine});
+ if(keep)root.querySelector('.tmScroll217').scrollLeft=keep;
+ bind();requestAnimationFrame(lines)}
+
+// The joining lines: from the right of what names or does something to the left of what it names or does. A line
+// within a column runs down its left edge. Drawn again when anything changes size.
+function find(key){if(key.startsWith('tok:'))return root.querySelector(`[data-tm-token="${CSS.escape(key.slice(4))}"]`);if(key.startsWith('set:'))return root.querySelector(`[data-tm-set="${CSS.escape(key.slice(4))}"]`);return document.getElementById(key)}
+// Each destination card moves down to the first card that leads to it, so the lines between them run level; they keep
+// their order, so a card never moves above the one before it. Measured once: a card's margin moves every card below it.
+function align(stacked){const cards=[...root.querySelectorAll('.tmCol217[data-phase="store"]>.tmResult217')];
+ cards.forEach(c=>c.style.marginTop='');if(stacked)return;
+ const tops=cards.map(c=>c.getBoundingClientRect().top),wants=cards.map(c=>{const from=drawn.edges.filter(e=>e.to===c.id).map(e=>find(e.from)).filter(Boolean);return from.length?Math.min(...from.map(el=>el.getBoundingClientRect().top)):-Infinity});
+ let shift=0;cards.forEach((c,i)=>{const top=tops[i]+shift;if(wants[i]>top+1){const m=Math.round(wants[i]-top);c.style.marginTop=m+'px';shift+=m}})}
+function lines(){
+ const grid=root.querySelector('.tmGrid217'),svg=root.querySelector('.tmEdges217');if(root.hidden||!grid||!svg||!drawn)return;
+ const stacked=getComputedStyle(grid).gridTemplateColumns.trim().split(/\s+/).length<2;align(stacked);const box=grid.getBoundingClientRect();
+ if(stacked||!box.width){svg.innerHTML='';return}
+ svg.setAttribute('width',grid.scrollWidth);svg.setAttribute('height',grid.scrollHeight);svg.setAttribute('viewBox',`0 0 ${grid.scrollWidth} ${grid.scrollHeight}`);
+ const anchor=(el,side)=>{const r=el.getBoundingClientRect(),head=el.matches('article')?el.querySelector('header'):null,hr=head?.getBoundingClientRect(),y=(hr?hr.top+hr.height/2:r.top+Math.min(r.height/2,14))-box.top;return {x:(side==='right'?r.right:r.left)-box.left,y,top:r.top-box.top,bottom:r.bottom-box.top,col:el.closest('.tmCol217')}};
+ const paths=[];
+ for(const e of drawn.edges){const a=find(e.from),b=find(e.to);if(!a||!b)continue;
+  const p=anchor(a,'right'),q=anchor(b,'left'),off=a.closest('.tmOff217')||b.closest('.tmOff217');
+  let d;if(p.col===q.col){const x=q.x+10;d=`M${x} ${p.bottom}L${x} ${q.top-1}`}
+  else{const dx=Math.max(24,(q.x-p.x)/2);d=`M${p.x} ${p.y}C${p.x+dx} ${p.y} ${q.x-dx} ${q.y} ${q.x-1} ${q.y}`}
+  paths.push(`<path d="${d}" class="tmEdge217" data-edge="${e.kind}"${off?' data-off="1"':''} marker-end="url(#tmArrow217-${e.kind})"/>`)}
+ const kinds=['name','match','copy','index','route','drop','meta','field','text'];
+ svg.innerHTML=`<defs>${kinds.map(k=>`<marker id="tmArrow217-${k}" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8z" class="tmArrow217" data-edge="${k}"/></marker>`).join('')}</defs>${paths.join('')}`}
+const resized=typeof ResizeObserver==='function'?new ResizeObserver(()=>requestAnimationFrame(lines)):null;
+function bind(){
+ root.querySelectorAll('[data-tm-type]').forEach(b=>b.onclick=()=>{pm.focus=b.dataset.tmType;render()});
+ root.querySelectorAll('[data-tm-stage]').forEach(b=>b.onclick=()=>cv.showStage(+b.dataset.tmStage));
+ root.querySelectorAll('[data-tm-line]').forEach(b=>b.onclick=()=>cv.showLine(b.dataset.tmLine));
+ const grid=root.querySelector('.tmGrid217');if(resized){resized.disconnect();if(grid)resized.observe(grid)}}
+addEventListener('resize',()=>requestAnimationFrame(lines));
+
+// Drawn with the Config view: after every render, which the panel, the strip and the source type list all call.
+const renderBefore=render;
+render=function(){const result=renderBefore.apply(this,arguments);draw();return result};
+window.configTypeMap217={gather,outcomes,phaseOf,draw:()=>{signature='';draw()}};
+draw();
+})();
+</script>
+<style id="collapsed-box-v216">
+/* Fault 43. A collapsed container's box lays its "Expand" pill out beside its first line, which wraps to keep clear of
+   it, instead of placing the pill over the line: at 11.5 px, the canvas's text size since Build 215, "REGION · COLLAPSED"
+   ran under it. The pill keeps its place, 10 px in from the box's top right; the name and the counts take the box's
+   full width. */
+#topologyBuilder #builderTree .collapsedGroupProxy{grid-template-columns:minmax(0,1fr) auto;column-gap:6px;align-content:start}
+#topologyBuilder #builderTree .collapsedGroupProxy>small{grid-area:1/1}
+#topologyBuilder #builderTree .collapsedGroupProxy>em{position:static;grid-area:1/2;align-self:start;margin:-3px -4px 0 0}
+#topologyBuilder #builderTree .collapsedGroupProxy>:is(strong,span){grid-column:1/-1}
+</style>
+<script id="redraw-text-v216">
+(function(){
+/* Fault 44. The text polish (polishBuilderText) gives Builder text under its floor, 11.5 px on the canvas and 10 px
+   elsewhere, its final size in the next frame's animation callbacks (Build 118 calls it from requestAnimationFrame).
+   Until then, code measuring the Builder saw the smaller text, and a redraw that itself ran in an animation callback,
+   as on crossing 760 px, was painted with it. The polish now runs as soon as the redraw's task is done: once, however
+   many redraws the task made, for what they added and kept, before any animation callback or paint. */
+let queued=false;
+const renderBefore=renderBuilder;
+renderBuilder=function(...args){
+ const result=renderBefore.apply(this,args);
+ // Build 151's observer hears of what the redraw added in a microtask queued at its first change, so before this one.
+ if(!queued){queued=true;queueMicrotask(()=>{queued=false;polishBuilderText()})}
+ return result;
+};
+})();
+</script>
+<script id="collapsed-and-redraw-records-v216">
+(function(){
+changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Collapsed containers in exports; redraws right from their first frame',"Export SVG and PNG draw each collapsed container's card in its own place, and no longer fail with types collapsed. A collapsed container's \"Expand\" pill no longer covers its type. Builder text is at its final size as soon as a redraw's task is done. With Group by on, a redraw keeps one Highlight row, and the canvas its place and height. On a phone, a collapsed container's links start and end at their cards.",true]);
+const root=document.getElementById('topologyBuilder');root.dataset.buildNumber='216';root.dataset.buildDate='2026-11-01';
+document.title='Splunk Pipeline Explorer · Build 216 · 1 Nov 2026';
+const info=document.getElementById('builderInfoText159');if(info)info.textContent=info.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 216 · 1 Nov 2026');
+})();
+</script>
+<script id="source-type-map-records-v217">
+(function(){
+changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Source type map','The Config view follows one source type through Splunk, from the inputs and stanzas that name it to the searches that use it: what parses it, the transforms its settings run and where its events go, with lines from each to what it names or does. Settings are checked against the component strip, and lead to their lines in the panel and their stages in the Matrix.',true]);
+const root=document.getElementById('topologyBuilder');root.dataset.buildNumber='217';root.dataset.buildDate='2026-11-12';
+document.title='Splunk Pipeline Explorer · Build 217 · 12 Nov 2026';
+const info=document.getElementById('builderInfoText159');if(info)info.textContent=info.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 217 · 12 Nov 2026');
 })();
 </script>
 </body>
