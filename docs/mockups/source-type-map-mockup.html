@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Source Type Map</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 217 TARGET · BUILD 215 + PROTOTYPE</span>
+ <h1>The source type map: one source type, followed through Splunk</h1>
+ <p class="lede">A new section of the Config view. For the source type chosen in the panel, it draws what reads it and names it, what parses it, the index-time transforms its settings run, where its events go and what searches add, in five columns, with a line from each thing to what it names or does. Every target scene is the real explorer, with the prototype applied to Build 215, loaded with the Config view’s example or other files; the “Today” scene is Build 215 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>The five columns</h2>
+  <table>
+   <thead><tr><th>Column</th><th>Its stages’ pipelines</th><th>What it holds</th></tr></thead>
+   <tbody>
+    <tr><td>1. Read</td><td>Every pipeline not below: the inputs’ own, the forwarder’s event breaking and structured parsing, HEC’s</td><td>The inputs that read it; the <code>[source::]</code> stanzas their paths match; <code>[source::]</code> and rule stanzas that name it; the <code>CLONE_SOURCETYPE</code> transforms that make it; props.conf settings applied where the data is read</td></tr>
+    <tr><td>2. Parse</td><td>TCP input, Parsing, Merging and Typing handoffs; Parsing and Merging pipelines</td><td>The receiving ports in the files, when an input other than HEC reads it; the source type’s own card, with its parsing settings, its Splunk Web lines and the lines Splunk ignores; <code>[host::]</code>, <code>[default]</code> and global settings</td></tr>
+    <tr><td>3. Transform</td><td>Typing pipeline</td><td>Each <code>TRANSFORMS-</code> and <code>RULESET-</code> line with the transforms.conf stanzas it runs, in its order, and what each does; <code>SEDCMD-</code> and the other Typing settings</td></tr>
+    <tr><td>4. Index or send</td><td>Indexing and TCP output handoffs, Forwarding and Indexing pipelines, Replication, Acknowledgement, Pipeline control, Post-index management</td><td>A card for each destination: an index, an output group, a drop, a copy, an indexed field, a rewrite; then what the indexer applies as it writes</td></tr>
+    <tr><td>5. Search</td><td>Search-time processing</td><td>The search-time settings in the order Splunk applies them, with the transforms and lookups they name</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>In short</h2>
+  <dl>
+   <dt>Where</dt><dd>Its own section in the Config view, between the files and the view’s Matrix, shown when files are loaded. Its chips are the panel’s Source type list: choosing in either moves both.</dd>
+   <dt>Lines</dt><dd><span class="swatch" style="background:#66e0a3"></span>names it · <span class="swatch" style="background:#5d7183"></span>a path matches a <code>[source::]</code> stanza, a listener takes a token’s events · <span class="swatch" style="background:#a996ff"></span>copy · <span class="swatch" style="background:#57c7e8"></span>index · <span class="swatch" style="background:#6fa8ff"></span>send · <span class="swatch" style="background:#f17a7a"></span>drop · <span class="swatch" style="background:#f3bd61"></span>field, rewrite, metadata.</dd>
+   <dt>Settings</dt><dd>Each with its stage chip, which shows the stage in the Matrix, and its line’s reference, which shows the line in the panel; secrets masked as in the panel.</dd>
+   <dt>Components</dt><dd>With a component chosen in the strip, what has no effect there fades, each card saying the reason once; destinations fade with their causes.</dd>
+   <dt>Narrow</dt><dd>The map scrolls sideways in its box when the window is narrower than it needs; at 900 px and below the columns stack and the lines go.</dd>
+   <dt>Unchanged</dt><dd>The panel, the view’s Matrix and every other view; the edit only exports six of the Config view’s functions.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-source-type-map.md</code> · Prototype: one edit, and <code>docs/mockups/source-type-map-prototype.css</code> and <code>.js</code> appended to Build 215, all in <code>docs/mockups/source-type-map.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "fw", "img": "compare/source-type-map-fw.png", "group": "target", "tab": "acme:fw", "title": "acme:fw, followed from the inputs that read it to the searches that use it, at 1,440 px", "w": 1388, "h": 1355, "zoom": 1, "size": "1440 px window, the map", "items": [{"n": 1, "head": "What names it", "text": "The monitor input reads /var/log/acme/fw-*.log and sets no source type, so the [source::] stanza its path matches names it: a grey line from the input to the stanza, a green one from the stanza to the source type.", "x": 1.4, "y": 19.78, "box": [1.22, 19.78, 16.87, 30.62]}, {"n": 2, "head": "The source type", "text": "props.conf [acme:fw], merged from 2 files: its parsing settings in stage order, each with its stage and its line; then its Splunk Web lines, and the line Splunk ignores, MAX_TIMESTAMP_LOOKAHED, with the panel’s reason.", "x": 20.55, "y": 37.2, "box": [20.55, 37.2, 16.88, 47.23]}, {"n": 3, "head": "Its transforms, in their order", "text": "Each TRANSFORMS- line, with the transforms.conf stanzas it runs in the order it lists them, and what each does: its REGEX, DEST_KEY, FORMAT, INGEST_EVAL or CLONE_SOURCETYPE.", "x": 39.87, "y": 18.63, "box": [39.87, 18.63, 20.25, 78.43]}, {"n": 4, "head": "Where its events go", "text": "A card for each destination, level with what leads to it: the input’s index, the drop, the other index, the output groups, the rewrite, the copy and the indexed field. Each cites its lines; the copy’s “Follow” opens acme:fw:denied.", "x": 62.57, "y": 19.78, "box": [62.57, 19.78, 16.88, 69.68]}, {"n": 5, "head": "What searches add", "text": "The search-time settings in the order Splunk applies them, with the transforms and lookups they name, down to the lookup’s file.", "x": 81.9, "y": 18.63, "box": [81.9, 18.63, 16.88, 31.74]}, {"n": 6, "head": "To the panel and the Matrix", "text": "A stage chip shows its stage in the Matrix; a line reference shows its line in the panel, on its file’s tab.", "x": 37.78, "y": 46.32, "box": [21.34, 44.41, 15.29, 3.82]}, {"n": 7, "head": "The counts", "text": "What the files give acme:fw, column by column.", "x": 64.32, "y": 9.96, "box": [0.07, 8.21, 99.86, 3.56]}]}, {"id": "chooser", "img": "compare/source-type-map-chooser.png", "group": "target", "tab": "Where it is", "title": "The Config view with the example loaded and no source type chosen, at 1,440 px", "w": 1404, "h": 1035, "zoom": 1, "size": "1440 px window, from the panel to the Matrix", "items": [{"n": 1, "head": "Its own section", "text": "Between the files and the view’s Matrix. It is hidden until files are loaded, and in every other view.", "x": 1.4, "y": 72.05, "box": [0.64, 72.05, 98.72, 10.68]}, {"n": 2, "head": "The panel’s source types", "text": "The chips are the panel’s Source type list. Choosing in either moves both: the map keeps no choice of its own.", "x": 58.85, "y": 75.91, "box": [58.85, 75.91, 39.37, 2.88]}, {"n": 3, "head": "The panel’s list", "text": "Choosing a source type here draws its map below.", "x": 66.6, "y": 5.33, "box": [56.13, 3.88, 9.33, 2.9]}]}, {"id": "uf", "img": "compare/source-type-map-uf.png", "group": "target", "tab": "Universal Forwarder", "title": "acme:fw with the Universal Forwarder chosen in the component strip", "w": 1388, "h": 1433, "zoom": 1, "size": "1440 px window, the map", "items": [{"n": 1, "head": "What fades", "text": "The title says what the faded settings mean for the chosen component.", "x": 48.49, "y": 3.88, "box": [1.22, 1.03, 46.11, 5.69]}, {"n": 2, "head": "Its cell, column by column", "text": "Each column outlines the Universal Forwarder’s cell from the Matrix: green where its stages run there, grey where they don’t.", "x": 38.58, "y": 14.43, "box": [20.55, 13.8, 16.88, 1.26]}, {"n": 3, "head": "One reason a card", "text": "A card says the component’s reason once: “None of these stages runs on a Universal Forwarder.” A line’s own reason, such as an override, stays on the line.", "x": 37.78, "y": 45.91, "box": [21.34, 44.74, 15.29, 2.33]}, {"n": 4, "head": "Destinations fade with their causes", "text": "A destination fades when nothing that leads to it has an effect there, and so do the lines into it. The input’s index stays: the forwarder sets it.", "x": 62.57, "y": 18.71, "box": [62.57, 18.71, 16.88, 68.61]}, {"n": 5, "head": "Read on the forwarder", "text": "The input’s settings, and EVENT_BREAKER_ENABLE and EVENT_BREAKER, run where the data is read, so they keep their effect.", "x": 1.4, "y": 18.71, "box": [1.22, 18.71, 16.87, 39.14]}]}, {"id": "denied", "img": "compare/source-type-map-denied.png", "group": "target", "tab": "A copy", "title": "acme:fw:denied, a source type made by CLONE_SOURCETYPE", "w": 1388, "h": 555, "zoom": 1, "size": "1440 px window, the map", "items": [{"n": 1, "head": "Where its events come from", "text": "[acme_fw_copy_denied] copies events of acme:fw as acme:fw:denied, after they are parsed; acme:fw’s TRANSFORMS-copy line runs it. The chip opens acme:fw.", "x": 1.4, "y": 48.3, "box": [1.22, 48.3, 16.87, 48.61]}, {"n": 2, "head": "Not parsed again", "text": "props.conf has no [acme:fw:denied] stanza, and its events are copies, made after parsing.", "x": 20.55, "y": 48.3, "box": [20.55, 48.3, 16.88, 20.85]}, {"n": 3, "head": "The index they had", "text": "Copies keep the index the events had when they were copied, unless a transform of this source type changes it.", "x": 62.57, "y": 48.3, "box": [62.57, 48.3, 16.88, 19.81]}]}, {"id": "csv", "img": "compare/source-type-map-csv.png", "group": "target", "tab": "Structured data", "title": "acme:proxy:csv, structured data read from files", "w": 1388, "h": 845, "zoom": 1, "size": "1440 px window, the map", "items": [{"n": 1, "head": "Named by its input", "text": "The input sets sourcetype = acme:proxy:csv: the green line to the source type.", "x": 1.4, "y": 31.71, "box": [1.22, 31.71, 16.87, 27.48]}, {"n": 2, "head": "Parsed where it is read", "text": "INDEXED_EXTRACTIONS = csv and its settings are applied where the file is read, so they sit under Read…", "x": 1.4, "y": 60.37, "box": [1.22, 60.37, 16.87, 37.52]}, {"n": 3, "head": "…and not again", "text": "…and the source type card says it isn’t parsed again on the parsing tier.", "x": 20.55, "y": 59.64, "box": [20.55, 59.64, 16.88, 17.84]}, {"n": 4, "head": "Its index and output group", "text": "The input’s index, and the output group its _TCP_ROUTING sends every event to.", "x": 62.57, "y": 31.71, "box": [62.57, 31.71, 16.88, 28.58]}]}, {"id": "json", "img": "compare/source-type-map-json.png", "group": "target", "tab": "HEC", "title": "acme:proxy:json, sent to the HTTP Event Collector", "w": 1388, "h": 668, "zoom": 1, "size": "1440 px window, the map", "items": [{"n": 1, "head": "The listener and its token", "text": "The HTTP Event Collector listener takes the token’s events: a line down to the token.", "x": 1.4, "y": 40.13, "box": [1.22, 40.13, 16.87, 57.27]}, {"n": 2, "head": "Named by the token", "text": "The token sets sourcetype = acme:proxy:json. Its value is masked, as in the panel.", "x": 1.4, "y": 59.71, "box": [1.22, 59.71, 16.87, 37.69]}, {"n": 3, "head": "The indexes it allows", "text": "Index proxy, unless the request names another index the token allows (proxy_summary).", "x": 62.57, "y": 40.13, "box": [62.57, 40.13, 16.88, 22.32]}]}, {"id": "other", "img": "compare/source-type-map-other.png", "group": "target", "tab": "Other files", "title": "Other files: a disabled input, a [source::] path, a rule, a missing transform and an INGEST_EVAL", "w": 1388, "h": 917, "zoom": 1, "size": "1440 px window, the map", "items": [{"n": 1, "head": "A disabled input", "text": "Disabled by its line local:4, so it doesn’t run: faded, and its index goes nowhere.", "x": 1.4, "y": 29.25, "box": [1.22, 29.25, 16.87, 18.27]}, {"n": 2, "head": "Named by its path", "text": "This input sets no source type; its path matches [source::/var/log/b.log], which names t1.", "x": 1.4, "y": 48.61, "box": [1.22, 48.61, 16.87, 23.14]}, {"n": 3, "head": "Read by nothing here", "text": "No input in these files reads /srv/c.log, but the stanza still names t1, and so does the rule.", "x": 1.4, "y": 72.84, "box": [1.22, 72.84, 16.87, 25.28]}, {"n": 4, "head": "A missing transform", "text": "[nosuch] isn’t in transforms.conf, so the line runs nothing for it.", "x": 60.48, "y": 40.65, "box": [42.4, 37.74, 16.94, 5.82]}, {"n": 5, "head": "An INGEST_EVAL", "text": "Each of its assignments is a destination: the index and the queue, both set by an expression.", "x": 62.57, "y": 55.58, "box": [62.57, 55.58, 16.88, 19.06]}]}, {"id": "narrow", "img": "compare/source-type-map-narrow.png", "group": "target", "tab": "1,024 px", "title": "acme:fw at 1,024 px", "w": 972, "h": 760, "zoom": 1, "size": "1024 px window, the map’s top", "items": [{"n": 1, "head": "Scrolls in its box", "text": "The map needs 1,191 px for its five columns, so it scrolls sideways inside its box. The page doesn’t.", "x": 1.4, "y": 26.5, "box": [0.1, 26.5, 99.79, 73.5]}, {"n": 2, "head": "Where a line is, below it", "text": "In a narrow card, a line’s reference goes under the line, and long names break after their separators.", "x": 1.75, "y": 40.77, "box": [1.75, 40.77, 21.09, 36.08]}]}, {"id": "phone", "img": "compare/source-type-map-phone.png", "group": "target", "tab": "Phone", "title": "acme:fw on a phone, 390 px wide", "w": 364, "h": 1500, "zoom": 1, "size": "390 px window, the map’s top", "items": [{"n": 1, "head": "One column", "text": "Below 900 px the columns stack, in processing order.", "x": 3.57, "y": 22.09, "box": [3.57, 22.09, 92.86, 40.59]}, {"n": 2, "head": "Said in words", "text": "With no lines, each card says what they showed: the [source::] card names its files and the source type it gives them.", "x": 3.57, "y": 41.24, "box": [3.57, 41.24, 92.86, 8.17]}]}, {"id": "today", "img": "compare/source-type-map-today.png", "group": "today", "tab": "Today · acme:fw", "title": "Build 215: the Config view with acme:fw chosen", "w": 1404, "h": 909, "zoom": 1, "size": "1440 px window, from the panel to the Matrix", "items": [{"n": 1, "head": "Lines by file", "text": "The panel keeps acme:fw’s lines, a tab for each kind of file, each with its stage and its verdict.", "x": 1.4, "y": 1.2, "box": [0.57, 0.89, 98.86, 79.5]}, {"n": 2, "head": "Stages in the Matrix", "text": "The Matrix below lists their stages. What reads acme:fw, what names it, which transforms its lines run and where its events go are left to the reader.", "x": 1.4, "y": 81.93, "box": [0.57, 81.93, 98.86, 18.07]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 215 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>

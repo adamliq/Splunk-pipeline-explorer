@@ -1,0 +1,118 @@
+/* Build 217: the source type map, between the Config view's files and its Matrix. Five columns in processing order, the
+   cards in each from the files' stanzas and lines, and the joining lines drawn behind them. The panel's look: its file
+   letters, its stage chips' colours and its faded lines for no effect. */
+.tmMap217{margin:0 0 14px;border:1px solid var(--line);border-radius:13px;background:#0b1620;overflow:hidden}
+.tmMap217[hidden]{display:none!important}
+/* The page styles every header as a flex row with 20px under it; the map's headers set their own. */
+.tmMap217 header{margin:0}
+.tmHead217{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px 18px;padding:14px 16px;background:#0d1a26;border-bottom:1px solid var(--line)}
+.tmTitle217{display:grid;gap:3px;min-width:0;max-width:640px}
+.tmTitle217 small{color:var(--cyan);font-size:.66rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.tmTitle217 strong{color:var(--text);font-size:.98rem;overflow-wrap:anywhere}
+.tmTitle217>span{color:var(--muted);font-size:.78rem;line-height:1.45}
+.tmTypes217{display:flex;flex-wrap:wrap;gap:6px}
+.tmTypes217 button,.tmType217{border:1px solid #2a4154;border-radius:99px;padding:5px 11px;background:#08131d;color:#b8c9d7;font:inherit;font-size:.74rem;cursor:pointer}
+.tmTypes217 button:hover,.tmType217:hover{color:var(--text);border-color:#3c6a86}
+.tmTypes217 button[aria-pressed=true]{border-color:var(--cyan);background:rgba(87,199,232,.12);color:var(--text)}
+.tmType217{padding:1px 8px;font-size:.7rem}
+.tmMap217 button:focus-visible{outline:2px solid var(--cyan);outline-offset:1px}
+.tmSummary217{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:10px 16px;border-bottom:1px solid var(--line)}
+.tmSummary217 span{border:1px solid var(--line);border-radius:99px;padding:4px 10px;color:#b8c9d7;font-size:.72rem}
+.tmSummary217 b{color:var(--text)}
+.tmScroll217{overflow-x:auto;padding:14px 16px 16px}
+.tmGrid217{position:relative;display:grid;grid-template-columns:repeat(2,minmax(205px,1fr)) minmax(235px,1.2fr) repeat(2,minmax(205px,1fr));gap:16px 34px;align-items:start;min-width:1191px}
+.tmCol217{position:relative;z-index:1;display:grid;align-content:start;gap:10px;min-width:0}
+.tmColHead217{display:grid;gap:4px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.tmColHead217 h3{display:flex;align-items:center;gap:8px;margin:0;color:var(--text);font-size:.84rem}
+.tmColHead217 h3 b{display:inline-grid;place-items:center;width:19px;height:19px;border-radius:50%;background:#16293a;color:var(--cyan);font-size:.7rem}
+.tmColHead217 small{color:var(--muted);font-size:.7rem;line-height:1.4}
+.tmTiers217{display:flex;gap:4px}
+.tmTiers217 i{min-width:26px;border-radius:5px;padding:1px 4px;background:#0a1520;font:700 10px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;font-style:normal;text-align:center}
+.tmTiers217 i.yes{color:var(--green)}
+.tmTiers217 i.maybe{color:var(--amber)}
+.tmTiers217 i.none{color:#4d5f70}
+.tmTiers217 i.tmPicked217{box-shadow:inset 0 0 0 1px var(--cyan)}
+.tmCard217{display:grid;gap:6px;min-width:0;border:1px solid #203345;border-radius:10px;padding:8px 10px;background:#07111a;font-size:.74rem}
+/* A card's name, then where it is; when the column is too narrow for both, where it is goes under the name. */
+.tmCard217>header{display:flex;flex-wrap:wrap;align-items:flex-start;gap:2px 6px;min-width:0}
+.tmCard217>header>code{flex:1 1 auto;min-width:0;max-width:calc(100% - 22px);color:var(--amber);font:700 12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere}
+.tmAt217{display:flex;align-items:baseline;gap:6px;margin-left:auto;white-space:nowrap}
+.tmCard217>header>.propsFile205{margin-top:1px}
+.tmCard217 .propsFile205{width:16px;height:16px;font-size:9.5px}
+.tmFiles217{color:var(--muted);font-size:.66rem;white-space:nowrap}
+.tmSub217,.tmNote217,.tmWhy217{margin:0;color:#a4b4c2;font-size:.72rem;line-height:1.45}
+.tmNote217{color:#f0b8b8}
+.tmWhy217{color:var(--muted)}
+.tmOwn217>.tmWhy217{color:#e9c88c}
+.tmCard217 ul,.tmCard217 ol{display:grid;gap:3px;margin:0;padding:0;list-style:none}
+/* A setting: its stage, the line, and where it is; when the card is too narrow, where it is goes under the line. */
+.tmSet217{display:flex;flex-wrap:wrap;align-items:flex-start;gap:2px 6px}
+.tmSet217>.tmStage217{flex:none;min-width:24px;margin-top:1px}
+.tmSet217>code{flex:1 1 9em}
+.tmSet217>.tmRef217{margin-left:auto}
+/* A long value runs to three lines; the whole line is in its tooltip. */
+.tmSet217>code,.tmRun217 li>code,.tmIgnored217 code{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;min-width:0;overflow:hidden;color:#c5e6f5;font:11.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere}
+.tmRun217>div>code{flex:1 1 auto;min-width:0;overflow-wrap:anywhere;font:11.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+.tmSet217>code b,.tmRun217 code b{color:#e8f4fb;font-weight:600}
+.tmSet217>small{flex:1 0 100%;box-sizing:border-box;padding-left:30px;color:var(--muted);font-size:.68rem;line-height:1.4}
+.tmStage217{border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);border-radius:99px;padding:0 4px;background:color-mix(in srgb,var(--accent) 12%,#08131d);color:#dbe9f2;font:700 10px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;cursor:pointer}
+.tmStage217:hover{border-color:var(--accent)}
+.tmNoStage217{border-color:transparent;background:none;color:#4d5f70;text-align:center;cursor:default}
+.tmRef217{border:0;padding:0;background:none;color:#6f8496;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap;cursor:pointer}
+.tmRef217:hover{color:var(--cyan);text-decoration:underline}
+.tmRuns217{display:grid;gap:4px}
+.tmRuns217>ol{margin-left:24px;gap:5px}
+.tmRun217{display:grid;gap:2px;border-left:2px solid var(--violet);padding:2px 0 2px 8px}
+.tmRun217>div{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 6px;min-width:0}
+.tmRun217>div>.tmRef217{margin-left:auto}
+.tmRun217>div>code{color:#cfc4ff;font-weight:700}
+.tmRuns217,.tmRun217,.tmRun217 li{min-width:0}
+
+.tmDoes217{color:#cfc4ff;font-size:.7rem}
+.tmMissing217{border-left-color:var(--red);color:#f6b4b4}
+.tmNestedList217{flex:1 0 100%;box-sizing:border-box;display:grid;gap:2px;padding-left:30px}
+.tmNested217{color:#a4b4c2;font-size:.7rem;overflow-wrap:anywhere}
+.tmNested217 code{color:#cfc4ff;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+.tmHub217{border-color:rgba(87,199,232,.55);background:rgba(87,199,232,.06)}
+.tmHub217>header{justify-content:space-between}
+.tmHubName217{color:var(--text);font-size:1rem;line-height:1.3;overflow-wrap:anywhere}
+.tmTypeLabel217{color:var(--cyan);font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.tmWeb217{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;margin:0;border-top:1px solid #1a2b3a;padding-top:6px;color:var(--muted);font-size:.7rem;overflow-wrap:anywhere}
+.tmWeb217>b{flex:1 0 100%;color:#9fb2c2;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em}
+.tmIgnored217{display:grid;gap:3px;border-top:1px solid #1a2b3a;padding-top:6px}
+.tmIgnored217>b{color:#f6b4b4;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em}
+.tmIgnored217 li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 6px}
+.tmIgnored217 li small{grid-column:1/3;color:#f0b8b8;font-size:.68rem}
+.tmReceiver217{border-style:dashed}
+.tmOrigin217{border-color:rgba(169,150,255,.5)}
+.tmResult217{border-left:3px solid var(--result,#57c7e8)}
+.tmResult217>header strong{color:var(--text);font-size:.8rem}
+.tmResult217[data-result=index]{--result:var(--cyan)}
+.tmResult217[data-result=route]{--result:var(--blue)}
+.tmResult217[data-result=drop]{--result:var(--red)}
+.tmResult217[data-result=copy]{--result:var(--violet)}
+.tmResult217:is([data-result=meta],[data-result=field],[data-result=text]){--result:var(--amber)}
+.tmGlyph217{width:8px;height:8px;border-radius:50%;background:var(--result,#57c7e8);flex:none}
+.tmRefs217{display:flex;flex-wrap:wrap;gap:4px 10px;margin:0}
+.tmEmpty217{margin:0;border:1px dashed #203345;border-radius:10px;padding:10px;color:var(--muted);font-size:.72rem;line-height:1.45}
+.tmOff217{opacity:.45}
+.tmCard217.tmOff217 .tmOff217,.tmCard217.tmOff217 .tmSet217{opacity:1}
+.tmOwn217{border-color:rgba(243,189,97,.5)}
+.tmSet217.tmOff217 code b{text-decoration:line-through;text-decoration-color:rgba(241,122,122,.7)}
+/* The joining lines, behind the cards. */
+.tmEdges217{position:absolute;top:0;left:0;z-index:0;overflow:visible;pointer-events:none}
+.tmEdge217{fill:none;stroke-width:1.6;stroke:var(--edge,#5d7183)}
+.tmArrow217{fill:var(--edge,#5d7183)}
+:is(.tmEdge217,.tmArrow217)[data-edge=name]{--edge:var(--green)}
+:is(.tmEdge217,.tmArrow217)[data-edge=copy]{--edge:var(--violet)}
+:is(.tmEdge217,.tmArrow217)[data-edge=index]{--edge:var(--cyan)}
+:is(.tmEdge217,.tmArrow217)[data-edge=route]{--edge:var(--blue)}
+:is(.tmEdge217,.tmArrow217)[data-edge=drop]{--edge:var(--red)}
+:is(.tmEdge217,.tmArrow217):is([data-edge=meta],[data-edge=field],[data-edge=text]){--edge:var(--amber)}
+.tmEdge217[data-off]{opacity:.3}
+/* Below 900 px the columns stack, and each card says in words what the lines showed. */
+@media (max-width:900px){
+ .tmGrid217{grid-template-columns:minmax(0,1fr);min-width:0}
+ .tmEdges217,.tmLinesSay217{display:none}
+ .tmScroll217{padding:12px}
+}
