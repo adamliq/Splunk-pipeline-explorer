@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Splits And Pipelines</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 218 TARGET · BUILD 217 + PROTOTYPE</span>
+ <h1>Source type splits and Ingest Processor pipelines in the source type map</h1>
+ <p class="lede">Build 217’s source type map, tested with the Fortinet FortiGate Add-on for Splunk 1.6.10. The add-on splits fortigate_log, and fgt_log, into four source types with one transform, and renames its older source types at search time. Build 217 draws each source type but not the split: faults 47 to 49. The fix follows it. The map also gains the Ingest Processor, only where an uploaded pipeline takes the source type. Every target scene is the real explorer with the prototype applied to Build 217 and the add-on’s props.conf and transforms.conf loaded, two of them with a pipeline’s SPL2 file as well; the “Today” scenes are Build 217 as shipped.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>What Build 217 does</h2>
+  <table>
+   <thead><tr><th>Fault</th><th>What you see</th><th>Why</th><th>Fix</th></tr></thead>
+   <tbody>
+    <tr><td>47. The split isn’t followed</td><td>fortigate_log’s transform leads to one destination, “Sourcetype set to fortigate_$1”</td><td>A transform that sets the source type gets one destination, titled with its <code>FORMAT</code> as written</td><td>A destination for each source type the transform can name, each with “Follow”</td></tr>
+    <tr><td>48. No word of where the events come from</td><td>fortigate_traffic: “No input, [source::] stanza or rule in these files names fortigate_traffic”, and its parsing settings drawn as acting on its events</td><td>The map looks for what names a source type among inputs, stanzas and copies, not transforms that set it</td><td>The transform’s card under Read, with the source types it takes events from; settings that don’t act on such events are faded, with the reason</td></tr>
+    <tr><td>49. A search-time rename isn’t followed</td><td>fgt_traffic’s <code>rename = fortigate_traffic</code> is a line like any other; fortigate_traffic doesn’t mention fgt_traffic</td><td>The map has no reading of <code>rename</code></td><td>The line says what searches see and leads there; the source type it names shows who is searched under its name</td></tr>
+    <tr><td>Ingest Processor (a request, not a fault)</td><td>The map has no Ingest Processor, and the Config view takes no pipelines</td><td>“Include ingest processor but only if pipeline used. Include config upload”</td><td>The Config view’s upload takes a pipeline’s SPL2 file; where a pipeline takes the source type, the map has a sixth column with its commands and what they lead to</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The fix in short</h2>
+  <dl>
+   <dt>Names</dt><dd><code>FORMAT</code>, with each <code>$n</code> replaced by each word the <code>REGEX</code>’s nth group lists. Where a group lists no words, one destination says the name comes from the event, and names the source types in the files that fit.</dd>
+   <dt>Splitting</dt><dd>“Becomes fortigate_traffic”: which word the transform finds for it, “Follow”, and a line from the transform.</dd>
+   <dt>Named</dt><dd>The transform’s card under Read: “Events of fortigate_log and fgt_log become fortigate_traffic here, after they are parsed.”</dd>
+   <dt>No effect</dt><dd>When only a transform names a source type, its settings under Read, its parsing lines and its own <code>TRANSFORMS-</code>, <code>RULESET-</code> and <code>SEDCMD-</code> lines are faded, each card saying why.</dd>
+   <dt>Renames</dt><dd>A <code>rename</code> line leads to the source type it names, and that source type shows the stanzas searched under its name.</dd>
+   <dt>Pipelines</dt><dd>A <code>.spl2</code> file goes in with the others. A pipeline is a statement that starts with <code>from $source</code>; its first <code>where</code> says which source types it takes.</dd>
+   <dt>Sixth column</dt><dd>“Ingest Processor”, after Transform, only where a pipeline takes the chosen source type: its commands in order, each with a line to what it leads to.</dd>
+   <dt>Unchanged</dt><dd>The example’s maps, which have no pipeline; the view’s Matrix.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-splits-and-pipelines.md</code> · Prototype: 46 in-place edits to Build 217, and <code>docs/mockups/ingest-pipelines-prototype.css</code> and <code>.js</code> appended, all in <code>docs/mockups/splits-and-pipelines.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "split", "img": "compare/splits-and-pipelines-split.png", "group": "target", "tab": "47 · The split", "title": "fortigate_log, split into four source types by one transform", "w": 1388, "h": 954, "zoom": 1, "size": "1440 px window, the map", "items": [{"n": 1, "head": "The transform", "text": "[force_sourcetype_fortigate] sets the source type to fortigate_$1, where $1 is one of the four words its REGEX lists.", "x": 42.4, "y": 44.24, "box": [42.4, 44.24, 16.94, 19.74]}, {"n": 2, "head": "A destination for each name", "text": "The map works the names out: FORMAT, with $1 replaced by each word the REGEX’s first group lists. Each says which word the transform finds for it.", "x": 62.57, "y": 45.09, "box": [62.57, 45.09, 16.88, 53.16]}, {"n": 3, "head": "Follow", "text": "Each opens the source type it names, as a copy’s destination does.", "x": 77.23, "y": 53.23, "box": [66.29, 52.17, 9.78, 2.12]}, {"n": 4, "head": "Counted", "text": "5 destinations: the four, and the default index.", "x": 55.99, "y": 18.56, "box": [0.07, 16.09, 99.86, 5.06]}]}, {"id": "named", "img": "compare/splits-and-pipelines-named.png", "group": "target", "tab": "48 · Where it comes from", "title": "fortigate_traffic, a source type the transform names", "w": 1388, "h": 640, "zoom": 1, "size": "1440 px window, the map’s top", "items": [{"n": 1, "head": "The transform that names it", "text": "Under Read, as a copy’s card is: events of fortigate_log and fgt_log become fortigate_traffic here, after they are parsed. The two are chips that open those source types.", "x": 1.4, "y": 48.52, "box": [1.22, 48.52, 16.87, 51.48]}, {"n": 2, "head": "Parsed under their first name", "text": "The source type’s card says its events get this name after they are parsed as fortigate_log or fgt_log, so its parsing lines are faded. The card itself stays readable.", "x": 20.55, "y": 48.52, "box": [20.55, 48.52, 16.88, 35.94]}, {"n": 3, "head": "Read under their first name", "text": "EVENT_BREAKER_ENABLE has no effect on these events either, and says why.", "x": 1.4, "y": 98.8, "box": [1.22, 105.82, 16.87, -5.82]}, {"n": 4, "head": "The index they had", "text": "A renamed event keeps its index.", "x": 62.57, "y": 48.52, "box": [62.57, 48.52, 16.88, 14.57]}, {"n": 5, "head": "49 · Searched under its name", "text": "[fgt_traffic] has rename = fortigate_traffic: events indexed as fgt_traffic are searched as fortigate_traffic, with the search-time settings below.", "x": 81.9, "y": 46.07, "box": [81.9, 46.07, 16.88, 23.87]}]}, {"id": "rename", "img": "compare/splits-and-pipelines-rename.png", "group": "target", "tab": "49 · A rename", "title": "fgt_traffic, renamed at search time", "w": 1388, "h": 534, "zoom": 1, "size": "1440 px window, the map", "items": [{"n": 1, "head": "What searches see", "text": "The rename line says searches see these events as fortigate_traffic, with fortigate_traffic’s search-time settings and none of this stanza’s, and leads there.", "x": 81.9, "y": 55.12, "box": [81.9, 55.12, 16.88, 41.67]}]}, {"id": "pipeline", "img": "compare/splits-and-pipelines-pipeline.png", "group": "target", "tab": "Ingest Processor", "title": "fortigate_log, with an Ingest Processor pipeline that takes it", "w": 1388, "h": 1627, "zoom": 1, "size": "1440 px window, the map", "items": [{"n": 1, "head": "Uploaded with the files", "text": "fortigate.spl2 went in with props.conf and transforms.conf, through Upload files. The map lists it here, with Remove.", "x": 28.61, "y": 13.67, "box": [0.07, 12.4, 99.86, 2.6]}, {"n": 2, "head": "A sixth column", "text": "The Ingest Processor’s, after Transform, because $pipeline takes fortigate_log. Its badge is IP.", "x": 52.6, "y": 15.86, "box": [52.6, 15.86, 13.76, 7.12]}, {"n": 3, "head": "The pipeline", "text": "Its name, its file, what it takes, and its commands in order, each saying what it does.", "x": 52.6, "y": 23.59, "box": [52.6, 23.59, 13.76, 32.59]}, {"n": 4, "head": "What its commands lead to", "text": "A drop, the index, two fields, the rewrite, the archive route and the destination, each with a line from its command, after the four source types the transform names.", "x": 68.81, "y": 67.46, "box": [68.81, 67.46, 13.76, 31.5]}, {"n": 5, "head": "Counted", "text": "1 Ingest Processor pipeline, 11 destinations.", "x": 68.71, "y": 10.88, "box": [0.07, 9.43, 99.86, 2.97]}]}, {"id": "pipeline-none", "img": "compare/splits-and-pipelines-pipeline-none.png", "group": "target", "tab": "No pipeline for it", "title": "fortigate_utm, which the pipeline doesn’t take", "w": 1388, "h": 560, "zoom": 1, "size": "1440 px window, the map’s top", "items": [{"n": 1, "head": "Five columns", "text": "$pipeline takes fortigate_log and fgt_log only, so fortigate_utm’s map has no Ingest Processor column, and its summary no pipeline.", "x": 66.64, "y": 31.68, "box": [0.07, 27.46, 99.86, 8.62]}, {"n": 2, "head": "Still loaded", "text": "The file is listed whatever source type is chosen.", "x": 28.61, "y": 39.76, "box": [0.07, 36.08, 99.86, 7.55]}]}, {"id": "split-today", "img": "compare/splits-and-pipelines-split-today.png", "group": "today", "tab": "Today · The split", "title": "Build 217: fortigate_log", "w": 1388, "h": 636, "zoom": 1, "size": "1440 px window, the map", "items": [{"n": 1, "head": "One destination", "text": "“Sourcetype set to fortigate_$1”: the four source types aren’t named, and can’t be opened from here.", "x": 62.57, "y": 67.63, "box": [62.57, 67.63, 16.88, 15.58]}, {"n": 2, "head": "2 destinations", "text": "That one, and the default index.", "x": 55.98, "y": 27.84, "box": [0.07, 24.13, 99.86, 7.59]}]}, {"id": "named-today", "img": "compare/splits-and-pipelines-named-today.png", "group": "today", "tab": "Today · Where it comes from", "title": "Build 217: fortigate_traffic", "w": 1388, "h": 640, "zoom": 1, "size": "1440 px window, the map’s top", "items": [{"n": 1, "head": "Nothing names it", "text": "“No input, [source::] stanza or rule in these files names fortigate_traffic.” The transform that gives events this name isn’t shown.", "x": 1.4, "y": 68.38, "box": [1.22, 68.38, 16.87, 8.65]}, {"n": 2, "head": "Drawn as its own", "text": "Its parsing settings are drawn as acting on its events, which were parsed as fortigate_log or fgt_log.", "x": 20.55, "y": 48.52, "box": [20.55, 48.52, 16.88, 25.51]}, {"n": 3, "head": "The default index", "text": "Its events keep the index they had as fortigate_log or fgt_log.", "x": 62.57, "y": 48.52, "box": [62.57, 48.52, 16.88, 17.18]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 217 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>

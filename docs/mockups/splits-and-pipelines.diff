@@ -1,0 +1,229 @@
+--- a/index.html
++++ b/index.html
+@@ -13655 +13655 @@
+- pm.types=[...found].sort();if(pm.focus!=='all'&&!found.has(pm.focus))pm.focus='all'}
++ for(const t of window.configPipelines218?.types()||[])found.add(t);pm.types=[...found].sort();if(pm.focus!=='all'&&!found.has(pm.focus))pm.focus='all'}
+@@ -13704 +13704 @@
+-const fileInput=Object.assign(document.createElement('input'),{type:'file',accept:'.conf,.txt,text/plain',multiple:true,hidden:true});
++const fileInput=Object.assign(document.createElement('input'),{type:'file',accept:'.conf,.txt,.spl2,.spl,text/plain',multiple:true,hidden:true});
+@@ -13751 +13751 @@
+- if(!pm.files.length){panel.innerHTML=`<div class="propsHead205"><div class="propsTitle205"><small>Configuration files</small><strong>See where your configuration acts</strong><span>${pm.error?`<em class="propsError205">${esc(pm.error)}</em>`:'Upload inputs.conf, props.conf and transforms.conf files, or an app or etc folder, or drop them here. Each line is matched to the stage below that applies it, and files of one kind are merged in Splunk’s precedence order.'}</span></div><div class="propsActions205"><button class="builderBtn" data-props-example>Try an example</button><button class="builderBtn" data-props-folder>Upload a folder</button><button class="builderBtn primary" data-props-upload>Upload files</button></div></div>`;bindPanel();return}
++ if(!pm.files.length){panel.innerHTML=`<div class="propsHead205"><div class="propsTitle205"><small>Configuration files</small><strong>See where your configuration acts</strong><span>${pm.error?`<em class="propsError205">${esc(pm.error)}</em>`:'Upload inputs.conf, props.conf and transforms.conf files, or an app or etc folder, or drop them here. An Ingest Processor pipeline’s SPL2 file (.spl2) can go with them, for the source type map. Each line is matched to the stage below that applies it, and files of one kind are merged in Splunk’s precedence order.'}</span></div><div class="propsActions205"><button class="builderBtn" data-props-example>Try an example</button><button class="builderBtn" data-props-folder>Upload a folder</button><button class="builderBtn primary" data-props-upload>Upload files</button></div></div>`;bindPanel();return}
+@@ -13770 +13770 @@
+- on('[data-props-clear]','onclick',()=>{pm.files=[];pm.tab=null;pm.focus='all';pm.error='';analyse();refresh()});
++ on('[data-props-clear]','onclick',()=>{window.configPipelines218?.clear();pm.files=[];pm.tab=null;pm.focus='all';pm.error='';analyse();refresh()});
+@@ -13830 +13830 @@
+- for(const {file,path} of list){const fromFolder=path.includes('/');
++ for(const {file,path} of list){const fromFolder=path.includes('/');if(/\.spl2?$/i.test(path)&&window.configPipelines218){if(file.size>2_000_000)errors.push(`${path} is over 2 MB`);else if(!window.configPipelines218.add(path,await file.text()))errors.push(`${file.name} has no pipeline: no statement in it starts with from $source`);continue}
+@@ -15016 +15016 @@
+-.tmResult217[data-result=copy]{--result:var(--violet)}
++.tmResult217:is([data-result=copy],[data-result=retype]){--result:var(--violet)}
+@@ -15030 +15030 @@
+-:is(.tmEdge217,.tmArrow217)[data-edge=copy]{--edge:var(--violet)}
++:is(.tmEdge217,.tmArrow217):is([data-edge=copy],[data-edge=retype]){--edge:var(--violet)}
+@@ -15096 +15096 @@
+-  for(const u of role?.usedBy||[])copies.push({st,role,line:u.r,from:u.r.stanza.types?[...u.r.stanza.types].filter(t=>t!==T):null})}
++  for(const u of role?.usedBy||[])copies.push({st,role,line:u.r,from:u.r.stanza.types?[...u.r.stanza.types].filter(t=>t!==T):null})}const retypes=[];for(const st of X){const role=pm.roles.get(st.name);if(st.keys.get('DEST_KEY')?.value!=='MetaData:Sourcetype'||!role?.usedBy?.length||role.search||role.area!=='stage')continue;const hit=named(st).find(x=>x.open?x.fits.includes(T):x.name===T);if(!hit)continue;const from=new Set();let every=false;for(const u of role.usedBy){if(u.r.stanza.types)u.r.stanza.types.forEach(t=>t!==T&&from.add(t));else every=true}retypes.push({st,role,maybe:!!hit.open,lines:role.usedBy.map(u=>u.r),from:every?null:[...from]})}const aliases=primaries('props').filter(st=>st.kind==='sourcetype'&&st.name!==T&&st.keys.get('rename')?.value===T);
+@@ -15102 +15102 @@
+- return {T,P,hub,inputs,receivers,everyInput,sources,rules,matches,copies,cols,other,X}}
++ return {T,P,hub,inputs,receivers,everyInput,sources,rules,matches,copies,retypes,aliases,cols,other,X}}
+@@ -15106 +15106 @@
+-function outcomes(st,role){
++function listed(re){const out=[],open=[];let n=0;for(let i=0;i<re.length;i++){const c=re[i];if(c==='\\'){i++;continue}if(c==='['){for(i++;i<re.length&&re[i]!==']';i++)if(re[i]==='\\')i++;continue}if(c==='('){const cap=re[i+1]!=='?'||/^\?(<[^=!]|P<|')/.test(re.slice(i+1,i+4));open.push({cap,start:i+1,n:cap?++n:0});continue}if(c===')'){const g=open.pop();if(g?.cap){const body=re.slice(g.start,i).replace(/^\?(?:P?<[^>]*>|'[^']*')/,'');out[g.n-1]=/^[\w.:-]+(\|[\w.:-]+)*$/.test(body)?body.split('|'):null}}}return out}function named(st){const fmt=(st.keys.get('FORMAT')?.value||'').trim().replace(/^sourcetype::/i,''),lists=listed(st.keys.get('REGEX')?.value||'');if(!fmt)return[];let out=[{name:'',found:[]}];for(const part of fmt.split(/(\$\d)/).filter(Boolean)){const alts=/^\$\d$/.test(part)?lists[+part[1]-1]:[part];if(!alts){const fit=new RegExp('^'+fmt.split(/\$\d/).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('.+')+'$');return [{name:fmt,open:true,fits:pm.types.filter(t=>fit.test(t))}]}out=out.flatMap(o=>alts.map(a=>({name:o.name+a,found:/^\$/.test(part)?[...o.found,a]:o.found})))}return out}function outcomes(st,role){
+@@ -15115 +15115 @@
+- if(/^MetaData:(Host|Source|Sourcetype)$/.test(dest||''))return [{kind:'meta',key:'meta:'+dest+fmt,title:`${dest.slice(9)} set to ${fmt.replace(/^\w+::/,'')}`}];
++ if(dest==='MetaData:Sourcetype')return named(st).map(x=>x.open?{kind:'retype',key:'retype:'+x.name,title:'Source type set from the event',pattern:x.name,fits:x.fits}:{kind:'retype',key:'retype:'+x.name,title:`Becomes ${x.name}`,type:x.name,found:x.found});if(/^MetaData:(Host|Source)$/.test(dest||''))return [{kind:'meta',key:'meta:'+dest+fmt,title:`${dest.slice(9)} set to ${fmt.replace(/^\w+::/,'')}`}];
+@@ -15146 +15146 @@
+-function setting(r,extra='',quiet=false){const v=verdict(r),over=(r.overrides||[]).filter(x=>x.fid!==r.fid);
++function setting(r,extra='',quiet=false,faded=false){const v=verdict(r),over=(r.overrides||[]).filter(x=>x.fid!==r.fid);
+@@ -15148 +15148 @@
+- return`<li class="tmSet217${v.e==='no'?' tmOff217':v.e==='own'?' tmOwn217':''}">${stageChip(staged(r)?r.m.stages[0]:null)}<code title="${esc(`${r.key} = ${cv.shown(r)}`)}"><b>${breakable(r.key)}</b> = ${esc(cv.shown(r))}</code>${lineRef(r)}${note?`<small>${esc(note)}</small>`:''}</li>`}
++ return`<li class="tmSet217${v.e==='no'||faded?' tmOff217':v.e==='own'?' tmOwn217':''}">${stageChip(staged(r)?r.m.stages[0]:null)}<code title="${esc(`${r.key} = ${cv.shown(r)}`)}"><b>${breakable(r.key)}</b> = ${esc(cv.shown(r))}</code>${lineRef(r)}${note?`<small>${esc(note)}</small>`:''}</li>`}
+@@ -15150 +15150 @@
+-function list(lines){const why=shared(lines);return {ul:`<ul>${lines.map(r=>setting(r,'',!!why)).join('')}</ul>`,why}}
++function list(lines,faded=false){const why=shared(lines);return {ul:`<ul>${lines.map(r=>setting(r,'',!!why,faded)).join('')}</ul>`,why}}
+@@ -15161 +15161 @@
+- ids=0;effects=new Map();const g=gather(T),edges=[],results=new Map(),cards={read:[],parse:[],transform:[],store:[],search:[]};
++ ids=0;effects=new Map();const g=gather(T),edges=[],results=new Map(),cards={read:[],parse:[],transform:[],ingest:[],store:[],search:[]};
+@@ -15186 +15186 @@
+-  edges.push({from:id,to:hubId,kind:'copy'})}
++  edges.push({from:id,to:hubId,kind:'copy'})} for(const c of g.retypes){const id=nid('N'),l=list(inOrder(winners(c.st)));cards.read.push(card({id,cls:'tmOrigin217',kind:'transforms',st:c.st,sub:`Events of ${c.from?.length?c.from.map(t=>`<button type="button" class="tmType217" data-tm-type="${esc(t)}">${esc(t)}</button>`).join(', ').replace(/, (?=[^,]*$)/,' and '):'every source type its stanzas cover'} ${c.maybe?'can become':'become'} ${esc(T)} here, after they are parsed. Run by ${c.lines.map(lineRef).join(' and ')}`,body:l.ul,why:l.why,off:tone([stanzaLine(c.st)].filter(Boolean))}));edges.push({from:id,to:hubId,kind:'retype'})}
+@@ -15190 +15190 @@
+- const stanzaCard=(ph,{st,lines})=>{const l=list(lines);return card({kind:'props',st,sub:st===g.hub?(ownSub[ph]?.()||''):scope(st,T),body:l.ul,why:l.why,off:tone(lines)})};
++ const renamedOnly=g.retypes.length&&!g.copies.length&&!g.inputs.length&&!shown.size,firsts=[...new Set(g.retypes.flatMap(c=>c.from||[]))].join(' or ')||'the source type they came as',lateWhy=`No effect on events that get this name from a transform: they were read and parsed as ${firsts}.`,lateRuns=`Events that get this name from a transform aren’t run through these: they were transformed as ${firsts}.`;const stanzaCard=(ph,{st,lines})=>{const l=list(lines),late=renamedOnly&&st===g.hub&&ph==='read';return card({kind:'props',st,sub:st===g.hub?(ownSub[ph]?.()||''):scope(st,T),body:l.ul,why:late?lateWhy:l.why,off:late?'off':tone(lines)})};
+@@ -15192 +15192 @@
+- if(!g.inputs.length&&!shown.size&&!g.copies.length)cards.read.push(`<p class="tmEmpty217">No input, [source::] stanza or rule in these files names ${esc(T)}.</p>`);
++ if(!g.inputs.length&&!shown.size&&!g.copies.length&&!g.retypes.length)cards.read.push(`<p class="tmEmpty217">No input, [source::] stanza or rule in these files names ${esc(T)}.</p>`);
+@@ -15197 +15197 @@
+- const hubLines=g.cols.parse.find(x=>x.st===g.hub)?.lines||[],hubList=list(hubLines);
++ const hubLines=g.cols.parse.find(x=>x.st===g.hub)?.lines||[],hubList=list(hubLines,!!(copyOnly||renamedOnly));
+@@ -15202,2 +15202,2 @@
+-  g.copies.length?copyOnly?`Its events are copies, made after parsing${hubLines.length?', so the parsing settings below don’t apply to them':''}.`:'Copies made by a transform skip parsing: these settings apply to the events its inputs read.':''].filter(Boolean).join(' ');
+- cards.parse.push(`<article class="tmCard217 tmHub217${copyOnly&&hubLines.length?' tmOff217':''}" id="${hubId}" data-kind="type"><header><span class="tmTypeLabel217">Source type</span>${g.hub&&stanzaLine(g.hub)?lineRef(stanzaLine(g.hub)):''}</header><strong class="tmHubName217">${esc(T)}</strong>
++  g.copies.length?copyOnly?`Its events are copies, made after parsing${hubLines.length?', so the parsing settings below don’t apply to them':''}.`:'Copies made by a transform skip parsing: these settings apply to the events its inputs read.':'',g.retypes.length?renamedOnly?`Its events get this name from a transform, after they are parsed as ${esc(firsts)}${hubLines.length?', so the parsing settings below don’t apply to them':''}.`:`Events that get this name from a transform were parsed as ${esc(firsts)}: these settings apply to the events that arrive already named ${esc(T)}.`:''].filter(Boolean).join(' ');
++ cards.parse.push(`<article class="tmCard217 tmHub217" id="${hubId}" data-kind="type"><header><span class="tmTypeLabel217">Source type</span>${g.hub&&stanzaLine(g.hub)?lineRef(stanzaLine(g.hub)):''}</header><strong class="tmHubName217">${esc(T)}</strong>
+@@ -15210 +15210 @@
+- for(const {st,lines} of g.cols.transform){const why=shared(lines);
++ for(const {st,lines} of g.cols.transform){const isLate=r=>renamedOnly&&st===g.hub&&/^(TRANSFORMS|RULESET|SEDCMD)-/.test(r.key),anyLate=lines.some(isLate),sh=shared(lines),why=anyLate?lateRuns:sh;
+@@ -15212 +15212 @@
+-   if(!r.refs||!/^(TRANSFORMS|RULESET)-/.test(r.key))return`<ul>${setting(r,'',!!why)}</ul>`;
++   if(!r.refs||!/^(TRANSFORMS|RULESET)-/.test(r.key))return`<ul>${setting(r,'',!!sh||isLate(r),isLate(r))}</ul>`;
+@@ -15216,6 +15216,6 @@
+-    for(const o of outs)edges.push({from:id,to:result(o,`Events matching [${name}]`,[line].filter(Boolean)).id,kind:o.kind});
+-    return`<li class="tmRun217${e==='no'?' tmOff217':''}" id="${id}"><div><code>[${breakable(name)}]</code>${line?lineRef(line):''}</div><small class="tmDoes217">${esc(role.label)}${role.search?'. It runs at search time; at index time it changes nothing.':''}</small><ul>${inOrder(winners(x).filter(k=>key.includes(k.key))).map(k=>`<li><code title="${esc(`${k.key} = ${cv.shown(k)}`)}"><b>${breakable(k.key)}</b> = ${esc(cv.shown(k))}</code></li>`).join('')}</ul></li>`}).join('');
+-   return`<div class="tmRuns217">${`<ul>${setting(r,'',!!why)}</ul>`}<ol>${runs}</ol></div>`}).join('');
+-  for(const r of lines)if(/^SEDCMD-/.test(r.key))edges.push({from:'set:'+r.fid+':'+r.n,to:result({kind:'text',key:'text',title:'Text rewritten'},`${r.key}`,[r]).id,kind:'text'});
+-  cards.transform.push(card({kind:'props',st,sub:st===g.hub?`Run on ${esc(T)}’s events, on the parsing tier`:scope(st,T),body,why,off:tone(lines)}))}
+- if(!cards.transform.length)cards.transform.push(`<p class="tmEmpty217">No index-time transforms in these files act on ${esc(T)}.</p>`);
++    for(const o of isLate(r)?[]:outs)edges.push({from:id,to:result(o,o.found?.length?`Events where [${name}] finds ${o.found.join(' and ')}`:o.pattern?`Events matching [${name}] are named ${o.pattern}, from their own text`:`Events matching [${name}]`,[line].filter(Boolean)).id,kind:o.kind});
++    return`<li class="tmRun217${e==='no'||isLate(r)?' tmOff217':''}" id="${id}"><div><code>[${breakable(name)}]</code>${line?lineRef(line):''}</div><small class="tmDoes217">${esc(role.label)}${role.search?'. It runs at search time; at index time it changes nothing.':''}</small><ul>${inOrder(winners(x).filter(k=>key.includes(k.key))).map(k=>`<li><code title="${esc(`${k.key} = ${cv.shown(k)}`)}"><b>${breakable(k.key)}</b> = ${esc(cv.shown(k))}</code></li>`).join('')}</ul></li>`}).join('');
++   return`<div class="tmRuns217">${`<ul>${setting(r,'',!!sh||isLate(r),isLate(r))}</ul>`}<ol>${runs}</ol></div>`}).join('');
++  for(const r of lines)if(!isLate(r)&&/^SEDCMD-/.test(r.key))edges.push({from:'set:'+r.fid+':'+r.n,to:result({kind:'text',key:'text',title:'Text rewritten'},`${r.key}`,[r]).id,kind:'text'});
++  cards.transform.push(card({kind:'props',st,sub:st===g.hub?`Run on ${esc(T)}’s events, on the parsing tier`:scope(st,T),body,why,off:anyLate&&lines.every(isLate)?'off':tone(lines)}))}
++ if(!cards.transform.length)cards.transform.push(`<p class="tmEmpty217">No index-time transforms in these files act on ${esc(T)}.</p>`);const ip=window.configPipelines218?.forType(T,{esc,nid})||{cards:[],outs:[],count:0};cards.ingest.push(...ip.cards);for(const o of ip.outs)edges.push({from:o.from,to:result(o.result,o.detail).id,kind:o.result.kind});
+@@ -15224 +15224 @@
+- if(!hasIndex)Object.assign(result({kind:'index',key:'index:',title:copyOnly?'The index the events had':'The default index'},copyOnly?'Copies keep the index the events had when they were copied, unless a transform of this source type changes it':'No input or transform in these files sets the index, so Splunk uses the instance’s default, main unless set elsewhere'),{seq:-1});
++ if(!hasIndex)Object.assign(result({kind:'index',key:'index:',title:copyOnly||renamedOnly?'The index the events had':'The default index'},renamedOnly?'Events that get this name from a transform keep the index they had, unless a later transform changes it':copyOnly?'Copies keep the index the events had when they were copied, unless a transform of this source type changes it':'No input or transform in these files sets the index, so Splunk uses the instance’s default, main unless set elsewhere'),{seq:-1});
+@@ -15227 +15227 @@
+-  cards.store.push(`<article class="tmCard217 tmResult217${off?' tmOff217':''}" id="${x.id}" data-kind="result" data-result="${x.kind}"><header><span class="tmGlyph217" aria-hidden="true"></span><strong>${esc(x.title)}</strong></header><p class="tmSub217">${[...new Set(x.details)].map(esc).join('. ')}.${x.type?` <button type="button" class="tmType217" data-tm-type="${esc(x.type)}">Follow ${esc(x.type)}</button>`:''}</p>${x.refs.length?`<p class="tmRefs217">${x.refs.map(lineRef).join('')}</p>`:''}</article>`)}
++  cards.store.push(`<article class="tmCard217 tmResult217${off?' tmOff217':''}" id="${x.id}" data-kind="result" data-result="${x.kind}"><header><span class="tmGlyph217" aria-hidden="true"></span><strong>${esc(x.title)}</strong></header><p class="tmSub217">${[...new Set(x.details)].map(esc).join('. ')}.${x.type?pm.types.includes(x.type)?` <button type="button" class="tmType217" data-tm-type="${esc(x.type)}">Follow ${esc(x.type)}</button>`:' Nothing else in these files names it.':''}${x.pattern?x.fits.length?` In these files: ${x.fits.map(t=>`<button type="button" class="tmType217" data-tm-type="${esc(t)}">${esc(t)}</button>`).join(' ')}`:' No source type in these files fits.':''}</p>${x.refs.length?`<p class="tmRefs217">${x.refs.map(lineRef).join('')}</p>`:''}</article>`)}
+@@ -15230,2 +15230,2 @@
+- for(const {st,lines} of g.cols.search){const why=shared(lines);
+-  const body=`<ul>${lines.map(r=>{if(!r.refs)return setting(r,'',!!why);
++ for(const a of g.aliases){const t=a.name;cards.search.push(card({cls:'tmOrigin217',kind:'props',st:a,sub:`Events indexed as ${`<button type="button" class="tmType217" data-tm-type="${esc(t)}">${esc(t)}</button>`} are searched as ${esc(T)}, with ${esc(T)}’s search-time settings`,body:`<ul>${setting(a.keys.get('rename'))}</ul>`}))}for(const {st,lines} of g.cols.search){const why=shared(lines);
++  const body=`<ul>${lines.map(r=>{if(r.key==='rename'){const t=r.value;return setting(r,'',!!why).replace(/<\/li>$/,`<div class="tmNestedList217"><span class="tmNested217">Searches see these events as ${esc(t)}, with ${esc(t)}’s search-time settings and none of this stanza’s. ${pm.types.includes(t)?`<button type="button" class="tmType217" data-tm-type="${esc(t)}">Follow ${esc(t)}</button>`:''}</span></div></li>`)}if(!r.refs)return setting(r,'',!!why);
+@@ -15237 +15237 @@
+- return {g,cards,edges}}
++ return {g,cards,edges,ip}}
+@@ -15254,2 +15254,2 @@
+- const on=state.view==='config'&&pm.files.length>0;if(root.hidden===on)root.hidden=!on;if(!on){signature='';drawn=null;return}
+- const T=pm.focus==='all'?null:pm.focus,sig=JSON.stringify([pm.files.map(f=>[f.id,f.place.layer,f.place.app]),pm.focus,comp(),pm.types]);
++ const pipes=window.configPipelines218,on=state.view==='config'&&(pm.files.length>0||!!pipes?.files().length);if(root.hidden===on)root.hidden=!on;if(!on){signature='';drawn=null;return}
++ const T=pm.focus==='all'?null:pm.focus,sig=JSON.stringify([pm.files.map(f=>[f.id,f.place.layer,f.place.app]),pm.focus,comp(),pm.types,pipes?.version||0]);
+@@ -15259,3 +15259,3 @@
+- if(!pm.types.length){root.innerHTML=`<div class="tmHead217"><div class="tmTitle217"><small>Source type map</small><strong>No source type to follow</strong><span>These files name no source type. A props.conf source type stanza, or an input or [source::] stanza that sets one, gives the map a source type to follow.</span></div></div>`;drawn=null;bind();return}
+- if(!T){root.innerHTML=`<div class="tmHead217"><div class="tmTitle217"><small>Source type map</small><strong>Follow a source type through Splunk</strong><span>Choose one to see what reads it and names it, what parses it, the transforms it runs, where its events go and what searches add.</span></div>${chips}</div>`;drawn=null;bind();return}
+- const {g,cards,edges}=build(T);drawn={g,edges};
++ if(!pm.types.length){root.innerHTML=`<div class="tmHead217"><div class="tmTitle217"><small>Source type map</small><strong>No source type to follow</strong><span>These files name no source type. A props.conf source type stanza, or an input or [source::] stanza that sets one, gives the map a source type to follow.</span></div></div>${pipes?.head({esc})||''}`;drawn=null;bind();return}
++ if(!T){root.innerHTML=`<div class="tmHead217"><div class="tmTitle217"><small>Source type map</small><strong>Follow a source type through Splunk</strong><span>Choose one to see what reads it and names it, what parses it, the transforms it runs, where its events go and what searches add.</span></div>${chips}</div>${pipes?.head({esc})||''}`;drawn=null;bind();return}
++ const {g,cards,edges,ip}=build(T);drawn={g,edges};const phases=ip.count?[...PHASES.slice(0,3),{key:'ingest',name:'Ingest Processor',where:'Splunk Cloud’s Ingest Processor: the pipelines that take this source type. Its path is separate from the parsing tier’s'},...PHASES.slice(3)]:PHASES;
+@@ -15265 +15265 @@
+- const summary=[count(g.inputs.filter(st=>st.input?.hec!=='listener').length,'input','inputs'),g.copies.length?count(g.copies.length,'copy rule','copy rules'):'',settings('read')?count(settings('read'),'setting where it’s read','settings where it’s read'):'',count(settings('parse'),'parsing setting','parsing settings'),count(transforms,'index-time transform','index-time transforms'),count(destinations,'destination','destinations'),count(settings('search'),'search-time setting','search-time settings'),ignored?count(ignored,'ignored line','ignored lines'):''].filter(Boolean);
++ const summary=[count(g.inputs.filter(st=>st.input?.hec!=='listener').length,'input','inputs'),g.copies.length?count(g.copies.length,'copy rule','copy rules'):'',g.retypes.length?count(g.retypes.length,'naming transform','naming transforms'):'',settings('read')?count(settings('read'),'setting where it’s read','settings where it’s read'):'',count(settings('parse'),'parsing setting','parsing settings'),count(transforms,'index-time transform','index-time transforms'),ip.count?count(ip.count,'Ingest Processor pipeline','Ingest Processor pipelines'):'',count(destinations,'destination','destinations'),count(settings('search'),'search-time setting','search-time settings'),ignored?count(ignored,'ignored line','ignored lines'):''].filter(Boolean);
+@@ -15267,2 +15267,2 @@
+- <p class="tmSummary217" aria-live="polite">${summary.map(s=>`<span>${s.replace(/^(\d+)/,'<b>$1</b>')}</span>`).join('')}</p>
+- <div class="tmScroll217"><div class="tmGrid217">${PHASES.map((p,i)=>`<section class="tmCol217" data-phase="${p.key}" aria-labelledby="tmCol217-${p.key}"><header class="tmColHead217"><h3 id="tmCol217-${p.key}"><b>${i+1}</b>${p.name}</h3><span class="tmTiers217">${tiers(p.key,g)}</span><small>${p.where}</small></header>${cards[p.key].join('')}</section>`).join('')}<svg class="tmEdges217" aria-hidden="true"></svg></div></div>`;
++ <p class="tmSummary217" aria-live="polite">${summary.map(s=>`<span>${s.replace(/^(\d+)/,'<b>$1</b>')}</span>`).join('')}</p>${pipes?.head({esc})||''}
++ <div class="tmScroll217"><div class="tmGrid217${ip.count?' tmSix218':''}">${phases.map((p,i)=>`<section class="tmCol217" data-phase="${p.key}" aria-labelledby="tmCol217-${p.key}"><header class="tmColHead217"><h3 id="tmCol217-${p.key}"><b>${i+1}</b>${p.name}</h3><span class="tmTiers217">${p.key==='ingest'?`<i class="tmIp218${comp()==='ip'?' tmPicked217':''}" title="Ingest Processor">IP</i>`:tiers(p.key,g)}</span><small>${p.where}</small></header>${cards[p.key].join('')}</section>`).join('')}<svg class="tmEdges217" aria-hidden="true"></svg></div></div>`;
+@@ -15296 +15296 @@
+- const kinds=['name','match','copy','index','route','drop','meta','field','text'];
++ const kinds=['name','match','copy','retype','index','route','drop','meta','field','text'];
+@@ -15300 +15300 @@
+- root.querySelectorAll('[data-tm-type]').forEach(b=>b.onclick=()=>{pm.focus=b.dataset.tmType;render()});
++ root.querySelectorAll('[data-tm-type]').forEach(b=>b.onclick=()=>{pm.focus=b.dataset.tmType;render()});root.querySelectorAll('[data-tm-pipe-remove]').forEach(b=>b.onclick=()=>{window.configPipelines218.remove(b.dataset.tmPipeRemove);cv.analyse();render()});
+@@ -15355,0 +15356,105 @@
++<style id="ingest-pipelines-v218-styles">
++/* Build 218: Ingest Processor pipelines in the source type map. With a pipeline that takes the source type, the map
++   has a sixth column, in the Ingest Processor's colour, and its head lists the pipeline files. */
++.tmGrid217.tmSix218{grid-template-columns:repeat(2,minmax(188px,1fr)) minmax(212px,1.2fr) repeat(3,minmax(188px,1fr));min-width:1322px}
++.tmPipe218{border-color:rgba(210,141,245,.5)}
++.tmPipe218 .propsFile205{background:#d28df5;color:#1b0d26}
++.tmCmds218{gap:5px}
++.tmCmds218 li{display:grid;gap:1px;min-width:0;border-left:2px solid #d28df5;padding:1px 0 1px 8px}
++.tmCmds218 code{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;min-width:0;overflow:hidden;color:#c5e6f5;font:11.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere}
++.tmCmds218 code b{color:#e8f4fb;font-weight:600}
++.tmCmds218 small{color:var(--muted);font-size:.68rem;line-height:1.4}
++.tmPipes218{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0;padding:8px 16px;border-bottom:1px solid var(--line);color:var(--muted);font-size:.72rem}
++.tmPipes218 span{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(210,141,245,.45);border-radius:99px;padding:3px 6px 3px 10px;color:#e3d2f3}
++.tmPipes218 button{border:0;padding:0 4px;background:none;color:#b8c9d7;font:inherit;cursor:pointer}
++.tmPipes218 button:hover{color:var(--text);text-decoration:underline}
++.tmTiers217 i.tmIp218{color:#d28df5}
++/* Below 900 px the columns stack, six as five do. */
++@media (max-width:900px){.tmGrid217.tmSix218{grid-template-columns:minmax(0,1fr);min-width:0}}
++</style>
++<script id="ingest-pipelines-v218">
++(function(){
++/* Build 218: Ingest Processor pipelines for the source type map. A pipeline is an SPL2 statement that starts with
++   "from $source": "$pipeline = | from $source | where … | eval … | into $destination;". The Config view's upload passes
++   .spl2 files here; they are kept for the visit, like its other files. For a source type, the map asks which pipelines
++   take it, and gets a card for each, with its commands in order and what each leads to: a drop, an index, another
++   source type, a field, a rewrite, a destination. With no pipeline that takes the source type, the map has no Ingest
++   Processor column. */
++const files=[];let version=0;
++const word=s=>(s.match(/^[A-Za-z_]\w*/)||[''])[0].toLowerCase();
++
++// Where a string, a regular expression or a comment that starts at i ends; nothing where none starts. A slash starts a
++// regular expression after an opening bracket, a comma or an operator, and in rex's arguments; elsewhere it divides.
++function token(text,i){const c=text[i],before=text.slice(Math.max(0,i-80),i);
++ if(c==='"'||c==="'"||c==='`'){let j=i+1;for(;j<text.length&&text[j]!==c;j++)if(text[j]==='\\')j++;return {end:j,kind:'string'}}
++ if(c!=='/')return null;
++ if(text[i+1]==='*'){const e=text.indexOf('*/',i+2);return {end:e<0?text.length-1:e+1,kind:'comment'}}
++ if(text[i+1]==='/'){let j=i;while(j<text.length&&text[j]!=='\n')j++;return {end:j-1,kind:'comment'}}
++ if(/(^|[(,=|\[!&<>~])\s*$/.test(before)||/\brex\s+(\w+\s*=\s*\S+\s+)*$/i.test(before)){let j=i+1;for(;j<text.length&&text[j]!=='/';j++)if(text[j]==='\\')j++;return {end:j,kind:'regex'}}
++ return null}
++// The parts of SPL2 text between a separator at the top level: outside strings, regular expressions, comments and brackets.
++function split(text,sep){const out=[];let depth=0,start=0;
++ for(let i=0;i<text.length;i++){const t=token(text,i);if(t){i=t.end;continue}const c=text[i];
++  if('([{'.includes(c))depth++;else if(')]}'.includes(c))depth=Math.max(0,depth-1);
++  else if(c===sep&&!depth){out.push(text.slice(start,i));start=i+1}}
++ out.push(text.slice(start));return out}
++const uncomment=text=>{let out='';for(let i=0;i<text.length;i++){const t=token(text,i);if(t){out+=t.kind==='comment'?' ':text.slice(i,t.end+1);i=t.end;continue}out+=text[i]}return out};
++const tidy=s=>s.replace(/\s+/g,' ').trim();
++const literal=s=>{const m=s.trim().match(/^"((?:\\.|[^"\\])*)"$|^'((?:\\.|[^'\\])*)'$/);return m?(m[1]??m[2]).replace(/\\(.)/g,'$1'):null};
++
++// The tests a where makes of the source type: each a function of a source type name; and the names it gives outright.
++function tests(expr){const list=[],names=[];let m;
++ for(m of expr.matchAll(/\bsourcetype\s*==?\s*("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/gi)){const v=literal(m[1]);names.push(v);list.push(t=>t===v)}
++ for(m of expr.matchAll(/\bsourcetype\s+IN\s*\(([^)]*)\)/gi)){const vs=split(m[1],',').map(literal).filter(v=>v!==null);names.push(...vs);list.push(t=>vs.includes(t))}
++ for(m of expr.matchAll(/\bsourcetype\s+LIKE\s+("(?:\\.|[^"\\])*")|\blike\(\s*sourcetype\s*,\s*("(?:\\.|[^"\\])*")\s*\)/gi)){const v=literal(m[1]||m[2]),re=new RegExp('^'+v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/%/g,'.*').replace(/_/g,'.')+'$');list.push(t=>re.test(t))}
++ for(m of expr.matchAll(/\bmatch\(\s*sourcetype\s*,\s*(?:\/((?:\\.|[^\/\\])*)\/|"((?:\\.|[^"\\])*)")/gi)){try{const re=new RegExp(m[1]??m[2]);list.push(t=>re.test(t))}catch(e){}}
++ return {list,names}}
++
++// One pipeline: its name, what it takes, and its commands; a route's or a branch's own pipeline is read the same way.
++function commands(text){return split(text,'|').map(tidy).filter(Boolean).map(c=>({word:word(c),args:tidy(c.slice(word(c).length))}))}
++function pipeline(name,rest){const cmds=commands(rest);let takes='',who={list:[],names:[]};
++ if(cmds[0]?.word==='where'&&/\b(sourcetype|source|host)\b/i.test(cmds[0].args)){takes=cmds[0].args;who=tests(takes);cmds.shift()}
++ return {name:'$'+name,takes,who,cmds}}
++function read(text){const out=[];
++ for(const st of split(uncomment(text),';')){const m=st.match(/(?:^|\n)\s*\$([A-Za-z_]\w*)\s*=\s*\|?\s*from\s+\$\w+\b([\s\S]*)$/);if(m)out.push(pipeline(m[1],m[2]))}
++ return out}
++
++// What a command leads to, for the map's Index or send column; and what it says under its line.
++function leads(cmd,P,where=''){const by=where?`Events where ${where}, in ${P.name}`:'',outs=[],says=[];
++ const out=(kind,key,title,detail,type)=>outs.push({result:{kind,key,title,...(type?{type}:{})},detail:by||detail});
++ if(cmd.word==='where'){says.push('Keeps the events this holds for, and drops the others.');out('drop','drop','Dropped',`Events that fail a where of ${P.name}`)}
++ else if(cmd.word==='eval'){for(const a of split(cmd.args,',')){const m=a.match(/^\s*([A-Za-z_][\w.]*)\s*=(?!=)([\s\S]*)$/);if(!m)continue;const f=m[1],v=literal(m[2]);
++   if(f==='index')v!==null?out('index','index:'+v,`Index ${v}`,`Events ${P.name} sets it for`):out('index','index:?','Index set by an expression',`In ${P.name}`);
++   else if(f==='sourcetype')v!==null?out('retype','retype:'+v,`Becomes ${v}`,`Events ${P.name} names so`,v):out('meta','meta:sourcetype?','Source type set by an expression',`In ${P.name}`);
++   else if(f==='host'||f==='source')out('meta','meta:'+f+(v??'?'),v!==null?`${f[0].toUpperCase()+f.slice(1)} set to ${v}`:`${f[0].toUpperCase()+f.slice(1)} set by an expression`,`In ${P.name}`);
++   else if(f==='_raw')out('text','text','Text rewritten',`Rewritten by ${P.name}`);
++   else if(f==='_time')out('meta','time','Timestamp set by an expression',`In ${P.name}`);
++   else out('field','field:'+f,`Indexed field ${f}`,`Set by ${P.name}`)}}
++ else if(cmd.word==='rex'){const names=[...cmd.args.matchAll(/\(\?P?<([A-Za-z_]\w*)>/g)].map(m=>m[1]);if(names.length)says.push(`Extracts ${names.join(', ')}.`);for(const f of names)out('field','field:'+f,`Indexed field ${f}`,`Extracted by ${P.name}`)}
++ else if(cmd.word==='fields')says.push(/^\s*-/.test(cmd.args)?'Removes these fields.':'Keeps only these fields.');
++ else if(cmd.word==='into'){const d=cmd.args.split(/\s/)[0];out('route','route:'+d,`Sent to ${d}`,`What ${P.name} lets through`);if(!where)says.push('The destination is chosen where the pipeline is applied.')}
++ else if(['route','branch','thru'].includes(cmd.word)){const parts=split(cmd.args,','),subs=parts.filter(x=>/^\s*\[/.test(x)),pred=cmd.word==='route'?tidy(parts.filter(x=>!/^\s*\[/.test(x)).join(',')):'';
++   says.push(cmd.word==='route'?'Matching events leave the pipeline here, by their own route.':cmd.word==='branch'?'Each branch gets a copy.':'A copy goes through this.');
++   for(const s of subs)for(const c of commands(s.trim().replace(/^\[|\]$/g,'')))outs.push(...leads(c,P,pred||where||`a ${cmd.word} copy`).outs)}
++ return {says:says.join(' '),outs}}
++
++// For the map: the pipelines that take a source type, as cards, with what their commands lead to.
++function forType(T,h){const cards=[],outs=[];let count=0;
++ for(const f of files)for(const P of f.pipelines){if(P.who.list.length&&!P.who.list.some(t=>t(T)))continue;count++;
++  const lis=P.cmds.map(c=>{const id=h.nid('P'),l=leads(c,P);for(const o of l.outs)outs.push({...o,from:id});
++   return`<li id="${id}"><code title="${h.esc(c.word+' '+c.args)}"><b>${h.esc(c.word)}</b> ${h.esc(c.args)}</code>${l.says?`<small>${h.esc(l.says)}</small>`:''}</li>`}).join('');
++  cards.push(`<article class="tmCard217 tmPipe218" data-kind="pipeline"><header><i class="propsFile205" data-file="pipeline" title="SPL2 pipeline">S</i><code title="${h.esc(P.name)}">${h.esc(P.name)}</code><span class="tmAt217"><span class="tmFiles217">${h.esc(f.name)}</span></span></header><p class="tmSub217">${P.takes?`Takes events where ${h.esc(P.takes)}`:'Takes every source type it receives'}</p><ol class="tmCmds218">${lis}</ol></article>`)}
++ return {cards,outs,count}}
++// The loaded files, for the map's head: each with a way to take it out.
++function head(h){return files.length?`<p class="tmPipes218">Ingest Processor pipelines${files.map(f=>`<span>${h.esc(f.name)} · ${f.pipelines.length} pipeline${f.pipelines.length===1?'':'s'}<button type="button" data-tm-pipe-remove="${h.esc(f.path)}" aria-label="Remove ${h.esc(f.name)}">Remove</button></span>`).join('')}</p>`:''}
++
++window.configPipelines218={read,leads,forType,head,
++ files:()=>files,get version(){return version},
++ // A file's pipelines; a file loaded again replaces itself. Returns how many pipelines it has.
++ add(path,text){const pipelines=read(text);if(!pipelines.length)return 0;const i=files.findIndex(f=>f.path===path),f={path,name:path.split('/').pop(),pipelines};if(i<0)files.push(f);else files[i]=f;version++;return pipelines.length},
++ remove(path){const i=files.findIndex(f=>f.path===path);if(i>=0){files.splice(i,1);version++}},
++ clear(){if(files.length){files.length=0;version++}},
++ // The source types the pipelines name: those their where takes outright, and those an eval names.
++ types(){const out=new Set();for(const f of files)for(const P of f.pipelines){P.who.names.forEach(t=>out.add(t));const scan=cmds=>{for(const c of cmds)for(const o of leads(c,P).outs)if(o.result.type)out.add(o.result.type)};scan(P.cmds)}return [...out]}};
++})();
++</script>

@@ -1,0 +1,17 @@
+/* Build 218: Ingest Processor pipelines in the source type map. With a pipeline that takes the source type, the map
+   has a sixth column, in the Ingest Processor's colour, and its head lists the pipeline files. */
+.tmGrid217.tmSix218{grid-template-columns:repeat(2,minmax(188px,1fr)) minmax(212px,1.2fr) repeat(3,minmax(188px,1fr));min-width:1322px}
+.tmPipe218{border-color:rgba(210,141,245,.5)}
+.tmPipe218 .propsFile205{background:#d28df5;color:#1b0d26}
+.tmCmds218{gap:5px}
+.tmCmds218 li{display:grid;gap:1px;min-width:0;border-left:2px solid #d28df5;padding:1px 0 1px 8px}
+.tmCmds218 code{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;min-width:0;overflow:hidden;color:#c5e6f5;font:11.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere}
+.tmCmds218 code b{color:#e8f4fb;font-weight:600}
+.tmCmds218 small{color:var(--muted);font-size:.68rem;line-height:1.4}
+.tmPipes218{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0;padding:8px 16px;border-bottom:1px solid var(--line);color:var(--muted);font-size:.72rem}
+.tmPipes218 span{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(210,141,245,.45);border-radius:99px;padding:3px 6px 3px 10px;color:#e3d2f3}
+.tmPipes218 button{border:0;padding:0 4px;background:none;color:#b8c9d7;font:inherit;cursor:pointer}
+.tmPipes218 button:hover{color:var(--text);text-decoration:underline}
+.tmTiers217 i.tmIp218{color:#d28df5}
+/* Below 900 px the columns stack, six as five do. */
+@media (max-width:900px){.tmGrid217.tmSix218{grid-template-columns:minmax(0,1fr);min-width:0}}
