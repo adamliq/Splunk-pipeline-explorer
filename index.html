@@ -13701,7 +13701,7 @@ const viewButton=document.querySelector('.seg button[data-view="config"]');if(vi
 const stripLabel=document.createElement('p');stripLabel.className='configStripLabel205';document.querySelector('.componentStrip').before(stripLabel);
 const panel=document.createElement('section');panel.id='configView205';panel.className='propsMap205';panel.setAttribute('aria-label','Configuration files on the Matrix');
 document.getElementById('matrix').before(panel);
-const fileInput=Object.assign(document.createElement('input'),{type:'file',accept:'.conf,.txt,.spl2,.spl,text/plain',multiple:true,hidden:true});
+const fileInput=Object.assign(document.createElement('input'),{type:'file',accept:'.conf,.txt,.spl2,.spl,.tar.gz,.tgz,application/gzip,application/x-gzip,text/plain',multiple:true,hidden:true});
 const folderInput=Object.assign(document.createElement('input'),{type:'file',multiple:true,hidden:true});folderInput.setAttribute('webkitdirectory','');
 document.body.append(fileInput,folderInput);
 
@@ -13748,7 +13748,7 @@ function renderPanel(){
  const on=state.view==='config';panel.hidden=!on;stripLabel.hidden=!on;
  const t=tier();stripLabel.innerHTML=t==='all'?'Choose a component to check where each line takes effect on it.':`Checking where each line takes effect on ${article(componentNames[t])} <b>${esc(componentNames[t])}</b>. Choose another component, or All components.`;
  panel.classList.toggle('propsEmpty205',!pm.files.length);
- if(!pm.files.length){panel.innerHTML=`<div class="propsHead205"><div class="propsTitle205"><small>Configuration files</small><strong>See where your configuration acts</strong><span>${pm.error?`<em class="propsError205">${esc(pm.error)}</em>`:'Upload inputs.conf, props.conf and transforms.conf files, or an app or etc folder, or drop them here. An Ingest Processor pipeline’s SPL2 file (.spl2) can go with them, for the source type map. Each line is matched to the stage below that applies it, and files of one kind are merged in Splunk’s precedence order.'}</span></div><div class="propsActions205"><button class="builderBtn" data-props-example>Try an example</button><button class="builderBtn" data-props-folder>Upload a folder</button><button class="builderBtn primary" data-props-upload>Upload files</button></div></div>`;bindPanel();return}
+ if(!pm.files.length){panel.innerHTML=`<div class="propsHead205"><div class="propsTitle205"><small>Configuration files</small><strong>See where your configuration acts</strong><span>${pm.error?`<em class="propsError205">${esc(pm.error)}</em>`:'Upload inputs.conf, props.conf and transforms.conf files, a Splunk app package (.tar.gz or .tgz), or an app or etc folder, or drop them here. App packages are opened locally; their configuration paths and default/local precedence are preserved. An Ingest Processor pipeline’s SPL2 file (.spl2) can go with them, for the source type map. Each line is matched to the stage below that applies it, and files of one kind are merged in Splunk’s precedence order.'}</span></div><div class="propsActions205"><button class="builderBtn" data-props-example>Try an example</button><button class="builderBtn" data-props-folder>Upload a folder</button><button class="builderBtn primary" data-props-upload>Upload files</button></div></div>`;bindPanel();return}
  const kinds=fileTypes.filter(k=>kindFiles(k).length);if(!kinds.includes(pm.tab))pm.tab=kinds.includes('props')?'props':kinds[0];
  const settings=pm.files.reduce((n,f)=>n+f.doc.settings.filter(r=>!r.invalid).length,0),apps=new Set(pm.files.map(f=>f.place.app).filter(Boolean)),missing=fileTypes.filter(k=>!kindFiles(k).length),files=kindFiles(pm.tab);
  panel.innerHTML=`<div class="propsHead205"><div class="propsTitle205"><small>Configuration files</small><strong>${pm.files.length} file${pm.files.length===1?'':'s'}${apps.size?` from ${[...apps].map(esc).join(', ')}`:''}</strong><span>${settings} settings, merged in Splunk’s precedence order${pm.error?` · <em class="propsError205">${esc(pm.error)}</em>`:''}</span></div><div class="propsActions205">
@@ -13824,9 +13824,10 @@ openDetail=function(id){const result=detailBefore.apply(this,arguments);let box=
   return`<div class="propsDetailLine205${e==='no'?' noEffect205':''}">${badge(r.file)}<code>${codeHtml(r)}${keys?`<span class="propsDetailKeys205">${esc(keys)}</span>`:''}</code><small>${esc(where(r))}${also?' · also acts here':''}${e?` · ${e==='own'?`on ${article(componentNames[tier()])} ${componentNames[tier()]}, only for data it reads itself`:`${effectLabel[e].toLowerCase()}${tier()!=='all'?` on ${article(componentNames[tier()])} ${componentNames[tier()]}`:''}`}`:''}</small>${note?`<p class="propsNote205">${esc(note)}</p>`:''}</div>`}).join('')}</div><p class="propsActs205">${esc(actsWhere(id))}</p>`;
  return result};
 
-// Files come from the picker, a folder, or a drop of either, several at once. From a folder only inputs.conf, props.conf
-// and transforms.conf are read, and their paths give their places.
+// Files come from the picker, a folder, or a drop. Packages expand into supported configuration and SPL2 files;
+// configuration paths determine app identity and precedence. Other folder assets are skipped.
 async function readFiles(list){if(!list.length)return;const errors=[],held=new Map();let first=null,skipped=0;
+ const expanded=[];for(const entry of list){if(/\.(tar\.gz|tgz)$/i.test(entry.path)){try{expanded.push(...await window.configAppPackages219.expand(entry.file))}catch(e){errors.push(`${entry.file.name}: ${e.message}`)}}else expanded.push(entry)}list=expanded;
  for(const {file,path} of list){const fromFolder=path.includes('/');if(/\.spl2?$/i.test(path)&&window.configPipelines218){if(file.size>2_000_000)errors.push(`${path} is over 2 MB`);else if(!window.configPipelines218.add(path,await file.text()))errors.push(`${file.name} has no pipeline: no statement in it starts with from $source`);continue}
   if(fromFolder&&!/^(inputs|props|transforms)\.conf$/i.test(path.split('/').pop())){skipped++;continue}
   const folder=fromFolder&&heldBack(path);if(folder){held.set(folder,(held.get(folder)||0)+1);continue}
@@ -13839,7 +13840,7 @@ async function readFiles(list){if(!list.length)return;const errors=[],held=new M
 fileInput.onchange=()=>{readFiles([...fileInput.files].map(file=>({file,path:file.name}))).finally(()=>{fileInput.value=''})};
 folderInput.onchange=()=>{readFiles([...folderInput.files].map(file=>({file,path:file.webkitRelativePath||file.name}))).finally(()=>{folderInput.value=''})};
 async function walk(entry,out){
- if(entry.isFile){if(/^(inputs|props|transforms)\.conf$/i.test(entry.name))out.push({file:await new Promise((ok,fail)=>entry.file(ok,fail)),path:entry.fullPath.replace(/^\//,'')});return}
+ if(entry.isFile){if(/^(inputs|props|transforms)\.conf$/i.test(entry.name)||/\.(spl2?|tar\.gz|tgz)$/i.test(entry.name))out.push({file:await new Promise((ok,fail)=>entry.file(ok,fail)),path:entry.fullPath.replace(/^\//,'')});return}
  const reader=entry.createReader();let batch;do{batch=await new Promise((ok,fail)=>reader.readEntries(ok,fail));await Promise.all(batch.map(x=>walk(x,out)))}while(batch.length)}
 panel.addEventListener('dragover',e=>{if([...e.dataTransfer.types].includes('Files')){e.preventDefault();panel.classList.add('propsDrop205')}});
 panel.addEventListener('dragleave',e=>{if(!panel.contains(e.relatedTarget))panel.classList.remove('propsDrop205')});
@@ -15464,6 +15465,50 @@ changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Source ty
 const root=document.getElementById('topologyBuilder');root.dataset.buildNumber='218';root.dataset.buildDate='2026-11-12';
 document.title='Splunk Pipeline Explorer · Build 218 · 12 Nov 2026';
 const info=document.getElementById('builderInfoText159');if(info)info.textContent=info.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 218 · 12 Nov 2026');
+})();
+</script>
+<script id="config-app-packages-v219">
+(function(){
+// Read app packages locally. Only regular configuration and SPL2 files enter the Config view.
+const MAX_COMPRESSED=64*1024*1024,MAX_EXPANDED=256*1024*1024,MAX_ENTRIES=20000;
+const decode=new TextDecoder(),field=(b,a,n)=>decode.decode(b.subarray(a,a+n)).replace(/\0.*$/s,'');
+function number(b,a,n){const bytes=b.subarray(a,a+n);let v;
+ if(bytes[0]&128){let x=BigInt(bytes[0]&127);if(bytes[0]&64)throw Error('Negative archive entry size');for(const c of bytes.subarray(1))x=(x<<8n)+BigInt(c);v=Number(x)}
+ else{const s=field(b,a,n).trim();if(s&&!/^[0-7]+$/.test(s))throw Error('Invalid archive header');v=s?parseInt(s,8):0}
+ if(!Number.isSafeInteger(v)||v<0)throw Error('Invalid archive entry size');return v}
+function pax(bytes){const out=Object.create(null);let i=0;
+ while(i<bytes.length){let space=i;while(space<bytes.length&&bytes[space]!==32)space++;const raw=decode.decode(bytes.subarray(i,space));if(!/^\d+$/.test(raw))throw Error('Invalid extended archive header');const n=Number(raw);if(!Number.isSafeInteger(n)||n<=space-i+1||i+n>bytes.length||bytes[i+n-1]!==10)throw Error('Invalid extended archive header');const line=decode.decode(bytes.subarray(space+1,i+n-1)),eq=line.indexOf('=');if(eq>0)out[line.slice(0,eq)]=line.slice(eq+1);i+=n}return out}
+function safePath(raw){const p=raw.replace(/\\/g,'/');if(p.startsWith('/')||/^[A-Za-z]:/.test(p)||p.includes('\0'))throw Error('Unsafe path in app package');const parts=p.split('/').filter(x=>x&&x!=='.');if(parts.includes('..'))throw Error('Unsafe path in app package');return parts.join('/')}
+async function expand(file){
+ if(file.size>MAX_COMPRESSED)throw Error('App package is over 64 MiB');
+ if(typeof DecompressionStream!=='function')throw Error('This browser cannot open gzip app packages; extract the package and use Upload a folder');
+ const reader=file.stream().pipeThrough(new DecompressionStream('gzip')).getReader(),chunks=[];let total=0;
+ try{for(;;){const {done,value}=await reader.read();if(done)break;total+=value.length;if(total>MAX_EXPANDED){await reader.cancel();throw Error('Expanded app package is over 256 MiB')}chunks.push(value)}}catch(e){if(/over 256 MiB/.test(e.message))throw e;throw Error('Cannot decompress app package: the gzip file is invalid or incomplete')}finally{reader.releaseLock()}
+ const bytes=new Uint8Array(total);let cursor=0;for(const c of chunks){bytes.set(c,cursor);cursor+=c.length}
+ const files=[],global=Object.create(null);let local=Object.create(null),longName='',offset=0,count=0,ended=false;
+ while(offset+512<=bytes.length){const h=bytes.subarray(offset,offset+512);if(h.every(x=>x===0)){ended=true;break}if(++count>MAX_ENTRIES)throw Error('App package contains too many entries');
+  let sum=0;for(let i=0;i<512;i++)sum+=i>=148&&i<156?32:h[i];if(sum!==number(h,148,8))throw Error('Invalid app package: archive header checksum does not match');
+  const type=field(h,156,1),metadata=['x','g','L','K'].includes(type),attrs={...global,...local};let size=number(h,124,12);
+  if(!metadata&&attrs.size!==undefined){if(!/^\d+$/.test(attrs.size))throw Error('Invalid extended archive size');size=Number(attrs.size)}
+  if(!Number.isSafeInteger(size)||size<0||size>MAX_EXPANDED)throw Error('Invalid archive entry size');const start=offset+512,end=start+size,next=start+Math.ceil(size/512)*512;if(next>bytes.length)throw Error('App package is truncated');const body=bytes.subarray(start,end);offset=next;
+  if(type==='x'){local=pax(body);continue}if(type==='g'){Object.assign(global,pax(body));continue}if(type==='L'){longName=decode.decode(body).replace(/\0.*$/s,'').replace(/\n$/,'');continue}if(type==='K')continue;
+  const prefix=field(h,257,6)==='ustar'?field(h,345,155):'',raw=attrs.path||longName||[prefix,field(h,0,100)].filter(Boolean).join('/');local=Object.create(null);longName='';
+  const path=safePath(raw);if(type!==''&&type!=='0')continue;
+  const name=path.split('/').pop();if(!/^(inputs|props|transforms)\.conf$/i.test(name)&&!(/\.spl2?$/i.test(name)))continue;
+  const root=file.name.replace(/\.(tar\.gz|tgz|spl)$/i,'');files.push({file:new File([body],name,{type:'text/plain'}),path:path.includes('/')?path:root+'/'+path});
+ }
+ if(!ended)throw Error('App package is truncated or is not a tar archive');
+ if(!files.length)throw Error('App package contains no inputs.conf, props.conf, transforms.conf or SPL2 pipeline files');return files;
+}
+window.configAppPackages219={expand};
+})();
+</script>
+<script id="app-packages-records-v219">
+(function(){
+changeRegister.find(g=>g.group==='Explorer foundations')?.items.push(['Splunk app package uploads','The Config view accepts .tar.gz and .tgz app packages through file upload, folder upload or drag and drop. It reads supported configuration and SPL2 files locally, retaining app paths and default/local precedence for the source type map.',true]);
+const root=document.getElementById('topologyBuilder');root.dataset.buildNumber='219';root.dataset.buildDate='2026-11-12';
+document.title='Splunk Pipeline Explorer · Build 219 · 12 Nov 2026';
+const info=document.getElementById('builderInfoText159');if(info)info.textContent=info.textContent.replace(/^Build \d+ · \d{1,2} \w{3} \d{4}/,'Build 219 · 12 Nov 2026');
 })();
 </script>
 </body>
