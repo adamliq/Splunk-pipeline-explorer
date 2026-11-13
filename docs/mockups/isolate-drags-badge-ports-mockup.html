@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Isolation And Drag Fixes</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 220 TARGET · BUILD 219 + PROTOTYPE</span>
+ <h1>Isolation, label and waypoint drags, the card badge and default ports</h1>
+ <p class="lede">Eight Builder faults, fixed with eight in-place edits to Build 219. Five are from the Build 215 recheck’s open list: isolating a region or an environment (28), dragging a link’s label (35 and 36), a card’s issue badge (37), and the ports of syslog and search dispatch links (21). Three were found while testing those fixes: the same two drag faults in a link’s waypoint handle (50 and 51), and leader lines left for the labels of hidden links (52). Every target scene is the real explorer with the edits applied to Build 219; each “Today” scene is Build 219 as shipped, set up by the same steps.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>What Build 219 does</h2>
+  <table>
+   <thead><tr><th>Fault</th><th>What you see</th><th>Why</th><th>Fix</th></tr></thead>
+   <tbody>
+    <tr><td>28. Isolating a region or an environment throws</td><td>The region’s one card and all 12 links, an error at each redraw, and the Find box gone from the toolbar, with Clear isolate</td><td><code>involved</code> is declared with <code>const</code> and then assigned, so the redraw stops there</td><td><code>involved</code> takes its whole value where it is declared</td></tr>
+    <tr><td>52. A hidden link’s label keeps its leader line</td><td>With a container collapsed, a short line with no label, where a hidden link’s label had been placed off its link</td><td>The label placement draws a leader for every label, hidden or not</td><td>No leader for a label that is hidden with its link</td></tr>
+    <tr><td>35. A label’s drag stops at its first step</td><td>A 50 px drag moves the label 8 px</td><td>Each move writes to the routing record the drag took at its press; the first move’s redraw puts a fresh copy in the store</td><td>Each move writes to the record as it is at that moment</td></tr>
+    <tr><td>36. An additional data link’s label doesn’t move</td><td>Nothing moves, and Undo gains “Move connector label”</td><td>The press turns the link’s id into a number; an additional link’s id is text, such as <code>data-rel-1</code></td><td>The id stays text, as the label’s click keeps it</td></tr>
+    <tr><td>50, 51. The same two faults in the waypoint handle</td><td>A waypoint springs back to its drag’s first step; an additional data link’s doesn’t move</td><td>The waypoint’s handler, beside the label’s, has the same two lines</td><td>The same two changes</td></tr>
+    <tr><td>37. A card’s issue badge selects its card without showing it</td><td>The findings open; the card isn’t outlined, and the Inspector goes empty</td><td>The click sets the selection and draws nothing</td><td>It selects as a link’s badge does, since Build 212</td></tr>
+    <tr><td>21. Syslog and search dispatch links get port 0</td><td>The built-in topology’s syslog link has no port; five OV pages list it, and finding I-08 asks for it</td><td>“TCP/TLS or UDP” and “Search dispatch” name no port for the page to read</td><td>514, or 6514 for TLS with no UDP; 8089 for search dispatch</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The fix in short</h2>
+  <dl>
+   <dt>Isolation</dt><dd>No error. Only the links between the cards still shown are drawn, and the redraw runs to its end: the Find box, its options and Clear isolate stay where they are.</dd>
+   <dt>Leaders</dt><dd>A label hidden with its link, by isolation or by a collapsed container, gets no leader line.</dd>
+   <dt>Label drags</dt><dd>A label follows its whole drag, an additional data link’s too. One drag is one Undo step.</dd>
+   <dt>Waypoint drags</dt><dd>A waypoint stays where it is let go, and its link runs through it during the drag. An additional data link’s too.</dd>
+   <dt>Card badge</dt><dd>A click, or Enter, selects the card, outlines it, shows it in the Inspector and opens its findings. Below 1,280 px the Inspector is left closed, as for a link’s badge.</dd>
+   <dt>Ports</dt><dd>A new syslog link starts at 514, or 6514 where its protocol is TLS with no UDP; a new search dispatch link at 8089.</dd>
+   <dt>Unchanged</dt><dd>A click on a label; a press on a label’s issue badge; where labels may be placed; a port a link or a file already holds, 0 included.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-isolate-drags-badge-ports.md</code> · Prototype: eight in-place edits to Build 219, in <code>docs/mockups/isolate-drags-badge-ports.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "isolate", "img": "compare/isolate-drags-badge-ports-isolate.png", "group": "target", "tab": "28 · Isolate", "title": "The reference topology, isolated to the region AWS ap-southeast-2", "w": 754, "h": 792, "zoom": 1, "size": "1440 × 900 window: the toolbar and the canvas, after Fit", "items": [{"n": 1, "head": "Isolated", "text": "Isolate by region, AWS ap-southeast-2: in Navigate, under the Find box’s ⋯ options. No error is raised.", "x": 34.98, "y": 21.15, "box": [34.98, 21.15, 43.37, 4.04]}, {"n": 2, "head": "One card, no links", "text": "AWS Lambda 1 is the region’s one component. None of the 12 links is drawn: each joins a card the isolation hides.", "x": 40.32, "y": 71.04, "box": [40.32, 71.04, 21.68, 24.34]}, {"n": 3, "head": "Still in the toolbar", "text": "The redraw runs to its end, so the Find box and its options are put back where they belong.", "x": 46.06, "y": 1.2, "box": [46.06, 0.88, 37.14, 3.54]}, {"n": 4, "head": "Clear isolate", "text": "There to press. It brings every card and link back.", "x": 39.75, "y": 28.13, "box": [26.43, 26.07, 11.2, 4.1]}]}, {"id": "leader", "img": "compare/isolate-drags-badge-ports-leader.png", "group": "target", "tab": "52 · Leader lines", "title": "The zones topology, its Universal Forwarders in a collapsed container", "w": 754, "h": 743, "zoom": 1, "size": "1440 × 900 window: the canvas at 180 %", "items": [{"n": 1, "head": "No leader", "text": "Deployment Server 1’s link to Universal Forwarder 1 is hidden with the collapsed container, and so is its label. The label gets no leader line. Isolation hides links the same way.", "x": 47.18, "y": 44.59, "box": [47.18, 44.59, 5.73, 7.27]}]}, {"id": "labels", "img": "compare/isolate-drags-badge-ports-labels.png", "group": "target", "tab": "35, 36 · Label drags", "title": "Two labels, each dragged once", "w": 754, "h": 743, "zoom": 1, "size": "1440 × 900 window: the canvas at 125 %", "items": [{"n": 1, "head": "35 · The whole drag", "text": "“File handoff”, dragged 50 px up, stays where it was let go, with a leader line to its link, as any label off its link has. One Undo step.", "x": 42.71, "y": 53.73, "box": [42.71, 53.73, 14.52, 3.7]}, {"n": 2, "head": "Where it was", "text": "On its link. Its issue badge stays there.", "x": 39.22, "y": 60.06, "box": [39.22, 60.06, 15.32, 4.51]}, {"n": 3, "head": "36 · An additional data link’s label", "text": "“Configured handoff”, on the second link into Indexer 1, dragged 36 px right and 44 px down. It follows too.", "x": 43.27, "y": 38.8, "box": [43.27, 38.8, 20.29, 3.7]}, {"n": 4, "head": "Where it was", "text": "On the dashed link, above.", "x": 38.1, "y": 35.5, "box": [38.1, 35.5, 21.09, 4.51]}]}, {"id": "waypoint", "img": "compare/isolate-drags-badge-ports-waypoint.png", "group": "target", "tab": "50, 51 · Waypoint drags", "title": "A link’s waypoint, dragged once", "w": 754, "h": 743, "zoom": 1, "size": "1440 × 900 window: the canvas at 125 %", "items": [{"n": 1, "head": "50 · Where it was let go", "text": "The waypoint, dragged 30 px left and 80 px up, stays there, and the link runs through it, during the drag and after. One Undo step.", "x": 41.01, "y": 45.42, "box": [41.01, 45.42, 2.65, 2.69]}, {"n": 2, "head": "Where it started", "text": "On the link, where “+ Add waypoint” put it.", "x": 49.37, "y": 56.59, "box": [49.37, 56.59, 2.92, 2.96]}, {"n": 3, "head": "51 · An additional data link’s waypoint", "text": "Follows its drag the same way (not in this picture).", "x": 41.01, "y": 45.42, "box": [41.01, 45.42, 2.65, 2.69]}]}, {"id": "badge", "img": "compare/isolate-drags-badge-ports-badge.png", "group": "target", "tab": "37 · Card badge", "title": "A click on Universal Forwarder 1’s issue badge", "w": 1111, "h": 743, "zoom": 1, "size": "1440 × 900 window: the canvas and the Inspector", "items": [{"n": 1, "head": "The badge", "text": "Clicked once.", "x": 47.34, "y": 33.12, "box": [44.7, 32.23, 1.19, 1.79]}, {"n": 2, "head": "Selected, and shown", "text": "The card is outlined at once.", "x": 35.61, "y": 32.93, "box": [35.61, 32.93, 9.87, 17.4]}, {"n": 3, "head": "Its findings", "text": "Open beside the badge, as before.", "x": 38.79, "y": 33.3, "box": [38.79, 33.3, 28.35, 17.99]}, {"n": 4, "head": "In the Inspector", "text": "Universal Forwarder 1, at once. Below 1,280 px, where the Inspector opens over the canvas, it is left closed, as for a link’s badge; opening it shows the card.", "x": 70.66, "y": 11.49, "box": [70.66, 11.49, 27.9, 3.07]}]}, {"id": "ports", "img": "compare/isolate-drags-badge-ports-ports.png", "group": "target", "tab": "21 · Ports", "title": "The built-in topology with a Search Head added, its syslog link selected", "w": 1111, "h": 743, "zoom": 1, "size": "1440 × 900 window: the canvas and the Inspector, after Fit", "items": [{"n": 1, "head": "The syslog link", "text": "Syslog Source 1 → Syslog Server 1, “TCP/TLS or UDP”, selected.", "x": 9.26, "y": 48.81, "box": [9.26, 48.81, 6.69, 2.42]}, {"n": 2, "head": "Port 514", "text": "It starts at 514: 6514 where the protocol is TLS with no UDP, or names 6514.", "x": 70.66, "y": 56, "box": [70.66, 56, 13.64, 3.85]}, {"n": 3, "head": "Search dispatch", "text": "The new Indexer 1 → Search Head 1 link starts at 8089, the indexers’ management port.", "x": 48.5, "y": 48.81, "box": [48.5, 48.81, 6.69, 2.42]}]}, {"id": "isolate-today", "img": "compare/isolate-drags-badge-ports-isolate-today.png", "group": "today", "tab": "Today · Isolate", "title": "Build 219: the same isolation", "w": 754, "h": 792, "zoom": 1, "size": "1440 × 900 window: the toolbar and the canvas, after Fit", "items": [{"n": 1, "head": "All 12 links", "text": "Drawn between cards the isolation has hidden, with no issue badges. The page throws “Assignment to constant variable.” here, and at each redraw after.", "x": 12.87, "y": 34.39, "box": [12.87, 34.39, 78.98, 37.4]}, {"n": 2, "head": "One card", "text": "AWS Lambda 1, as it should be.", "x": 3.05, "y": 54.86, "box": [3.05, 54.86, 9.82, 11.02]}, {"n": 3, "head": "No Find box", "text": "The redraw stops at the error, before the toolbar is put together. The Find box and its ⋯ options are left under the canvas, and the page is 47 px taller.", "x": 70.95, "y": 1.2, "box": [70.95, 0.51, 28.38, 4.29]}, {"n": 4, "head": "No way back", "text": "Clear isolate is in those options, so the isolation stays until the page is reloaded.", "x": 98.6, "y": 2.65, "box": [94.3, 0.51, 5.04, 4.29]}]}, {"id": "leader-today", "img": "compare/isolate-drags-badge-ports-leader-today.png", "group": "today", "tab": "Today · Leader lines", "title": "Build 219: the same container, collapsed", "w": 754, "h": 743, "zoom": 1, "size": "1440 × 900 window: the canvas at 180 %", "items": [{"n": 1, "head": "A leader with no label", "text": "The hidden label “Phone-home and app delivery · 3 clients” still gets its leader line, 18 units long, above the Deployment Server’s other links. One such leader in 5 of the 8 collapsed containers tried.", "x": 47.18, "y": 44.59, "box": [47.18, 44.59, 5.73, 7.27]}]}, {"id": "labels-today", "img": "compare/isolate-drags-badge-ports-labels-today.png", "group": "today", "tab": "Today · Label drags", "title": "Build 219: the same two drags", "w": 754, "h": 743, "zoom": 1, "size": "1440 × 900 window: the canvas at 125 %", "items": [{"n": 1, "head": "35 · The first step only", "text": "“File handoff” takes the first 8 px of the drag and ignores the rest.", "x": 39.62, "y": 59.34, "box": [39.62, 59.34, 14.52, 3.7]}, {"n": 2, "head": "Let go here", "text": "50 px up.", "x": 39.22, "y": 53.33, "box": [39.22, 53.33, 15.32, 4.51]}, {"n": 3, "head": "36 · Nothing moves", "text": "“Configured handoff” stays where it was, and Undo still gains “Move connector label”.", "x": 38.49, "y": 35.9, "box": [38.49, 35.9, 20.29, 3.7]}, {"n": 4, "head": "Let go here", "text": "36 px right and 44 px down.", "x": 42.87, "y": 41.42, "box": [42.87, 41.42, 21.09, 4.51]}]}, {"id": "waypoint-today", "img": "compare/isolate-drags-badge-ports-waypoint-today.png", "group": "today", "tab": "Today · Waypoint drags", "title": "Build 219: the same drag", "w": 754, "h": 743, "zoom": 1, "size": "1440 × 900 window: the canvas at 125 %", "items": [{"n": 1, "head": "50 · Sprung back", "text": "During the drag the handle follows the pointer and the link doesn’t. On release the waypoint is at the drag’s first step, 5 px left and 13 px up.", "x": 48.09, "y": 54.85, "box": [48.09, 54.85, 2.65, 2.69]}, {"n": 2, "head": "Let go here", "text": "30 px left and 80 px up.", "x": 40.62, "y": 45.02, "box": [40.62, 45.02, 3.45, 3.5]}, {"n": 3, "head": "51 · An additional data link’s waypoint", "text": "Doesn’t move at all, and Undo still gains “Move connector waypoint” (not in this picture).", "x": 48.09, "y": 54.85, "box": [48.09, 54.85, 2.65, 2.69]}]}, {"id": "badge-today", "img": "compare/isolate-drags-badge-ports-badge-today.png", "group": "today", "tab": "Today · Card badge", "title": "Build 219: the same click", "w": 1111, "h": 743, "zoom": 1, "size": "1440 × 900 window: the canvas and the Inspector", "items": [{"n": 1, "head": "The badge", "text": "Clicked once.", "x": 47.34, "y": 33.12, "box": [44.7, 32.23, 1.19, 1.79]}, {"n": 2, "head": "Not outlined", "text": "The card is selected, and nothing shows it.", "x": 35.61, "y": 32.93, "box": [35.61, 32.93, 9.87, 17.4]}, {"n": 3, "head": "Its findings", "text": "Open.", "x": 38.79, "y": 33.3, "box": [38.79, 33.3, 28.35, 17.99]}, {"n": 4, "head": "An empty Inspector", "text": "The topology’s summary goes, and nothing takes its place. The card and the Inspector catch up at the next redraw.", "x": 70.66, "y": 8.48, "box": [70.66, 8.48, 27.9, 16.15]}]}, {"id": "ports-today", "img": "compare/isolate-drags-badge-ports-ports-today.png", "group": "today", "tab": "Today · Ports", "title": "Build 219: the same link", "w": 1111, "h": 743, "zoom": 1, "size": "1440 × 900 window: the canvas and the Inspector, after Fit", "items": [{"n": 1, "head": "The syslog link", "text": "Syslog Source 1 → Syslog Server 1, selected.", "x": 9.26, "y": 48.81, "box": [9.26, 48.81, 6.69, 2.42]}, {"n": 2, "head": "Port 0", "text": "“TCP/TLS or UDP” names no port, so the link starts with none: the configuration draft asks to confirm it, and SV-1 lists “port not set”.", "x": 70.66, "y": 56, "box": [70.66, 56, 13.64, 3.85]}, {"n": 3, "head": "Search dispatch", "text": "The new Indexer 1 → Search Head 1 link starts at 0 too.", "x": 48.5, "y": 48.81, "box": [48.5, 48.81, 6.69, 2.42]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 219 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
