@@ -1,0 +1,25 @@
+/* Build 221: where the files act, under the Config panel's summary: a tile for each tier with the lines that take
+   effect there, a row for each app. And the source type map's folded runs of search-time lines. The panel's and the
+   map's look: their borders, their pills and their text sizes. */
+.cfInstall221{display:grid;gap:8px;padding:10px 16px 12px;border-bottom:1px solid var(--line)}
+.cfInstallHead221{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px}
+.cfInstallHead221 strong{color:var(--text);font-size:.8rem}
+.cfInstallHead221 span{color:var(--muted);font-size:.72rem;line-height:1.45}
+.cfInstallRow221{display:flex;flex-wrap:wrap;gap:8px}
+.cfInstallApp221{flex:1 0 100%;color:#b8c9d7;font:600 .72rem/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere}
+.cfTier221{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:baseline;align-content:center;gap:0 8px;flex:1 1 150px;min-width:0;border:1px solid #2a4154;border-radius:10px;padding:7px 12px;background:#08131d;color:#b8c9d7;font:inherit;text-align:left;cursor:pointer}
+.cfTier221 b{color:var(--green);font-size:1.1rem;font-variant-numeric:tabular-nums}
+.cfTier221 span{font-size:.76rem;overflow-wrap:anywhere}
+.cfTier221 small{grid-column:1/-1;color:var(--amber);font-size:.68rem}
+.cfTier221:hover{border-color:#3c6a86;color:var(--text)}
+.cfTier221[aria-pressed=true]{border-color:var(--cyan);background:rgba(87,199,232,.12);color:var(--text)}
+.cfTier221.cfNone221 b{color:#4d5f70}
+.cfTier221:focus-visible{outline:2px solid var(--cyan);outline-offset:1px}
+.tmFold221 summary{display:flex;flex-wrap:wrap;align-items:baseline;gap:1px 8px;border:1px dashed #2a4154;border-radius:8px;padding:5px 9px;color:#b8c9d7;font-size:.72rem;cursor:pointer}
+.tmFold221 summary::before{content:'▸';color:var(--cyan)}
+.tmFold221 details[open]>summary::before{content:'▾'}
+.tmFold221 summary:hover{border-color:#3c6a86;color:var(--text)}
+.tmFold221 summary b{color:var(--text)}
+.tmFold221 summary small{flex:1 0 100%;color:var(--muted);font-size:.68rem;line-height:1.4;overflow-wrap:anywhere}
+.tmFold221 summary:focus-visible{outline:2px solid var(--cyan);outline-offset:1px}
+.tmFold221 details[open]>summary{margin-bottom:5px}
