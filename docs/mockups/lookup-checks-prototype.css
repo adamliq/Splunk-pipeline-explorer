@@ -1,0 +1,7 @@
+/* Build 223: lookup checks. L, for the files of an app's lookups folder. */
+.propsFile205[data-file=lookups]{--file:#9bd88f}
+/* A column whose name has spaces round it in the file's header. */
+.lkFile223 code mark{background:none;color:#ffd08a;border-bottom:1px dotted rgba(255,208,138,.7)}
+/* In the source type map, under a lookup a LOOKUP- line runs: its rows and fields, or what's wrong with them. */
+.tmLookup223{display:block;margin-top:1px;color:#9fcfaa;font-size:.66rem;overflow-wrap:anywhere}
+.tmLookup223[data-tone=bad]{color:#f6b4b4}

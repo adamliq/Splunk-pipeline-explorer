@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lookup Checks</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.notes{min-width:0;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 223 TARGET · BUILD 222 + PROTOTYPE</span>
+ <h1>Lookup checks in the Config view</h1>
+ <p class="lede">The Config view reads the lookup files an app keeps in its <code>lookups</code> folder, from app packages, folders and <code>.csv</code> files picked on their own. For each lookup <code>transforms.conf</code> defines with a <code>filename</code>, it says whether that file is there, with its rows and columns; for each <code>LOOKUP-</code> line, whether the fields it names are columns of the lookup’s file, or of its <code>fields_list</code>. Build 222 drops the lookups folder, so it can say neither. Every target scene is the real explorer with the prototype applied to Build 222; each “Today” scene is Build 222, set up by the same steps. Four scenes use the Fortinet FortiGate Add-on for Splunk 1.6.10’s package, which isn’t in the repository: two of its four lookup files write their column names with a space after each comma.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>What Build 222 does</h2>
+  <table>
+   <thead><tr><th>Where the files come from</th><th>What you see</th><th>Why</th><th>With the prototype</th></tr></thead>
+   <tbody>
+    <tr><td>An app package</td><td>Its configuration files, and nothing from its <code>lookups</code> folder</td><td>The package readers take configuration and SPL2 files only</td><td>They take the lookups folder’s <code>.csv</code> and <code>.csv.gz</code> files too</td></tr>
+    <tr><td>A folder, or a dropped folder</td><td>The lookup files are among the “Skipped … other files”</td><td>Only configuration files are taken from a folder</td><td>Its lookup files are read</td></tr>
+    <tr><td>Upload files</td><td>A <code>.csv</code> picked on its own is read as <code>props.conf</code></td><td><code>confType</code> takes any other file for props.conf</td><td>It’s read as a lookup file, and matched by its name</td></tr>
+    <tr><td>A <code>LOOKUP-</code> line</td><td>“[ftnt_action_lookup] → 115: lookup table ftnt_action_info.csv.”</td><td>Nothing reads the file</td><td>What it matches and outputs, and whether each field is a column</td></tr>
+    <tr><td>The source type map</td><td>Each lookup with its stanza and <code>filename</code></td><td></td><td>Its rows and fields, or what’s wrong with them</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The design in short</h2>
+  <dl>
+   <dt>Files</dt><dd>A <code>.csv</code> or <code>.csv.gz</code> in a <code>lookups</code> folder, or picked on its own. Its header gives its columns, as written; its rows are counted, up to 20 MB.</dd>
+   <dt>Whose</dt><dd>A lookup’s file is looked for in its own app’s <code>lookups</code> folder, then among files picked on their own, then in another app’s. An app read whole, from a package or a folder, is known to lack a file it doesn’t have.</dd>
+   <dt>Fields</dt><dd>A <code>LOOKUP-</code> line’s fields are found among the columns as written; only once the spaces round a name are left out; in another case; or not at all, with the nearest. A KV store or external lookup is checked against its <code>fields_list</code>, and <code>match_type</code> and <code>time_field</code> too.</dd>
+   <dt>Spaces</dt><dd>Whether Splunk keeps the spaces round a column’s name isn’t settled here: the line is to check, with the search that shows it.</dd>
+   <dt>Panel</dt><dd>Notes on the <code>LOOKUP-</code>, <code>filename</code>, <code>match_type</code> and <code>time_field</code> lines; a problem puts the line among those to check. A lookups tab lists the files.</dd>
+   <dt>Unchanged</dt><dd>With no lookup file read, and no app read whole, every view, the panel and every map are as in Build 222.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-lookup-checks.md</code> · Prototype: 13 in-place edits to Build 222 and a new style and script block, in <code>docs/mockups/lookup-checks.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "lookups", "img": "compare/lookup-checks-lookups.png", "group": "target", "tab": "The lookups tab", "title": "The add-on’s package: its four lookup files", "w": 1388, "h": 792, "zoom": 1, "size": "1440 px window, the panel", "items": [{"n": 1, "head": "A lookups tab", "text": "L, for the files of the app’s lookups folder, read from its package with its configuration files.", "x": 60.31, "y": 35.26, "box": [48.87, 33, 9.86, 4.51]}, {"n": 2, "head": "Columns as the header writes them", "text": "ftnt_action_info.csv writes “ action”, with a space before it. Such names are marked.", "x": 18.01, "y": 58.31, "box": [4.54, 57.11, 79.59, 2.37]}, {"n": 3, "head": "Rows", "text": "Counted after the header: 21 in ftnt_action_info.csv.", "x": 89.55, "y": 56.7, "box": [84.99, 56.7, 4.56, 3.19]}, {"n": 4, "head": "What uses it", "text": "[ftnt_action_lookup] names it, and three LOOKUP- lines run that lookup.", "x": 4.54, "y": 60.14, "box": [4.54, 60.14, 94.24, 2.11]}, {"n": 5, "head": "4 to check", "text": "The LOOKUP- lines that name a column the header writes with a space.", "x": 19.44, "y": 14.88, "box": [12.1, 13.16, 5.75, 3.44]}]}, {"id": "line", "img": "compare/lookup-checks-line.png", "group": "target", "tab": "A LOOKUP- line", "title": "LOOKUP-fortigate_traffic_action, to check", "w": 1388, "h": 700, "zoom": 1, "size": "1440 px window, the panel", "items": [{"n": 1, "head": "To check", "text": "It matches on ftnt_action and outputs action, and ftnt_action_info.csv writes “ action” with a space before it.", "x": 1.4, "y": 49.13, "box": [0.07, 49.13, 99.86, 9.88]}, {"n": 2, "head": "How to tell", "text": "| inputlookup ftnt_action_info.csv lists the columns as Splunk reads them.", "x": 98.06, "y": 55.71, "box": [4.54, 53.38, 94.24, 4.77]}, {"n": 3, "head": "Counted", "text": "4 to check: this line, and three more like it.", "x": 19.44, "y": 16.84, "box": [12.1, 14.89, 5.75, 3.9]}]}, {"id": "filename", "img": "compare/lookup-checks-filename.png", "group": "target", "tab": "Its lookup", "title": "transforms.conf: where each lookup’s file is", "w": 1388, "h": 760, "zoom": 1, "size": "1440 px window, the panel", "items": [{"n": 1, "head": "Where the file is", "text": "Its path in the package, its rows and its columns.", "x": 1.4, "y": 55.08, "box": [0.07, 55.08, 99.86, 5.98]}, {"n": 2, "head": "As written", "text": "“ action” keeps its space, so the line that names it can say so.", "x": 1.4, "y": 71.6, "box": [0.07, 71.6, 99.86, 5.98]}]}, {"id": "map", "img": "compare/lookup-checks-map.png", "group": "target", "tab": "The map", "title": "fortigate_traffic’s lookups in the source type map", "w": 273, "h": 625, "zoom": 1, "size": "1440 px window, the map’s Search column", "items": [{"n": 1, "head": "All there", "text": "137 rows, matched on proto, output transport and protocol.", "x": 98.6, "y": 95.97, "box": [17.9, 94.7, 74.92, 2.54]}, {"n": 2, "head": "To check", "text": "“ action” has spaces round it in the header.", "x": 98.6, "y": 75.31, "box": [17.9, 74.05, 74.92, 2.54]}]}, {"id": "acme", "img": "compare/lookup-checks-acme.png", "group": "target", "tab": "Fields to check", "title": "An app’s LOOKUP- lines, with mistakes", "w": 1388, "h": 791, "zoom": 1, "size": "1440 px window, the panel", "items": [{"n": 1, "head": "Not a column", "text": "acme_geo.csv has no column ipp: did you mean ip?", "x": 1.4, "y": 48.03, "box": [0.07, 48.03, 99.86, 6.63]}, {"n": 2, "head": "Another case", "text": "Field names are case sensitive: ip, not IP; country, not Country.", "x": 1.4, "y": 54.66, "box": [0.07, 54.66, 99.86, 8.74]}, {"n": 3, "head": "No OUTPUT", "text": "It outputs the other columns: country and city.", "x": 1.4, "y": 63.4, "box": [0.07, 63.4, 99.86, 6.63]}, {"n": 4, "head": "A KV store lookup", "text": "Checked against its fields_list.", "x": 1.4, "y": 78.77, "box": [0.07, 78.77, 99.86, 6.63]}, {"n": 5, "head": "7 to check", "text": "With its lookups’ lines in transforms.conf.", "x": 18.42, "y": 14.9, "box": [11.16, 13.18, 5.67, 3.45]}]}, {"id": "defs", "img": "compare/lookup-checks-defs.png", "group": "target", "tab": "Files to check", "title": "Its lookups: a missing file, another app’s, and match_type", "w": 1388, "h": 791, "zoom": 1, "size": "1440 px window, the panel", "items": [{"n": 1, "head": "A missing file", "text": "Splunk_TA_acme/lookups/ has no acme_names.csv: the note names the files it has.", "x": 1.4, "y": 79.6, "box": [0.07, 79.6, 99.86, 5.74]}, {"n": 2, "head": "Another app’s file", "text": "Z_shared/lookups/ has it: Splunk finds it there only if Z_shared shares it.", "x": 1.4, "y": 93.36, "box": [0.07, 93.36, 99.86, 5.74]}, {"n": 3, "head": "match_type and time_field", "text": "Their fields are checked too: no column usr, no column ts.", "x": 1.4, "y": 41.83, "box": [0.07, 41.83, 99.86, 11.49]}]}, {"id": "line-today", "img": "compare/lookup-checks-line-today.png", "group": "today", "tab": "Today · The panel", "title": "Build 222: the same package", "w": 1388, "h": 700, "zoom": 1, "size": "1440 px window, the panel", "items": [{"n": 1, "head": "Not read", "text": "The note names the lookup and its file. The package’s lookups folder is dropped, so nothing more is known.", "x": 1.4, "y": 49.13, "box": [0.07, 49.13, 99.86, 7.49]}, {"n": 2, "head": "Four tabs", "text": "No lookups tab, and nothing to check.", "x": 98.6, "y": 39.18, "box": [0.07, 35.91, 99.86, 6.53]}]}, {"id": "map-today", "img": "compare/lookup-checks-map-today.png", "group": "today", "tab": "Today · The map", "title": "Build 222: fortigate_traffic’s lookups", "w": 273, "h": 591, "zoom": 1, "size": "1440 px window, the map’s Search column", "items": [{"n": 1, "head": "No check", "text": "Each lookup shows its stanza and its filename, and nothing about the file.", "x": 98.6, "y": 82.94, "box": [17.9, 68.75, 74.92, 28.38]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 222 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
