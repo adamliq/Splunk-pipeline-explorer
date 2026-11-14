@@ -1,0 +1,34 @@
+/* Build 224: the search-time order by app, in the panel; and the source type map's tools: try an event, copy or save
+   its settings, save it as an image. */
+.appPick224{display:flex;align-items:center;gap:6px;color:#aab9c8;font-size:.72rem}
+.appPick224 select{max-width:260px}
+.appNote224{margin:0;padding:10px 16px;border-bottom:1px solid var(--line);color:#aab9c8;font-size:.72rem;line-height:1.5}
+.appNote224 b{color:#e6edf3}
+.tmTools224{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.tmTry224{display:grid;gap:10px;margin:0 0 14px;padding:12px;border:1px solid var(--line);border-radius:10px;background:rgba(87,199,232,.05)}
+.tmTryText224{display:grid;gap:4px;color:#aab9c8;font-size:.72rem}
+.tmTryText224 textarea,.tmText224 textarea{box-sizing:border-box;width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:#08121a;color:#e6edf3;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
+.tmTryRow224{display:flex;flex-wrap:wrap;align-items:end;gap:10px}
+.tmTryField224{display:grid;gap:4px;min-width:0;color:#aab9c8;font-size:.72rem}
+.tmTryField224 select{max-width:min(100%,440px)}
+.tmPath224{display:grid;gap:4px;min-width:0}
+.tmPathHead224{margin:0;color:#cfd9e2;font-size:.78rem}
+.tmPath224 h4{margin:4px 0 0;color:#9fb3c5;font-size:.72rem;font-weight:600}
+.tmPath224 ol{display:grid;gap:3px;margin:0;padding:0;list-style:none}
+/* Each step: a dot, filled where it hit, ringed where it didn't, red where something it names is missing. */
+.tmStep224{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;color:#cfd9e2;font-size:.74rem;overflow-wrap:anywhere}
+.tmMark224{flex:none;align-self:center;width:9px;height:9px;border-radius:50%;background:#4b5b69}
+.tmStep224[data-state=hit] .tmMark224{background:#66e0a3}
+.tmStep224[data-state=miss] .tmMark224{background:none;box-shadow:inset 0 0 0 1px #8a9aa8}
+.tmStep224[data-state=missing] .tmMark224{background:#f17a7a}
+.tmTryRef224{border:0;padding:0;background:none;color:var(--cyan);font:inherit;font-size:.68rem;cursor:pointer}
+.tmTryRef224:hover,.tmTryRef224:focus-visible{text-decoration:underline;outline:none}
+.tmFields224{max-width:100%;overflow-x:auto;color:#cfd9e2;font-size:.72rem}
+.tmFields224 summary{cursor:pointer}
+.tmFields224 table{width:100%;border-collapse:collapse;margin-top:4px}
+.tmFields224 th,.tmFields224 td{padding:2px 10px 2px 0;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;overflow-wrap:anywhere}
+/* In the map: what the event's path goes through, and what it passes by. */
+.tmHit224{outline:2px solid #66e0a3;outline-offset:1px;border-radius:6px}
+.tmMiss224{opacity:.5}
+.tmText224{display:grid;gap:6px;margin:0 0 12px;color:#aab9c8;font-size:.72rem}
+.tmText224 p{margin:0}

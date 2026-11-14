@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Config View Tools</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.notes{min-width:0;overflow-wrap:anywhere}
+.panel pre{margin:0;max-height:420px;overflow:auto;padding:10px 12px;border:1px solid var(--rule);border-radius:8px;background:var(--panel-2);color:var(--ink-2);font:12px/1.55 var(--mono);white-space:pre}
+.panel p{margin:0 0 10px;color:var(--ink-2);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 224 TARGET · BUILD 223 + PROTOTYPE</span>
+ <h1>Try an event, search-time order by app, and export</h1>
+ <p class="lede">Three tools for the Config view. <b>Try an event:</b> paste one, or pick one from a package’s <code>samples</code> folder, and the source type map lights the transforms that match it, the source type it becomes and the extractions that give it fields, with each step listed in order. <b>Search-time order:</b> rank the search-time settings for a search in an app, by what each app’s <code>metadata</code> exports, as Splunk does, instead of one global order. <b>Copy or export:</b> a source type’s merged settings as <code>.conf</code> text, and its map as a PNG. Every target scene is the real explorer with the prototype applied to Build 223; each “Today” scene is Build 223, set up by the same steps. Five scenes use the Fortinet FortiGate Add-on for Splunk 1.6.10’s package, which isn’t in the repository; the order’s scenes use two made-up apps, one that keeps its settings to itself and one that exports them.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>What Build 223 does</h2>
+  <table>
+   <thead><tr><th>What you want</th><th>What you see</th><th>Why</th><th>With the prototype</th></tr></thead>
+   <tbody>
+    <tr><td>Try an event</td><td>The map shows each setting and where it leads, not what one event meets</td><td>Nothing runs an event</td><td>The path, step by step, and the map lit</td></tr>
+    <tr><td>A package’s <code>samples</code></td><td>Dropped, without a word</td><td>The package readers take configuration, SPL2 and lookup files</td><td>One event a line, to pick from</td></tr>
+    <tr><td>An app’s <code>metadata</code></td><td>Dropped too; from a folder, among the files skipped</td><td>The same</td><td><code>default.meta</code> and <code>local.meta</code>, for the search-time order</td></tr>
+    <tr><td>The search-time order</td><td>One order for every search: the global one</td><td>Each setting’s winner is decided once</td><td>For a search in an app: its own settings, then the other apps’ exported ones, Z to A, then <code>etc/system</code>’s</td></tr>
+    <tr><td>Copy or export</td><td>Nothing to copy or save</td><td></td><td>Copy settings, Save settings (<code>.conf</code>), Save image (PNG)</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The design in short</h2>
+  <dl>
+   <dt>Index time</dt><dd>The <code>TRANSFORMS-</code> lines of the source type the event arrives as, with <code>[default]</code>’s, in ASCII order of their names, each line’s transforms in the order it lists them. Every transform runs, whatever an earlier one did: one can send the event to <code>nullQueue</code> and a later one send it back.</dd>
+   <dt>Search time</dt><dd>The source type it becomes: <code>EXTRACT-</code>, <code>REPORT-</code>, <code>KV_MODE</code>, then <code>FIELDALIAS-</code>, as Splunk orders them. <code>EVAL-</code> and <code>LOOKUP-</code> lines are counted, not run.</dd>
+   <dt>Expressions</dt><dd>Splunk’s PCRE is translated to JavaScript’s dialect; what can’t be is reported, not guessed.</dd>
+   <dt>Lit</dt><dd>A line that gave the event something is outlined, one tried that gave nothing is dimmed, and the card of what the event becomes is outlined. Follow opens that source type’s map, lit the same way.</dd>
+   <dt>Order</dt><dd>The search-time lines of <code>props.conf</code> and <code>transforms.conf</code>, and every line of <code>eventtypes.conf</code> and <code>tags.conf</code>, ranked for a search in the app chosen. Index-time lines keep the global order.</dd>
+   <dt>Sharing</dt><dd>Another app’s line counts only where its metadata exports it (<code>export = system</code>), <code>local.meta</code> before <code>default.meta</code>, the most specific stanza first. A line not shared has no effect, and says why.</dd>
+   <dt>Copy</dt><dd><code>.conf</code> text: the inputs that name the source type, its <code>props.conf</code> stanza and the transforms its lines name, each line under the file it comes from, overridden lines left out.</dd>
+   <dt>Image</dt><dd>The map as plain SVG, drawn into a PNG at twice its size: its title, summary, columns and lines, without the controls.</dd>
+   <dt>Unchanged</dt><dd>With the global order and nothing tried, every view, the panel and every map are as in Build 223, but for the picker and the tools.</dd>
+  </dl>
+ </section>
+ <section class="panel">
+  <h2>What Copy settings gives</h2>
+  <p>For <code>acme:fw</code>, from the made-up apps, in the global order. Save settings saves the same text as <code>acme_fw.conf</code>.</p>
+  <pre># acme:fw: its settings as Splunk merges them, from Splunk Pipeline Explorer.
+# Every setting in the global order. Overridden lines are left out.
+
+# props.conf
+[acme:fw]
+# A_site/local/props.conf
+EXTRACT-src = src=(?&lt;src&gt;\S+)
+FIELDALIAS-site = src AS site_src
+# Splunk_TA_try/default/props.conf
+EXTRACT-port = (?P&lt;dest_port&gt;\d+)/tcp
+EXTRACT-user = user=(?&lt;user&gt;\w+) in raw_user
+EXTRACT-odd = (?i)x(?-i)y
+REPORT-kv = acme_kv
+REPORT-fmt = acme_fmt
+FIELDALIAS-a = src AS src_ip dest_port AS port
+FIELDALIAS-b = nosuch AS other
+EVAL-risk = if(port==443,"low","high")
+KV_MODE = none
+
+# transforms.conf
+[acme_kv]
+# Splunk_TA_try/default/transforms.conf
+DELIMS = " ", ":"
+
+[acme_fmt]
+# Splunk_TA_try/default/transforms.conf
+REGEX = (\w+)@(\w+)
+FORMAT = $1::$2</pre>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-config-tools.md</code> · Prototype: 11 in-place edits to Build 223 and a new style and script block, in <code>docs/mockups/config-tools.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "try", "img": "compare/config-tools-try.png", "group": "target", "tab": "Try an event", "title": "fortigate_log: one of the package’s sample events, tried", "w": 1402, "h": 675, "zoom": 1, "size": "1440 px window, the map’s head", "items": [{"n": 1, "head": "A sample event", "text": "One of the 54 in the package’s 11 samples files, or any event pasted in.", "x": 34.45, "y": 60.15, "box": [1.5, 57.34, 31.38, 5.63]}, {"n": 2, "head": "Arrives as", "text": "The map’s source type, fortigate_log; any other can be chosen.", "x": 44.86, "y": 65.34, "box": [39.73, 57.34, 10.27, 5.63]}, {"n": 3, "head": "Indexed as fortigate_traffic", "text": "A transform gave it that name. Follow opens that source type’s map with the lines it went through lit.", "x": 98.6, "y": 65.99, "box": [1.5, 64.45, 97, 3.08]}, {"n": 4, "head": "Index time", "text": "Each transform its source type runs, in order: [force_sourcetype_fortigate] matched “traffic”.", "x": 98.6, "y": 73.18, "box": [1.5, 71.86, 97, 2.63]}, {"n": 5, "head": "Search time", "text": "Then fortigate_traffic’s extractions, in Splunk’s order: field_extract’s DELIMS give 36 fields.", "x": 98.6, "y": 80.15, "box": [1.5, 78.83, 97, 2.63]}, {"n": 6, "head": "Listed, not run", "text": "Its 18 calculated fields and 2 lookups aren’t computed here.", "x": 98.6, "y": 89.38, "box": [1.5, 88.06, 97, 2.63]}, {"n": 7, "head": "The fields", "text": "Each with its value and the line that gave it, folded.", "x": 98.6, "y": 95.64, "box": [1.5, 94.36, 97, 2.56]}]}, {"id": "lit", "img": "compare/config-tools-lit.png", "group": "target", "tab": "Its path, lit", "title": "acme:raw: the transforms an event went through", "w": 565, "h": 564, "zoom": 1, "size": "1440 px window, the map’s Transform and Index or send columns", "items": [{"n": 1, "head": "Dimmed", "text": "[acme_drop_debug] didn’t match: the event has no level=debug.", "x": 53.19, "y": 43.99, "box": [7.69, 35.12, 41.61, 17.74]}, {"n": 2, "head": "Lit", "text": "[acme_to_fw] matched “edge”, and named the event acme:fw.", "x": 53.19, "y": 62.62, "box": [7.69, 53.75, 41.61, 17.74]}, {"n": 3, "head": "Lit", "text": "[acme_host] matched, and set its host to gw1.", "x": 53.19, "y": 88.25, "box": [7.69, 79.38, 41.61, 17.74]}, {"n": 4, "head": "The source type it becomes", "text": "Its card is lit too.", "x": 98.6, "y": 74.95, "box": [57.26, 55.9, 41.46, 38.12]}]}, {"id": "follow", "img": "compare/config-tools-follow.png", "group": "target", "tab": "Followed", "title": "fortigate_traffic, followed: its search-time lines, lit or dimmed", "w": 273, "h": 900, "zoom": 1, "size": "1440 px window, the map’s Search column", "items": [{"n": 1, "head": "Lit", "text": "REPORT-field_extract gave the event its 36 fields.", "x": 98.6, "y": 38.78, "box": [6.91, 33.74, 85.91, 10.08]}, {"n": 2, "head": "Folded, and lit", "text": "14 of its 26 aliases give fields. Open it to see each one lit or dimmed.", "x": 98.6, "y": 51.61, "box": [6.91, 46.55, 85.91, 10.13]}, {"n": 3, "head": "Left as they are", "text": "Calculated fields and lookups aren’t computed here.", "x": 98.6, "y": 60.38, "box": [6.91, 57.01, 85.91, 6.74]}]}, {"id": "order", "img": "compare/config-tools-order.png", "group": "target", "tab": "A search in search", "title": "The search-time order for a search in search", "w": 1388, "h": 986, "zoom": 1, "size": "1440 px window, the panel", "items": [{"n": 1, "head": "Search-time order", "text": "For a search in an app: search, or any app the files name. The global order, as at index time, is the default.", "x": 51.89, "y": 4.78, "box": [29.27, 3.26, 21.03, 3.04]}, {"n": 2, "head": "What it means", "text": "How a search in search ranks the files, and what each app’s metadata shares.", "x": 98.6, "y": 17.27, "box": [0.07, 14.45, 99.86, 5.63]}, {"n": 3, "head": "Not shared with search", "text": "Splunk_TA_try’s default.meta keeps its settings to the app, so its search-time lines have no effect here.", "x": 98.6, "y": 90.12, "box": [0.07, 87.47, 99.86, 5.32]}, {"n": 4, "head": "Index time keeps the global order", "text": "Its TRANSFORMS- lines still run, whatever app a search runs in.", "x": 98.6, "y": 76.06, "box": [0.07, 73.41, 99.86, 5.32]}]}, {"id": "order-own", "img": "compare/config-tools-order-own.png", "group": "target", "tab": "In the app itself", "title": "The same files, for a search in Splunk_TA_try", "w": 1388, "h": 968, "zoom": 1, "size": "1440 px window, the panel", "items": [{"n": 1, "head": "A search in Splunk_TA_try", "text": "Its own settings come first, then the other apps’ exported ones.", "x": 51.89, "y": 4.87, "box": [29.27, 3.32, 21.03, 3.1]}, {"n": 2, "head": "Overridden here", "text": "A_site’s line wins in the global order. For a search in Splunk_TA_try, the app’s own default line comes before another app’s local one.", "x": 98.6, "y": 62.14, "box": [0.07, 59.43, 99.86, 5.42]}]}, {"id": "export", "img": "compare/config-tools-export.png", "group": "target", "tab": "Copy or save", "title": "fortigate_traffic’s map, with its tools", "w": 1402, "h": 250, "zoom": 1, "size": "1440 px window, the map’s head", "items": [{"n": 1, "head": "Copy settings", "text": "fortigate_traffic’s settings as Splunk merges them, as .conf text, each line under the file it comes from.", "x": 11.08, "y": 98.8, "box": [7.59, 83.56, 6.97, 13.41]}, {"n": 2, "head": "Save settings", "text": "The same text, as fortigate_traffic.conf.", "x": 18.54, "y": 98.8, "box": [15.13, 83.56, 6.82, 13.41]}, {"n": 3, "head": "Save image", "text": "The map as a PNG at twice its size: the next scene.", "x": 25.58, "y": 98.8, "box": [22.52, 83.56, 6.12, 13.41]}]}, {"id": "image", "img": "compare/config-tools-image.png", "group": "target", "tab": "The saved image", "title": "What Save image saves: fortigate_traffic-map.png", "w": 1386, "h": 1306, "zoom": 1, "size": "The PNG, shown at half its size", "items": [{"n": 1, "head": "Its title and summary", "text": "As the screen shows them.", "x": 25.73, "y": 3.58, "box": [1.23, 1.15, 22.92, 4.86]}, {"n": 2, "head": "Its columns", "text": "Each card, line and link where the page draws it, as rectangles, text and paths: no HTML inside, so a drawing program opens the SVG.", "x": 85.24, "y": 23.15, "box": [65.14, 17.96, 18.51, 10.38]}, {"n": 3, "head": "Not the controls", "text": "The list of source types and the tools are left out.", "x": 98.6, "y": 9, "box": [0.07, 7.16, 99.93, 3.7]}]}, {"id": "map-today", "img": "compare/config-tools-map-today.png", "group": "today", "tab": "Today · The map", "title": "Build 223: fortigate_log’s map", "w": 1402, "h": 217, "zoom": 1, "size": "1440 px window, the map’s head", "items": [{"n": 1, "head": "No tools", "text": "No way to try an event, and nothing to copy or save.", "x": 98.6, "y": 85.16, "box": [0.57, 74.04, 98.86, 22.24]}]}, {"id": "order-today", "img": "compare/config-tools-order-today.png", "group": "today", "tab": "Today · The order", "title": "Build 223: the same files, one order", "w": 1388, "h": 930, "zoom": 1, "size": "1440 px window, the panel", "items": [{"n": 1, "head": "One order", "text": "No choice of app: every search sees the global order.", "x": 98.6, "y": 5.07, "box": [51.02, 3.27, 47.75, 3.61]}, {"n": 2, "head": "Overridden for every search", "text": "By A_site’s local line, even for a search in Splunk_TA_try.", "x": 98.6, "y": 92.02, "box": [0.07, 89.2, 99.86, 5.64]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 223 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
