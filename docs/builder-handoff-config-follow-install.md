@@ -2,6 +2,7 @@
 
 **For:** an AI agent maintaining `index.html` in `adamliq/Splunk-pipeline-explorer`
 **Start from:** Build 220.
+**Applied:** as Build 221, in `index.html` on the branch `claude/build-page-layout-bl6jk1`, while the builder was unavailable. Nothing is left to apply: the rest of this handoff records what was done and checked.
 **22 in-place edits,** under "The edits": 13 in `<script id="config-view-v205">` and 9 in `<script id="config-type-map-v217">`. Each old string occurs exactly once in Build 220, each edit is on a line of its own, and none changes the number of lines.
 **Two new blocks, at the end of the page (before `</body>`):**
 - `<style id="config-follow-install-v221-styles">`, containing [`docs/mockups/config-follow-install-prototype.css`](mockups/config-follow-install-prototype.css);
