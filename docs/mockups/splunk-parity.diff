@@ -1,0 +1,385 @@
+--- a/index.html
++++ b/index.html
+@@ -16115,2 +16115,2 @@
+-// Its first record: the column names as written. Quotes come off; spaces stay, since Splunk may keep them.
+-function header(text){text=text.replace(/^﻿/,'');const out=[];let cur='',q=false;
++// Its first record: the column names as written. Quotes come off. Splunk leaves out the spaces round a name that isn't quoted, and keeps those inside quotes.
++function header(text){text=text.replace(/^﻿/,'');const out=[],qs=[];let cur='',q=false,qd=false;
+@@ -16119,2 +16119,2 @@
+-  if(c==='"'&&!cur.trim()){q=true;continue}
+-  if(c===','){out.push(cur);cur='';continue}
++  if(c==='"'&&!cur.trim()){q=true;qd=true;cur='';continue}
++  if(c===','){out.push(cur);qs.push(qd);cur='';qd=false;continue}
+@@ -16122,2 +16122,2 @@
+-  cur+=c}
+- out.push(cur);return out.length===1&&!out[0].trim()?[]:out.map(raw=>({raw,name:raw.trim()}))}
++  if(qd&&!q&&!c.trim())continue;cur+=c}
++ out.push(cur);qs.push(qd);return out.length===1&&!out[0].trim()?[]:out.map((raw,i)=>({raw,name:qs[i]?raw:raw.trim(),quoted:qs[i]}))}
+@@ -16153 +16153 @@
+-// A field among a lookup's columns: as written; or only once the spaces round a column's name are left out; or in
++// A field among a lookup's columns: as written or as Splunk reads them; or only once the spaces inside a quoted name are left out; or in
+@@ -16155,2 +16155,2 @@
+-function find(cols,field){if(cols.some(c=>c.raw===field))return {ok:true};
+- const sp=cols.find(c=>c.name===field);if(sp)return {space:sp.raw};
++function find(cols,field){if(cols.some(c=>c.raw===field||c.name===field))return {ok:true};
++ const sp=cols.find(c=>c.raw.trim()===field);if(sp)return {space:sp.raw};
+@@ -16185 +16185 @@
+-  out.push(`${name}’s header writes ${and(sp.map(y=>`“${y.space}”`))}, with ${lead?`a space before ${many?'each':'it'}`:`spaces round ${many?'them':'it'}`}. Run | inputlookup ${name} to see whether Splunk reads ${many?'them':'it'} as ${and(sp.map(y=>y.f.field))}.`)}
++  out.push(`${name}’s header writes ${and(sp.map(y=>`“${y.space}”`))} inside quotes, with ${lead?`a space before ${many?'each':'it'}`:`spaces round ${many?'them':'it'}`}, which Splunk keeps: it reads no column ${and(sp.map(y=>y.f.field))}.`)}
+@@ -16231 +16231 @@
+- const sp=f.columns.filter(c=>c.raw!==c.name);if(sp.length)out.push(`Its header puts ${sp.every(c=>/^\s/.test(c.raw)&&!/\s$/.test(c.raw))?'a space before':'spaces round'} ${and(sp.map(c=>c.name))}.`);
++ const sp=f.columns.filter(c=>c.raw!==c.name);if(sp.length)out.push(`Its header puts ${sp.every(c=>/^\s/.test(c.raw)&&!/\s$/.test(c.raw))?'a space before':'spaces round'} ${and(sp.map(c=>c.name))}, which Splunk leaves out.`);
+@@ -16506,2 +16506,2 @@
+-// Key-value pairs split by delimiters: a pair delimiter inside double quotes doesn't split, and the quotes come off.
+-function kvByDelims(text,pairs,kv){const out=[];let cur='',q=false;const flush=()=>{if(cur){const i=[...cur].findIndex(ch=>kv.includes(ch));if(i>0){const k=cleanKey(cur.slice(0,i).trim()),v=cur.slice(i+1).trim().replace(/^"([\s\S]*)"$/,'$1');if(k)out.push([k,v])}}cur=''};
++// Key-value pairs split by delimiters: a pair delimiter inside double quotes doesn't split, and every quote comes off, an unclosed one too, as in Splunk. A value left empty gives no field, unless keep (KEEP_EMPTY_VALS = true) and it was quoted.
++function kvByDelims(text,pairs,kv,keep=false){const out=[];let cur='',q=false;const flush=()=>{if(cur){const i=[...cur].findIndex(ch=>kv.includes(ch));if(i>0){const k=cleanKey(cur.slice(0,i).trim()),w=cur.slice(i+1).trim(),v=w.replace(/"/g,'');if(k&&(v!==''||keep&&w!==''))out.push([k,v])}}cur=''};
+@@ -16510 +16510 @@
+-function autoKv(text){const out=[];for(const m of text.matchAll(/(?:^|[\s,;])([A-Za-z_][\w.-]*)=("((?:[^"\\]|\\.)*)"|'([^']*)'|([^\s,;"]*))/g)){const k=cleanKey(m[1]);if(k)out.push([k,m[3]??m[4]??m[5]??''])}return out}
++function autoKv(text){const out=[];for(const m of text.matchAll(/(?:^|[\s,;])([A-Za-z_][\w.-]*)=("((?:[^"\\]|\\.)*)"|'([^']*)'|([^\s,;"]*))/g)){const k=cleanKey(m[1]),v=m[3]??m[4]??m[5]??'';if(k&&(v!==''||m[3]!==undefined||m[4]!==undefined))out.push([k,v])}return out}
+@@ -16557 +16557 @@
+-  const got=groups(m);got.forEach(([k,x])=>setField(k,x,r));steps.push({at:'search',r,state:got.length?'hit':'miss',say:got.length?`${r.key} extracts ${and(got.map(g=>g[0]))}`:`${r.key} matches, with no named group`,n:got.length})}
++  const all=groups(m),got=all.filter(([,x])=>x!=='');got.forEach(([k,x])=>setField(k,x,r));steps.push({at:'search',r,state:got.length?'hit':'miss',say:got.length?`${r.key} extracts ${and(got.map(g=>g[0]))}`:all.length?`${r.key} matches, with every group empty`:`${r.key} matches, with no named group`,n:got.length})}
+@@ -16561 +16561 @@
+-  if(val(keys,'DELIMS')!==undefined){const d=delims(val(keys,'DELIMS'));if(d.length>=2)got=kvByDelims(src,d[0],d[1]);else if(d.length===1){const names=(val(keys,'FIELDS')||'').split(',').map(s=>s.trim().replace(/^"|"$/g,'')).filter(Boolean),vals=[];let cur='',q=false;for(const ch of src){if(ch==='"'){q=!q;continue}if(!q&&d[0].includes(ch)){vals.push(cur);cur='';continue}cur+=ch}vals.push(cur);got=names.map((n,i)=>[n,vals[i]??'']).filter(x=>x[1]!=='')}}
++  if(val(keys,'DELIMS')!==undefined){const d=delims(val(keys,'DELIMS'));if(d.length>=2)got=kvByDelims(src,d[0],d[1],truthy(val(keys,'KEEP_EMPTY_VALS')));else if(d.length===1){const names=(val(keys,'FIELDS')||'').split(',').map(s=>s.trim().replace(/^"|"$/g,'')).filter(Boolean),vals=[];let cur='',q=false;for(const ch of src){if(ch==='"'){q=!q;continue}if(!q&&d[0].includes(ch)){vals.push(cur);cur='';continue}cur+=ch}vals.push(cur);got=names.map((n,i)=>[n,vals[i]??'']).filter(x=>x[1]!==''||truthy(val(keys,'KEEP_EMPTY_VALS')))}}
+@@ -16564 +16564 @@
+-   if(fmt&&/\$\d+::/.test(fmt)){const re=new RegExp(rx.re.source,rx.re.flags.includes('g')?rx.re.flags:rx.re.flags+'g');for(const m of src.matchAll(re)){for(const p of fill(fmt,m).matchAll(/([^\s:]+)::("[^"]*"|\S*)/g))got.push([cleanKey(p[1]),p[2].replace(/^"|"$/g,'')]);if(!m[0])break}}
++   if(fmt&&/\$\d+::/.test(fmt)||truthy(val(keys,'MV_ADD'))){const re=new RegExp(rx.re.source,rx.re.flags.includes('g')?rx.re.flags:rx.re.flags+'g');for(const m of src.matchAll(re)){if(fmt){for(const p of fill(fmt,m).matchAll(/([^\s:]+)::("[^"]*"|\S*)/g))got.push([cleanKey(p[1]),p[2].replace(/^"|"$/g,'')])}else got.push(...groups(m));if(!m[0])break}}
+@@ -16566 +16566 @@
+-  got=got.filter(([k])=>k);got.forEach(([k,x])=>setField(k,x,r));
++  got=got.filter(([k,x])=>k&&(x!==''||truthy(val(keys,'KEEP_EMPTY_VALS'))));const mv=truthy(val(keys,'MV_ADD'));got.forEach(([k,x])=>{const f=fields.get(k);if(mv&&f)f.value=[...(Array.isArray(f.value)?f.value:[f.value]),x];else setField(k,x,r)});
+@@ -16640 +16640 @@
+-<script id="config-eval-v225">
++<script id="config-eval-v226">
+@@ -16642,11 +16642,19 @@
+-/* Build 225: lookups and calculated fields in Try an event.
+-   - Calculated fields (EVAL-): an eval engine for the expressions add-ons write: literals, fields, arithmetic, string
+-     joins, comparisons, AND, OR, NOT, LIKE, IN, and the common functions. As Splunk's props.conf says, they "behave as if
+-     they are run in parallel": each sees the fields as they were before any of them ran. What the engine can't do, or
+-     what Splunk's docs don't define, is reported on the step, not guessed.
+-   - Lookups (LOOKUP-): run against the CSV files Build 223 reads, in lexicographic order of their names. Splunk
+-     "does not support nested automatic lookups", so each sees the fields as they were after the calculated fields.
+-     OUTPUT writes over the event's fields, and clears them when no row matches; OUTPUTNEW writes only fields the event
+-     doesn't have. match_type (WILDCARD, CIDR), case_sensitive_match, max_matches, min_matches and default_match are read.
+-   - INGEST_EVAL, at index time: its assignments in order, = adding a value and := replacing it. index, queue and _raw
+-     change the event; any other name is an indexed field. */
++/* Build 226: Try an event as Splunk 10.6.1.1 runs it. Build 225's lookups and calculated fields, with each rule checked
++   against Splunk Enterprise 10.6.1.1 in Docker (docs/splunk-checks.md has the searches and their results).
++   - Calculated fields (EVAL-): Splunk checks an expression's types before it runs any of it. A number and a string
++     where Splunk can see both types (5 + "abc", s1 - "1", a sum compared with "6") reject the whole expression. A
++     field's value acts as a number where it reads as one and as text always, so + adds two numbers and joins two
++     strings: n + t gives "5abc". Comparisons work the same way, and event text against a number gives no answer.
++     true and false are stored as 1 and 0. NOT, AND, OR and XOR count a missing condition as false. tostring() gives
++     Null, True and False. Fields with several values follow Splunk's rules per function. Numbers written with a
++     decimal point keep their precision: + and - the fewest decimal places, * / % and the functions the fewest
++     significant figures. As props.conf says, they "behave as if they are run in parallel": each sees the fields as
++     they were before any of them ran.
++   - Lookups (LOOKUP-): run one after another in order of their names, each on the fields the earlier ones wrote, as
++     Splunk 10.6.1.1 does, although the Knowledge Manager Manual says nested automatic lookups aren't supported. OUTPUT
++     writes over the event's fields, and clears them when no row matches; OUTPUTNEW writes only fields the event doesn't
++     have. match_type (WILDCARD, CIDR), case_sensitive_match, max_matches, min_matches and default_match are read.
++     Spaces round a CSV value or name that isn't quoted are left out, as Splunk leaves them out.
++   - INGEST_EVAL, at index time: its assignments in order, = adding a value and := replacing it. index, queue, _raw,
++     host, source and sourcetype change the event; any other name is an indexed field. A type error stops all of it.
++     Numbers lose the zeros Splunk shows after a point at search time: 1.5+1.5 is 3. */
+@@ -16659,2 +16667,4 @@
+-// A field's value as the data gives it: {fv:'443'} acts as a number where it reads as one, and keeps its own text. A
+-// literal string stays a string, a literal or computed number a number. Several values are an array.
++// A field's value as the data gives it, {fv:'443'}: a number where it reads as one, and text always, keeping its own
++// text. A literal string is text. A number is a JS number when it's exact, or {dec, nv, dp, sf, s} when it carries the
++// precision of a number written with a decimal point: nv its value, dp its decimal places, sf its significant figures
++// (null for no limit) and s how Splunk shows it. Several values are an array; true and false are booleans.
+@@ -16665,6 +16675,42 @@
+-const one=v=>{if(Array.isArray(v)){if(v.length===1)return v[0];throw nc('it reads a field with several values')}return v};
+-const isNum=v=>{v=one(v);return typeof v==='number'||!!v&&typeof v==='object'&&NUM.test(v.fv)};
+-const num=v=>{v=one(v);return typeof v==='number'?v:Number(v.fv)};
+-const fmt=n=>Number.isInteger(n)?String(n):String(Number(n.toPrecision(15)));
+-function text(v){v=one(v);if(v==null)return null;if(typeof v==='number')return Number.isFinite(v)?fmt(v):null;if(typeof v==='boolean')throw nc('it uses true or false as text');return typeof v==='object'?v.fv:v}
+-const isStrLit=v=>typeof one(v)==='string';
++const typeErr=why=>Object.assign(new Stop(why),{type:true});
++const isFv=v=>v!=null&&typeof v==='object'&&!Array.isArray(v)&&v.fv!==undefined;
++const isDec=v=>v!=null&&typeof v==='object'&&v.dec===true;
++const isMany=v=>Array.isArray(v)&&v.length>1;
++// Where one value is needed, several act as none.
++const one=v=>Array.isArray(v)?(v.length===1?v[0]:null):v;
++const present=v=>v!=null&&!(Array.isArray(v)&&!v.length);
++const canNum=v=>{v=one(v);return typeof v==='number'||isDec(v)||isFv(v)&&NUM.test(v.fv)};
++const canText=v=>{v=one(v);return typeof v==='string'||isFv(v)};
++const num=v=>{v=one(v);return typeof v==='number'?v:isDec(v)?v.nv:Number(v.fv)};
++// A number as plain digits, as Splunk shows it: never with an exponent.
++function plain(n){let s=String(n);if(!/e/i.test(s))return s;const neg=s[0]==='-';if(neg)s=s.slice(1);
++ const [m,ex]=s.split(/e/i),e=Number(ex),[ip,fp='']=m.split('.'),d=ip+fp,p=ip.length+e;
++ return (neg?'-':'')+(p<=0?'0.'+'0'.repeat(-p)+d:p>=d.length?d+'0'.repeat(p-d.length):d.slice(0,p)+'.'+d.slice(p))}
++// Plain digits rounded half away from zero to k places after the point; a negative k rounds to tens, hundreds, ...
++function roundAt(s,k){const neg=s[0]==='-';if(neg)s=s.slice(1);const [ip0,fp='']=s.split('.'),ip=ip0||'0',d=[...ip+fp].map(Number),p=ip.length,n=p+k;
++ if(n<0)return '0';
++ const kept=d.slice(0,n);while(kept.length<n)kept.push(0);let carry=n<d.length&&d[n]>=5?1:0;
++ for(let i=kept.length-1;carry&&i>=0;i--){const x=kept[i]+1;kept[i]=x%10;carry=x>9?1:0}
++ const all=(carry?'1':'')+kept.join(''),ipLen=p+(carry?1:0);
++ let I=k>=0?all.slice(0,ipLen):all+'0'.repeat(-k),F=k>0?all.slice(ipLen):'';I=I.replace(/^0+(?=\d)/,'')||'0';
++ const out=F?I+'.'+F:I;return (neg&&/[1-9]/.test(out)?'-':'')+out}
++// Significant figures written in a plain number: leading zeros don't count; a number with no figure but 0 has as many
++// as its decimal places, and at least one.
++function sigs(s){s=String(s).replace(/^[+-]/,'');const d=s.replace('.',''),first=d.search(/[1-9]/);return first<0?Math.max(1,(s.split('.')[1]||'').length):d.length-first}
++// How exactly a number written as text is known: with a point, its decimal places and figures; with an exponent and no
++// point, decimal places only; a whole number is exact (null).
++function precText(t){const m=/^[+-]?(\d*)(?:\.(\d*))?(?:[eE]([+-]?\d+))?$/.exec(String(t).trim());if(!m)return null;const [,ip,fp,ex]=m;
++ if(ex!==undefined)return {dp:Math.max(0,(fp||'').length-Number(ex)),sf:fp===undefined?null:sigs((ip||'0')+'.'+fp)};
++ return fp===undefined?null:{dp:fp.length,sf:sigs((ip||'0')+'.'+fp)}}
++const precOf=v=>{v=one(v);if(isDec(v))return v.dp==null&&v.sf==null?null:{dp:v.dp,sf:v.sf};return isFv(v)?precText(v.fv):null};
++// A number to the decimal places given (+ and -), or to the significant figures given (* / % and the functions).
++const decFixed=(n,dp)=>{const s=roundAt(plain(n),dp);return {dec:true,nv:n,dp,sf:sigs(s),s}};
++function decSig(n,sf){const s=plain(n),lead=x=>{const [a,b='']=x.replace(/^-/,'').split('.'),d=a+b,f=d.search(/[1-9]/);return f<0?-Infinity:a.length-f};
++ if(lead(s)===-Infinity){const k=Math.max(0,sf-1);return {dec:true,nv:n,dp:k,sf,s:roundAt(s,k)}}
++ let k=sf-lead(s),r=roundAt(s,k);if(lead(r)>lead(s)){k--;r=roundAt(s,k)}return {dec:true,nv:n,dp:Math.max(0,k),sf,s:r}}
++const bySig=(n,ps)=>{if(!Number.isFinite(n))return null;const sf=ps.map(p=>p?.sf).filter(x=>x!=null);return sf.length?decSig(n,Math.min(...sf)):n};
++// A number written as text: a whole number is exact; one with a point or an exponent keeps its precision, and shows as
++// written, an exponent spelled out.
++function decText(t){t=String(t).trim();const p=precText(t),n=Number(t);if(!p)return n;
++ const s=p.sf==null?roundAt(plain(n),p.dp):t.replace(/^\+/,'').replace(/^(-?)\./,'$10.').replace(/\.$/,'');return {dec:true,nv:n,dp:p.dp,sf:p.sf,s}}
++function text(v){v=one(v);if(v==null)return null;if(typeof v==='string')return v;if(typeof v==='number')return Number.isFinite(v)?plain(v):null;if(isDec(v))return v.s;if(isFv(v))return v.fv;return null}
+@@ -16680 +16726 @@
+-  let m=/^(\d+\.?\d*(?:[eE][+-]?\d+)?|\.\d+(?:[eE][+-]?\d+)?)/.exec(r);if(m){t.push({k:'num',v:Number(m[1])});i+=m[1].length;continue}
++  let m=/^(\d+\.?\d*(?:[eE][+-]?\d+)?|\.\d+(?:[eE][+-]?\d+)?)/.exec(r);if(m){t.push({k:'num',v:Number(m[1]),s:m[1]});i+=m[1].length;continue}
+@@ -16689 +16735 @@
+-  if(x.k==='num'||x.k==='str')return {n:'lit',v:x.v};if(x.k==='field')return {n:'field',v:x.v};
++  if(x.k==='num')return {n:'lit',v:x.v,s:x.s};if(x.k==='str')return {n:'lit',v:x.v};if(x.k==='field')return {n:'field',v:x.v};
+@@ -16712,0 +16759,28 @@
++// ---- Splunk's type check ----
++// Before an expression runs, Splunk checks the types it can see: a number written or computed, a string written or a
++// function's string, true or false. Fields could be either (any). A clash rejects the whole expression.
++const U=(a,b)=>a==='null'?b:b==='null'?a:a===b?a:'any';
++const RET={len:'num',length:'num',abs:'num',ceil:'num',ceiling:'num',floor:'num',round:'num',sqrt:'num',exp:'num',ln:'num',log:'num',pow:'num',pi:'num',exact:'num',tonumber:'num',mvcount:'num',
++ lower:'str',upper:'str',trim:'str',ltrim:'str',rtrim:'str',substr:'str',replace:'str',urldecode:'str',tostring:'str',md5:'str',mvjoin:'str',mvindex:'str',validate:'str',
++ isnull:'bool',isnotnull:'bool',isnum:'bool',isint:'bool',isstr:'bool',like:'bool',match:'bool',in:'bool',cidrmatch:'bool',true:'bool',false:'bool',null:'null'};
++const NOBOOL=new Set(['lower','upper','trim','ltrim','rtrim','len','length','substr','replace','urldecode','md5','split','like','match','abs','ceil','ceiling','floor','round','sqrt','exp','ln','log','pow']);
++function typeOf(e){switch(e.n){
++ case 'lit':return typeof e.v==='number'?'num':'str';
++ case 'field':return 'any';
++ case 'neg':{const t=typeOf(e.a);if(t==='str'||t==='bool')throw typeErr('- takes a number');return 'num'}
++ case 'bin':{const a=typeOf(e.a),b=typeOf(e.b);if(a==='bool'||b==='bool')throw typeErr(`${e.o} can’t take true or false`);
++  if(e.o==='.')return 'str';
++  if(e.o==='+'){if(a==='num'&&b==='str'||a==='str'&&b==='num')throw typeErr('+ takes two numbers or two strings');return a==='num'||b==='num'?'num':a==='str'||b==='str'?'str':a==='null'&&b==='null'?'null':'any'}
++  if(a==='str'||b==='str')throw typeErr(`${e.o} takes two numbers`);return 'num'}
++ case 'cmp':{const a=typeOf(e.a),b=typeOf(e.b);if(a==='num'&&b==='str'||a==='str'&&b==='num')throw typeErr(`${e.o==='='?'==':e.o} compares a number with a string`);return 'bool'}
++ case 'like':typeOf(e.a);typeOf(e.b);return 'bool';
++ case 'in':typeOf(e.a);e.list.forEach(typeOf);return 'bool';
++ case 'not':typeOf(e.a);return 'bool';
++ case 'and':case 'or':case 'xor':typeOf(e.a);typeOf(e.b);return 'bool';
++ case 'call':{const ts=e.args.map(typeOf);if(NOBOOL.has(e.f)&&ts.includes('bool'))throw typeErr(`${e.f}() can’t take true or false`);
++  if(e.f==='if')return U(ts[1]??'null',ts[2]??'null');
++  if(e.f==='case'){let t='null';for(let i=1;i<ts.length;i+=2)t=U(t,ts[i]);return t}
++  if(e.f==='coalesce'||e.f==='min'||e.f==='max')return ts.reduce(U,'null');
++  if(e.f==='nullif')return ts[0]??'null';
++  return RET[e.f]||'any'}}}
++
+@@ -16714 +16788,2 @@
+-// A condition is true or false; a comparison with a missing value gives no answer, which counts as false.
++// A condition is true or false; a comparison with a missing value gives no answer, and NOT, AND, OR, XOR, if(), case()
++// and validate() count no answer as false.
+@@ -16716 +16791,5 @@
+-function compare(a,b){if(one(a)==null||one(b)==null)return null;if(isNum(a)&&isNum(b)&&!isStrLit(a)&&!isStrLit(b)){const x=num(a),y=num(b);return x<y?-1:x>y?1:0}const x=text(a),y=text(b);return x<y?-1:x>y?1:0}
++// Two values compared: as numbers when both can be, else as text when both can be; a number against text has no
++// answer.
++function cmpv(a,b){a=one(a);b=one(b);if(a==null||b==null)return null;
++ if(canNum(a)&&canNum(b)){const x=num(a),y=num(b);return x<y?-1:x>y?1:0}
++ if(canText(a)&&canText(b)){const x=text(a),y=text(b);return x<y?-1:x>y?1:0}return null}
+@@ -16729,0 +16809,5 @@
++// A text function on each of several values, or on the one.
++const each=(v,f)=>{if(isMany(v))return v.map(x=>{const t=text(x);return t==null?null:f(t)}).filter(x=>x!=null);const t=text(v);return t==null?null:f(t)};
++// abs() and a sign keep a number's precision.
++const signed=(v,f)=>{if(!canNum(v))return null;const p=precOf(v),n=f(num(v));if(!p)return n;const r=decFixed(n,p.dp??0);r.sf=p.sf;return r};
++const math1=(v,f)=>{if(!canNum(v))return null;const n=f(num(v));return Number.isFinite(n)?bySig(n,[precOf(v)]):null};
+@@ -16734 +16818 @@
+- coalesce:(a,e)=>{for(const x of a){const v=e(x);if(v!=null&&!(Array.isArray(v)&&!v.length))return v}return null},
++ coalesce:(a,e)=>{for(const x of a){const v=e(x);if(present(v))return v}return null},
+@@ -16736 +16820 @@
+- nullif:(a,e)=>{const x=e(a[0]),y=e(a[1]);return compare(x,y)===0?null:x},
++ nullif:(a,e)=>{const x=e(a[0]),y=e(a[1]);if(isMany(x))return x;return cmpv(x,y)===0?null:x},
+@@ -16738,7 +16822,7 @@
+- isnull:(a,e)=>one(e(a[0]))==null,isnotnull:(a,e)=>one(e(a[0]))!=null,
+- isnum:(a,e)=>{const v=e(a[0]);return one(v)!=null&&isNum(v)&&!isStrLit(v)},isint:(a,e)=>{const v=e(a[0]);return one(v)!=null&&isNum(v)&&Number.isInteger(num(v))},
+- isstr:(a,e)=>{const v=one(e(a[0]));return v!=null&&typeof v!=='boolean'&&!(typeof v==='number'||isNum(v)&&!isStrLit(v))},
+- like:(a,e)=>{const x=text(e(a[0])),p=text(e(a[1]));return x==null||p==null?null:likeRe(p).test(x)},
+- match:(a,e)=>{const x=text(e(a[0])),p=text(e(a[1]));return x==null||p==null?null:regex(p).test(x)},
+- in:(a,e)=>{const x=e(a[0]);if(one(x)==null)return null;return a.slice(1).some(y=>compare(x,e(y))===0)},
+- cidrmatch:(a,e)=>{const r=text(e(a[0])),x=text(e(a[1]));if(r==null||x==null)return null;const m=cidr(r,x);if(m==null)throw nc('cidrmatch() is tried here for IPv4 only');return m},
++ isnull:(a,e)=>!present(e(a[0])),isnotnull:(a,e)=>present(e(a[0])),
++ isnum:(a,e)=>{const v=e(a[0]);return !isMany(v)&&one(v)!=null&&canNum(v)},isint:(a,e)=>{const v=e(a[0]);return !isMany(v)&&one(v)!=null&&canNum(v)&&Number.isInteger(num(v))},
++ isstr:(a,e)=>{const v=e(a[0]);if(isMany(v))return false;const x=one(v);return x!=null&&(typeof x==='string'||isFv(x)&&!NUM.test(x.fv))},
++ like:(a,e)=>{const v=e(a[0]),p=text(e(a[1]));if(p==null)return null;const re=likeRe(p);if(isMany(v))return v.some(x=>re.test(text(x)));const x=text(v);return x==null?null:re.test(x)},
++ match:(a,e)=>{const v=e(a[0]),p=text(e(a[1]));if(p==null)return null;const re=regex(p);if(isMany(v))return v.some(x=>re.test(text(x)));const x=text(v);return x==null?null:re.test(x)},
++ in:(a,e)=>{const x=e(a[0]),vals=a.slice(1).map(e);if(isMany(x))return x.some(v=>vals.some(y=>cmpv(v,y)===0));if(one(x)==null)return null;return vals.some(y=>cmpv(x,y)===0)},
++ cidrmatch:(a,e)=>{const r=text(e(a[0])),v=e(a[1]);if(isMany(v))return false;const x=text(v);if(r==null||x==null)return null;const m=cidr(r,x);if(m==null)throw nc('cidrmatch() is tried here for IPv4 only');return m},
+@@ -16746 +16830 @@
+- lower:(a,e)=>{const x=text(e(a[0]));return x==null?null:x.toLowerCase()},upper:(a,e)=>{const x=text(e(a[0]));return x==null?null:x.toUpperCase()},
++ lower:(a,e)=>each(e(a[0]),x=>x.toLowerCase()),upper:(a,e)=>each(e(a[0]),x=>x.toUpperCase()),
+@@ -16752,7 +16836,10 @@
+- tostring:(a,e)=>{if(a.length>1)throw nc('tostring() with a format isn’t computed here');const v=one(e(a[0]));return v==null?null:typeof v==='boolean'?(v?'True':'False'):text(v)},
+- tonumber:(a,e)=>{const x=text(e(a[0]));if(x==null)return null;const base=a[1]?num(e(a[1])):10;if(base===10)return NUM.test(x.trim())?Number(x.trim()):null;const ok=new RegExp(`^[+-]?[${'0123456789abcdefghijklmnopqrstuvwxyz'.slice(0,base)}]+$`,'i').test(x.trim());return ok?parseInt(x.trim(),base):null},
+- abs:(a,e)=>math(a,e,Math.abs),ceil:(a,e)=>math(a,e,Math.ceil),ceiling:(a,e)=>math(a,e,Math.ceil),floor:(a,e)=>math(a,e,Math.floor),sqrt:(a,e)=>math(a,e,Math.sqrt),exp:(a,e)=>math(a,e,Math.exp),ln:(a,e)=>math(a,e,Math.log),
+- round:(a,e)=>{const v=e(a[0]);if(one(v)==null||!isNum(v))return null;const d=a[1]?num(e(a[1])):0,f=10**d;return Math.round(num(v)*f)/f},
+- pow:(a,e)=>{const x=e(a[0]),y=e(a[1]);return one(x)==null||one(y)==null||!isNum(x)||!isNum(y)?null:num(x)**num(y)},
+- log:(a,e)=>{const x=e(a[0]);if(one(x)==null||!isNum(x))return null;const b=a[1]?num(e(a[1])):10;return Math.log(num(x))/Math.log(b)},
+- pi:()=>Math.PI,exact:(a,e)=>e(a[0]),
++ tostring:(a,e)=>{if(a.length>1)throw nc('tostring() with a format isn’t computed here');const v=e(a[0]);if(!present(v))return 'Null';if(isMany(v))return v.map(text).join(' ');const x=one(v);return typeof x==='boolean'?(x?'True':'False'):text(x)},
++ tonumber:(a,e)=>{const x=text(e(a[0]));if(x==null)return null;const base=a[1]?num(e(a[1])):10,t=x.trim();if(base===10)return NUM.test(t)?decText(t):null;const ok=new RegExp(`^[+-]?(0x)?[${'0123456789abcdefghijklmnopqrstuvwxyz'.slice(0,base)}]+$`,'i').test(t);return ok?parseInt(t,base):null},
++ abs:(a,e)=>signed(e(a[0]),Math.abs),
++ ceil:(a,e)=>{const v=e(a[0]);return canNum(v)?Math.ceil(num(v)):null},floor:(a,e)=>{const v=e(a[0]);return canNum(v)?Math.floor(num(v)):null},
++ sqrt:(a,e)=>math1(e(a[0]),Math.sqrt),exp:(a,e)=>math1(e(a[0]),Math.exp),ln:(a,e)=>math1(e(a[0]),Math.log),
++ round:(a,e)=>{const v=e(a[0]);if(!canNum(v))return null;const d=a[1]?num(e(a[1])):0,n=Math.round(num(v)*10**d)/10**d;return d>0?decFixed(n,d):n},
++ pow:(a,e)=>{const x=e(a[0]),y=e(a[1]);if(!canNum(x)||!canNum(y))return null;return bySig(num(x)**num(y),[precOf(x),precOf(y)])},
++ log:(a,e)=>{const x=e(a[0]);if(!canNum(x))return null;const b=a[1]?e(a[1]):null;if(b!=null&&!canNum(b))return null;const v=num(x),base=b==null?10:num(b);
++  return bySig(base===10?Math.log10(v):base===2?Math.log2(v):Math.log(v)/Math.log(base),[precOf(x),b==null?null:precOf(b)])},
++ pi:()=>({dec:true,nv:Math.PI,dp:11,sf:12,s:'3.14159265358'}),exact:(a,e)=>{const v=e(a[0]);return isDec(one(v))?one(v).nv:v},
+@@ -16761 +16848 @@
+- mvappend:(a,e)=>{const out=a.flatMap(x=>many(e(x))).filter(v=>one(v)!=null);return out.length?out:null},
++ mvappend:(a,e)=>{const out=a.flatMap(x=>many(e(x))).filter(v=>v!=null);return out.length?out:null},
+@@ -16766,4 +16853,14 @@
+- length:(a,e)=>FN.len(a,e)};
+-function trimmer(a,e,l,r){const x=text(e(a[0]));if(x==null)return null;const cs=a[1]?text(e(a[1])):' \t';const set=new Set([...cs]);let s=0,t=[...x],n=t.length;if(l)while(s<n&&set.has(t[s]))s++;if(r)while(n>s&&set.has(t[n-1]))n--;return t.slice(s,n).join('')}
+-function math(a,e,f){const v=e(a[0]);return one(v)==null||!isNum(v)?null:f(num(v))}
+-function extreme(a,e,sign){const v=a.flatMap(x=>many(e(x))).filter(x=>one(x)!=null);if(!v.length)return null;if(v.every(x=>isNum(x)&&!isStrLit(x)))return v.map(num).reduce((m,x)=>sign*(x-m)>0?x:m);if(v.some(x=>isNum(x)&&!isStrLit(x)))throw nc(`${sign>0?'max':'min'}() mixes numbers and text`);return v.map(text).reduce((m,x)=>sign*(x<m?-1:x>m?1:0)>0?x:m)}
++ length:(a,e)=>FN.len(a,e),ceiling:(a,e)=>FN.ceil(a,e)};
++function trimmer(a,e,l,r){const cs=a[1]?text(e(a[1])):' \t',set=new Set([...(cs??'')]);
++ return each(e(a[0]),x=>{let s=0,t=[...x],n=t.length;if(l)while(s<n&&set.has(t[s]))s++;if(r)while(n>s&&set.has(t[n-1]))n--;return t.slice(s,n).join('')})}
++// min() and max() return the value itself, so 1.50 stays 1.50; of equal values, the first.
++function extreme(a,e,sign){const v=a.flatMap(x=>many(e(x))).filter(x=>one(x)!=null);if(!v.length)return null;
++ if(v.every(canNum))return v.reduce((m,x)=>sign*(num(x)-num(m))>0?x:m);
++ if(v.some(x=>canNum(x)&&!canText(x)))throw nc(`${sign>0?'max':'min'}() mixes numbers and text`);
++ return v.reduce((m,x)=>{const a=text(x),b=text(m);return sign*(a<b?-1:a>b?1:0)>0?x:m})}
++function arith(o,a,b){if(!canNum(a)||!canNum(b))return null;const x=num(a),y=num(b),pa=precOf(a),pb=precOf(b);let n;
++ if(o==='+')n=x+y;else if(o==='-')n=x-y;else if(o==='*')n=x*y;else{if(y===0)return null;n=o==='/'?x/y:x%y}
++ if(!Number.isFinite(n))return null;
++ if(o==='+'||o==='-'){const dp=[pa?.dp,pb?.dp].filter(d=>d!=null);return dp.length?decFixed(n,Math.min(...dp)):n}
++ return bySig(n,[pa,pb])}
++const OPS={'=':c=>c===0,'!=':c=>c!==0,'<':c=>c<0,'>':c=>c>0,'<=':c=>c<=0,'>=':c=>c>=0};
+@@ -16771 +16868 @@
+- case 'lit':return e.v;
++ case 'lit':return typeof e.v==='number'&&e.s&&/[.eE]/.test(e.s)?decText(e.s):e.v;
+@@ -16773 +16870 @@
+- case 'neg':{const v=ev(e.a,get);return one(v)==null?null:isNum(v)?-num(v):null}
++ case 'neg':return signed(ev(e.a,get),x=>-x);
+@@ -16776,9 +16873,12 @@
+-  if(e.o==='+'){const na=isNum(a)&&!isStrLit(a),nb=isNum(b)&&!isStrLit(b);if(na&&nb)return num(a)+num(b);if(!na&&!nb)return text(a)+text(b);throw nc('it adds a number to text with +, which Splunk’s docs don’t define')}
+-  if(!isNum(a)||!isNum(b))return null;const x=num(a),y=num(b);if(e.o==='-')return x-y;if(e.o==='*')return x*y;if(y===0)return null;return e.o==='/'?x/y:x%y}
+- case 'cmp':{const c=compare(ev(e.a,get),ev(e.b,get));if(c==null)return null;return e.o==='='?c===0:e.o==='!='?c!==0:e.o==='<'?c<0:e.o==='>'?c>0:e.o==='<='?c<=0:c>=0}
+- case 'like':{const x=text(ev(e.a,get)),p=text(ev(e.b,get));return x==null||p==null?null:likeRe(p).test(x)}
+- case 'in':{const x=ev(e.a,get);if(one(x)==null)return null;return e.list.some(y=>compare(x,ev(y,get))===0)}
+- case 'not':{const v=ev(e.a,get);return one(v)==null?null:!truth(v)}
+- case 'and':{const a=ev(e.a,get);if(one(a)!=null&&!truth(a))return false;const b=ev(e.b,get);if(one(b)!=null&&!truth(b))return false;return one(a)==null||one(b)==null?null:true}
+- case 'or':{const a=ev(e.a,get);if(one(a)!=null&&truth(a))return true;const b=ev(e.b,get);if(one(b)!=null&&truth(b))return true;return one(a)==null||one(b)==null?null:false}
+- case 'xor':{const a=ev(e.a,get),b=ev(e.b,get);return one(a)==null||one(b)==null?null:truth(a)!==truth(b)}
++  if(e.o==='+'){if(canNum(a)&&canNum(b))return arith('+',a,b);if(canText(a)&&canText(b))return text(a)+text(b);return null}
++  return arith(e.o,a,b)}
++ case 'cmp':{const a=ev(e.a,get),b=ev(e.b,get);
++  // Several values: == finds any of them equal to text; anything else is false.
++  if(isMany(a)||isMany(b)){if(e.o!=='=')return false;const [m,o]=isMany(a)?[a,b]:[b,a];if(isMany(o)||!canText(o))return false;const t=text(o);return m.some(x=>canText(x)&&text(x)===t)}
++  const c=cmpv(a,b);return c==null?null:OPS[e.o](c)}
++ case 'like':{const v=ev(e.a,get),p=text(ev(e.b,get));if(p==null)return null;const re=likeRe(p);if(isMany(v))return v.some(x=>re.test(text(x)));const x=text(v);return x==null?null:re.test(x)}
++ case 'in':{const x=ev(e.a,get),vals=e.list.map(y=>ev(y,get));if(isMany(x))return x.some(v=>vals.some(y=>cmpv(v,y)===0));if(one(x)==null)return null;return vals.some(y=>cmpv(x,y)===0)}
++ case 'not':return !truth(ev(e.a,get));
++ case 'and':return truth(ev(e.a,get))&&truth(ev(e.b,get));
++ case 'or':return truth(ev(e.a,get))||truth(ev(e.b,get));
++ case 'xor':return truth(ev(e.a,get))!==truth(ev(e.b,get));
+@@ -16786,3 +16886,8 @@
+-// One expression, with the fields get gives. {v} with its value, or {nc} with why it isn't computed.
+-function run(src,get){try{const v=ev(parse(src),get);if(typeof one(v)==='boolean')return {nc:'it gives true or false, which a field can’t hold'};return {v:v==null?null:Array.isArray(v)?v.map(text):text(v)}}
+- catch(e){if(e instanceof Stop)return e.bad?{nc:`its expression can’t be read here: ${e.message}`}:{nc:e.message};throw e}}
++// A value as a field holds it: true and false as 1 and 0; at index time, numbers without the zeros after a point.
++const strip=s=>s.includes('.')?s.replace(/0+$/,'').replace(/\.$/,''):s;
++const held=(x,index)=>typeof x==='boolean'?(x?'1':'0'):index&&isDec(x)?strip(x.s):text(x);
++const out=(v,index)=>{if(v==null)return null;if(Array.isArray(v)){const a=v.map(x=>held(x,index)).filter(x=>x!=null);return a.length?(a.length===1?a[0]:a):null}return held(v,index)};
++// One expression, with the fields get gives: {v} with its value, {rejected} with why Splunk's type check rejects it, or
++// {nc} with why it isn't computed here.
++function run(src,get){try{const e=parse(src);typeOf(e);return {v:out(ev(e,get),false)}}
++ catch(err){if(err instanceof Stop)return err.type?{rejected:err.message}:err.bad?{nc:`its expression can’t be read here: ${err.message}`}:{nc:err.message};throw err}}
+@@ -16796,2 +16901,2 @@
+-// Each EVAL- sees the fields as they were before any ran. A null result clears the field; one that isn't computed leaves
+-// it as it was.
++// Each EVAL- sees the fields as they were before any ran. A null result clears the field; one the type check rejects,
++// or that isn't computed, leaves it as it was.
+@@ -16801,0 +16907 @@
++  if(x.rejected){steps.push({at:'search',r,state:'miss',group:'eval',made:[],rejected:true,say:`${r.key} is rejected by Splunk’s type check: ${x.rejected}${fields.has(name)?`, so ${name} stays as it was`:''}`});continue}
+@@ -16804,2 +16910,2 @@
+-// The calculated fields' row on the path: how many give values, which, and why any aren't computed.
+-function row(ev){if(!ev?.length)return null;const hit=ev.filter(s=>s.state==='hit'),none=ev.filter(s=>s.state==='miss'),skip=ev.filter(s=>s.state==='skip'),got=hit.flatMap(s=>s.made),why=[...new Set(skip.map(s=>s.why))];
++// The calculated fields' row on the path: how many give values, which, and why any don't.
++function row(ev){if(!ev?.length)return null;const hit=ev.filter(s=>s.state==='hit'),none=ev.filter(s=>s.state==='miss'&&!s.rejected),rej=ev.filter(s=>s.rejected),skip=ev.filter(s=>s.state==='skip'),got=hit.flatMap(s=>s.made),why=[...new Set(skip.map(s=>s.why))];
+@@ -16807,0 +16914 @@
++ if(rej.length)say.push(`${rej.length} ${rej.length===1?'is':'are'} rejected by Splunk’s type check`);
+@@ -16809 +16916 @@
+- return {state:hit.length?'hit':none.length?'miss':'skip',r:null,say:say.join('. ')}}
++ return {state:hit.length?'hit':none.length||rej.length?'miss':'skip',r:null,say:say.join('. ')}}
+@@ -16813 +16920 @@
+-// out, and the file says so (whether Splunk keeps them isn't settled here, as Build 223's check says).
++// out, as Splunk leaves them out.
+@@ -16815,2 +16922,2 @@
+-function csv(text){const recs=[];let rec=[],cur='',q=false,quoted=false,live=false,trimmed=false;
+- const end=()=>{const v=quoted?cur:cur.trim();if(!quoted&&v!==cur)trimmed=true;rec.push(v);cur='';quoted=false};
++function csv(text){const recs=[];let rec=[],cur='',q=false,quoted=false,live=false;
++ const end=()=>{rec.push(quoted?cur:cur.trim());cur='';quoted=false};
+@@ -16826 +16933 @@
+- return {head:recs[0]||[],rows:recs.slice(1),trimmed}}
++ return {head:recs[0]||[],rows:recs.slice(1)}}
+@@ -16829,2 +16936,2 @@
+-// Each LOOKUP-, in lexicographic order of its name, with the fields as they were after the calculated fields.
+-function lookups(lines,fields,steps,ctx){if(!lines.length)return;const before=new Map(fields);
++// Each LOOKUP-, in order of its name, on the fields as the earlier ones left them.
++function lookups(lines,fields,steps,ctx){if(!lines.length)return;
+@@ -16842 +16949 @@
+-  const t=tableOf(file),col=n=>t.head.indexOf(n),spaced=t.trimmed?`. ${file.name} writes spaces round its names or values, which are left out here: to check`:'';
++  const t=tableOf(file),col=n=>t.head.indexOf(n);
+@@ -16847 +16954,4 @@
+-  const absent=match.filter(m=>before.get(m.as)?.value==null).map(m=>m.as);if(absent.length){put('miss',`: the event has no ${and(absent)}, so it isn’t run`);continue}
++  const absent=match.filter(m=>fields.get(m.as)?.value==null).map(m=>m.as);if(absent.length){put('miss',`: the event has no ${and(absent)}, so it isn’t run`);continue}
++  // A match field an earlier lookup wrote: lookups run one after another, in order of their names.
++  const chained=match.map(m=>({as:m.as,f:fields.get(m.as)})).filter(x=>x.f?.lookup&&x.f.r).map(x=>`${x.as} is ${x.f.r.key}’s output`);
++  const after=chained.length?`. ${and(chained)}, as lookups run one after another, in order of their names`:'';
+@@ -16854 +16964 @@
+-  const vals=match.map(m=>many(before.get(m.as).value));
++  const vals=match.map(m=>many(fields.get(m.as).value));
+@@ -16860 +16970 @@
+-   put(wrote.length?'hit':'miss',`: ${found}: ${wrote.length?wrote.join(', '):'nothing new'}${kept.length?`. ${and(kept)} ${kept.length===1?'is':'are'} kept, as OUTPUTNEW writes only fields the event doesn’t have`:''}${spaced}`);continue}
++   put(wrote.length?'hit':'miss',`: ${found}: ${wrote.length?wrote.join(', '):'nothing new'}${kept.length?`. ${and(kept)} ${kept.length===1?'is':'are'} kept, as OUTPUTNEW writes only fields the event doesn’t have`:''}${after}`);continue}
+@@ -16862 +16972 @@
+-  put('miss',`: no row of ${file.name} has ${desc}, so ${cleared.length?`OUTPUT clears ${and(cleared)}`:'it gives nothing'}${spaced}`)}}
++  put('miss',`: no row of ${file.name} has ${desc}, so ${cleared.length?`OUTPUT clears ${and(cleared)}`:'it gives nothing'}${after}`)}}
+@@ -16865,3 +16975,4 @@
+-// Its assignments in order: = adds a value to a field, := replaces it, and null() to a field that isn't there does
+-// nothing. _raw, queue and index change the event; host, source and sourcetype are read, not set; any other name is an
+-// indexed field. Returns the step's words and what changed.
++// Splunk compiles it first: a type error anywhere and none of it runs. Then its assignments in order: = adds a value to
++// a field, := replaces it, and null() to a field that isn't there does nothing. _raw, queue, index, host, source and
++// sourcetype change the event (for the last three, either sign replaces, and the last one wins); any other name is an
++// indexed field. Returns the step's words and what changed; meta takes the new index, host, source and source type.
+@@ -16869,3 +16980,3 @@
+- const cur={raw,queue,index:meta.index},local=new Map(),cleared=new Set(),unset=[];let qset=false;
+- const get=k=>{if(k==='_raw')return {fv:cur.raw};if(k==='queue')return cur.queue!=null?{fv:cur.queue}:undefined;if(k==='index')return cur.index!=null?{fv:cur.index}:undefined;
+-  if(k==='sourcetype')return {fv:meta.sourcetype};if((k==='host'||k==='source')&&meta[k]!=null)return {fv:meta[k]};if(k==='linecount')return {fv:String(cur.raw.split(/\r\n|\r|\n/).length)};
++ try{as.forEach(a=>typeOf(a.e))}catch(e){if(e instanceof Stop&&e.type)return {state:'miss',say:`evaluates INGEST_EVAL, which Splunk can’t compile, as ${e.message}: none of its assignments run`};if(!(e instanceof Stop))throw e}
++ const cur={raw,queue,index:meta.index,host:meta.host,source:meta.source,sourcetype:meta.sourcetype},local=new Map(),cleared=new Set();let qset=false;
++ const get=k=>{if(k==='_raw')return {fv:cur.raw};if(['queue','index','host','source','sourcetype'].includes(k))return cur[k]!=null?{fv:cur[k]}:undefined;if(k==='linecount')return {fv:String(cur.raw.split(/\r\n|\r|\n/).length)};
+@@ -16873,2 +16984,2 @@
+- for(const a of as){let v;try{v=ev(a.e,get);if(typeof one(v)==='boolean')throw nc(`${a.name} gets true or false, which a field can’t hold`)}catch(e){if(e instanceof Stop)return {state:'skip',say:`evaluates INGEST_EVAL, which isn’t tried here: ${e.bad?`it can’t be read: ${e.message}`:e.message}`};throw e}
+-  const vals=v==null?[]:many(v).map(text);
++ for(const a of as){let v;try{v=ev(a.e,get)}catch(e){if(e instanceof Stop)return {state:'skip',say:`evaluates INGEST_EVAL, which isn’t tried here: ${e.bad?`it can’t be read: ${e.message}`:e.message}`};throw e}
++  const vals=v==null?[]:many(v).map(x=>held(x,true)).filter(x=>x!=null);
+@@ -16877,2 +16988 @@
+-  if(a.name==='index'){if(vals.length)cur.index=vals[0];continue}
+-  if(['host','source','sourcetype'].includes(a.name)){unset.push(a.name);continue}
++  if(['index','host','source','sourcetype'].includes(a.name)){if(vals.length)cur[a.name]=vals[0];continue}
+@@ -16882 +16992,2 @@
+- const say=[];if(cur.raw!==raw)say.push('the event text is rewritten');if(cur.index!==meta.index){meta.index=cur.index;say.push(`the index becomes ${cur.index}`)}
++ const say=[];if(cur.raw!==raw)say.push('the event text is rewritten');
++ for(const [k,name] of [['index','index'],['host','host'],['source','source'],['sourcetype','source type']])if(cur[k]!==meta[k]){meta[k]=cur[k];say.push(`the ${name} becomes ${cur[k]}`)}
+@@ -16884 +16995 @@
+- if(wrote.length)say.push(`it writes ${and(wrote.map(k=>`${k} = ${quote(local.get(k).length===1?local.get(k)[0]:local.get(k))}`))} as indexed field${wrote.length>1?'s':''}`);
++ if(wrote.length)say.push(`it writes ${and(wrote.map(k=>`${k} = ${quote(local.get(k).length===1?local.get(k)[0]:local.get(k))}`))} as ${wrote.length>1?'indexed fields':'an indexed field'}`);
+@@ -16886 +16996,0 @@
+- if(unset.length)say.push(`its ${and([...new Set(unset)])} assignment${unset.length>1?'s aren’t':' isn’t'} tried: Splunk’s docs show INGEST_EVAL setting index, queue, _raw and indexed fields`);
+@@ -16890 +17000,2 @@
+-window.configEval225={lex,parse,assignments,run,calculated,lookups,ingest,row,show,csv,md5,cidr,likeRe,
++// The engine keeps Build 225's name, which Build 225's edits read; configEval226 names the same object.
++window.configEval225=window.configEval226={lex,parse,assignments,run,calculated,lookups,ingest,row,show,csv,md5,cidr,likeRe,typeOf,plain,roundAt,decSig,decFixed,decText,

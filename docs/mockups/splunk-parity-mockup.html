@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Matched to Splunk</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.notes{min-width:0;overflow-wrap:anywhere}
+.panel pre{margin:0;max-height:420px;overflow:auto;padding:10px 12px;border:1px solid var(--rule);border-radius:8px;background:var(--panel-2);color:var(--ink-2);font:12px/1.55 var(--mono);white-space:pre}
+.panel p{margin:0 0 10px;color:var(--ink-2);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 226 TARGET · BUILD 225 + PROTOTYPE</span>
+ <h1>Try an event matched to Splunk</h1>
+ <p class="lede">Splunk Enterprise 10.6.1.1, run in Docker, showed where Build 225’s readings of Splunk’s rules were wrong. Try an event now follows what Splunk did: its type check, <code>+</code> and comparisons, true and false as 1 and 0, missing values, several values and numbers’ precision; lookups that run on each other’s output; <code>INGEST_EVAL</code> setting host, source and source type; empty values and quotes in extractions. Every one of 304 probes, the Fortinet add-on’s 54 sample events and two made-up apps give what Splunk gave. Every target scene is the real explorer with the prototype applied to Build 225; each “Today” scene is Build 225, set up by the same steps. Three scenes use the Fortinet FortiGate Add-on for Splunk 1.6.10’s package, which isn’t in the repository.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>Splunk against Build 225</h2>
+  <table>
+   <thead><tr><th>Case</th><th>Splunk 10.6.1.1</th><th>Build 225</th><th>With the prototype</th></tr></thead>
+   <tbody>
+    <tr><td><code>n + t</code>, an event’s 5 and abc</td><td>“5abc”</td><td>Not computed</td><td>“5abc”</td></tr>
+    <tr><td><code>5 + "abc"</code></td><td>Rejected by the type check</td><td>Not computed</td><td>Rejected, and said so</td></tr>
+    <tr><td><code>if(NOT a &gt; 1, …)</code>, no a</td><td>True</td><td>False</td><td>True</td></tr>
+    <tr><td><code>s1 &gt; 1</code> as a value</td><td>1</td><td>Not computed</td><td>1</td></tr>
+    <tr><td><code>w * 2</code>, w = 1.50</td><td>3.00</td><td>3</td><td>3.00</td></tr>
+    <tr><td>A lookup on another’s output</td><td>Runs</td><td>Not run</td><td>Runs</td></tr>
+    <tr><td><code>INGEST_EVAL</code> <code>host="x"</code></td><td>Sets the host</td><td>Not tried</td><td>Sets the host</td></tr>
+    <tr><td><code>user=""</code> in an event</td><td>No user field</td><td>user = “”</td><td>No user field</td></tr>
+    <tr><td>A CSV header’s <code>ftnt_action, action</code></td><td>Column action</td><td>Marked “ action” has spaces</td><td>Column action</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>Checked in Splunk</h2>
+  <dl>
+   <dt>Probes</dt><dd>304 expressions, as calculated fields on indexed events and as searches: Build 225 gave Splunk’s value for 128, the prototype for all 304.</dd>
+   <dt>Fortinet</dt><dd>The add-on’s 54 sample events: 2,682 field values, each as Splunk’s, and the same source type.</dd>
+   <dt>Made-up apps</dt><dd>Build 225’s, 24 of 26 fields, and its index, host and source type; <code>strftime()</code> isn’t computed, and Splunk hides an indexed field named tag. Build 226’s four events, value for value.</dd>
+   <dt>Evidence</dt><dd><code>docs/splunk-checks.md</code>: each rule, the searches that show it, and every probe’s value in Splunk, Build 225 and Build 226.</dd>
+  </dl>
+ </section>
+ <section class="panel rules">
+  <h2>The rules in short</h2>
+  <dl>
+   <dt>Types</dt><dd>A field’s value is a number where it reads as one, and text always. <code>+</code> adds two numbers and joins two strings; a number and text Splunk can see together rejects the whole expression.</dd>
+   <dt>Conditions</dt><dd>A comparison with a missing value has no answer, which <code>NOT</code>, <code>AND</code>, <code>OR</code>, <code>XOR</code>, <code>if()</code> and <code>case()</code> take as false. True and false are stored as 1 and 0.</dd>
+   <dt>Numbers</dt><dd>With a decimal point, a number keeps its precision: <code>+</code> and <code>-</code> the fewest places, <code>*</code> and <code>/</code> the fewest figures.</dd>
+   <dt>Lookups</dt><dd>One after another, in order of their names, each on what the earlier ones wrote.</dd>
+   <dt>Extractions</dt><dd>An empty value gives no field unless <code>KEEP_EMPTY_VALS</code>; quotes come off <code>DELIMS</code> values; <code>MV_ADD</code> keeps every value.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-splunk-parity.md</code> · Prototype: a replaced script block and 17 in-place edits to Build 225, in <code>docs/mockups/splunk-parity.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "parity", "img": "compare/splunk-parity-parity.png", "group": "target", "tab": "Index and search time", "title": "A made-up app’s event, as Splunk 10.6.1.1 indexed and searched it", "w": 1376, "h": 318, "zoom": 1, "size": "1440 px window, the path under the map’s head", "items": [{"n": 1, "head": "Host, source and source type", "text": "INGEST_EVAL sets all three, as Splunk did with this event: parity-host, parity-source and parity:web.", "x": 98.6, "y": 21.1, "box": [0.58, 18.31, 98.84, 5.59]}, {"n": 2, "head": "The new source type, read", "text": "The next transform in the same TRANSFORMS- line reads sourcetype as parity:web.", "x": 98.6, "y": 27.63, "box": [0.58, 24.84, 98.84, 5.59]}, {"n": 3, "head": "A type error stops it all", "text": "5 + \"abc\" can’t compile, so fine=\"kept\", before it, isn’t written either. Splunk logged “Operator  types incompatible”.", "x": 98.6, "y": 34.16, "box": [0.58, 31.37, 98.84, 5.59]}, {"n": 4, "head": "Empty groups", "text": "user= and note= capture nothing, so they give no field: only n, t and w.", "x": 98.6, "y": 48.95, "box": [0.58, 46.16, 98.84, 5.59]}, {"n": 5, "head": "Rejected before it runs", "text": "n + 1 + \"x\" and 5 + \"abc\" mix a number and text where Splunk can see both, so its type check rejects them.", "x": 98.6, "y": 68.54, "box": [0.58, 65.75, 98.84, 5.59]}, {"n": 6, "head": "Lookups in a chain", "text": "LOOKUP-b_floor matches on desk, which LOOKUP-a_desk wrote: Splunk runs lookups one after another, in order of their names.", "x": 98.6, "y": 81.6, "box": [0.58, 78.81, 98.84, 5.59]}, {"n": 7, "head": "A quoted name keeps its space", "text": "parity_quoted.csv’s header quotes “ office”, so Splunk finds no column office either.", "x": 98.6, "y": 88.13, "box": [0.58, 85.34, 98.84, 5.59]}]}, {"id": "parity-fields", "img": "compare/splunk-parity-parity-fields.png", "group": "target", "tab": "Its fields", "title": "The event’s fields: each value Splunk gave", "w": 1376, "h": 414, "zoom": 1, "size": "1440 px window, the fields under the path", "items": [{"n": 1, "head": "+ joins", "text": "n + t: an event’s 5 and abc join to 5abc.", "x": 98.6, "y": 49.37, "box": [0.58, 46.51, 98.84, 5.73]}, {"n": 2, "head": "True is 1", "text": "n > 1 is stored as 1.", "x": 98.6, "y": 43.64, "box": [0.58, 40.78, 98.84, 5.73]}, {"n": 3, "head": "Null", "text": "tostring() of a field that isn’t there gives the text Null.", "x": 98.6, "y": 60.83, "box": [0.58, 57.96, 98.84, 5.73]}, {"n": 4, "head": "Several values", "text": "MV_ADD gives m two values, and upper() works on each.", "x": 98.6, "y": 66.56, "box": [0.58, 63.69, 98.84, 5.73]}, {"n": 5, "head": "Precision", "text": "w * 2: 1.50 has three significant figures, so 3.00.", "x": 98.6, "y": 78.02, "box": [0.58, 75.15, 98.84, 5.73]}, {"n": 6, "head": "Text against a number", "text": "abc against 5 has no answer, so t != 5 is false.", "x": 98.6, "y": 72.29, "box": [0.58, 69.42, 98.84, 5.73]}, {"n": 7, "head": "Kept", "text": "EVAL-t is rejected, so t stays as EXTRACT-kv gave it.", "x": 98.6, "y": 26.45, "box": [0.58, 23.59, 98.84, 5.73]}]}, {"id": "virus", "img": "compare/splunk-parity-virus.png", "group": "target", "tab": "An empty value", "title": "A Fortinet sample with user=\"\": no user field, as in Splunk", "w": 1376, "h": 297, "zoom": 1, "size": "1440 px window, the path under the map’s head", "items": [{"n": 1, "head": "user=\"\"", "text": "The empty value gives no field: KEEP_EMPTY_VALS is false unless set, and Splunk leaves it out.", "x": 98.6, "y": 38.38, "box": [0.58, 35.39, 98.84, 5.98]}, {"n": 2, "head": "Every field as Splunk’s", "text": "All 54 sample events give Splunk’s fields: 2,682 values.", "x": 98.6, "y": 94.57, "box": [0.58, 91.66, 98.84, 5.81]}]}, {"id": "lookups", "img": "compare/splunk-parity-lookups.png", "group": "target", "tab": "Lookup checks", "title": "fortigate_traffic’s lookups: the header’s space is no problem", "w": 273, "h": 1000, "zoom": 1, "size": "1440 px window, the map’s Search column", "items": [{"n": 1, "head": "No problem", "text": "ftnt_action_info.csv writes “ action”; Splunk leaves the space out, so the column is action.", "x": 98.6, "y": 69.58, "box": [17.9, 68.79, 74.92, 1.58]}]}, {"id": "calc", "img": "compare/splunk-parity-calc.png", "group": "target", "tab": "Build 225’s app", "title": "Build 225’s made-up app: what Splunk changes", "w": 1376, "h": 547, "zoom": 1, "size": "1440 px window, the path under the map’s head", "items": [{"n": 1, "head": "host, set", "text": "INGEST_EVAL’s host=\"override\" sets the host, as Splunk did.", "x": 98.6, "y": 23.67, "box": [0.58, 22.04, 98.84, 3.25]}, {"n": 2, "head": "Computed", "text": "hostname+bytes joins to web01.corp2048; round(2048/1024,1) is 2.0.", "x": 98.6, "y": 43.65, "box": [0.58, 42.03, 98.84, 3.25]}, {"n": 3, "head": "Chained", "text": "dept is LOOKUP-a_user’s output, so LOOKUP-h_nested gives floor = 3, as in Splunk.", "x": 98.6, "y": 74.02, "box": [0.58, 72.4, 98.84, 3.25]}, {"n": 4, "head": "No note", "text": "calc_spaced.csv’s spaces are left out, as Splunk leaves them out.", "x": 98.6, "y": 89.21, "box": [0.58, 87.59, 98.84, 3.25]}]}, {"id": "parity-today", "img": "compare/splunk-parity-parity-today.png", "group": "today", "tab": "Today · The made-up event", "title": "Build 225: the same event", "w": 1376, "h": 192, "zoom": 1, "size": "1440 px window, the path under the map’s head", "items": [{"n": 1, "head": "Not tried", "text": "Build 225 doesn’t set host, source or sourcetype, so the event stays parity:raw, and none of parity:web’s settings run.", "x": 98.6, "y": 33.87, "box": [0.58, 29.24, 98.84, 9.25]}, {"n": 2, "head": "Not tried either", "text": "5 + \"abc\" isn’t computed, so the step can’t say that Splunk runs none of this transform.", "x": 98.6, "y": 55.5, "box": [0.58, 50.87, 98.84, 9.25]}]}, {"id": "lookups-today", "img": "compare/splunk-parity-lookups-today.png", "group": "today", "tab": "Today · Lookup checks", "title": "Build 225: the same lookups", "w": 273, "h": 1000, "zoom": 1, "size": "1440 px window, the map’s Search column", "items": [{"n": 1, "head": "To check", "text": "The header’s “ action” is marked, though Splunk reads it as action.", "x": 98.6, "y": 69.58, "box": [17.9, 68.79, 74.92, 1.58]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 225 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
