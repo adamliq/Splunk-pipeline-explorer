@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Types and Samples</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.notes{min-width:0;overflow-wrap:anywhere}
+.panel pre{margin:0;max-height:420px;overflow:auto;padding:10px 12px;border:1px solid var(--rule);border-radius:8px;background:var(--panel-2);color:var(--ink-2);font:12px/1.55 var(--mono);white-space:pre}
+.panel p{margin:0 0 10px;color:var(--ink-2);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 227 TARGET · BUILD 226 + PROTOTYPE</span>
+ <h1>Event types, tags and every sample</h1>
+ <p class="lede">Try an event no longer stops at the lookups. It ends with the event types the event gets, their tags and the CIM data models it lands in, each matched as Splunk 10.6.1.1 matched them. And the samples, or the lines pasted in the box, can be tried all at once: what they’re indexed as, the event types, tags and data models they get, each line with the events it gives something to, and each field with the events that have it. The Fortinet add-on’s 54 samples get exactly Splunk’s event types and tags.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>Splunk against Build 226</h2>
+  <table>
+   <thead><tr><th>Case</th><th>Splunk 10.6.1.1</th><th>Build 226</th><th>With the prototype</th></tr></thead>
+   <tbody>
+    <tr><td>A Fortinet config change sample’s event types</td><td>ftnt_fortigate, ftnt_fortigate_config_change, ftnt_fortigate_event, ftnt_fortigate_system</td><td>Not shown</td><td>The same four</td></tr>
+    <tr><td>Its tags</td><td>change, network</td><td>Not shown</td><td>change, network</td></tr>
+    <tr><td>A sample’s own <code>eventtype=signature</code></td><td>Replaced by its event types</td><td>A field, signature</td><td>Replaced, and said so</td></tr>
+    <tr><td><code>n=010</code>, the event’s n is 10</td><td>Matches</td><td>Not tried</td><td>Matches</td></tr>
+    <tr><td><code>ip=10.0.0.0/8</code>, ip is 10.1.2.3</td><td>Matches</td><td>Not tried</td><td>Matches</td></tr>
+    <tr><td>Free text <code>1.2</code>, in 10.1.2.3</td><td>Matches</td><td>Not tried</td><td>Matches</td></tr>
+    <tr><td>Free text <code>ab</code>, the event has abc</td><td>No match</td><td>Not tried</td><td>No match</td></tr>
+    <tr><td><code>m!=1</code>, m is 1 and 2</td><td>No match</td><td>Not tried</td><td>No match</td></tr>
+    <tr><td><code>[k=ABC]</code> in tags.conf, k is abc</td><td>Not tagged</td><td>Not tried</td><td>Not tagged</td></tr>
+    <tr><td>The 54 samples</td><td>Indexed and searched together</td><td>One at a time</td><td>One summary, with Splunk’s counts</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>Checked in Splunk</h2>
+  <dl>
+   <dt>Fortinet</dt><dd>The add-on’s 54 samples, as Splunk indexed and searched them: each one’s event types and tags, the same on the page, with none left open.</dd>
+   <dt>Every rule</dt><dd>A made-up app’s event against 52 event types, one for each rule: 49 as Splunk matched them, none otherwise, and the two that ask for host and index left open. Its ten tags, Splunk’s.</dd>
+   <dt>Its own fields</dt><dd>An event whose text has <code>eventtype=</code> and <code>tag=</code>: event types replace the one, and an event that gets none keeps it; tags replace the other.</dd>
+   <dt>Evidence</dt><dd><code>docs/splunk-checks.md</code>, its event types section: each rule, and each of the 52 searches with Splunk’s answer and the page’s.</dd>
+  </dl>
+ </section>
+ <section class="panel rules">
+  <h2>The rules in short</h2>
+  <dl>
+   <dt>Values</dt><dd>In any case, with <code>*</code> as a wildcard; a range like 10.0.0.0/8 takes its addresses; two numbers compare as numbers. Any of a field’s values can match.</dd>
+   <dt>Not</dt><dd><code>field!=x</code> needs the field, and none of its values x. <code>NOT field=x</code> is also true with no field.</dd>
+   <dt>Free text</dt><dd>The term’s pieces, split where Splunk splits the event, one after another: 1.2 is in 10.1.2.3, ab isn’t in abc.</dd>
+   <dt>Names</dt><dd>Field names are case sensitive. sourcetype is the name the event is searched as. host, source and index are known only once a transform sets them.</dd>
+   <dt>Tags</dt><dd>[field=value] tags a value written exactly so; [eventtype=x] tags x’s events. A disabled event type or tag gives nothing.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-try-types-and-samples.md</code> · Prototype: a new script block, its styles and seven in-place edits to Build 226, in <code>docs/mockups/try-types-and-samples.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "one", "img": "compare/try-types-and-samples-one.png", "group": "target", "tab": "One sample", "title": "A Fortinet sample: its event types, tags and CIM data model", "w": 1376, "h": 378, "zoom": 1, "size": "1440 px window, the path under the map’s head", "items": [{"n": 1, "head": "Event types", "text": "4 of the add-on’s 35 take it: the four Splunk gave this event, in ASCII order, as Splunk lists them.", "x": 98.6, "y": 78.95, "box": [0.58, 76.6, 98.84, 4.7]}, {"n": 2, "head": "Tags", "text": "change and network, from [eventtype=ftnt_fortigate_config_change]: Splunk’s tags for this event.", "x": 98.6, "y": 84.44, "box": [0.58, 82.09, 98.84, 4.7]}, {"n": 3, "head": "CIM data model", "text": "Those tags fit the CIM’s Change data model, and two of its datasets.", "x": 98.6, "y": 89.94, "box": [0.58, 87.59, 98.84, 4.7]}]}, {"id": "ips", "img": "compare/try-types-and-samples-ips.png", "group": "target", "tab": "Its own eventtype", "title": "An IPS sample whose text has eventtype=signature", "w": 1376, "h": 360, "zoom": 1, "size": "1440 px window, the path under the map’s head", "items": [{"n": 1, "head": "Replaced, as in Splunk", "text": "Three event types take it, and they replace the eventtype field its text gave, “signature”. The add-on’s alias keeps that value as vendor_eventtype, as in Splunk.", "x": 98.6, "y": 77.81, "box": [0.58, 75.34, 98.84, 4.93]}, {"n": 2, "head": "Its tags and data model", "text": "attack and ids, from [eventtype=ftnt_fortigate_ips]: the Intrusion Detection data model.", "x": 98.6, "y": 89.35, "box": [0.58, 86.88, 98.84, 4.93]}, {"n": 3, "head": "56 fields", "text": "Build 226 shows 57: eventtype = signature among them.", "x": 98.6, "y": 95.32, "box": [0.58, 92.93, 98.84, 4.8]}]}, {"id": "map", "img": "compare/try-types-and-samples-map.png", "group": "target", "tab": "Its map", "title": "The same event on fortigate_event’s map: what takes it, lit", "w": 484, "h": 1460, "zoom": 1, "size": "1440 px window, the map’s Search and Data models columns", "items": [{"n": 1, "head": "Lit", "text": "Its search takes this event: subtype=system, and vendor_action Edit is one it names.", "x": 56.9, "y": 94.66, "box": [3.9, 92.15, 48.46, 5.03]}, {"n": 2, "head": "Dimmed", "text": "Its search wants subtype=vpn, and this event’s subtype is system.", "x": 56.9, "y": 9.13, "box": [3.9, 6.62, 48.46, 5.03]}, {"n": 3, "head": "Its data model", "text": "Change, lit: the one its tags fit. The others are dimmed.", "x": 98.6, "y": 14.69, "box": [61.65, 6.59, 36.69, 16.2]}]}, {"id": "all", "img": "compare/try-types-and-samples-all.png", "group": "target", "tab": "Every sample", "title": "All 54 samples at once: what Splunk gives them", "w": 1376, "h": 521, "zoom": 1, "size": "1440 px window, under Try it", "items": [{"n": 1, "head": "As Splunk indexed them", "text": "Each sample tried as fortigate_log: 37 become fortigate_event, 12 fortigate_utm and 5 fortigate_traffic, as in Splunk.", "x": 98.6, "y": 10.48, "box": [0.58, 8.78, 98.84, 3.41]}, {"n": 2, "head": "Event types", "text": "Each with how many of the 54 get it: Splunk’s counts, every one.", "x": 22.38, "y": 13.72, "box": [0.58, 13.72, 21.8, 70.26]}, {"n": 3, "head": "Tags", "text": "Each with how many of the 54 have it: Splunk’s counts.", "x": 46.51, "y": 13.72, "box": [24.71, 13.72, 21.8, 70.26]}, {"n": 4, "head": "CIM data models", "text": "The data models the samples’ tags fit, with how many land in each.", "x": 70.64, "y": 13.72, "box": [48.84, 13.72, 21.8, 70.26]}, {"n": 5, "head": "Each line", "text": "114 lines give something to an event; 29 give nothing to any.", "x": 98.6, "y": 87.17, "box": [0.58, 85.52, 98.84, 3.31]}, {"n": 6, "head": "Each field", "text": "171 fields, each on as many events as Splunk gave it; 14 on every one.", "x": 98.6, "y": 92.02, "box": [0.58, 90.37, 98.84, 3.31]}, {"n": 7, "head": "Each sample", "text": "What each is searched as, its fields and event types; Show puts its path above.", "x": 98.6, "y": 96.87, "box": [0.58, 95.22, 98.84, 3.31]}]}, {"id": "lines", "img": "compare/try-types-and-samples-lines.png", "group": "target", "tab": "Each line", "title": "Each line, with the events it gives something to", "w": 1376, "h": 860, "zoom": 1, "size": "1440 px window, the summary’s lines", "items": [{"n": 1, "head": "Nothing to any event, first", "text": "[src_ip_from_ui] extracts nothing from any of the 37 samples searched as fortigate_event.", "x": 98.6, "y": 7.15, "box": [0.58, 5.77, 98.84, 2.76]}, {"n": 2, "head": "Field aliases that find nothing", "text": "None of the samples has their fields: no sample is a wireless log, for one.", "x": 98.6, "y": 20.94, "box": [0.58, 19.56, 98.84, 2.76]}, {"n": 3, "head": "Every sample", "text": "54 of 54: each takes its source type from this line.", "x": 98.6, "y": 87.13, "box": [0.58, 85.75, 98.84, 2.76]}, {"n": 4, "head": "Where", "text": "Each opens its line in the file.", "x": 82.39, "y": 9.82, "box": [72.04, 6.06, 20.69, 1.9]}]}, {"id": "fields", "img": "compare/try-types-and-samples-fields.png", "group": "target", "tab": "Each field", "title": "Each field, with the events that have it", "w": 1376, "h": 860, "zoom": 1, "size": "1440 px window, the summary’s fields", "items": [{"n": 1, "head": "On every sample", "text": "14 of the 171 fields, such as date, devid and logid.", "x": 98.6, "y": 7.18, "box": [0.58, 5.8, 98.84, 2.76]}, {"n": 2, "head": "On fewer", "text": "Each count is how many of Splunk’s 54 events have the field: vendor_action is on 51.", "x": 98.6, "y": 45.79, "box": [0.58, 44.41, 98.84, 2.76]}, {"n": 3, "head": "From", "text": "The lines that give it, across the samples.", "x": 63.15, "y": 7.66, "box": [26.89, 3.38, 72.53, 2.42]}]}, {"id": "allmap", "img": "compare/try-types-and-samples-allmap.png", "group": "target", "tab": "All on the map", "title": "All 54 on fortigate_event’s map", "w": 484, "h": 1300, "zoom": 1, "size": "1440 px window, the map’s Search and Data models columns", "items": [{"n": 1, "head": "Lit", "text": "An event type some sample gets.", "x": 56.9, "y": 23.99, "box": [3.9, 20.49, 48.46, 7.01]}, {"n": 2, "head": "Dimmed", "text": "No sample gets it: none has either logid its search names.", "x": 56.9, "y": 10.28, "box": [3.9, 7.46, 48.46, 5.65]}, {"n": 3, "head": "Data models", "text": "Lit where some sample lands: Change, Authentication, Network Sessions and more.", "x": 98.6, "y": 16.52, "box": [61.65, 7.43, 36.69, 18.19]}]}, {"id": "pasted", "img": "compare/try-types-and-samples-pasted.png", "group": "target", "tab": "Pasted lines", "title": "Three pasted lines, each tried as an event", "w": 1376, "h": 303, "zoom": 1, "size": "1440 px window, the Try panel", "items": [{"n": 1, "head": "Try each line", "text": "The box holds three of the samples, a traffic, a VPN and a web filter log, one to a line: each can be tried as an event.", "x": 69.99, "y": 27.4, "box": [64.72, 11.05, 10.54, 11.07]}, {"n": 2, "head": "Their summary", "text": "As for all the samples: what they’re indexed as, then their event types, tags and data models, lines and fields.", "x": 98.6, "y": 32.14, "box": [0.58, 29.05, 98.84, 6.18]}, {"n": 3, "head": "Splunk’s", "text": "Each event type and tag, as Splunk gave these three.", "x": 22.38, "y": 46.37, "box": [0.58, 46.37, 21.8, 50.87]}]}, {"id": "pe", "img": "compare/try-types-and-samples-pe.png", "group": "target", "tab": "Every rule", "title": "A made-up app’s event against 52 event types, as Splunk matched them", "w": 1376, "h": 292, "zoom": 1, "size": "1440 px window, the path under the map’s head", "items": [{"n": 1, "head": "As Splunk matched them", "text": "38 of 51 take it, each one Splunk gave it. host and index aren’t known for a pasted event, so the two that ask for them stay open: Splunk took both.", "x": 98.6, "y": 69.93, "box": [0.58, 63.84, 98.84, 12.17]}, {"n": 2, "head": "Splunk’s tags", "text": "All ten. [k=ABC] doesn’t tag k=abc: tags match a value exactly, as in Splunk.", "x": 98.6, "y": 80.08, "box": [0.58, 77.04, 98.84, 6.08]}, {"n": 3, "head": "Network Traffic", "text": "network and communicate, from [eventtype=et_wild], fit it.", "x": 98.6, "y": 87.19, "box": [0.58, 84.15, 98.84, 6.08]}]}, {"id": "one-today", "img": "compare/try-types-and-samples-one-today.png", "group": "today", "tab": "Today · One sample", "title": "Build 226: the same sample", "w": 1376, "h": 316, "zoom": 1, "size": "1440 px window, the path under the map’s head", "items": [{"n": 1, "head": "Ends with the lookups", "text": "Build 226 stops here: no event types, tags or data models for the event.", "x": 98.6, "y": 87.87, "box": [0.58, 85.06, 98.84, 5.62]}]}, {"id": "panel-today", "img": "compare/try-types-and-samples-panel-today.png", "group": "today", "tab": "Today · Samples", "title": "Build 226: one sample at a time", "w": 1402, "h": 200, "zoom": 1, "size": "1440 px window, the Try panel", "items": [{"n": 1, "head": "One at a time", "text": "Build 226 tries the event in the box, or one sample picked; never the 54 together.", "x": 55.84, "y": 81.13, "box": [50.71, 72.74, 3.56, 16.77]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 226 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>

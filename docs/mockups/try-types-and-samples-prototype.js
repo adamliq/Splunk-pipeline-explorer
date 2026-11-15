@@ -1,0 +1,178 @@
+(function(){
+/* Build 227: Try an event ends with the event types it gets, their tags and the CIM data models it lands in; and every
+   sample, or every pasted line, can be tried at once.
+   - Event types (eventtypes.conf): after the lookups, each event type's search is matched against the event, as Splunk
+     10.6.1.1 matches it (docs/splunk-checks.md):
+     - field=value: any of the field's values, in any case, with * as a wildcard; an IPv4 range written a.b.c.d/n takes
+       the addresses in it; two numbers compare as numbers, so n=010 matches 10. A field the event doesn't have
+       matches nothing.
+     - field!=value: the field is there and none of its values matches. NOT field=value: none matches, or there's no
+       field. field=*: the field is there.
+     - < > <= >=: as numbers when both are, else as text. field IN (a, b): any of them.
+     - Free text: the term's pieces, split where Splunk's breakers split the event, follow one another among the
+       event's, in any case, with * as a wildcard: 1.2 is in 10.1.2.3, ab isn't in abc. A quoted phrase the same way.
+     - Field names are case sensitive. sourcetype is the name the event is searched as. eventtype=x asks what x asks;
+       tag=x, the tags of the event's field values.
+     - host, source and index are known only where a transform sets them, and a macro isn't read: a search that needs
+       one is left open, and the row says so.
+   - Tags (tags.conf): each enabled tag of [eventtype=x] for the event types it gets, and of [field=value] for its
+     field values, the value as written. Splunk lists event types and tags in ASCII order, and so does the row.
+   - An event's own eventtype and tag fields, extracted from its text: event types replace its eventtype, and an
+     event that gets none keeps it; tags always replace its tag, so with none it has no tag field. They leave the
+     fields list, as the rows hold the event types and tags. A field alias or a lookup read them before.
+   - CIM data models: those its tags fit, from Build 222's table of the CIM's tags.
+   - Every sample, or every line: each event tried as the source type chosen. The summary gives what they're indexed
+     as; their event types, tags and data models, with how many events get each; each line, with how many events it
+     gives something to, those that give nothing to any first; and each field, with how many events have it. */
+const T=window.configTools224,ET=window.configEventTypes222,pm=state.configView205;if(!T||!ET||!pm)return;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const and=a=>a.length>1?a.slice(0,-1).join(', ')+' and '+a.at(-1):a[0]||'';
+const plural=(n,one,many)=>`${n.toLocaleString('en-US')} ${n===1?one:many||one+'s'}`;
+const ascii=(a,b)=>a<b?-1:a>b?1:0;
+const list=(a,n=8)=>a.length>n?`${a.slice(0,n).join(', ')} and ${a.length-n} more`:and(a);
+
+// ---- matching an event type's search ----
+// Splunk's breakers, major and minor (segmenters.conf): an event's terms are what lies between them. A search term
+// splits the same way, but its * is a wildcard.
+const BREAKS='\\s\\[\\]<>(){}|!;,\'"&?+\\/:=@.\\-$#%\\\\_',RAW=new RegExp(`[${BREAKS}*]+`),TERM=new RegExp(`[${BREAKS}]+`);
+const pieces=(s,re=RAW)=>String(s).toLowerCase().split(re).filter(Boolean);
+const wild=p=>new RegExp('^'+p.split('*').map(x=>x.replace(/[.+?^${}()|[\]\\]/g,'\\$&')).join('.*')+'$','i');
+const NUM=/^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/;
+const ip4=s=>{const m=/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(String(s).trim());if(!m||m.slice(1).some(x=>+x>255))return null;return m.slice(1).reduce((n,x)=>n*256+ +x,0)};
+const RANGE=/^\d{1,3}(\.\d{1,3}){3}\/\d{1,2}$/;
+function inRange(range,v){const [net,bits]=range.split('/'),a=ip4(net),b=ip4(v),n=+bits;if(a==null||b==null||n>32)return false;const m=n===0?0:(0xffffffff<<(32-n))>>>0;return ((a&m)>>>0)===((b&m)>>>0)}
+// One of a field's values against what a search writes for it.
+function same(p,v){v=String(v);if(p.includes('*'))return wild(p).test(v);if(RANGE.test(p)&&ip4(v)!=null)return inRange(p,v);
+ if(NUM.test(p)&&NUM.test(v.trim()))return Number(p)===Number(v);return p.toLowerCase()===v.toLowerCase()}
+function cmp(op,p,v){const [x,y]=NUM.test(String(v).trim())&&NUM.test(p)?[Number(v),Number(p)]:[String(v),p];return op==='<'?x<y:op==='>'?x>y:op==='<='?x<=y:x>=y}
+// Free text, or a quoted phrase: its pieces one after another among the event's.
+function inText(term,raw){const want=pieces(term,TERM);if(!want.length)return true;const have=pieces(raw),re=want.map(w=>w.includes('*')?wild(w):null);
+ for(let i=0;i+want.length<=have.length;i++)if(want.every((w,j)=>re[j]?re[j].test(have[i+j]):w===have[i+j]))return true;return false}
+// The values an event has for a name. null: not known for a pasted event.
+function valuesOf(ev,name){if(name==='sourcetype')return [ev.S];
+ if(name==='host'||name==='source'||name==='index')return ev.meta[name]==null?null:[ev.meta[name]];
+ if(name==='tag')return ev.fieldTags;
+ const f=ev.fields.get(name);if(!f)return [];return Array.isArray(f.value)?f.value:[f.value]}
+// A search against an event: true, false, or null when it can't be settled here, with why in ev.why.
+function test(n,ev,seen){if(!n)return false;
+ if(n.k==='and'){let open=false;for(const k of n.kids){const v=test(k,ev,seen);if(v===false)return false;if(v===null)open=true}return open?null:true}
+ if(n.k==='or'){let open=false;for(const k of n.kids){const v=test(k,ev,seen);if(v===true)return true;if(v===null)open=true}return open?null:false}
+ if(n.k==='not'){const v=test(n.kid,ev,seen);return v===null?null:!v}
+ if(n.k==='text'){const s=n.src.slice(n.i,n.j);if(s==='*')return true;if(n.macro){ev.why.add('macro');return null}return inText(s.replace(/^"([\s\S]*)"$/,'$1'),ev.raw)}
+ if(n.field==='eventtype'&&['=','!=','::','in'].includes(n.op)){const K=ET.knowledge(),names=[...K.ets.keys()].filter(name=>n.values.some(p=>p.includes('*')?wild(p).test(name):p===name));
+  let open=false,hit=false;for(const name of names){const et=K.ets.get(name);if(!et.node||et.bad||et.st.disabledBy)continue;if(seen.has(name)){ev.why.add('loop');open=true;continue}
+   seen.add(name);const v=test(et.node,ev,seen);seen.delete(name);if(v===true){hit=true;break}if(v===null)open=true}
+  const v=hit?true:open?null:false;return n.op==='!='?(v===null?null:!v):v}
+ const vals=valuesOf(ev,n.field);if(vals===null){ev.why.add(`field:${n.field}`);return null}
+ if(n.op==='in')return vals.some(v=>n.values.some(p=>same(p,v)));
+ if(n.op==='='||n.op==='::')return n.values[0]==='*'?vals.length>0:vals.some(v=>same(n.values[0],v));
+ if(n.op==='!=')return vals.length>0&&!vals.some(v=>same(n.values[0],v));
+ return vals.some(v=>cmp(n.op,n.values[0],v))}
+
+// ---- an event's event types, tags and data models ----
+const enabled=ts=>ts?ts.tags.filter(x=>x.on).map(x=>x.tag):[];
+// Called by Try an event after the lookups: three more rows for the path, and what they found, for the map and the
+// summary of every sample.
+function typed(fields,steps,ctx){const K=ET.knowledge();if(!K.files)return null;
+ const ev={fields,raw:ctx.raw,meta:ctx.meta,S:ctx.sourcetype,why:new Set(),fieldTags:[]};
+ // The tags of its field values first: an event type's search can ask for them.
+ const fromValues=[];for(const ts of K.tagSets){if(ts.field==='eventtype')continue;const tags=enabled(ts);if(!tags.length)continue;
+  const hit=ts.field==='sourcetype'?ev.S.toLowerCase()===ts.value.toLowerCase():(valuesOf(ev,ts.field)||[]).some(v=>String(v)===ts.value);if(hit)fromValues.push({ts,tags})}
+ ev.fieldTags=[...new Set(fromValues.flatMap(x=>x.tags))];
+ const got=[],open=[],none=[];
+ for(const et of K.ets.values()){if(et.st.disabledBy||!et.node||et.bad)continue;ev.why=new Set();const v=test(et.node,ev,new Set([et.name]));
+  if(v===true)got.push(et.name);else if(v===null)open.push({name:et.name,why:[...ev.why]});else none.push(et.name)}
+ got.sort(ascii);
+ // Its own eventtype and tag fields: event types replace the one, if it gets any; tags always replace the other.
+ const ownType=got.length?fields.get('eventtype'):null,ownTag=fields.get('tag');if(ownType)fields.delete('eventtype');if(ownTag)fields.delete('tag');
+ const shown=f=>{const v=Array.isArray(f.value)?f.value:[f.value];return and(v.map(x=>`“${x}”`))};
+ const fromTypes=got.map(name=>({name,tags:enabled(K.byEt.get(name))})).filter(x=>x.tags.length);
+ const tags=[...new Set([...fromTypes.flatMap(x=>x.tags),...ev.fieldTags])].sort(ascii);
+ const models=ET.models(new Set(tags)).map(({m,sets})=>({name:m.name,sets:sets.map(s=>s.set)}));
+ const all=got.length+open.length+none.length,why=new Set(open.flatMap(x=>x.why)),unknown=[...why].filter(w=>w.startsWith('field:')).map(w=>w.slice(6)).sort(ascii);
+ // Why some can't be settled: host, source or index, unknown for a pasted event; a macro; event types that name each other.
+ const because=[unknown.length?`${and(unknown)} ${unknown.length===1?'isn’t':'aren’t'} known for a pasted event`:'',why.has('macro')?'a macro isn’t read here':'',why.has('loop')?'event types name each other':''].filter(Boolean);
+ const say=!all?'Event types (eventtypes.conf): these files have none':`Event types (eventtypes.conf): ${got.length?`${got.length} of ${all} ${got.length===1?'takes':'take'} it: ${list(got)}`:`none of ${all} takes it`}${open.length?`. ${open.length} can’t be settled here, as ${because.join('; ')}: ${list(open.map(x=>x.name).sort(ascii),3)}`:''}${ownType?`. They replace the eventtype field from its text, ${shown(ownType)}`:''}`;
+ steps.push({at:'search',r:null,group:'types',state:got.length?'hit':open.length?'skip':'miss',say});
+ const from=[...fromTypes.map(x=>`[eventtype=${x.name}]`),...fromValues.map(x=>`[${x.ts.st.name}]`)];
+ steps.push({at:'search',r:null,group:'types',state:tags.length?'hit':'miss',say:(tags.length?`Tags (tags.conf): ${list(tags,12)}, from ${list(from,4)}`:`Tags (tags.conf): none, as ${got.length?'no tags.conf stanza tags its event types or field values':'no tags.conf stanza tags its field values'}`)+(ownTag?`. ${tags.length?'They replace':'Splunk keeps tag for tags, so it loses'} the tag field from its text, ${shown(ownTag)}`:'')});
+ steps.push({at:'search',r:null,group:'types',state:models.length?'hit':'miss',say:models.length?`CIM data models: ${and(models.map(x=>`${x.name} (${x.sets.join(', ')})`))}`:`CIM data models: none${tags.length?` fits its tags`:', as it has no tags'}`});
+ return {eventtypes:got,open,none,tags,fromTypes,fromValues,models,replaced:{eventtype:ownType||null,tag:ownTag||null}}}
+
+// ---- the map ----
+// Called by Try an event's light, with its marks cleared. For one event: its event types and the [field=value]
+// stanzas that tag it are lit, those it doesn't get dimmed, and those that can't be settled left as they are; the data
+// models it lands in lit, the others dimmed. For every sample (no event shown): each line any event got something
+// from lit, each line tried and giving nothing to any dimmed; and the event types, tags and data models any event got.
+const nameOf=li=>(li.querySelector('code')?.title||'').replace(/^\[|\]$/g,'');
+function light(r,Tn,x){if(!r)return;const rows=r.querySelectorAll('.tmEt222'),cards=r.querySelectorAll('.tmResult217[data-result=model]'),B=own.batch;
+ const mark=(got,miss,vals,models)=>{rows.forEach(li=>{const n=nameOf(li);if(li.closest('[data-kind=tags]'))li.classList.add(vals.has(n)?'tmHit224':'tmMiss224');else if(got.has(n))li.classList.add('tmHit224');else if(miss(n))li.classList.add('tmMiss224')});
+  cards.forEach(c=>c.classList.add(models.has(c.querySelector('strong')?.textContent)?'tmHit224':'tmMiss224'))};
+ if(x){const t=x.typed;if(t){const none=new Set(t.none);mark(new Set(t.eventtypes),n=>none.has(n),new Set(t.fromValues.map(v=>v.ts.st.name)),new Set(t.models.map(m=>m.name)))}return}
+ if(!B)return;
+ for(const [k,l] of B.lines){const c=l.hit?'tmHit224':'tmMiss224';
+  for(const li of r.querySelectorAll(`[data-tm-set="${k}"]`)){li.classList.add(c);const runs=[...li.querySelectorAll('.tmNested217'),...(li.closest('.tmRuns217')?.querySelectorAll('.tmRun217')||[])];
+   for(const [name,hit] of l.names)runs.find(e=>e.querySelector('code')?.textContent===`[${name}]`)?.classList.add(hit?'tmHit224':'tmMiss224')}}
+ if(B.typed){const open=new Set(B.open.keys());mark(new Set(B.eventtypes.keys()),n=>!open.has(n),new Set(B.values.keys()),new Set(B.models.keys()))}
+ r.querySelectorAll('.tmFold221').forEach(f=>{const c=f.querySelector('.tmHit224')?'tmHit224':f.querySelector('.tmMiss224')?'tmMiss224':null;if(c)f.querySelector(':scope>details>summary')?.classList.add(c)});
+ if(B.dropped)r.querySelectorAll('.tmResult217[data-result=drop]').forEach(c=>c.classList.add('tmHit224'));
+ r.querySelectorAll('.tmResult217:not([data-result=drop]):not([data-result=model])').forEach(c=>{if([...B.to].some(t=>c.querySelector(`[data-tm-type="${CSS.escape(t)}"]`))||[...B.met].some(n=>c.textContent.includes(`[${n}]`)))c.classList.add('tmHit224')})}
+
+// ---- every sample, or every line ----
+const own={batch:null,open:{}};
+// Each event tried, and what they come to together. A line gives an event something when any step it makes hits.
+function batch(events,from,kind){const t0=performance.now(),B={from,kind,events:[],indexed:new Map(),searched:new Map(),dropped:0,lines:new Map(),fields:new Map(),eventtypes:new Map(),tags:new Map(),models:new Map(),values:new Map(),open:new Map(),untyped:0,unsettled:0,typed:false,to:new Set(),met:new Set()};
+ for(const e of events){const x=T.tryEvent(e.raw,from);B.events.push({...e,x});
+  const seen=new Map();for(const s of x.steps){if(!s.r||!/^(hit|miss|missing)$/.test(s.state))continue;const k=`${s.r.fid}:${s.r.n}`,hit=s.state==='hit';
+   if(!B.lines.has(k))B.lines.set(k,{r:s.r,key:s.r.key||'',stanza:s.r.stanza?.name||'',hit:0,tried:0,names:new Map(),order:B.lines.size});
+   const l=B.lines.get(k);if(s.name)l.names.set(s.name,l.names.get(s.name)||hit);seen.set(k,seen.get(k)||hit);if(hit&&s.at==='index'&&s.name)B.met.add(s.name)}
+  for(const [k,hit] of seen){const l=B.lines.get(k);l.tried++;if(hit)l.hit++}
+  if(x.dropped){B.dropped++;continue}
+  B.indexed.set(x.meta.sourcetype,(B.indexed.get(x.meta.sourcetype)||0)+1);B.searched.set(x.searchedAs,(B.searched.get(x.searchedAs)||0)+1);if(x.meta.sourcetype!==from)B.to.add(x.meta.sourcetype);
+  for(const [name,f] of x.fields){const c=B.fields.get(name)||{n:0,from:new Set()};c.n++;c.from.add(f.r?.key||'automatic');B.fields.set(name,c)}
+  const t=x.typed;if(!t)continue;B.typed=true;const add=(m,k)=>m.set(k,(m.get(k)||0)+1);
+  t.eventtypes.forEach(n=>add(B.eventtypes,n));t.tags.forEach(n=>add(B.tags,n));t.models.forEach(m=>add(B.models,m.name));t.fromValues.forEach(v=>add(B.values,v.ts.st.name));t.open.forEach(o=>add(B.open,o.name));
+  if(!t.eventtypes.length)B.untyped++;if(t.open.length)B.unsettled++}
+ B.ms=performance.now()-t0;return B}
+const counts=m=>[...m].sort((a,b)=>b[1]-a[1]||ascii(a[0],b[0]));
+const linesOf=text=>String(text||'').split(/\r?\n/).filter(l=>l.trim());
+const sampleCount=Es=>[...Es.samples.values()].reduce((k,s)=>k+s.events.length,0);
+// Beside Try it: Try all samples, when the files have some; Try each line, when the box holds more than one.
+function buttons(Es){const n=sampleCount(Es),k=linesOf(Es.text).length;
+ return`${n?`<button type="button" class="builderBtn" data-try-all>Try all ${plural(n,'sample')}</button>`:''}<button type="button" class="builderBtn" data-try-lines${k>1?'':' hidden'}>Try each of the ${k} lines</button>`}
+// Under the path: the summary of every event tried.
+function html(Tn,Es){const B=own.batch;if(!B)return'';const n=B.events.length,kept=n-B.dropped,picked=Es.result&&B.events.some(e=>e.x===Es.result);
+ const ref=r=>`<button type="button" class="tmTryRef224" data-try-line="${r.fid}:${r.n}" title="Show the line">${esc(T.at(r))}</button>`;
+ const col=(title,m,empty)=>`<section><h5>${title}</h5>${m.size?`<ol>${counts(m).map(([k,c])=>`<li><span>${esc(k)}</span><b title="${plural(c,'event')}">${c}</b></li>`).join('')}</ol>`:`<p>${empty}</p>`}</section>`;
+ const lines=[...B.lines.values()],dead=lines.filter(l=>!l.hit).sort((a,b)=>a.order-b.order),used=lines.filter(l=>l.hit).sort((a,b)=>b.hit-a.hit||a.order-b.order);
+ const fields=counts(new Map([...B.fields].map(([k,v])=>[k,v.n]))),every=fields.filter(([,c])=>c===kept).length;
+ const ends=m=>counts(m).map(([k,c])=>`${esc(k)} (${c})`);
+ const searchedDiffers=[...B.searched.keys()].some(k=>!B.indexed.has(k))||B.searched.size!==B.indexed.size;
+ const what=B.kind==='sample'?['sample event','sample events']:['line','lines'];
+ const lineRows=[...dead,...used].map(l=>`<tr${l.hit?'':' class="tmUnused227"'}><td><code>${esc(l.key)}</code>${l.names.size>1||[...l.names.keys()].some(k=>k!==l.key)?` <small>${esc([...l.names.keys()].map(k=>`[${k}]`).join(' '))}</small>`:''}</td><td>${esc(l.stanza)}</td><td>${l.hit?`${l.hit} of ${l.tried}`:`None of ${l.tried}`}</td><td>${ref(l.r)}</td></tr>`).join('');
+ const evRows=B.events.map((e,i)=>{const x=e.x,t=x.typed;return`<tr${Es.result===x?' class="tmPicked227"':''}><td>${i+1}</td><td>${esc(e.name)}</td><td>${x.dropped?'Dropped':esc(x.searchedAs)}</td><td>${x.dropped?'':x.fields.size}</td>${B.typed?`<td>${t?t.eventtypes.length:''}</td><td>${t&&t.models.length?esc(t.models.map(m=>m.name).join(', ')):''}</td>`:''}<td><button type="button" class="propsLink205" data-try-pick="${i}">Show</button></td></tr>`}).join('');
+ return`<section class="tmBatch227" aria-live="polite"><h4>${plural(n,...what)}, each tried as ${esc(B.from)}</h4>${Es.result?`<p class="tmBatchNote227">${picked?'The path above is one of them.':'The path above is the event in the box, not one of them.'} <button type="button" class="propsLink205" data-try-unpick>Show them all on the map</button></p>`:''}
+  <p class="tmBatchNote227">${kept?`Indexed as ${and(ends(B.indexed))}${searchedDiffers?`; searched as ${and(ends(B.searched))}`:''}`:'Each one is dropped'}${B.dropped&&kept?`. ${plural(B.dropped,'is dropped','are dropped')}`:''}.${B.typed&&B.untyped?` ${plural(B.untyped,'event gets','events get')} no event type.`:''}${B.unsettled?` For ${plural(B.unsettled,'event')}, some event types can’t be settled here.`:''}</p>
+  ${B.typed?`<div class="tmBatchCols227">${col('Event types',B.eventtypes,'None')}${col('Tags',B.tags,'None')}${col('CIM data models',B.models,'None')}</div>`:''}
+  <details class="tmBatchFold227" data-batch-fold="lines"${own.open.lines?' open':''}><summary>${plural(used.length,'line gives','lines give')} something to an event; ${plural(dead.length,'line gives','lines give')} nothing to any</summary><table><thead><tr><th>Line</th><th>Stanza</th><th>Events it gives something to</th><th></th></tr></thead><tbody>${lineRows}</tbody></table></details>
+  <details class="tmBatchFold227" data-batch-fold="fields"${own.open.fields?' open':''}><summary>${plural(fields.length,'field')}, ${every===fields.length&&every?'every one on every event':`${every} on every event`}</summary><table><thead><tr><th>Field</th><th>Events</th><th>From</th></tr></thead><tbody>${fields.map(([k,c])=>`<tr><td><code>${esc(k)}</code></td><td>${c} of ${kept}</td><td>${esc([...B.fields.get(k).from].join(', '))}</td></tr>`).join('')}</tbody></table></details>
+  <details class="tmBatchFold227" data-batch-fold="events"${own.open.events?' open':''}><summary>Each ${what[0]}</summary><table><thead><tr><th>#</th><th>${B.kind==='sample'?'Sample':'Line'}</th><th>Searched as</th><th>Fields</th>${B.typed?'<th>Event types</th><th>CIM data models</th>':''}<th></th></tr></thead><tbody>${evRows}</tbody></table></details></section>`}
+const root=()=>document.getElementById('configTypeMap217');
+function run(kind){const Es=T.tryState(),r=root();if(!Es)return;const from=r?.querySelector('[data-try-from]')?.value||Es.from||pm.focus;Es.from=from;
+ let events;if(kind==='sample')events=[...Es.samples.values()].sort((a,b)=>ascii(a.path,b.path)).flatMap(s=>s.events.map((raw,i)=>({raw,name:`${s.name} ${i+1}`,sample:`${s.path}|${i}`})));
+ else{Es.text=r?.querySelector('[data-try-text]')?.value??Es.text;events=linesOf(Es.text).map((raw,i)=>({raw,name:`Line ${i+1}`}))}
+ own.batch=batch(events,from,kind);Es.result=null;T.redraw()}
+document.addEventListener('click',e=>{const r=root();if(!r||!r.contains(e.target))return;
+ if(e.target.closest('[data-try-all]')){run('sample');return}
+ if(e.target.closest('[data-try-lines]')){run('line');return}
+ if(e.target.closest('[data-try-unpick]')){const Es=T.tryState();Es.result=null;T.redraw();return}
+ const pick=e.target.closest('[data-try-pick]');if(pick&&own.batch){const Es=T.tryState(),ev=own.batch.events[+pick.dataset.tryPick];if(!ev)return;
+  Es.text=ev.raw;Es.sample=ev.sample||null;Es.from=own.batch.from;Es.result=ev.x;T.redraw();requestAnimationFrame(()=>root()?.querySelector('.tmPath224')?.scrollIntoView({block:'nearest'}))}});
+// Try each line shows once the box holds more than one line.
+document.addEventListener('input',e=>{if(!e.target.matches?.('[data-try-text]'))return;const b=root()?.querySelector('[data-try-lines]');if(!b)return;const k=linesOf(e.target.value).length;b.hidden=k<2;b.textContent=`Try each of the ${k} lines`});
+document.addEventListener('toggle',e=>{const k=e.target.dataset?.batchFold;if(k)own.open[k]=e.target.open},true);
+
+window.configTry227={typed,light,buttons,html,batch,test,same,inText,pieces,
+ // Clearing the Try panel, or any change to the files, ends the summary.
+ reset(){own.batch=null},current:()=>own.batch};
+})();

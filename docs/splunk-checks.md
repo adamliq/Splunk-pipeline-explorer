@@ -8,9 +8,10 @@ Every rule Try an event follows that Splunk's docs leave open, or that Build 225
 - **Loaded into Splunk:**
   - `pe_checks`, a test app of 304 probes: `EVAL-` lines on indexed events, and `| makeresults | eval` searches;
   - Build 225's made-up app, `Splunk_TA_calc`, and Build 226's, `Splunk_TA_parity`;
+  - `pe_et`, a made-up app of 52 event types and their tags, for Build 227 (see [Event types and tags](#event-types-and-tags));
   - the Fortinet FortiGate add-on 1.6.10. That add-on isn't in the repository, because Splunk licenses it.
 
-Build 226 brings the page in line with these results; Build 225 is the page before.
+Build 226 brings the page in line with these results; Build 225 is the page before. Build 227 adds event types and tags, checked in rounds 6 and 7 below.
 
 | | Build 225 | Build 226 |
 |---|---|---|
@@ -130,6 +131,122 @@ At search time, a number written with a decimal point keeps its precision. Whole
   - A quote in a value's middle works the same way: `a=x"y b=2` gives a = xy b=2.
   - `a=` gives no field, even with `KEEP_EMPTY_VALS`.
 - **`MV_ADD = true`:** a `REPORT-` applies its `REGEX` to every match, and a field the event has already takes each value as another one: `mv=a mv=b` gives m = a, b.
+
+## Event types and tags
+
+Build 227 ends Try an event with the event types the event gets, their tags and the CIM data models they fit. These are the rules it follows, each as Splunk 10.6.1.1 showed it.
+
+| | Build 226 | Build 227 |
+|---|---|---|
+| The Fortinet add-on's 54 sample events: event types and tags as Splunk's | Not shown | Each event's event types and tags, all 54, none left open |
+| The made-up app `pe_et`: one event against its 51 event types in use | Not shown | 49 as Splunk, 0 otherwise; the 2 that ask for host and index left open, and Splunk took both |
+| The same event's tags | Not shown | All 10, Splunk's |
+
+- **Round 6:** `pe_et` has 52 event types, one for each rule below, and tags of event types and of field values. Its one event is `k=abc n=10 mv=1 mv=2 q="a b" ip=10.1.2.3 e=""`, of source type pe_et, sent with host h-et to index pe. Its `REPORT-mv` gives m = 1, 2 (`MV_ADD`), its calculated field gives calc = yes, and its lookup gives lk = found. The event's `eventtype` and `tag` fields were read with `| table *`.
+- **Round 7:** two events of source type pe_r7, each with `eventtype=foo tag=bar` in its text. An event type, `et_r7_match`, takes the first; a tag, `[k=match]`, tags it.
+- **The Fortinet add-on:** the 54 sample events' `eventtype` and `tag` fields, from the same search as their other fields: 16 event types and 18 tags between them.
+- **CIM data models** weren't checked: the container had no CIM app. They follow Build 222's table of the tags each data model's datasets need.
+
+### What Splunk does with an event type's search
+
+- **field=value:**
+  - values match in any case: `k=ABC` takes k = abc;
+  - `*` is a wildcard: `k=a*`, `k=*b*`;
+  - an IPv4 range takes its addresses: `ip=10.0.0.0/8` takes 10.1.2.3, and `ip=10.1.*` does too;
+  - two numbers compare as numbers: `n=10.0` and `n=010` take n = 10;
+  - a quoted value is the same: `k="abc"`, `q="a b"`;
+  - any of a field's values can match: `m=2` takes m = 1, 2;
+  - `k=ab` doesn't take abc, and `n=1` doesn't take 10.
+- **Field names are case sensitive:** `K=abc` takes nothing.
+- **A field the event doesn't have matches nothing,** whatever the operator: `missing!=x` and `missing=*` are false, while `NOT missing=x` is true.
+- **field!=value:** true only when the field is there and none of its values matches. `k!=x` and `m!=3` are true; `m!=1` and `k!=a*` are false.
+- **field=\*:** the field is there, whatever its value: `k=*`. `e=""` takes an empty value.
+- **< and >:** as numbers when both sides are (`n>5`, `n>9`), else as text (`k<b`).
+- **IN, OR, AND and NOT,** with brackets: `k IN (x, abc)`, `(k=x OR n=10)`, `AND` written or implied. `NOT m=1` is false, as one of m's values is 1.
+- **Free text:** the term's pieces, split at Splunk's breakers, follow one another among the event's, in any case.
+  - `abc`, `ABC`, `10`, `10.1.2.3`, `1.2` and `2.3` take the event; `ab` doesn't, but `ab*` does.
+  - A quoted phrase works the same way: `"k=abc"` and `"abc n"`.
+  - `NOT zzz` is true.
+- **sourcetype** in any case, with wildcards: `sourcetype=PE_ET`, `sourcetype=pe_*`. host and index are the event's own: `host=h-et`, `index=pe`.
+- **Other event types:** `eventtype=et_eq` asks what et_eq asks. `NOT eventtype=et_eq_case` is false, as et_eq_case takes the event.
+- **Fields from later in search time** can be matched: a calculated field (`calc=yes`), a lookup's output (`lk=found`), and a tag of a field value (`tag=tag_fv`).
+- **disabled = 1:** the event type isn't used, and neither are its tags.
+
+### Tags
+
+- **[field=value]** tags a value written exactly so, case sensitive: [k=abc] tags k = abc, and [k=ABC] doesn't. It tags any of several values ([m=2]), a calculated field ([calc=yes]), a lookup's output ([lk=found]), a value with a space ([q=a b]) and the source type ([sourcetype=pe_et]).
+- **[eventtype=x]** tags x's events. A tag set to `disabled` isn't given, and neither are a disabled event type's tags.
+- **Order:** Splunk lists an event's event types and its tags in ASCII order.
+
+### An event's own eventtype and tag fields
+
+| Event | Event type | Tag | eventtype at the end | tag at the end |
+|---|---|---|---|---|
+| `eventtype=foo tag=bar k=match r7=1` | et_r7_match takes it | [k=match] gives tag_r7 | et_r7_match | tag_r7 |
+| `eventtype=foo tag=bar k=nomatch r7=2` | None | None | foo | None |
+
+- **Event types replace** an `eventtype` field taken from the event's text; an event that gets none keeps it. A search's `eventtype=foo` finds neither event: it asks for an event type.
+- **Tags replace** a `tag` field taken from the text; with no tags, the event has no tag field.
+- **In the Fortinet add-on,** 11 samples have `eventtype=` in their text, with analytics and ftgd_allow and signature and urlfilter. Splunk's `eventtype` for each is its event types; the add-on's field alias keeps the text's value as `vendor_eventtype`.
+
+### Every event type, against the one event
+
+○ marks an answer that isn't Splunk's: the page leaves it open, as host and index aren't known for a pasted event.
+
+| Event type | Search | Splunk | Build 227 |
+|---|---|---|---|
+| et_eq | `sourcetype=pe_et k=abc` | Takes it | Takes it |
+| et_eq_case | `sourcetype=pe_et k=ABC` | Takes it | Takes it |
+| et_wild | `sourcetype=pe_et k=a*` | Takes it | Takes it |
+| et_ne_missing | `sourcetype=pe_et missing!=x` | Doesn’t | Doesn’t |
+| et_ne_present | `sourcetype=pe_et k!=x` | Takes it | Takes it |
+| et_not_missing | `sourcetype=pe_et NOT missing=x` | Takes it | Takes it |
+| et_star | `sourcetype=pe_et k=*` | Takes it | Takes it |
+| et_star_missing | `sourcetype=pe_et missing=*` | Doesn’t | Doesn’t |
+| et_gt_num | `sourcetype=pe_et n>5` | Takes it | Takes it |
+| et_gt_text | `sourcetype=pe_et n>9` | Takes it | Takes it |
+| et_lt_text | `sourcetype=pe_et k<b` | Takes it | Takes it |
+| et_in | `sourcetype=pe_et k IN (x, abc)` | Takes it | Takes it |
+| et_or | `sourcetype=pe_et (k=x OR n=10)` | Takes it | Takes it |
+| et_text | `sourcetype=pe_et abc` | Takes it | Takes it |
+| et_text_part | `sourcetype=pe_et ab` | Doesn’t | Doesn’t |
+| et_text_case | `sourcetype=pe_et ABC` | Takes it | Takes it |
+| et_text_wild | `sourcetype=pe_et ab*` | Takes it | Takes it |
+| et_phrase | `sourcetype=pe_et "k=abc"` | Takes it | Takes it |
+| et_phrase2 | `sourcetype=pe_et "abc n"` | Takes it | Takes it |
+| et_ip | `sourcetype=pe_et 10.1.2.3` | Takes it | Takes it |
+| et_ip_part | `sourcetype=pe_et 1.2` | Takes it | Takes it |
+| et_ip_word | `sourcetype=pe_et 10` | Takes it | Takes it |
+| et_mv_eq | `sourcetype=pe_et m=2` | Takes it | Takes it |
+| et_mv_ne | `sourcetype=pe_et m!=1` | Doesn’t | Doesn’t |
+| et_mv_not | `sourcetype=pe_et NOT m=1` | Doesn’t | Doesn’t |
+| et_quoted_val | `sourcetype=pe_et q="a b"` | Takes it | Takes it |
+| et_field_case | `sourcetype=pe_et K=abc` | Doesn’t | Doesn’t |
+| et_calc | `sourcetype=pe_et calc=yes` | Takes it | Takes it |
+| et_lookup | `sourcetype=pe_et lk=found` | Takes it | Takes it |
+| et_tag | `sourcetype=pe_et tag=tag_fv` | Takes it | Takes it |
+| et_index | `sourcetype=pe_et index=pe` | Takes it | Left open: index isn’t known for a pasted event ○ |
+| et_host | `sourcetype=pe_et host=h-et` | Takes it | Left open: host isn’t known for a pasted event ○ |
+| et_and_explicit | `sourcetype=pe_et AND k=abc AND n=10` | Takes it | Takes it |
+| et_not_text | `sourcetype=pe_et NOT zzz` | Takes it | Takes it |
+| et_numeq | `sourcetype=pe_et n=10.0` | Takes it | Takes it |
+| et_numeq2 | `sourcetype=pe_et n=010` | Takes it | Takes it |
+| et_eq_quoted | `sourcetype=pe_et k="abc"` | Takes it | Takes it |
+| et_wild_mid | `sourcetype=pe_et k=*b*` | Takes it | Takes it |
+| et_empty_value | `sourcetype=pe_et e=""` | Takes it | Takes it |
+| et_neq_wild | `sourcetype=pe_et k!=a*` | Doesn’t | Doesn’t |
+| et_ip_field | `sourcetype=pe_et ip=10.1.*` | Takes it | Takes it |
+| et_cidr | `sourcetype=pe_et ip=10.0.0.0/8` | Takes it | Takes it |
+| et_raw_kv | `sourcetype=pe_et k=ab` | Doesn’t | Doesn’t |
+| et_text_kvpart | `sourcetype=pe_et n=1` | Doesn’t | Doesn’t |
+| et_minor | `sourcetype=pe_et 2.3` | Takes it | Takes it |
+| et_ne_mv_both | `sourcetype=pe_et m!=3` | Takes it | Takes it |
+| et_space_val | `sourcetype=pe_et q=a` | Doesn’t | Doesn’t |
+| et_nested | `eventtype=et_eq n=10` | Takes it | Takes it |
+| et_st_case | `sourcetype=PE_ET k=abc` | Takes it | Takes it |
+| et_st_wild | `sourcetype=pe_* k=abc` | Takes it | Takes it |
+| et_disabled | `sourcetype=pe_et`, with `disabled = 1` | Not used | Not used |
+| et_nested_not | `sourcetype=pe_et NOT eventtype=et_eq_case` | Doesn’t | Doesn’t |
 
 ## Every probe
 
