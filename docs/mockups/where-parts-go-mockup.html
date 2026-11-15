@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Where Parts Go</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.notes{min-width:0;overflow-wrap:anywhere}
+.panel p{margin:0 0 10px;color:var(--ink-2);font-size:13px}
+.panel a{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 228 TARGET · BUILD 227 + PROTOTYPE</span>
+ <h1>What each tier gets</h1>
+ <p class="lede">Under Where it acts, a table for each app. Its lines, stage by stage, with how many take effect on a Universal Forwarder, a Heavy Forwarder, an Indexer and a Search Head. Then, for a package or a folder, its other files, placed as Splunk’s packaging toolkit places them. Then what its app.manifest’s targetWorkloads leave out, or name where nothing acts. For the Fortinet add-on: 6 lines for forwarders, 21 for heavy forwarders or indexers and 365 for search heads, with its 16 macros, 4 lookup files and Splunk Web’s files there too.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>Build 227 against the prototype</h2>
+  <table>
+   <thead><tr><th>The Fortinet add-on’s package</th><th>Build 227</th><th>With the prototype</th></tr></thead>
+   <tbody>
+    <tr><td>Its lines on each tier</td><td>Totals: 6, 21, 21 and 365, with 21 more for the Search Head’s own data</td><td>The same, stage by stage, over 13 stages</td></tr>
+    <tr><td>Its macros.conf, app.conf, navigation and static files</td><td>Dropped unread</td><td>16 macros, the navigation and 4 static files on search heads; app.conf on every tier</td></tr>
+    <tr><td>Its README, licenses, VERSION, samples and app.manifest</td><td>Dropped unread</td><td>Listed as not read by Splunk while it runs</td></tr>
+    <tr><td>Its app.manifest’s targetWorkloads</td><td>Not read</td><td>Search heads, indexers and forwarders: each has parts</td></tr>
+    <tr><td>The made-up packages as an etc folder</td><td>“Skipped 15 other files.”</td><td>Their settings files and manifests placed; “Skipped 8 other files.”</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>Where the placements come from</h2>
+  <dl>
+   <dt>Lines</dt><dd>Where each takes effect, as Build 221 counts them. Splunk puts each setting on the first component that handles its phase: inputs where data is read, parsing on a heavy forwarder or an indexer, search-time settings on a search head.</dd>
+   <dt>Settings files</dt><dd>The ones the Config view doesn’t read line by line go where the packaging toolkit’s <code>@placement</code> notes put any of their settings. A file with no notes, like outputs.conf, is kept on every tier.</dd>
+   <dt>Folders</dt><dd>lookups, static, appserver and default/data on search heads. app.conf and metadata on every tier. A script goes where what names it runs.</dd>
+   <dt>app.manifest</dt><dd>Its targetWorkloads, as the toolkit reads them: none named, or *, is every workload, and a name it doesn’t know, it rejects.</dd>
+  </dl>
+ </section>
+ <section class="panel rules">
+  <h2>The page beside the toolkit</h2>
+  <dl>
+   <dt>62 settings</dt><dd>Of the Fortinet add-on and a made-up set: 50 take effect where the toolkit puts them.</dd>
+   <dt>5 input settings</dt><dd>NO_BINARY_CHECK, CHECK_METHOD, INDEXED_EXTRACTIONS, TIMESTAMP_FIELDS and FIELD_NAMES act wherever the data is read. The toolkit puts them on forwarders only.</dd>
+   <dt>7 transform settings</dt><dd>An index-time transform’s REGEX, FORMAT, DEST_KEY and SOURCE_KEY act on a heavy forwarder too. The toolkit puts transforms.conf on search heads and indexers. The page keeps Build 221’s tiers for lines.</dd>
+  </dl>
+ </section>
+ <section class="panel rules">
+  <h2>Sources</h2>
+  <dl>
+   <dt>Splunk</dt><dd><a href="https://help.splunk.com/en/splunk-enterprise/administer/admin-manual/10.0/administer-splunk-enterprise-with-configuration-files/configuration-parameters-and-the-data-pipeline">Configuration parameters and the data pipeline</a>, the Splunk Enterprise 10.0 Admin Manual: each phase’s settings, and the components that run it.</dd>
+   <dt>Toolkit</dt><dd><a href="https://pypi.org/project/splunk-packaging-toolkit/">Splunk Packaging Toolkit 1.2.4</a>: its specs’ <code>@placement</code> notes, its partitions’ rules for other files, and its reading of app.manifest. Read, not run.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-where-parts-go.md</code> · Prototype: a new script block, its styles and nine in-place edits to Build 227, in <code>docs/mockups/where-parts-go.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "lines", "img": "compare/where-parts-go-lines.png", "group": "target", "tab": "By stage", "title": "The Fortinet add-on’s lines, stage by stage, on each tier", "w": 1368, "h": 702, "zoom": 1, "size": "1440 px window, under Where it acts", "items": [{"n": 1, "head": "Each stage", "text": "The 13 stages the add-on’s 392 lines are on, in the pipeline’s order. A stage’s name shows its row in the Matrix.", "x": 13.7, "y": 12.05, "box": [1.32, 10.88, 10.78, 2.32]}, {"n": 2, "head": "Universal Forwarder only", "text": "6 lines: EVENT_BREAKER_ENABLE, set for 6 source types, breaks events on the forwarder.", "x": 53.59, "y": 13.27, "box": [0.58, 10.1, 51.39, 6.34]}, {"n": 3, "head": "Heavy Forwarder or Indexer", "text": "Index-time lines count on both: they act on whichever parses the data first. +7: on a Search Head, only for data it reads itself.", "x": 53.59, "y": 32.3, "box": [0.58, 29.13, 51.39, 6.34]}, {"n": 4, "head": "Search Head", "text": "89 field aliases, 78 calculated fields, 35 event types and 56 tags: all at search time.", "x": 53.59, "y": 64.02, "box": [0.58, 60.85, 51.39, 6.34]}, {"n": 5, "head": "In all", "text": "6, 21, 21 and 365, with 21 more for the Search Head’s own data: Build 221’s Where it acts, tier for tier.", "x": 53.59, "y": 95.74, "box": [0.58, 92.57, 51.39, 6.34]}]}, {"id": "files", "img": "compare/where-parts-go-files.png", "group": "target", "tab": "Other files", "title": "Its other files, placed as Splunk’s packaging toolkit places them", "w": 1368, "h": 482, "zoom": 1, "size": "1440 px window, the table’s foot (its stage rows left out)", "items": [{"n": 1, "head": "Search heads", "text": "macros.conf’s 16 macros: Splunk’s packaging toolkit places macros.conf on search heads.", "x": 53.59, "y": 28.01, "box": [0.58, 23.18, 51.39, 9.65]}, {"n": 2, "head": "Splunk Web and lookups", "text": "4 lookup files, the app’s navigation and 4 static files: the toolkit keeps them for search heads only.", "x": 53.59, "y": 39.24, "box": [0.58, 32.84, 51.39, 12.81]}, {"n": 3, "head": "Every tier", "text": "app.conf and metadata/default.meta go wherever the app is installed.", "x": 53.59, "y": 69.78, "box": [0.58, 64.96, 51.39, 9.65]}, {"n": 4, "head": "Not read while Splunk runs", "text": "The licenses, README, VERSION, app.manifest and 11 sample files: kept with the app.", "x": 1.46, "y": 89.19, "box": [1.46, 89.19, 97.08, 3.79]}, {"n": 5, "head": "Its manifest", "text": "It names search heads, indexers and forwarders, and each gets parts here.", "x": 1.46, "y": 94.63, "box": [1.46, 94.63, 97.08, 3.58]}]}, {"id": "manifest", "img": "compare/where-parts-go-manifest.png", "group": "target", "tab": "A manifest short", "title": "A made-up package whose app.manifest leaves out forwarders", "w": 1370, "h": 930, "zoom": 1, "size": "1440 px window, under Where it acts", "items": [{"n": 1, "head": "Inputs", "text": "A monitor and a script: they act on any tier the app is installed on, 3 lines a stage.", "x": 53.58, "y": 10.13, "box": [0.66, 7.74, 51.32, 4.79]}, {"n": 2, "head": "No placement", "text": "The toolkit gives outputs.conf no placement, so it keeps it on every tier. Kept everywhere for want of a rule, it says nothing of which tiers need the app.", "x": 53.58, "y": 52.24, "box": [0.66, 49.74, 51.32, 5]}, {"n": 3, "head": "An input’s script", "text": "bin/collect.py runs where [script://./bin/collect.py] runs: on forwarders.", "x": 53.58, "y": 84.71, "box": [0.66, 81.39, 51.32, 6.64]}, {"n": 4, "head": "Forwarders left out", "text": "Its app.manifest names search heads and indexers only, though 7 lines act on a Universal Forwarder, and its script and inputs.conf’s spec go there.", "x": 1.53, "y": 91.77, "box": [1.53, 91.77, 96.93, 3.71]}]}, {"id": "idle", "img": "compare/where-parts-go-idle.png", "group": "target", "tab": "A manifest wide", "title": "A made-up package whose app.manifest names tiers where nothing acts", "w": 1370, "h": 580, "zoom": 1, "size": "1440 px window, under Where it acts", "items": [{"n": 1, "head": "Search heads only", "text": "Its event type and tag, 3 macros, a lookup file, a view, its navigation and a static file.", "x": 53.58, "y": 45.08, "box": [0.66, 41.06, 51.32, 8.02]}, {"n": 2, "head": "Named where nothing acts", "text": "Its app.manifest names indexers and forwarders too.", "x": 1.53, "y": 89.8, "box": [1.53, 89.8, 96.93, 2.98]}]}, {"id": "today", "img": "compare/where-parts-go-today.png", "group": "today", "tab": "Today", "title": "Build 227: the same package", "w": 1402, "h": 125, "zoom": 1, "size": "1440 px window, the panel’s Where it acts", "items": [{"n": 1, "head": "Totals only", "text": "Build 227 counts the lines that take effect on each tier, but not by stage, and says nothing of the package’s other files or its manifest.", "x": 98.6, "y": 59.64, "box": [74.57, 36.16, 23.72, 46.96]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 227 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
