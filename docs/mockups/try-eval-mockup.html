@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lookups and Calculated Fields</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.notes{min-width:0;overflow-wrap:anywhere}
+.panel pre{margin:0;max-height:420px;overflow:auto;padding:10px 12px;border:1px solid var(--rule);border-radius:8px;background:var(--panel-2);color:var(--ink-2);font:12px/1.55 var(--mono);white-space:pre}
+.panel p{margin:0 0 10px;color:var(--ink-2);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 225 TARGET · BUILD 224 + PROTOTYPE</span>
+ <h1>Lookups and calculated fields in Try an event</h1>
+ <p class="lede">Try an event now runs the rest of a source type’s search-time settings. Its calculated fields (<code>EVAL-</code>) are evaluated by a small eval engine, all from the same fields, as Splunk runs them “as if in parallel”. Its lookups (<code>LOOKUP-</code>) run on the lookup files the page reads, in order, none on another’s output. At index time, <code>INGEST_EVAL</code> sets the index, the queue and indexed fields. What the engine can’t compute, or Splunk’s docs don’t define, is said on the step, not guessed. Every target scene is the real explorer with the prototype applied to Build 224; each “Today” scene is Build 224, set up by the same steps. Four scenes use the Fortinet FortiGate Add-on for Splunk 1.6.10’s package, which isn’t in the repository; the others use a made-up app that covers the rules the add-on doesn’t use.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>What Build 224 does</h2>
+  <table>
+   <thead><tr><th>Setting</th><th>What you see</th><th>So</th><th>With the prototype</th></tr></thead>
+   <tbody>
+    <tr><td><code>EVAL-</code></td><td>“18 calculated fields (EVAL-) aren’t computed here”</td><td>The fields add-ons compute for the CIM aren’t there</td><td>Each evaluated: its value, no value, or why it isn’t computed</td></tr>
+    <tr><td><code>LOOKUP-</code></td><td>“2 lookups (LOOKUP-) aren’t run here”</td><td><code>action</code> stays “accept”</td><td>Run on the lookup files read: “allowed”</td></tr>
+    <tr><td><code>INGEST_EVAL</code></td><td>“evaluates INGEST_EVAL, which isn’t tried here”</td><td>Its index, fields and queue aren’t shown</td><td>Its assignments in order, <code>=</code> and <code>:=</code> as Splunk’s docs say</td></tr>
+    <tr><td>Lookup files</td><td>Their headers and how many rows</td><td>No row to look up</td><td>Their text is kept, and read once</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>The design in short</h2>
+  <dl>
+   <dt>Order</dt><dd>Extractions, aliases, then calculated fields, then lookups, as props.conf orders them. Each calculated field sees the fields as they were after the aliases; each lookup, as they were after the calculated fields.</dd>
+   <dt>Values</dt><dd>A field’s value is a number where it reads as one, and keeps its own text; <code>+</code> adds numbers and joins text; a missing value gives no value.</dd>
+   <dt>OUTPUT</dt><dd>Writes over the event’s fields, and clears them when no row matches. <code>OUTPUTNEW</code> writes only fields the event doesn’t have.</dd>
+   <dt>Matching</dt><dd>Exact and case sensitive unless <code>case_sensitive_match = false</code>; <code>WILDCARD()</code> and <code>CIDR()</code> as <code>match_type</code> says; up to <code>max_matches</code> rows, 100 unless set; <code>min_matches</code> with <code>default_match</code>.</dd>
+   <dt>Not run</dt><dd>KV store, external and time-based lookups, a file not read, and functions outside the engine’s list: each step says so.</dd>
+   <dt>On the map</dt><dd>A line that gives something is lit, one that gives nothing dimmed, one not run left as it is.</dd>
+  </dl>
+ </section>
+ <section class="panel rules">
+  <h2>What Splunk’s docs leave open</h2>
+  <dl>
+   <dt>Missing values</dt><dd>What arithmetic or a comparison gives with a missing field: here, no value, which a condition takes as false.</dd>
+   <dt>A number + text</dt><dd>The docs define <code>+</code> for two numbers or two strings: anything else isn’t computed, and the step says why.</dd>
+   <dt>CSV spaces</dt><dd>Whether spaces round a lookup file’s names and values are kept: here they are left out, and the step says “to check”.</dd>
+   <dt>INGEST_EVAL keys</dt><dd>Its examples set <code>index</code>, <code>queue</code> and new fields; host, source and sourcetype are read, not set.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-try-eval.md</code> · Prototype: 8 in-place edits to Build 224 and a new script block, in <code>docs/mockups/try-eval.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "fortinet", "img": "compare/try-eval-fortinet.png", "group": "target", "tab": "The Fortinet sample", "title": "fortigate_log’s traffic sample: its calculated fields and lookups", "w": 1376, "h": 274, "zoom": 1, "size": "1440 px window, the path under the map’s head", "items": [{"n": 1, "head": "Calculated fields", "text": "14 of fortigate_traffic’s 18 EVAL- lines give a value; 4 give none for this event. Each sees the fields as they were before any ran.", "x": 98.6, "y": 64.34, "box": [0.58, 61.1, 98.84, 6.48]}, {"n": 2, "head": "A lookup, run", "text": "ftnt_action, which a calculated field gives, is looked up in ftnt_action_info.csv: action becomes “allowed”. The file writes a space after each comma; the page leaves the spaces out and says so, as whether Splunk keeps them isn’t settled.", "x": 98.6, "y": 75.26, "box": [0.58, 68.68, 98.84, 13.17]}, {"n": 3, "head": "OUTPUT writes over", "text": "proto 58 gives transport and protocol; the extracted transport, 0, is replaced.", "x": 98.6, "y": 86.18, "box": [0.58, 82.94, 98.84, 6.48]}, {"n": 4, "head": "The event’s fields", "text": "61 now, with the calculated fields and the lookups’ outputs.", "x": 98.6, "y": 94.03, "box": [0.58, 90.88, 98.84, 6.3]}]}, {"id": "fields", "img": "compare/try-eval-fields.png", "group": "target", "tab": "Its fields", "title": "The event’s fields, and where each comes from", "w": 1376, "h": 900, "zoom": 1, "size": "1440 px window, the fields under the path", "items": [{"n": 1, "head": "From a lookup", "text": "action: “allowed”, from LOOKUP-fortigate_traffic_action, with its file.", "x": 98.6, "y": 46.41, "box": [0.58, 45.1, 98.84, 2.64]}, {"n": 2, "head": "From a calculated field", "text": "devname, kept by coalesce(devname, devid).", "x": 98.6, "y": 12.15, "box": [0.58, 10.84, 98.84, 2.64]}, {"n": 3, "head": "Written over", "text": "transport, extracted as 0, is the protocol lookup’s ipv6-icmp now: OUTPUT writes over the event’s fields.", "x": 98.6, "y": 62.23, "box": [0.58, 60.91, 98.84, 2.64]}]}, {"id": "follow", "img": "compare/try-eval-follow.png", "group": "target", "tab": "Followed", "title": "fortigate_traffic, followed: its calculated fields and lookups lit", "w": 273, "h": 1000, "zoom": 1, "size": "1440 px window, the map’s Search column", "items": [{"n": 1, "head": "Folded, and lit", "text": "Its 18 calculated fields: 14 give a value.", "x": 98.6, "y": 54.35, "box": [6.91, 51.31, 85.91, 6.07]}, {"n": 2, "head": "Lit", "text": "Both lookups gave fields, and each lookup under its line is lit too.", "x": 98.6, "y": 63.99, "box": [6.91, 57.68, 85.91, 12.61]}]}, {"id": "calc", "img": "compare/try-eval-calc.png", "group": "target", "tab": "Every rule", "title": "A made-up app: what each lookup does, and what isn’t computed", "w": 1376, "h": 547, "zoom": 1, "size": "1440 px window, the path under the map’s head", "items": [{"n": 1, "head": "Not computed, and why", "text": "strftime() isn’t computed here, and + between a number and text isn’t defined in Splunk’s docs.", "x": 98.6, "y": 43.65, "box": [0.58, 42.03, 98.84, 3.25]}, {"n": 2, "head": "OUTPUTNEW", "text": "status is kept: the event already has it, from a calculated field.", "x": 98.6, "y": 51.25, "box": [0.58, 49.62, 98.84, 3.25]}, {"n": 3, "head": "WILDCARD and CIDR", "text": "match_type in transforms.conf: web*.corp matches web01.corp; 10.1.2.3 is in 10.0.0.0/8.", "x": 98.6, "y": 56.94, "box": [0.58, 53.42, 98.84, 7.04]}, {"n": 4, "head": "No row: OUTPUT clears", "text": "reason, extracted, is cleared, as props.conf says.", "x": 98.6, "y": 62.64, "box": [0.58, 61.01, 98.84, 3.25]}, {"n": 5, "head": "Not run", "text": "A KV store lookup; and dept comes from another lookup, and Splunk doesn’t support nested automatic lookups.", "x": 98.6, "y": 72.13, "box": [0.58, 68.6, 98.84, 7.04]}, {"n": 6, "head": "Several rows, or none", "text": "case_sensitive_match = false finds Bob and bob; min_matches gives default_match.", "x": 98.6, "y": 83.52, "box": [0.58, 79.99, 98.84, 7.04]}]}, {"id": "ingest", "img": "compare/try-eval-ingest.png", "group": "target", "tab": "INGEST_EVAL", "title": "The same app’s INGEST_EVAL transforms, with a long event", "w": 1376, "h": 186, "zoom": 1, "size": "1440 px window, the path under the map’s head", "items": [{"n": 1, "head": "INGEST_EVAL", "text": "Each transform’s assignments in order: index, then indexed fields.", "x": 98.6, "y": 34.99, "box": [0.58, 30.22, 98.84, 9.55]}, {"n": 2, "head": "= and :=", "text": "tag=\"a\", tag=\"b\" gives two values; len_bucket:= replaces.", "x": 98.6, "y": 46.16, "box": [0.58, 41.38, 98.84, 9.55]}, {"n": 3, "head": "queue", "text": "As DEST_KEY = queue does: a long event goes to nullQueue and is dropped.", "x": 98.6, "y": 57.32, "box": [0.58, 52.55, 98.84, 9.55]}, {"n": 4, "head": "host", "text": "Splunk’s docs read host in INGEST_EVAL but don’t show it set, so that assignment isn’t tried.", "x": 98.6, "y": 68.49, "box": [0.58, 63.71, 98.84, 9.55]}]}, {"id": "fortinet-today", "img": "compare/try-eval-fortinet-today.png", "group": "today", "tab": "Today · The sample", "title": "Build 224: the same sample", "w": 1376, "h": 235, "zoom": 1, "size": "1440 px window, the path under the map’s head", "items": [{"n": 1, "head": "Counted, not run", "text": "The 18 calculated fields and 2 lookups are listed, and the event keeps action = accept.", "x": 98.6, "y": 79.43, "box": [0.58, 71.24, 98.84, 16.4]}]}, {"id": "ingest-today", "img": "compare/try-eval-ingest-today.png", "group": "today", "tab": "Today · INGEST_EVAL", "title": "Build 224: the same long event", "w": 1376, "h": 297, "zoom": 1, "size": "1440 px window, the path under the map’s head", "items": [{"n": 1, "head": "Not tried", "text": "Every INGEST_EVAL transform is passed over, so the index and fields it sets aren’t shown.", "x": 98.6, "y": 33.1, "box": [0.58, 19.62, 98.84, 26.96]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 224 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
