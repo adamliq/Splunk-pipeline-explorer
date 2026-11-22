@@ -1,0 +1,108 @@
+--- a/index.html
++++ b/index.html
+@@ -1080 +1080 @@
+-function responsibilityFailureOwnership(){const selected=operationFailures(),owners={detect:[],respond:[],dependency:[],recover:[],validate:['Log onboarding team'],escalate:[]},add=(key,value)=>{if(!owners[key].includes(value))owners[key].push(value)};selected.forEach(f=>{if(f.id.startsWith('hec')){add('detect','Source / application owner');add('respond','Splunk platform team');add('dependency','Network team');add('recover','Source / application owner');add('escalate','Splunk Cloud provider')}else if(f.id==='s3-delivery'){add('detect','Splunk platform team');add('respond','Cloud storage team');add('dependency','Cloud platform team');add('recover','Splunk platform team');add('escalate','Cloud storage team')}else if(f.id==='syslog-unreachable'){add('detect','Source / application owner');add('respond','Log onboarding team');add('dependency','Network team');add('recover','Log onboarding team');add('escalate','Network team')}else if(['index-stall','disk-full','cluster'].includes(f.id)){add('detect','Splunk platform team');add('respond','Splunk platform team');add('dependency',f.id==='cluster'?'Splunk Cloud provider':'Cloud platform team');add('recover','Splunk platform team');add('escalate','Splunk Cloud provider')}else if(['receiver-down','ack','pq-full'].includes(f.id)){add('detect','Log onboarding team');add('respond','Splunk platform team');add('dependency','Network team');add('recover','Log onboarding team');add('escalate','Splunk platform team')}else{add('detect','Security operations');add('respond','Log onboarding team');add('dependency','Source / application owner');add('recover','Log onboarding team');add('escalate','Splunk platform team')}});return {selected,owners}}
++function responsibilityFailureOwnership(){const selected=operationFailures(),owners={detect:[],respond:[],dependency:[],recover:[],validate:['Log onboarding team'],escalate:[]},add=(key,value)=>{if(!owners[key].includes(value))owners[key].push(value)};selected.forEach(f=>{if(f.id.startsWith('hec')){add('detect','Source / application owner');add('respond','Splunk platform team');add('dependency','Network team');add('recover','Source / application owner');add('escalate','Splunk Cloud provider')}else if(f.id==='s3-delivery'){add('detect','Splunk platform team');add('respond','Cloud storage team');add('dependency','Cloud platform team');add('recover','Splunk platform team');add('escalate','Cloud storage team')}else if(f.id==='syslog-unreachable'){add('detect','Source / application owner');add('respond','Log onboarding team');add('dependency','Network team');add('recover','Log onboarding team');add('escalate','Network team')}else if(['index-stall','disk-full','cluster'].includes(f.id)){add('detect','Splunk platform team');add('respond','Splunk platform team');add('dependency',f.id==='cluster'?'Splunk Cloud provider':'Cloud platform team');add('recover','Splunk platform team');add('escalate','Splunk Cloud provider')}else if(['receiver-down','ack','pq-full'].includes(f.id)){add('detect','Log onboarding team');add('respond','Splunk platform team');add('dependency','Network team');add('recover','Log onboarding team');add('escalate','Splunk platform team')}else if(f.id==='sqs-catalog-expiry'){add('detect','Splunk platform team');add('respond','Cloud platform team');add('dependency','Cloud storage team');add('recover','Splunk platform team');add('escalate','Splunk Cloud provider')}else{add('detect','Security operations');add('respond','Log onboarding team');add('dependency','Source / application owner');add('recover','Log onboarding team');add('escalate','Splunk platform team')}});return {selected,owners}}
+@@ -17448,0 +17449,102 @@
++<script id="catalog-sync-v229">
++(function(){
++/* Build 229: a federated search catalog kept in sync through Amazon SQS, and the failure when SQS ages out its
++   messages before federated search retrieves them.
++   - Splunk Cloud Platform's Federated Search for Amazon S3 can search a dataset backed by a Splunk-native data
++     catalog, which Splunk software creates and maintains. To keep the catalog in sync as the dataset changes, the
++     bucket sends its object create, object removal, restore and lifecycle events for the dataset's prefix to a
++     standard SQS queue in the customer's AWS account, and Splunk retrieves them.
++   - Amazon SQS deletes a message once it is older than the queue's message retention period: 4 days by default, from
++     60 seconds to 14 days. A dead-letter queue takes only messages received more times than its redrive policy allows.
++   - Splunk's documentation doesn't say how quickly the catalog sync retrieves the queue, or how to resync the catalog
++     after events are lost.
++   So: two components, Amazon SQS and the S3 Data Catalog (the Builder's name for it); seven stages from the S3 event
++   notification to the federated search's results; a path for them; and the failure, with its flow, its queue gauge,
++   the stage where it stops the flow, a symptom that points to it, and its owners. */
++if(typeof stages==='undefined'||typeof failures==='undefined'||typeof componentOrder==='undefined')return;
++const ID='sqs-catalog-expiry',PATH='s3-sqs-catalog';
++const SYNC='Federated search catalog',SEARCHING='Federated search';
++const SQS_COLOR='#f28b82',CATALOG_COLOR='#ecc996',SEARCH_COLOR='#89b7ec';
++const R='required',N='no';
++let added=[];
++
++if(!componentOrder.includes('sqs')){
++ // Two components after Amazon S3. None of the stages so far uses either.
++ componentNames.sqs='Amazon SQS';componentNames.catalog='S3 Data Catalog';
++ componentOrder.splice(componentOrder.indexOf('s3')+1,0,'sqs','catalog');
++ for(const s of stages){s.sqs=N;s.catalog=N}
++ // The stages, after the last: each is on Amazon S3, Amazon SQS, the catalog or the search tier (the Search Head).
++ const rows=[
++  [SYNC,'S3 event notification','Sends each object create, object removal, restore and lifecycle event under the dataset’s prefix to the catalog’s SQS queue.','S3 bucket · Properties · Event notifications · prefix · SQS queue destination',R,N,N,N,'Splunk’s setup selects all object create events, all object removal events, all restore object events, and lifecycle transition and expiration events.'],
++  [SYNC,'SQS message retention','Holds each event in a standard queue until Splunk retrieves it, or until the event is older than the queue’s message retention period.','SQS queue · MessageRetentionPeriod · queue access policy',N,R,N,N,'The retention period is 4 days by default, and from 60 seconds to 14 days. SQS deletes a message older than it; a dead-letter queue takes only messages received more times than its redrive policy allows.'],
++  [SYNC,'Catalog event retrieval','Splunk retrieves the queued events for the dataset.','Amazon S3 dataset · Keep catalog in sync with dataset · SQS queue ARN',N,N,R,N,'Keeping the catalog in sync is optional: a dataset of historical data that won’t change can do without it.'],
++  [SYNC,'Catalog update','Applies the changes to the dataset’s Splunk-native data catalog, which Splunk software creates and maintains.','Splunk-native data catalog · columns · schema · partitions',N,N,R,N,'A change the catalog never learns of isn’t reflected in what federated searches read.'],
++  [SEARCHING,'Federated search planning','A federated search over the dataset takes what to read for its time range from the catalog.','Amazon S3 dataset · time field · time partition fields',N,N,R,R,'Time partition fields let a search read less.'],
++  [SEARCHING,'Remote dataset scan','Reads the chosen data in the Amazon S3 bucket, where it is.','Amazon S3 connection · dataset resource access policy',R,N,N,R,'The data isn’t ingested or indexed into the Splunk platform.'],
++  [SEARCHING,'Federated search results','Returns what the scan found to the search.','Splunk Cloud Platform search',N,N,N,R,'Federated Search for Amazon S3 is for Splunk Cloud Platform deployments in AWS regions.']];
++ let id=Math.max(...stages.map(s=>s.id));
++ added=rows.map(x=>({id:++id,pipeline:x[0],name:x[1],what:x[2],config:x[3],note:x[8],...Object.fromEntries(componentOrder.map(k=>[k,N])),s3:x[4],sqs:x[5],catalog:x[6],sh:x[7]}));
++ stages.push(...added);
++ colors[SYNC]=CATALOG_COLOR;colors[SEARCHING]=SEARCH_COLOR;
++ // Their Matrix columns, their cards in the component strip, their pipelines in the filter, and the counts.
++ // The Matrix calls Amazon S3's column "AWS S3".
++ [...document.querySelectorAll('#matrix thead th')].find(th=>/^(AWS|Amazon) S3$/.test(th.textContent.trim()))?.insertAdjacentHTML('afterend','<th>Amazon SQS</th><th>S3 Data Catalog</th>');
++ const card=(k,color,small,strong,em)=>`<button class="component" style="--component:${color}" data-component="${k}"><span class="count" id="${k}Count">0</span><small>${small}</small><strong>${strong}</strong><em>${em}</em></button>`;
++ document.querySelector('.component[data-component="s3"]')?.insertAdjacentHTML('afterend',card('sqs',SQS_COLOR,'AWS queue','Amazon SQS','Hold S3 events for the catalog')+card('catalog',CATALOG_COLOR,'Splunk-native catalog','S3 Data Catalog','Keep federated search in sync'));
++ for(const k of ['sqs','catalog']){const el=document.querySelector(`.component[data-component="${k}"]`);if(el)el.onclick=()=>{state.customTopologyActive=false;focusComponent(k);renderRouteDiagram();render()}}
++ const filter=document.getElementById('pipelineFilter');for(const p of [SYNC,SEARCHING])filter?.insertAdjacentHTML('beforeend',`<option>${p}</option>`);
++ document.getElementById('allCount').textContent=stages.length;
++ for(const k of componentOrder){const el=document.getElementById(k+'Count');if(el)el.textContent=stages.filter(s=>s[k]!=='no').length}
++ const stat=[...document.querySelectorAll('.headerStats .stat')].find(x=>/components/.test(x.textContent));if(stat)stat.querySelector('strong').textContent=componentOrder.length;
++}
++const mine=new Set(added.map(s=>s.id)),storage=stages.find(s=>s.name==='Amazon S3 object storage');
++
++// The path: Amazon S3 → Amazon SQS → S3 Data Catalog → federated search. Its stages show only on it and on the
++// complete model; the Config view's Matrix ignores the path.
++topology[PATH]={title:'Amazon S3 → SQS → S3 Data Catalog → Federated search',text:'The bucket sends each change to the dataset to an SQS queue; Splunk retrieves the queue to keep its native data catalog in sync, and federated searches read the data in S3 through that catalog.'};
++routeModels[PATH]={title:'Amazon S3 → SQS → S3 Data Catalog → Federated search',note:'Splunk Cloud Platform searches the data where it is, without ingesting or indexing it.',source:['Amazon S3','Dataset objects · event notifications','#f3bd61'],processor:['SQS → S3 Data Catalog','Queue · catalog sync','#ecc996'],destinations:[['Splunk Cloud Search','Federated Search for Amazon S3','#89b7ec']]};
++pathScenarioFit[PATH]=new Set([ID]);
++const allowsBefore=pathAllows;
++pathAllows=function(s){
++ if(state.view==='config')return allowsBefore.apply(this,arguments);
++ if(state.path===PATH)return mine.has(s.id)||s===storage;
++ if(mine.has(s.id))return state.path==='all';
++ return allowsBefore.apply(this,arguments)};
++const chips=document.querySelector('.chip[data-path="tcp"]');
++if(chips&&!document.querySelector(`.chip[data-path="${PATH}"]`)){
++ chips.insertAdjacentHTML('afterend',`<button class="chip" data-path="${PATH}">S3 → SQS → Catalog → Federated search</button>`);
++ const chip=document.querySelector(`.chip[data-path="${PATH}"]`);
++ // As the other chips do.
++ chip.onclick=()=>{state.customTopologyActive=false;document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));chip.classList.add('active');state.path=PATH;
++  document.getElementById('contextTitle').textContent=topology[PATH].title;document.getElementById('contextText').textContent=topology[PATH].text;renderRouteDiagram();render();if(state.view==='diagnostic')renderDiagnostics()}}
++
++// The failure.
++if(!failures.some(f=>f.id===ID)){
++ failures.push({id:ID,name:'SQS ages out messages before federated search retrieves them',scope:'Federated search catalog',risk:'high',
++  summary:'The SQS queue that keeps a Splunk-native data catalog in sync deletes S3 events that wait longer than its message retention period, before Splunk retrieves them, so Federated Search for Amazon S3 never learns of those changes to the dataset.',
++  loss:'None in S3; search gap',detect:'Searches quietly incomplete',recovery:'Longer retention, catalog resync',
++  affected:['SQS message retention','Catalog event retrieval','Catalog update'],
++  effects:[
++   ['Trigger','Events wait longer than the queue keeps them','More S3 events reach the queue than Splunk retrieves, or retrieval stops, so the oldest events reach the queue’s message retention period.'],
++   ['Immediate','SQS deletes the oldest events','Each event older than the retention period, 4 days by default, is deleted unread. A dead-letter queue doesn’t keep them: SQS moves a message there only after too many receives.'],
++   ['Downstream','The catalog falls out of sync','The Splunk-native data catalog never learns of the objects those events described: added, removed, restored or moved by lifecycle rules.'],
++   ['Outcome','Federated searches miss data that is in S3','Searches over that time can come back incomplete, though the objects are still in the bucket.']],
++  checks:['Compare the queue’s ApproximateAgeOfOldestMessage with its message retention period, and see whether ApproximateNumberOfMessagesVisible keeps growing.','Compare the objects under the dataset’s prefix for a time range with what a federated search returns for it.','Confirm the bucket’s event notification still sends the dataset’s prefix and its four event types to the queue.'],
++  actions:['Raise the queue’s message retention period, up to 14 days, while the backlog drains.','List what changed under the dataset’s prefix while events were expiring.','Ask Splunk Support to bring the catalog back in sync for that window: Splunk’s documentation describes no way to resync it yourself.']});
++ failureFlowSteps[ID]=['Amazon S3 object storage','S3 event notification','SQS message retention','Catalog event retrieval','Catalog update','Federated search planning','Remote dataset scan','Federated search results'];
++ failureFlowComponents[ID]=['Amazon S3','Amazon S3','Amazon SQS','S3 Data Catalog','S3 Data Catalog','Splunk Cloud Search','Splunk Cloud Search','Splunk Cloud Search'];
++ Object.assign(failureComponentColors,{'Amazon SQS':SQS_COLOR,'S3 Data Catalog':CATALOG_COLOR,'Splunk Cloud Search':SEARCH_COLOR});
++ queuePressure[ID]=[{stage:'SQS message retention',name:'S3 events in SQS',level:97,state:'aging out'}];
++ // The flow stops where SQS deletes the events: nothing after it learns of them.
++ blockingAt[ID]='SQS message retention';blockingFailures.add(ID);
++ diagnosticSymptoms.push({id:'catalog-gap',name:'Federated searches miss S3 data',hint:'Searches over a time range return less than the bucket should hold',summary:'Prioritises the catalog’s SQS queue, its message retention period and the catalog sync, then whether the objects reached the bucket.',causes:[[ID,99],['s3-delivery',40]]});
++ // The header counts the failures.
++ const stat=[...document.querySelectorAll('.headerStats .stat')].find(x=>/failures/.test(x.textContent));if(stat)stat.querySelector('strong').textContent=failures.length;
++}
++// The page drew the Failure view and the Matrix before this block ran, and opening a view doesn't draw them again.
++renderFailures();
++render();
++
++window.catalogSync229={ID,PATH,stages:()=>added.map(s=>s.id),allows:s=>pathAllows(s)};
++})();
++</script>

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Catalog Sync Failure</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.notes{min-width:0;overflow-wrap:anywhere}
+.panel p{margin:0 0 10px;color:var(--ink-2);font-size:13px}
+.panel a{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 229 TARGET · BUILD 228 + PROTOTYPE</span>
+ <h1>SQS ages out a federated search catalog’s messages</h1>
+ <p class="lede">A failure scenario for Federated Search for Amazon S3 with a Splunk-native data catalog. The bucket sends each change to the dataset to an SQS queue, and Splunk retrieves the queue to keep the catalog in sync. When events wait longer than the queue’s message retention period, 4 days by default, SQS deletes them unread. The catalog never learns of those changes, and federated searches miss data that is still in the bucket. With it: a path for the sync and the search, two components, seven stages, and a symptom in Diagnose.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>Build 228 against the prototype</h2>
+  <table>
+   <thead><tr><th>The page</th><th>Build 228</th><th>With the prototype</th></tr></thead>
+   <tbody>
+    <tr><td>Components</td><td>11, with Amazon S3 as a destination only</td><td>13: Amazon SQS, on 1 stage, and the S3 Data Catalog, on 3</td></tr>
+    <tr><td>Stages</td><td>118</td><td>125: four for the catalog sync, three for the federated search</td></tr>
+    <tr><td>Paths</td><td>11, none of them federated search</td><td>12, with S3 → SQS → Catalog → Federated search</td></tr>
+    <tr><td>Failure scenarios</td><td>64. The nearest, Amazon S3 destination unavailable, is Ingest Processor’s delivery to the bucket</td><td>65, with SQS ages out messages before federated search retrieves them</td></tr>
+    <tr><td>Diagnose</td><td>12 symptoms. S3 objects are missing ranks Ingest Processor’s delivery first</td><td>13. Federated searches miss S3 data ranks the new scenario first, at 99%, and Ingest Processor’s delivery second</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>What the scenario rests on</h2>
+  <dl>
+   <dt>The catalog</dt><dd>Splunk software creates and maintains it. Keeping it in sync with the dataset is a choice: a standard SQS queue in your AWS account, sent the bucket’s object create, removal, restore and lifecycle events for the dataset’s prefix.</dd>
+   <dt>The queue</dt><dd>SQS keeps a message for the queue’s message retention period: 60 seconds to 14 days, 4 days by default. Older messages expire and are deleted. A dead-letter queue takes only messages received too many times.</dd>
+   <dt>Seeing it</dt><dd>In CloudWatch, ApproximateAgeOfOldestMessage near the retention period, and ApproximateNumberOfMessagesVisible growing.</dd>
+   <dt>Not said</dt><dd>Splunk’s pages don’t say how fast Splunk retrieves the queue, or how to resync the catalog. The scenario names both causes, more events than are retrieved or retrieval stopping, and sends the resync to Splunk Support.</dd>
+  </dl>
+ </section>
+ <section class="panel rules">
+  <h2>Sources</h2>
+  <dl>
+   <dt>Splunk</dt><dd><a href="https://help.splunk.com/en/splunk-cloud-platform/search/federated-search/10.7/run-federated-searches-over-amazon-s3-datasets/define-an-amazon-s3-dataset/create-an-amazon-s3-dataset-for-federated-search-that-is-backed-by-a-splunk-native-data-catalog">Create an Amazon S3 dataset for federated search that is backed by a Splunk-native data catalog</a> and <a href="https://help.splunk.com/en/splunk-cloud-platform/search/federated-search/10.7/run-federated-searches-over-amazon-s3-datasets/define-an-amazon-s3-dataset/create-an-amazon-s3-dataset-for-federated-search-that-is-backed-by-a-splunk-native-data-catalog/set-up-automated-updates-for-splunk-native-data-catalogs-in-aws">Set up automated updates for Splunk-native data catalogs in AWS</a>, Federated Search for Splunk Cloud Platform 10.7. <a href="https://help.splunk.com/en/splunk-enterprise/splunk-validated-architectures/splunk-platform-indexing-and-search/federated-search-for-amazon-s3">Federated Search for Amazon S3</a>, Splunk Validated Architectures.</dd>
+   <dt>AWS</dt><dd><a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html">SetQueueAttributes</a>, the Amazon SQS API Reference: MessageRetentionPeriod and the redrive policy. <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-available-cloudwatch-metrics.html">Available CloudWatch metrics for Amazon SQS</a>.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-catalog-sync.md</code> · Prototype: a new script block and one in-place edit to Build 228, in <code>docs/mockups/catalog-sync.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "failure", "img": "compare/catalog-sync-failure.png", "group": "target", "tab": "The failure", "title": "SQS ages out messages before federated search retrieves them", "w": 1045, "h": 621, "zoom": 1, "size": "1440 px window, the Failure Lab’s detail, with reduced motion: no animation, the gauge at its level", "items": [{"n": 1, "head": "A federated search catalog failure", "text": "High risk, listed last of the Failure Lab’s 65 scenarios.", "x": 75.6, "y": 2.6, "box": [0.77, 1.27, 72.73, 2.67]}, {"n": 2, "head": "Nothing lost in S3", "text": "The objects stay in the bucket; searches quietly come back incomplete. Recovery: a longer retention period, then a catalog resync.", "x": 1.4, "y": 27.15, "box": [0.77, 27.15, 98.47, 10.34]}, {"n": 3, "head": "The failure point", "text": "SQS message retention: SQS deletes the events Splunk hasn’t retrieved once they’re older than the retention period, 4 days by default.", "x": 59.52, "y": 53.7, "box": [41.91, 53.7, 17.61, 28.66]}, {"n": 4, "head": "The queue’s gauge", "text": "S3 events in SQS, aging out. Like the other scenarios’ gauges, its level is representative.", "x": 50.72, "y": 83, "box": [43.06, 76.09, 15.31, 4.34]}, {"n": 5, "head": "Flow-on, stopped", "text": "The catalog never learns of those changes, and the federated searches that rely on it miss them. The flow scrolls on to the search tier.", "x": 85.1, "y": 53.7, "box": [67.49, 53.7, 17.61, 28.66]}, {"n": 6, "head": "Four components", "text": "Amazon S3, Amazon SQS, the S3 Data Catalog and Splunk Cloud Search, each with its own band.", "x": 53.65, "y": 91.38, "box": [41.91, 83.97, 23.47, 4.83]}]}, {"id": "effects", "img": "compare/catalog-sync-effects.png", "group": "target", "tab": "Effects and checks", "title": "What it leads to, and how to confirm and recover", "w": 1045, "h": 622, "zoom": 1, "size": "1440 px window, the same detail, lower down, with reduced motion", "items": [{"n": 1, "head": "Trigger", "text": "More S3 events reach the queue than Splunk retrieves, or retrieval stops.", "x": 98.6, "y": 1.32, "box": [0.77, 1.32, 98.47, 14.37]}, {"n": 2, "head": "No dead-letter queue", "text": "SQS moves a message to one only after too many receives, so an expired event is simply gone.", "x": 98.6, "y": 16.82, "box": [0.77, 16.82, 98.47, 17.3]}, {"n": 3, "head": "The outcome", "text": "Searches over that time miss objects that are still in the bucket.", "x": 98.6, "y": 50.74, "box": [0.77, 50.74, 98.47, 14.37]}, {"n": 4, "head": "Confirm it", "text": "In CloudWatch, ApproximateAgeOfOldestMessage against the retention period, and a growing ApproximateNumberOfMessagesVisible. Then the bucket against a search.", "x": 49.43, "y": 67.84, "box": [0.77, 67.84, 48.66, 30.93]}, {"n": 5, "head": "Recover", "text": "Raise the retention, up to 14 days. Splunk’s documentation gives no way to resync the catalog yourself, so ask Splunk Support.", "x": 98.6, "y": 67.84, "box": [50.57, 67.84, 48.66, 30.93]}]}, {"id": "path", "img": "compare/catalog-sync-path.png", "group": "target", "tab": "The path", "title": "Amazon S3 → SQS → S3 Data Catalog → Federated search", "w": 1404, "h": 1307, "zoom": 1, "size": "1440 px window, the Flow view on the new path", "items": [{"n": 1, "head": "A new path", "text": "S3 → SQS → Catalog → Federated search, after Raw TCP → HF → Indexer.", "x": 87.87, "y": 6.12, "box": [76.39, 1.95, 22.97, 2.95]}, {"n": 2, "head": "Two components", "text": "Amazon SQS, on 1 stage, and the S3 Data Catalog, on 3: the Builder’s name and colour for it.", "x": 66.24, "y": 37.56, "box": [0.57, 37.56, 65.67, 7.15]}, {"n": 3, "head": "Its route", "text": "From the bucket, through the queue and the catalog sync, to Splunk Cloud Search: searched where it is, not indexed.", "x": 98.6, "y": 61.71, "box": [1.78, 61.02, 96.44, 1.38]}, {"n": 4, "head": "Where the data is", "text": "Build 228’s Amazon S3 object storage, then the seven new stages.", "x": 16.45, "y": 71.93, "box": [0.57, 71.93, 15.88, 14.81]}, {"n": 5, "head": "The catalog sync", "text": "S3 event notification, SQS message retention, catalog event retrieval and catalog update.", "x": 49.64, "y": 71.93, "box": [33.76, 71.93, 15.88, 14.81]}, {"n": 6, "head": "The search", "text": "Planning from the catalog, the scan in S3, and the results.", "x": 16.45, "y": 87.5, "box": [0.57, 87.5, 15.88, 11.94]}]}, {"id": "matrix", "img": "compare/catalog-sync-matrix.png", "group": "target", "tab": "The Matrix", "title": "Two columns and seven stages", "w": 1402, "h": 588, "zoom": 1, "size": "1440 px window, the Matrix’s head and its last seven rows (the rest left out)", "items": [{"n": 1, "head": "Two columns", "text": "Amazon SQS and S3 Data Catalog, after AWS S3. No earlier stage uses either.", "x": 98.6, "y": 1.34, "box": [88.05, 1.34, 11.38, 9.38]}, {"n": 2, "head": "On Amazon S3", "text": "The bucket sends its events, and the scan reads its objects.", "x": 17.87, "y": 17.45, "box": [8.06, 10.71, 8.24, 13.46]}, {"n": 3, "head": "On Amazon SQS", "text": "One stage: the queue holds each event until it’s retrieved or too old.", "x": 17.87, "y": 30.91, "box": [8.06, 24.18, 8.24, 13.46]}, {"n": 4, "head": "On the catalog", "text": "Retrieval, the update, and the planning that reads it.", "x": 17.87, "y": 44.37, "box": [8.06, 37.64, 8.24, 13.46]}, {"n": 5, "head": "On the Search Head", "text": "The federated search: planning, the scan and the results.", "x": 17.87, "y": 93.44, "box": [8.06, 88.3, 8.24, 10.28]}]}, {"id": "diagnose", "img": "compare/catalog-sync-diagnose.png", "group": "target", "tab": "Diagnose", "title": "Federated searches miss S3 data", "w": 1383, "h": 990, "zoom": 1, "size": "1440 px window, Diagnose on the complete model", "items": [{"n": 1, "head": "A new symptom", "text": "Searches over a time range return less than the bucket should hold.", "x": 21.55, "y": 90.84, "box": [1.3, 90.84, 20.25, 7.35]}, {"n": 2, "head": "First: the queue", "text": "99%, a strong match: Amazon SQS, at SQS message retention.", "x": 98.6, "y": 28.13, "box": [24.73, 28.13, 74.69, 23.15]}, {"n": 3, "head": "What to check first", "text": "The queue’s oldest message against its retention period.", "x": 98.6, "y": 44.72, "box": [25.89, 43.85, 72.52, 1.74]}, {"n": 4, "head": "Then: did it reach the bucket?", "text": "Amazon S3 destination unavailable, 40%: data Ingest Processor never delivers isn’t there to find.", "x": 98.6, "y": 52.29, "box": [24.73, 52.29, 74.69, 23.15]}]}, {"id": "today", "img": "compare/catalog-sync-today.png", "group": "today", "tab": "Today", "title": "Build 228: S3 objects are missing", "w": 1383, "h": 960, "zoom": 1, "size": "1440 px window, Diagnose on the complete model", "items": [{"n": 1, "head": "One S3 symptom", "text": "Build 228’s nearest: S3 objects are missing.", "x": 21.55, "y": 57.36, "box": [1.3, 57.36, 20.25, 7.58]}, {"n": 2, "head": "All about delivery", "text": "Its causes are about getting data to the bucket, the Ingest Processor’s delivery first. Nothing covers data in the bucket that searches miss, and the page has no SQS or catalog.", "x": 98.6, "y": 26.96, "box": [24.73, 26.96, 74.69, 23.88]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 228 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
