@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Builder Ports</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.notes{min-width:0;overflow-wrap:anywhere}
+.panel p{margin:0 0 10px;color:var(--ink-2);font-size:13px}
+.panel a{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 230 TARGET · BUILD 229 + PROTOTYPE</span>
+ <h1>Ports on a load balancer and a Syslog Server</h1>
+ <p class="lede">In the Builder, a Syslog Server now listens on as many ports as a design needs: UDP, TCP or TLS, any number from 1 to 65535, with the senders a port is for when it is theirs alone. A load balancer keeps its preset listeners and takes any other port too. Each link into either is checked against its receiver’s ports, and a load balancer’s listeners against its Syslog Servers’.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>Build 229 against the prototype</h2>
+  <table>
+   <thead><tr><th>In the Builder</th><th>Build 229</th><th>With the prototype</th></tr></thead>
+   <tbody>
+    <tr><td>A Syslog Server’s ports</td><td>None</td><td>Any number: UDP, TCP or TLS, 1 to 65535, with the senders a port is for. UDP 514 and TCP 514 until they’re changed. On its card, and in its Settings tab</td></tr>
+    <tr><td>A load balancer’s listeners</td><td>UDP 514, TCP 514 and TLS 6514 for syslog; HTTPS 8088 or 443 for HEC; HTTPS 8089 for Deployment Servers</td><td>The same presets, and any other port: UDP, TCP or TLS for syslog, HTTPS for HEC and Deployment Servers</td></tr>
+    <tr><td>A link’s port</td><td>A number, not checked</td><td>Offered from its receiver’s ports, and flagged when it isn’t one of them</td></tr>
+    <tr><td>Architecture rules</td><td>AR-009 asks for DNAT with UDP 514 only</td><td>AR-009 counts any UDP listener; AR-016, AR-017 and AR-018 check the ports</td></tr>
+    <tr><td>Topology files</td><td>A load balancer’s presets</td><td>A Syslog Server’s ports, and a load balancer’s other listeners too</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>Where the design comes from</h2>
+  <dl>
+   <dt>Dedicated ports</dt><dd>SC4S, Splunk Connect for Syslog, gives a source technology a listening port of its own when its events can’t be told apart from others’, or it sends to a port other than UDP 514. It discourages using a default port as a dedicated one.</dd>
+   <dt>TLS</dt><dd>SC4S listens for TLS on 6514 when that is enabled. TLS runs over TCP, so TCP and TLS can’t share a port number; UDP can share one with either.</dd>
+   <dt>Listeners</dt><dd>A load balancer’s listener checks for connection requests using the protocol and port configured for it, on ports 1 to 65535, as AWS’s Network Load Balancer describes it. The Builder sends each listener to the same port on its members.</dd>
+  </dl>
+ </section>
+ <section class="panel rules">
+  <h2>Sources</h2>
+  <dl>
+   <dt>SC4S</dt><dd><a href="https://splunk.github.io/splunk-connect-for-syslog/main/sources/">Sources</a>, its unique listening ports, and <a href="https://splunk.github.io/splunk-connect-for-syslog/main/configuration/">Configuration</a>, its default TLS port.</dd>
+   <dt>AWS</dt><dd><a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-listeners.html">Listeners for your Network Load Balancers</a>.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-builder-ports.md</code> · Prototype: a new script block, its styles and five in-place edits to Build 229’s load balancer, in <code>docs/mockups/builder-ports.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "canvas", "img": "compare/builder-ports-canvas.png", "group": "target", "tab": "The canvas", "title": "Each Syslog Server’s card lists its ports", "w": 558, "h": 582, "zoom": 1, "size": "1440 px window, the Builder at 100%", "items": [{"n": 1, "head": "A Syslog Server’s card", "text": "Its ports under its name: UDP 514, TCP 514, TLS 6514, and past three, how many more.", "x": 97.67, "y": 18.89, "box": [63.62, 16.32, 30.11, 5.13]}, {"n": 2, "head": "Its defaults", "text": "A Syslog Server no one has changed listens on UDP 514 and TCP 514.", "x": 97.67, "y": 72.15, "box": [63.62, 69.59, 30.11, 5.13]}, {"n": 3, "head": "The load balancer", "text": "Its listeners, as before, with its own port UDP 5005 among them. Its links name them all.", "x": 36.38, "y": 43.99, "box": [6.27, 43.99, 30.11, 5.13]}]}, {"id": "editor", "img": "compare/builder-ports-editor.png", "group": "target", "tab": "Listening ports", "title": "A Syslog Server’s listening ports", "w": 306, "h": 497, "zoom": 1, "size": "1440 px window, the inspector’s Settings tab", "items": [{"n": 1, "head": "Each port", "text": "UDP, TCP or TLS, and a number from 1 to 65535. A change is one Undo step.", "x": 93.79, "y": 16.16, "box": [6.21, 16.16, 87.58, 15.29]}, {"n": 2, "head": "A port of its own", "text": "Name the senders that use a port alone, as SC4S’s dedicated ports do: Cisco ASA on UDP 5005.", "x": 93.79, "y": 64.85, "box": [6.21, 64.85, 87.58, 16.7]}, {"n": 3, "head": "Add a port", "text": "Adds UDP 5000, or the next free number, ready to type over.", "x": 37.8, "y": 85.63, "box": [6.21, 82.76, 24.4, 5.73]}, {"n": 4, "head": "What can’t share", "text": "TLS listens on a TCP port: TCP 514 and TLS 514 can’t both be listed. A port listed twice, or out of range, is refused and said.", "x": 93.79, "y": 90.1, "box": [6.21, 90.1, 87.58, 6.19]}]}, {"id": "listeners", "img": "compare/builder-ports-listeners.png", "group": "target", "tab": "Listeners", "title": "A load balancer’s listeners, on any port", "w": 284, "h": 194, "zoom": 1, "size": "1440 px window, the load balancer’s Settings tab", "items": [{"n": 1, "head": "The presets", "text": "UDP 514, TCP 514 and TLS 6514, as in Build 229.", "x": 98.6, "y": 40.46, "box": [7.83, 23.57, 84.33, 33.76]}, {"n": 2, "head": "Its own listener", "text": "UDP 5005: untick it to take it away.", "x": 98.6, "y": 65.71, "box": [7.83, 61.46, 84.33, 8.51]}, {"n": 3, "head": "Any other port", "text": "UDP, TCP or TLS for syslog; HTTPS for HEC and Deployment Servers. A listener it has, or TCP and TLS on one number, is refused.", "x": 50, "y": 97.8, "box": [7.83, 74.09, 84.33, 15.46]}]}, {"id": "link", "img": "compare/builder-ports-link.png", "group": "target", "tab": "A link’s port", "title": "A link’s port, against its receiver’s", "w": 330, "h": 237, "zoom": 1, "size": "1440 px window, the link’s inspector", "items": [{"n": 1, "head": "The receiver’s ports", "text": "Port offers the numbers Syslog Server B listens on.", "x": 48.94, "y": 58.19, "box": [3.03, 58.19, 45.91, 12.08]}, {"n": 2, "head": "Not one of them", "text": "Branch router sends to 5141, and Syslog Server B doesn’t listen there. AR-016 says so too.", "x": 55.61, "y": 86.17, "box": [3.03, 73.65, 45.91, 25.05]}]}, {"id": "rules", "img": "compare/builder-ports-rules.png", "group": "target", "tab": "Rules", "title": "Three rules for ports", "w": 595, "h": 362, "zoom": 1, "size": "1440 px window, the rule engine searched for AR-01", "items": [{"n": 1, "head": "AR-016", "text": "A sender uses a port its receiver listens on: Branch router, on 5141, fails.", "x": 98.6, "y": 2.25, "box": [1.34, 2.25, 97.31, 34.5]}, {"n": 2, "head": "AR-017", "text": "A syslog load balancer’s listeners are open on its Syslog Servers: Syslog Server B has no UDP 5005.", "x": 98.6, "y": 38.68, "box": [1.34, 38.68, 97.31, 30.98]}, {"n": 3, "head": "AR-018", "text": "A port named for its senders isn’t a default port, as SC4S advises.", "x": 98.6, "y": 71.59, "box": [1.34, 71.59, 97.31, 26.21]}]}, {"id": "today", "img": "compare/builder-ports-today.png", "group": "today", "tab": "Today", "title": "Build 229: three listeners for syslog, and no ports on a Syslog Server", "w": 284, "h": 140, "zoom": 1, "size": "1440 px window, the load balancer’s Settings tab", "items": [{"n": 1, "head": "Three listeners", "text": "Build 229 offers UDP 514, TCP 514 and TLS 6514 for syslog, and no other port. A Syslog Server has no ports at all.", "x": 98.6, "y": 56.06, "box": [7.83, 32.67, 84.33, 46.79]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 229 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
