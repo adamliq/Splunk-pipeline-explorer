@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Builder Sweep</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.notes{min-width:0;overflow-wrap:anywhere}
+.panel p{margin:0 0 10px;color:var(--ink-2);font-size:13px}
+.panel a{color:inherit}
+.panel td:first-child{white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 232 TARGET · BUILD 231 + PROTOTYPE</span>
+ <h1>Fixes from a check of the Builder page</h1>
+ <p class="lede">The Builder was swept in 33 states at four widths, each feature used in turn, and the screenshots looked at by eye. Build 232 makes the 15 fixes that came out of it, the first of them a canvas that stopped answering once the topology was named.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>Build 231 against the prototype</h2>
+  <table>
+   <thead><tr><th>#</th><th>Where</th><th>Build 231</th><th>With the prototype</th></tr></thead>
+   <tbody>
+    <tr><td>1</td><td>Print / present</td><td>“undefined” title and classification; typing changed nothing</td><td>The topology’s title, today’s date, its classification; what’s typed is used</td></tr>
+    <tr><td>1</td><td>The canvas after the topology is named</td><td>Stopped answering: no choosing, no dragging</td><td>Answers as before</td></tr>
+    <tr><td>2</td><td>View › Presentation after a name</td><td>Two clicks</td><td>One</td></tr>
+    <tr><td>3</td><td>Help › Canvas controls and shortcuts</td><td>Hid the help card when it showed</td><td>Leaves it showing</td></tr>
+    <tr><td>4</td><td>Route labels from 75% to 100%</td><td>Text past the box</td><td>The box fits the text</td></tr>
+    <tr><td>5</td><td>Bundled labels</td><td>Off-centre</td><td>Centred</td></tr>
+    <tr><td>6</td><td>Badge and ⋯ menu on a chosen card</td><td>Overlapping</td><td>Badge outside the corner</td></tr>
+    <tr><td>7</td><td>File handoff on a phone</td><td>Under the Event data handle</td><td>Clear of it</td></tr>
+    <tr><td>8</td><td>A message and the help card</td><td>The message over the card</td><td>The message at the canvas top</td></tr>
+    <tr><td>9</td><td>A first visit at 1280 px</td><td>64%: no labels or details</td><td>90%: both panels folded; the Inspector opens on the first choice</td></tr>
+    <tr><td>10</td><td>Inspector and dialog text</td><td>9 px labels</td><td>11 px</td></tr>
+    <tr><td>11</td><td>Inventory and Rules search boxes</td><td>No name</td><td>Named</td></tr>
+    <tr><td>12</td><td>The help card’s text</td><td>4.31:1</td><td>4.94:1</td></tr>
+    <tr><td>13</td><td>Save’s suggested name</td><td>“Custom topology”</td><td>The topology’s own name</td></tr>
+    <tr><td>14</td><td>A card’s status dot</td><td>On its label’s first letter</td><td>In the corner</td></tr>
+    <tr><td>15</td><td>The connector tool</td><td>Counted labels the zoom hides</td><td>Counts them as hidden</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>Where the design comes from</h2>
+  <dl>
+   <dt>One field, one job</dt><dd>Print / present keeps its title, date and classification in its own state; View › Presentation keeps its on/off in another.</dd>
+   <dt>Labels</dt><dd>A label’s box fits its text at every zoom where it shows, its text in the middle; it keeps clear of cards, badges and, on a phone, the connection handles.</dd>
+   <dt>Controls</dt><dd>Two controls never overlap; every control has a name: WCAG’s Name, Role, Value.</dd>
+   <dt>Text</dt><dd>At least 11 px in the Builder’s panels, whatever is chosen or open, and at least 4.5:1: WCAG’s Contrast (Minimum).</dd>
+  </dl>
+ </section>
+ <section class="panel rules">
+  <h2>Sources</h2>
+  <dl>
+   <dt>WCAG 2.2</dt><dd><a href="https://www.w3.org/WAI/WCAG22/Understanding/name-role-value.html">Name, Role, Value</a> and <a href="https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html">Contrast (Minimum)</a>.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-builder-sweep.md</code> · Prototype: a new script block, its styles and ten in-place edits to Build 231, in <code>docs/mockups/builder-sweep.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "present", "img": "compare/builder-sweep-present.png", "group": "target", "tab": "Print / present", "title": "Print / present: its own title, date and classification", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, File › Print / present", "measure": {"title": "Splunk security telemetry architecture", "date": "2026-11-25", "cls": "Security telemetry + PII"}, "items": [{"n": 1, "head": "Splunk security telemetry architecture", "text": "The topology’s title, and what is typed here is the deck’s title.", "x": 14.41, "y": 8.53, "box": [0.97, 3.61, 26.87, 3.14]}, {"n": 2, "head": "2026-11-25", "text": "Today’s date.", "x": 48.82, "y": 8.53, "box": [39.23, 3.39, 19.19, 3.36]}, {"n": 3, "head": "Security telemetry + PII", "text": "The topology’s classification, for the deck’s corner and foot.", "x": 65.4, "y": 8.53, "box": [58.91, 3.61, 12.99, 3.14]}]}, {"id": "canvas", "img": "compare/builder-sweep-canvas.png", "group": "target", "tab": "Name, then a card", "title": "After the topology is named, the canvas still answers", "w": 1408, "h": 841, "zoom": 1, "size": "1440 px window, the Builder after “Payments logging pipeline” is typed as its name", "measure": {"selected": 2, "heading": "Syslog Server 1"}, "items": [{"n": 1, "head": "Chosen", "text": "A click on Syslog Server 1 selects it, and cards drag, as before the name was typed.", "x": 35.97, "y": 46.7, "box": [23.88, 36.31, 10.53, 20.78]}, {"n": 2, "head": "Syslog Server 1", "text": "Its Inspector opens on it.", "x": 87.86, "y": 25.48, "box": [76.85, 20.87, 22.02, 2.71]}]}, {"id": "labels", "img": "compare/builder-sweep-labels.png", "group": "target", "tab": "Labels, badge, dot", "title": "Route labels fit; the badge clears the ⋯ menu; the dot clears the label", "w": 994, "h": 743, "zoom": 1, "size": "1440 px window, the Builder on a first visit, Syslog Server 1 chosen", "measure": {"zoom": "78%", "labelLeft": 8.9, "labelRight": 8.3, "badgeMenu": 0, "dotLetter": 0}, "items": [{"n": 1, "head": "Each label fits its text", "text": "At 78% the text grows to 13 px; the box is widened about its middle to fit it, 8 px clear each side.", "x": 22.99, "y": 44.19, "box": [18.28, 36.37, 9.42, 5.67]}, {"n": 2, "head": "Outside the corner", "text": "While a card is chosen its review badge sits outside the corner, clear of the ⋯ menu.", "x": 46.94, "y": 28.65, "box": [42.92, 27.45, 1.8, 2.41]}, {"n": 3, "head": "The dot in the corner", "text": "Clear of the label’s first letter.", "x": 28.76, "y": 32.43, "box": [28.48, 29.55, 0.55, 0.73]}]}, {"id": "first1280", "img": "compare/builder-sweep-first1280.png", "group": "target", "tab": "1280 px", "title": "At 1280 px a first visit opens with full detail", "w": 1248, "h": 741, "zoom": 1, "size": "1280 × 800 px window, the Builder on a first visit", "measure": {"zoom": "90%", "labels": 3, "inspector": false, "components": false}, "items": [{"n": 1, "head": "90%", "text": "Both panels fold, as the fit is under 75% with Components folded alone. Build 231 opened at 64%.", "x": 15.73, "y": 11.17, "box": [14.05, 7.46, 3.37, 1.55]}, {"n": 2, "head": "The Inspector", "text": "Folded, it opens again on the first card or link chosen. One folded by hand stays folded.", "x": 98.36, "y": 28, "box": [97.76, 17.54, 1.2, 8.3]}, {"n": 3, "head": "Labels and details", "text": "From 75% cards show their details and links their labels.", "x": 25.44, "y": 49.78, "box": [21.12, 41.08, 8.65, 6.55]}]}, {"id": "phone", "img": "compare/builder-sweep-phone.png", "group": "target", "tab": "Phone", "title": "On a phone, File handoff shows beside its handle", "w": 346, "h": 690, "zoom": 1, "size": "390 px window, the Builder", "measure": {"under": false}, "items": [{"n": 1, "head": "File handoff", "text": "Placed clear of the Event data handle, as labels are of cards and badges.", "x": 49.94, "y": 96.17, "box": [39.01, 91.53, 21.86, 2.32]}]}, {"id": "inspector", "img": "compare/builder-sweep-inspector.png", "group": "target", "tab": "Inspector text", "title": "The Inspector’s labels are 11 px", "w": 340, "h": 743, "zoom": 1, "size": "1440 px window, the Inspector for Syslog Server 1 → Universal Forwarder 1", "measure": {"min": 11, "count": 9}, "items": [{"n": 1, "head": "11 px", "text": "Every field label, here and for a component; and the change-impact preview.", "x": 50, "y": 43.37, "box": [4.41, 34.6, 91.18, 6.61]}]}, {"id": "help", "img": "compare/builder-sweep-help.png", "group": "target", "tab": "Help and messages", "title": "Help stays; a message shows at the canvas top", "w": 994, "h": 743, "zoom": 1, "size": "1440 px window, after the reference topology is imported", "measure": {"help": true, "overlap": 0, "contrast": 4.94}, "items": [{"n": 1, "head": "At the top", "text": "While the help card shows, a message shows at the canvas top, clear of it.", "x": 50, "y": 9.93, "box": [25.05, 1.21, 49.9, 6.57]}, {"n": 2, "head": "Help › Canvas controls and shortcuts", "text": "Leaves the card showing. Its text is lightened to 4.94:1.", "x": 40.74, "y": 89.1, "box": [1.31, 79.95, 37.22, 18.3]}]}, {"id": "present-today", "img": "compare/builder-sweep-present-today.png", "group": "today", "tab": "Today: Print / present", "title": "Build 231: “undefined”", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, File › Print / present", "measure": {"title": "undefined", "date": "", "cls": "undefined"}, "items": [{"n": 1, "head": "undefined", "text": "And typing a title here changed nothing.", "x": 14.41, "y": 8.16, "box": [0.97, 3.24, 26.87, 3.14]}, {"n": 2, "head": "undefined", "text": "", "x": 65.4, "y": 8.16, "box": [58.91, 3.24, 12.99, 3.14]}]}, {"id": "canvas-today", "img": "compare/builder-sweep-canvas-today.png", "group": "today", "tab": "Today: Name, then a card", "title": "Build 231: after the name, the canvas stops answering", "w": 1408, "h": 841, "zoom": 1, "size": "1440 px window, the Builder after the name is typed", "measure": {"selected": null, "heading": "Payments logging pipeline"}, "items": [{"n": 1, "head": "Not chosen", "text": "The click on Syslog Server 1 did nothing; cards couldn’t be dragged.", "x": 35.97, "y": 46.7, "box": [23.88, 36.31, 10.53, 20.78]}]}, {"id": "labels-today", "img": "compare/builder-sweep-labels-today.png", "group": "today", "tab": "Today: Labels, badge, dot", "title": "Build 231: text past its box, badge on the menu", "w": 994, "h": 743, "zoom": 1, "size": "1440 px window, the Builder on a first visit, Syslog Server 1 chosen", "measure": {"zoom": "78%", "labelLeft": -1.5, "labelRight": -2.1, "badgeMenu": 67, "dotLetter": 10}, "items": [{"n": 1, "head": "Past its box", "text": "At 78% the text runs 1.5 and 2.1 px past its box’s sides.", "x": 23.01, "y": 44.19, "box": [18.98, 36.37, 8.07, 5.67]}, {"n": 2, "head": "On the ⋯ menu", "text": "The review badge covered the menu button’s corner.", "x": 45.84, "y": 29.39, "box": [41.82, 28.18, 1.8, 2.41]}]}, {"id": "first1280-today", "img": "compare/builder-sweep-first1280-today.png", "group": "today", "tab": "Today: 1280 px", "title": "Build 231: 64% at 1280 px, no labels or details", "w": 1248, "h": 741, "zoom": 1, "size": "1280 × 800 px window, the Builder on a first visit", "measure": {"zoom": "64%", "labels": 0, "inspector": true, "components": false}, "items": [{"n": 1, "head": "64%", "text": "Under 75% cards show only their names, and links no labels.", "x": 15.73, "y": 11.17, "box": [14.05, 7.46, 3.37, 1.55]}]}, {"id": "phone-today", "img": "compare/builder-sweep-phone-today.png", "group": "today", "tab": "Today: Phone", "title": "Build 231: File handoff under the Event data handle", "w": 346, "h": 690, "zoom": 1, "size": "390 px window, the Builder", "measure": {"under": true}, "items": [{"n": 1, "head": "Under here", "text": "The handle covered the label.", "x": 49.94, "y": 91.27, "box": [39.01, 86.63, 21.86, 2.32]}]}, {"id": "inspector-today", "img": "compare/builder-sweep-inspector-today.png", "group": "today", "tab": "Today: Inspector text", "title": "Build 231: 9 px labels", "w": 340, "h": 743, "zoom": 1, "size": "1440 px window, the same link’s Inspector", "measure": {"min": 8.96, "count": 9}, "items": [{"n": 1, "head": "9 px", "text": "", "x": 50, "y": 42.73, "box": [4.41, 34.38, 91.18, 6.2]}]}, {"id": "help-today", "img": "compare/builder-sweep-help-today.png", "group": "today", "tab": "Today: Help and messages", "title": "Build 231: the message over the help card", "w": 994, "h": 743, "zoom": 1, "size": "1440 px window, after the reference topology is imported", "measure": {"help": true, "overlap": 6537, "contrast": 4.31}, "items": [{"n": 1, "head": "Over the help", "text": "And Help › Canvas controls and shortcuts hid the card when it showed.", "x": 50, "y": 94.21, "box": [25.05, 85.49, 49.9, 6.57]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 231 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>

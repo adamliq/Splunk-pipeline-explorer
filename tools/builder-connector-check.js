@@ -4,7 +4,7 @@
    after an unconnected palette add, and 6 free-layout drags). For each connector it checks
    start/end contact with the card border, arrow direction, running along borders, passing
    through its own or other cards, label distance from the line, labels over cards and
-   badges over labels, both while dragging and after drop. Scenarios 9 and 10 load the reference topology
+   badges over labels (a label the zoom hides counts as hidden), both while dragging and after drop. Scenarios 9 and 10 load the reference topology
    (docs/mockups/ov1-reference-topology.json) and check every plane at Fit and at 100%. Prints JSON; "OK" means clean.
    Requires the playwright package (a global install is found automatically). */
 const path=require('path'),fs=require('fs');
@@ -37,7 +37,10 @@ const MEASURE=()=>{
    if(t>=4&&t<=L-4)[A,B].forEach(R=>{if(q.x>R.x+3&&q.x<R.x+R.w-3&&q.y>R.y+3&&q.y<R.y+R.h-3)insideOwn++});
    const onL=Math.abs(q.x-B.x)<3||Math.abs(q.x-(B.x+B.w))<3;const onT=Math.abs(q.y-B.y)<3||Math.abs(q.y-(B.y+B.h))<3;
    if((onL&&q.y>B.y+3&&q.y<B.y+B.h-3)||(onT&&q.x>B.x+3&&q.x<B.x+B.w-3))run+=4}
-  const g=document.querySelector(`[data-route-label][data-route-plane="${plane}"][data-route-edge="${CSS.escape(String(id))}"]`);const rect=g?.querySelector(':scope > rect');const LR=rect?scr(rect.getBoundingClientRect()):null;
+  const g=document.querySelector(`[data-route-label][data-route-plane="${plane}"][data-route-edge="${CSS.escape(String(id))}"]`);const rect=g?.querySelector(':scope > rect');
+  // Zoomed out (under 75%) the Builder hides route labels and draws each issue badge on its link (Builds 163 and 164):
+  // a label the zoom hides covers nothing, so it is checked as a hidden label is, by its badge being on the line.
+  const zoomHidden=!!rect&&getComputedStyle(rect).visibility==='hidden';const LR=rect&&!zoomHidden?scr(rect.getBoundingClientRect()):null;
   let labelDist=null;if(LR){const c={x:LR.x+LR.w/2,y:LR.y+LR.h/2};labelDist=1e9;for(let t=0;t<=L;t+=3){const q=at(t);labelDist=Math.min(labelDist,Math.hypot(q.x-c.x,q.y-c.y))}labelDist=Math.round(labelDist)}
   const hit=(a,b)=>a.x<b.x+b.w&&b.x<a.x+a.w&&a.y<b.y+b.h&&b.y<a.y+a.h;
   const labelOverNode=LR?state.builderNodes.some(n=>{const R=node(n.id);return R&&hit(LR,R)}):false;
@@ -45,15 +48,15 @@ const MEASURE=()=>{
   const badgeOverLabel=LR?[...document.querySelectorAll('.builderEdgeIssueMarker circle,.builderNodeIssueMarker')].some(m=>hit(scr(m.getBoundingClientRect()),LR)):false;
   const ownBadge=g?.querySelector('.builderEdgeIssueMarker');
   // a label deliberately hidden for lack of room (data-label-hidden, v156) keeps only its badge on the line
-  const labelHidden=g?.dataset.labelHidden==='true';let badgeDist=null;if(labelHidden&&ownBadge){const B=scr(ownBadge.getBoundingClientRect()),c={x:B.x+B.w/2,y:B.y+B.h/2};badgeDist=1e9;for(let t=0;t<=L;t+=3){const q=at(t);badgeDist=Math.min(badgeDist,Math.hypot(q.x-c.x,q.y-c.y))}badgeDist=Math.round(badgeDist)}
-  res.push({edge:`${name(item.from)} → ${name(item.to)} [${plane}]`,start:{...SS,dir:startDir,expect:outward},end:{...ES,dir:endDir,expect:inward},arrowIntoNode:endDir===inward,runAlongTargetBorder:run,insideOwnSamples:insideOwn,crossesOtherNodes:crosses.map(name),labelDistFromLine:labelDist,labelOverNode,markerOverLabel:badgeOverLabel,badgeInLabel:!!ownBadge,labelHidden,badgeDist,labelLeader:g?.dataset.labelLeader==='true'});
+  const labelHidden=g?.dataset.labelHidden==='true'||zoomHidden;let badgeDist=null;if(labelHidden&&ownBadge){const B=scr(ownBadge.getBoundingClientRect()),c={x:B.x+B.w/2,y:B.y+B.h/2};badgeDist=1e9;for(let t=0;t<=L;t+=3){const q=at(t);badgeDist=Math.min(badgeDist,Math.hypot(q.x-c.x,q.y-c.y))}badgeDist=Math.round(badgeDist)}
+  res.push({edge:`${name(item.from)} → ${name(item.to)} [${plane}]`,start:{...SS,dir:startDir,expect:outward},end:{...ES,dir:endDir,expect:inward},arrowIntoNode:endDir===inward,runAlongTargetBorder:run,insideOwnSamples:insideOwn,crossesOtherNodes:crosses.map(name),labelDistFromLine:labelDist,labelOverNode,markerOverLabel:badgeOverLabel,labelHiddenAtZoom:zoomHidden,badgeInLabel:!!ownBadge,labelHidden,badgeDist,labelLeader:g?.dataset.labelLeader==='true'});
  });
  return res;
 };
 
 (async()=>{const b=await chromium.launch();const results={};
 const go=async(vp)=>{const p=await b.newPage({viewport:vp||{width:1440,height:900}});p.errs=[];p.on('pageerror',e=>p.errs.push(e.message.slice(0,100)));await p.goto(f);await p.click('button[data-view="builder"]');await p.waitForTimeout(500);return p};
-const summarise=r=>r.map(e=>{const bad=[];if(!e.arrowIntoNode)bad.push(`arrow ${e.end.dir} at ${e.end.side} (expected ${e.end.expect})`);if(e.start.dir!==e.start.expect)bad.push(`leaves ${e.start.side} going ${e.start.dir}`);if(e.end.gap>6)bad.push(`end ${e.end.gap}px from target`);if(e.start.gap>6)bad.push(`start ${e.start.gap}px from source`);if(e.end.inside)bad.push('ends inside target');if(e.start.inside)bad.push('starts inside source');if(e.runAlongTargetBorder>12)bad.push(`runs ${e.runAlongTargetBorder}px along target border`);if(e.insideOwnSamples>2)bad.push(`passes through own node (${e.insideOwnSamples*4}px)`);if(e.crossesOtherNodes.length)bad.push('crosses '+e.crossesOtherNodes.join(','));if(e.labelHidden){if(e.badgeDist!==null&&e.badgeDist>12)bad.push(`hidden label's badge ${e.badgeDist}px off line`)}else{if(e.labelDistFromLine>(e.labelLeader?90:20))bad.push(`label ${e.labelDistFromLine}px off line${e.labelLeader?' (with leader)':''}`);if(e.labelOverNode)bad.push('label over a node');if(e.markerOverLabel)bad.push('badge over label');}return `${e.edge}: ${bad.length?bad.join('; '):'OK'}${e.labelHidden&&!bad.length?' (label hidden: no room, badge on line)':''}`});
+const summarise=r=>r.map(e=>{const bad=[];if(!e.arrowIntoNode)bad.push(`arrow ${e.end.dir} at ${e.end.side} (expected ${e.end.expect})`);if(e.start.dir!==e.start.expect)bad.push(`leaves ${e.start.side} going ${e.start.dir}`);if(e.end.gap>6)bad.push(`end ${e.end.gap}px from target`);if(e.start.gap>6)bad.push(`start ${e.start.gap}px from source`);if(e.end.inside)bad.push('ends inside target');if(e.start.inside)bad.push('starts inside source');if(e.runAlongTargetBorder>12)bad.push(`runs ${e.runAlongTargetBorder}px along target border`);if(e.insideOwnSamples>2)bad.push(`passes through own node (${e.insideOwnSamples*4}px)`);if(e.crossesOtherNodes.length)bad.push('crosses '+e.crossesOtherNodes.join(','));if(e.labelHidden){if(e.badgeDist!==null&&e.badgeDist>12)bad.push(`hidden label's badge ${e.badgeDist}px off line`)}else{if(e.labelDistFromLine>(e.labelLeader?90:20))bad.push(`label ${e.labelDistFromLine}px off line${e.labelLeader?' (with leader)':''}`);if(e.labelOverNode)bad.push('label over a node');if(e.markerOverLabel)bad.push('badge over label');}return `${e.edge}: ${bad.length?bad.join('; '):'OK'}${e.labelHidden&&!bad.length?(e.labelHiddenAtZoom?' (label hidden at this zoom, badge on line)':' (label hidden: no room, badge on line)'):''}`});
 // 1) default horizontal
 let p=await go();results['1 default (auto/horizontal)']=summarise(await p.evaluate(MEASURE));await p.close();
 // 2) screenshot scenario: add HEC client via palette with UF selected (auto layout). From 1280px the palette is docked open and "+ Add" is hidden.

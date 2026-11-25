@@ -1,0 +1,162 @@
+--- a/index.html
++++ b/index.html
+@@ -1633 +1633 @@
+- const current=$('#builderSaved').value||'',name=(prompt('Topology name',current||'Custom topology')||'').trim();if(!name)return;
++ const current=$('#builderSaved').value||'',name=(prompt('Topology name',current||state.builderPresentation?.title||defaultPresentationTitle()||'Custom topology')||'').trim();if(!name)return;
+@@ -2387 +2387 @@
+-function renderBuilderInventory(){const panel=$('#builderInventoryPanel'),inv=state.builderInventory;if(!panel)return;panel.classList.toggle('open',inv.open);$('#builderInventoryToggle')?.setAttribute('aria-expanded',String(inv.open));if(!inv.open){panel.innerHTML='';return}const all=builderInventoryRows(),rows=filteredBuilderInventory(),relationships=rows.reduce((n,r)=>n+r.outgoing,0),issues=rows.filter(r=>['Failed','Review'].includes(r.validation)).length;panel.innerHTML=`<div class="inventoryHead"><div><h3>Architecture inventory</h3><p>Live component register derived from the current custom topology.</p></div><div class="inventoryActions"><button class="builderBtn" id="inventoryCsv">Export CSV</button><button class="builderBtn" id="inventoryJson">Export JSON</button></div></div><div class="inventoryMetrics"><div class="inventoryMetric"><small>Components</small><strong>${rows.length}</strong></div><div class="inventoryMetric"><small>Relationships</small><strong>${relationships}</strong></div><div class="inventoryMetric"><small>Environments</small><strong>${new Set(rows.map(r=>r.environment)).size}</strong></div><div class="inventoryMetric"><small>Regions</small><strong>${new Set(rows.map(r=>r.region)).size}</strong></div><div class="inventoryMetric"><small>Review / failed</small><strong>${issues}</strong></div></div><div class="inventoryFilters"><input id="inventorySearch" type="search" placeholder="Search name, type, authority or location" value="${builderEscape(inv.search)}">${inventorySelect('inventoryType',inventoryValues(all,'componentType'),inv.type,'Types')}${inventorySelect('inventoryEnvironment',inventoryValues(all,'environment'),inv.environment,'Environments')}${inventorySelect('inventoryRegion',inventoryValues(all,'region'),inv.region,'Regions')}${inventorySelect('inventoryGroup',inventoryValues(all,'group'),inv.group,'Groups')}</div><div class="inventoryTableWrap"><table class="inventoryTable"><thead><tr><th>Name</th><th>Type / role</th><th>Group</th><th>Environment / region</th><th>Pipeline sets</th><th>Relationships</th><th>Management authority</th><th>Users</th><th>Validation</th></tr></thead><tbody>${rows.map(r=>`<tr data-inventory-node="${r.id}" class="${state.builderSelected===r.id?'selected':''}"><td><strong>${builderEscape(r.name)}</strong><br><small>ID ${r.id}</small></td><td><span class="inventoryType" style="--inventory-color:${r.color}">${builderEscape(r.componentType)}</span><br><small>${builderEscape(r.role)}</small></td><td>${builderEscape(r.group)}</td><td>${builderEscape(r.environment)}<br><small>${builderEscape(r.region)}</small></td><td>${r.pipelineSets}</td><td>${r.incoming} in · ${r.outgoing} out</td><td>${builderEscape(r.managementAuthority)}</td><td>${r.authenticatedUsers}</td><td><span class="inventoryState ${r.validation.toLowerCase()}">${builderEscape(r.validation)}</span></td></tr>`).join('')||'<tr><td class="inventoryEmpty" colspan="9">No components match the current filters.</td></tr>'}</tbody></table></div><div class="inventoryFoot"><span>Showing ${rows.length} of ${all.length} components</span><span>Select a row to focus its component in the diagram.</span></div>`;$('#inventoryCsv').onclick=()=>inventoryExport('csv');$('#inventoryJson').onclick=()=>inventoryExport('json');$('#inventorySearch').oninput=e=>{inv.search=e.target.value;renderBuilderInventory()};[['inventoryType','type'],['inventoryEnvironment','environment'],['inventoryRegion','region'],['inventoryGroup','group']].forEach(([id,key])=>$('#'+id).onchange=e=>{inv[key]=e.target.value;renderBuilderInventory()});$$('[data-inventory-node]').forEach(row=>row.onclick=()=>{state.builderSelected=+row.dataset.inventoryNode;renderBuilder();requestAnimationFrame(()=>{document.querySelector(`#builderTree [data-builder-node="${row.dataset.inventoryNode}"]`)?.scrollIntoView({behavior:'smooth',block:'center',inline:'center'})})})}
++function renderBuilderInventory(){const panel=$('#builderInventoryPanel'),inv=state.builderInventory;if(!panel)return;panel.classList.toggle('open',inv.open);$('#builderInventoryToggle')?.setAttribute('aria-expanded',String(inv.open));if(!inv.open){panel.innerHTML='';return}const all=builderInventoryRows(),rows=filteredBuilderInventory(),relationships=rows.reduce((n,r)=>n+r.outgoing,0),issues=rows.filter(r=>['Failed','Review'].includes(r.validation)).length;panel.innerHTML=`<div class="inventoryHead"><div><h3>Architecture inventory</h3><p>Live component register derived from the current custom topology.</p></div><div class="inventoryActions"><button class="builderBtn" id="inventoryCsv">Export CSV</button><button class="builderBtn" id="inventoryJson">Export JSON</button></div></div><div class="inventoryMetrics"><div class="inventoryMetric"><small>Components</small><strong>${rows.length}</strong></div><div class="inventoryMetric"><small>Relationships</small><strong>${relationships}</strong></div><div class="inventoryMetric"><small>Environments</small><strong>${new Set(rows.map(r=>r.environment)).size}</strong></div><div class="inventoryMetric"><small>Regions</small><strong>${new Set(rows.map(r=>r.region)).size}</strong></div><div class="inventoryMetric"><small>Review / failed</small><strong>${issues}</strong></div></div><div class="inventoryFilters"><input id="inventorySearch" type="search" aria-label="Search the inventory" placeholder="Search name, type, authority or location" value="${builderEscape(inv.search)}">${inventorySelect('inventoryType',inventoryValues(all,'componentType'),inv.type,'Types')}${inventorySelect('inventoryEnvironment',inventoryValues(all,'environment'),inv.environment,'Environments')}${inventorySelect('inventoryRegion',inventoryValues(all,'region'),inv.region,'Regions')}${inventorySelect('inventoryGroup',inventoryValues(all,'group'),inv.group,'Groups')}</div><div class="inventoryTableWrap"><table class="inventoryTable"><thead><tr><th>Name</th><th>Type / role</th><th>Group</th><th>Environment / region</th><th>Pipeline sets</th><th>Relationships</th><th>Management authority</th><th>Users</th><th>Validation</th></tr></thead><tbody>${rows.map(r=>`<tr data-inventory-node="${r.id}" class="${state.builderSelected===r.id?'selected':''}"><td><strong>${builderEscape(r.name)}</strong><br><small>ID ${r.id}</small></td><td><span class="inventoryType" style="--inventory-color:${r.color}">${builderEscape(r.componentType)}</span><br><small>${builderEscape(r.role)}</small></td><td>${builderEscape(r.group)}</td><td>${builderEscape(r.environment)}<br><small>${builderEscape(r.region)}</small></td><td>${r.pipelineSets}</td><td>${r.incoming} in · ${r.outgoing} out</td><td>${builderEscape(r.managementAuthority)}</td><td>${r.authenticatedUsers}</td><td><span class="inventoryState ${r.validation.toLowerCase()}">${builderEscape(r.validation)}</span></td></tr>`).join('')||'<tr><td class="inventoryEmpty" colspan="9">No components match the current filters.</td></tr>'}</tbody></table></div><div class="inventoryFoot"><span>Showing ${rows.length} of ${all.length} components</span><span>Select a row to focus its component in the diagram.</span></div>`;$('#inventoryCsv').onclick=()=>inventoryExport('csv');$('#inventoryJson').onclick=()=>inventoryExport('json');$('#inventorySearch').oninput=e=>{inv.search=e.target.value;renderBuilderInventory()};[['inventoryType','type'],['inventoryEnvironment','environment'],['inventoryRegion','region'],['inventoryGroup','group']].forEach(([id,key])=>$('#'+id).onchange=e=>{inv[key]=e.target.value;renderBuilderInventory()});$$('[data-inventory-node]').forEach(row=>row.onclick=()=>{state.builderSelected=+row.dataset.inventoryNode;renderBuilder();requestAnimationFrame(()=>{document.querySelector(`#builderTree [data-builder-node="${row.dataset.inventoryNode}"]`)?.scrollIntoView({behavior:'smooth',block:'center',inline:'center'})})})}
+@@ -2410 +2410 @@
+-function renderArchitectureRules(){const panel=$('#builderRulesPanel'),ui=state.builderRules;if(!panel)return;panel.classList.toggle('open',ui.open);$('#builderRulesToggle')?.setAttribute('aria-expanded',String(ui.open));if(!ui.open){/* v160: explicit unchanged-write guard */ builderSetHTML160(panel,'');return}const results=evaluateArchitectureRules(),pass=results.filter(r=>r.status==='pass').length,fail=results.filter(r=>r.status==='fail').length,advisory=results.filter(r=>r.status==='advisory').length,score=Math.round(pass/Math.max(1,results.length)*100),q=ui.search.toLowerCase(),shown=results.filter(r=>(ui.status==='all'||r.status===ui.status)&&(!q||`${r.id} ${r.title} ${r.description} ${r.evidence.join(' ')}`.toLowerCase().includes(q)));/* v160: explicit unchanged-write guard */ builderSetHTML160(panel,`<div class="rulesHead"><div><h3>Architecture rule engine</h3><p>Continuous assurance against the current topology and relationship controls.</p></div><div class="rulesActions"><button class="builderBtn" id="rulesCsv">Export CSV</button><button class="builderBtn" id="rulesJson">Export JSON</button></div></div><div class="rulesScore"><div class="ruleScoreMain"><strong>${score}%</strong><span>Rules passing</span></div><div class="ruleMetric pass"><small>Pass</small><strong>${pass}</strong></div><div class="ruleMetric fail"><small>Fail</small><strong>${fail}</strong></div><div class="ruleMetric advisory"><small>Advisory</small><strong>${advisory}</strong></div></div><div class="rulesTools"><input id="rulesSearch" type="search" placeholder="Search rules or evidence" value="${builderEscape(ui.search)}"><select id="rulesStatus"><option value="all">All statuses</option><option value="fail" ${ui.status==='fail'?'selected':''}>Failed</option><option value="advisory" ${ui.status==='advisory'?'selected':''}>Advisory</option><option value="pass" ${ui.status==='pass'?'selected':''}>Passed</option></select></div><div class="rulesList">${shown.map(r=>`<article class="ruleCard ${r.status}"><input type="checkbox" checked data-rule-toggle="${r.id}" aria-label="Enable ${builderEscape(r.title)}"><div class="ruleBody"><strong>${r.id} · ${builderEscape(r.title)}</strong><p>${builderEscape(r.description)}</p><div class="ruleEvidence">${(r.evidence.length?r.evidence:['No exceptions found']).slice(0,6).map(e=>`<span>${builderEscape(e)}</span>`).join('')}</div></div><div class="ruleStatus"><b>${r.status}</b><small>${builderEscape(r.severity)}</small>${r.nodes.length?`<button class="builderBtn" data-rule-focus="${r.id}">Show impact</button>`:''}</div></article>`).join('')||'<div class="inventoryEmpty">No rules match the current filters.</div>'}</div>`);$('#rulesCsv').onclick=()=>exportArchitectureRules('csv');$('#rulesJson').onclick=()=>exportArchitectureRules('json');$('#rulesSearch').oninput=e=>{ui.search=e.target.value;renderArchitectureRules()};$('#rulesStatus').onchange=e=>{ui.status=e.target.value;renderArchitectureRules()};$$('[data-rule-toggle]').forEach(el=>el.onchange=()=>{ui.disabled.push(el.dataset.ruleToggle);ui.focus=null;renderBuilder()});$$('[data-rule-focus]').forEach(el=>el.onclick=()=>{ui.focus=results.find(r=>r.id===el.dataset.ruleFocus);renderBuilder();requestAnimationFrame(()=>document.querySelector('#builderTree .ruleFocus')?.scrollIntoView({behavior:'smooth',block:'center',inline:'center'}))})}
++function renderArchitectureRules(){const panel=$('#builderRulesPanel'),ui=state.builderRules;if(!panel)return;panel.classList.toggle('open',ui.open);$('#builderRulesToggle')?.setAttribute('aria-expanded',String(ui.open));if(!ui.open){/* v160: explicit unchanged-write guard */ builderSetHTML160(panel,'');return}const results=evaluateArchitectureRules(),pass=results.filter(r=>r.status==='pass').length,fail=results.filter(r=>r.status==='fail').length,advisory=results.filter(r=>r.status==='advisory').length,score=Math.round(pass/Math.max(1,results.length)*100),q=ui.search.toLowerCase(),shown=results.filter(r=>(ui.status==='all'||r.status===ui.status)&&(!q||`${r.id} ${r.title} ${r.description} ${r.evidence.join(' ')}`.toLowerCase().includes(q)));/* v160: explicit unchanged-write guard */ builderSetHTML160(panel,`<div class="rulesHead"><div><h3>Architecture rule engine</h3><p>Continuous assurance against the current topology and relationship controls.</p></div><div class="rulesActions"><button class="builderBtn" id="rulesCsv">Export CSV</button><button class="builderBtn" id="rulesJson">Export JSON</button></div></div><div class="rulesScore"><div class="ruleScoreMain"><strong>${score}%</strong><span>Rules passing</span></div><div class="ruleMetric pass"><small>Pass</small><strong>${pass}</strong></div><div class="ruleMetric fail"><small>Fail</small><strong>${fail}</strong></div><div class="ruleMetric advisory"><small>Advisory</small><strong>${advisory}</strong></div></div><div class="rulesTools"><input id="rulesSearch" type="search" aria-label="Search rules or evidence" placeholder="Search rules or evidence" value="${builderEscape(ui.search)}"><select id="rulesStatus"><option value="all">All statuses</option><option value="fail" ${ui.status==='fail'?'selected':''}>Failed</option><option value="advisory" ${ui.status==='advisory'?'selected':''}>Advisory</option><option value="pass" ${ui.status==='pass'?'selected':''}>Passed</option></select></div><div class="rulesList">${shown.map(r=>`<article class="ruleCard ${r.status}"><input type="checkbox" checked data-rule-toggle="${r.id}" aria-label="Enable ${builderEscape(r.title)}"><div class="ruleBody"><strong>${r.id} · ${builderEscape(r.title)}</strong><p>${builderEscape(r.description)}</p><div class="ruleEvidence">${(r.evidence.length?r.evidence:['No exceptions found']).slice(0,6).map(e=>`<span>${builderEscape(e)}</span>`).join('')}</div></div><div class="ruleStatus"><b>${r.status}</b><small>${builderEscape(r.severity)}</small>${r.nodes.length?`<button class="builderBtn" data-rule-focus="${r.id}">Show impact</button>`:''}</div></article>`).join('')||'<div class="inventoryEmpty">No rules match the current filters.</div>'}</div>`);$('#rulesCsv').onclick=()=>exportArchitectureRules('csv');$('#rulesJson').onclick=()=>exportArchitectureRules('json');$('#rulesSearch').oninput=e=>{ui.search=e.target.value;renderArchitectureRules()};$('#rulesStatus').onchange=e=>{ui.status=e.target.value;renderArchitectureRules()};$$('[data-rule-toggle]').forEach(el=>el.onchange=()=>{ui.disabled.push(el.dataset.ruleToggle);ui.focus=null;renderBuilder()});$$('[data-rule-focus]').forEach(el=>el.onclick=()=>{ui.focus=results.find(r=>r.id===el.dataset.ruleFocus);renderBuilder();requestAnimationFrame(()=>document.querySelector('#builderTree .ruleFocus')?.scrollIntoView({behavior:'smooth',block:'center',inline:'center'}))})}
+@@ -3394 +3394 @@
+-state.builderPresentation=false;const presentationNavButton=document.createElement('button');presentationNavButton.id='builderPresentationToggle';presentationNavButton.type='button';presentationNavButton.className='builderNavBtn wide';$('.builderNavigation').insertBefore(presentationNavButton,$('#builderFullscreenToggle'));
++state.builderCleanView232=false;const presentationNavButton=document.createElement('button');presentationNavButton.id='builderPresentationToggle';presentationNavButton.type='button';presentationNavButton.className='builderNavBtn wide';$('.builderNavigation').insertBefore(presentationNavButton,$('#builderFullscreenToggle'));
+@@ -3396,2 +3396,2 @@
+-function syncBuilderPresentation(){const active=!!state.builderPresentation;$('#topologyBuilder').classList.toggle('presentationView',active);for(const button of [presentationNavButton,presentationFocusButton]){button.textContent=active?'Exit presentation':'Presentation';button.setAttribute('aria-pressed',String(active));button.title=active?'Show editing handles and Review badges':'Hide editing handles and Review badges'}presentationNavButton.classList.toggle('presentationActive',active)}
+-function toggleBuilderPresentation(){state.builderPresentation=!state.builderPresentation;if(state.builderPresentation){hideBuilderObjectMenu();hideBuilderIssuePopover();closeBuilderCanvasPanels()}syncBuilderPresentation()}
++function syncBuilderPresentation(){const active=!!state.builderCleanView232;$('#topologyBuilder').classList.toggle('presentationView',active);for(const button of [presentationNavButton,presentationFocusButton]){button.textContent=active?'Exit presentation':'Presentation';button.setAttribute('aria-pressed',String(active));button.title=active?'Show editing handles and Review badges':'Hide editing handles and Review badges'}presentationNavButton.classList.toggle('presentationActive',active)}
++function toggleBuilderPresentation(){state.builderCleanView232=!state.builderCleanView232;if(state.builderCleanView232){hideBuilderObjectMenu();hideBuilderIssuePopover();closeBuilderCanvasPanels()}syncBuilderPresentation()}
+@@ -3399 +3399 @@
+-for(const type of ['pointerdown','click','dblclick','contextmenu','dragstart','keydown'])$('.builderCanvas').addEventListener(type,event=>{if(!state.builderPresentation)return;const editTarget=event.target.closest?.('.builderNode,.unifiedConnectorHit,.unifiedConnector,.builderConnectionHandles,.builderNodeIssueMarker,.builderEdgeIssueMarker,[data-route-waypoint],[data-route-label],[data-unified-group]');if(!editTarget)return;event.preventDefault();event.stopImmediatePropagation()},true);
++for(const type of ['pointerdown','click','dblclick','contextmenu','dragstart','keydown'])$('.builderCanvas').addEventListener(type,event=>{if(!state.builderCleanView232)return;const editTarget=event.target.closest?.('.builderNode,.unifiedConnectorHit,.unifiedConnector,.builderConnectionHandles,.builderNodeIssueMarker,.builderEdgeIssueMarker,[data-route-waypoint],[data-route-label],[data-unified-group]');if(!editTarget)return;event.preventDefault();event.stopImmediatePropagation()},true);
+@@ -12193 +12193 @@
+-item(help,'Canvas controls and shortcuts',{run:()=>q('.builderSpaceHelp140')?.click()});
++item(help,'Canvas controls and shortcuts',{run:()=>{const card=q('.builderSpaceHelpPopover140');if(card&&!card.hidden&&card.checkVisibility())return;q('.builderSpaceHelp140')?.click()}});
+@@ -16765,0 +16766,61 @@
++<style id="builder-sweep-v232-styles">
++/* builder-sweep-v232: fixes from a check of the Builder page (Build 232). */
++/* 6. A selected card shows its ⋯ menu in its top right corner, where the review badge sits: the badge moves out to the
++   corner's outside while the card is selected, so the two buttons don't overlap. */
++#topologyBuilder .unifiedBuilderWorld:not(.builderLodLow163) .unifiedNodeWrap:has(>.builderNode.selected)>.builderNodeIssueMarker{right:-22px;top:-16px}
++/* 8. A message on the canvas sits above the help card's place at the canvas foot; while the help card shows, the
++   message shows at the canvas top instead. Phones don't show the help card. */
++@media (min-width:761px){#topologyBuilder:has(.builderSpaceHelpPopover140:not([hidden])) .builderCanvasStatusToast{top:8px!important;bottom:auto!important}}
++/* 12. The help card's text, 4.31:1 on the card, is lightened to 4.94:1. */
++#topologyBuilder .builderSpaceHelpPopover140 .builderNavigationHint{color:#8aa1b3}
++/* 14. A card's status dot sat over the first letter of its top label; it moves into the corner. */
++#topologyBuilder .builderNode>.builderNodeEventStatus{left:4px;top:3px}
++/* 10. No text under 11 px on screen in the Builder's panels that show when something is selected or a dialog, menu
++   or panel opens. Generated by docs/mockups/builder-sweep-text-floor.js: each selector was checked on every page as it
++   opens and in each of those Builder states to match only text at or under 11 px, outside SVGs and the Builder's canvas,
++   so the floor only raises text. Important and for screens only, as Build 231's floor is. */
++@media screen{
++ .builderAdvancedBody p.builderHelp{font-size:11px!important}
++ .builderBulkBody :is(label,small){font-size:11px!important}
++ .builderCapabilityCard :is(small,strong){font-size:11px!important}
++ .builderCapabilityInspector :is(div.builderCapabilityNotice,h4){font-size:11px!important}
++ .builderCheck span{font-size:11px!important}
++ .builderField :is(label,span){font-size:11px!important}
++ .builderGroupChips130 span{font-size:11px!important}
++ .builderImpactDialog div.builderImpactNote{font-size:11px!important}
++ .builderImpactHead :is(small,span){font-size:11px!important}
++ .builderImpactMetric small{font-size:11px!important}
++ .builderImpactSection :is(h4,li){font-size:11px!important}
++ .builderInspector :is(p.builderType,span.builderLabel){font-size:11px!important}
++ .builderInspectorQuick :is(button,small,strong){font-size:11px!important}
++ .builderInstanceGrid :is(label,label.builderHostIdentity147,label.builderInstanceGroupField,label.wide){font-size:11px!important}
++ .builderInstanceInspector h4{font-size:11px!important}
++ .builderLargeNav :is(span.builderLargeNavStatus,strong){font-size:11px!important}
++ .builderMenuItems div.mbHeading198{font-size:11px!important}
++ .builderNetworkFields label{font-size:11px!important}
++ .builderOwned strong{font-size:11px!important}
++ .builderPaletteCopy span.builderPaletteSubtitle{font-size:11px!important}
++ .builderPaletteItem span.builderIcon{font-size:11px!important}
++ .builderPaletteSearch :is(label,p.builderPaletteDragHint,small){font-size:11px!important}
++ .builderPaletteTarget :is(button,label,span){font-size:11px!important}
++ .builderPaletteToggleMeta span.builderPaletteGroupCount{font-size:11px!important}
++ .builderPresentationSheet span.builderPresentationPageLabel{font-size:11px!important}
++ .builderPresentationToolbar :is(label,span.builderPresentationBadge){font-size:11px!important}
++ .builderSegments button.builderSegment{font-size:11px!important}
++ .builderSuggestionList button{font-size:11px!important}
++ .builderSuggestions small{font-size:11px!important}
++ .builderTags span.builderTag{font-size:11px!important}
++ .chips199 button{font-size:11px!important}
++ .gained :is(h4,li){font-size:11px!important}
++ .ihead199 button.insert199{font-size:11px!important}
++ .indexClusterInspector :is(label,p,strong){font-size:11px!important}
++ .lost :is(h4,li){font-size:11px!important}
++ .ports230 h4{font-size:11px!important}
++ .relationshipAssuranceSummary :is(small,span){font-size:11px!important}
++ .relationshipInspectorGrid :is(label,label.wide,p.relationshipAuthHint127){font-size:11px!important}
++ .routingInspector :is(div.routingSummary,h5){font-size:11px!important}
++ .routingInspectorGrid label{font-size:11px!important}
++ .routingInspectorToggle span{font-size:11px!important}
++ .same :is(h4,li){font-size:11px!important}
++}
++</style>
+@@ -18167 +18228 @@
+-// ---- 19. The Builder on a first visit: when the topology would fit at under 70%, the Components panel starts folded so
++// ---- 19. The Builder on a first visit: when the topology would fit at under 75%, the Components panel starts folded so
+@@ -18174 +18235 @@
+-  if(v.initialized&&v.zoom<.7){const hide=document.getElementById('builderPaletteDrawerClose');if(hide?.checkVisibility())hide.click();else toggleBuilderCanvasPalette();requestAnimationFrame(()=>{try{fitBuilderView()}catch(e){}});return}
++  if(v.initialized&&v.zoom<.75){const hide=document.getElementById('builderPaletteDrawerClose');if(hide?.checkVisibility())hide.click();else toggleBuilderCanvasPalette();requestAnimationFrame(()=>{try{fitBuilderView()}catch(e){}window.builderFirstFit232?.()});return}
+@@ -18228,0 +18290,68 @@
++<script id="builder-sweep-v232">
++/* builder-sweep-v232: fixes from a check of the Builder page (Build 232). Numbers are the items of that check.
++   Item 1 and 2 (the presentation state), 3 (the Help item), 11 (two search boxes' names), 13 (Save's suggested name) and
++   9's threshold are in-place edits; this block holds the parts that run after the page's own code. */
++(function(){
++const world=()=>document.querySelector('#builderTree .unifiedBuilderWorld');
++const nums=s=>(s||'').match(/[-\d.]+/g)?.map(Number);
++
++// ---- 4 and 5. Route labels fit their text. Each label's box is sized from its text's length in characters (Build 123:
++// 5.8 px a character and 18 px over), and below 100% zoom its text grows to keep it readable, up to 13 px (Build 141); a
++// bundled management label gets " · N clients" added and its box widened without its text being moved back to the
++// middle (Build 164). After each placement, and when the zoom changes the text's size, a box narrower than its text and
++// 18 px is widened about its own middle, the text is put back in the middle, and an issue badge drawn beside the label
++// moves with the edge it sits by. A box is never narrowed, so the page's own spacing is kept.
++const PAD=18;
++function fitLabels(){const w=world();if(!w)return;
++ for(const label of w.querySelectorAll('.edgeRouteLabel')){if(label.dataset.labelHidden==='true')continue;
++  const text=label.querySelector(':scope>text'),rect=label.querySelector(':scope>rect');if(!text||!rect)continue;
++  const t=nums(label.getAttribute('transform'));if(!t||t.length<2)continue;
++  let width=Number(rect.getAttribute('width'))||0;const x0=Number(rect.getAttribute('x')||0),need=Math.ceil((text.getComputedTextLength()+PAD)*10)/10;
++  if(need>width+.5){const grow=need-width;
++   label.setAttribute('transform',`translate(${+(t[0]-grow/2).toFixed(2)} ${t[1]})`);rect.setAttribute('width',String(need));
++   // A badge inside the label is placed from the label's left edge: beside its right end it moves the whole growth,
++   // under its middle half of it, before its left end not at all (the left end itself moved).
++   const shift=v=>{const q=nums(v);if(!q||q.length<2)return v;const x=q[0]-x0,dx=x>width?grow:x>=0?grow/2:0;return `translate(${+(q[0]+dx).toFixed(2)} ${q[1]})`};
++   for(const m of label.querySelectorAll(':scope>.builderEdgeIssueMarker')){m.setAttribute('transform',shift(m.getAttribute('transform')));if(m.dataset.labelTransform164)m.dataset.labelTransform164=shift(m.dataset.labelTransform164)}
++   width=need}
++  if(getComputedStyle(text).textAnchor==='middle'){const mid=+(x0+width/2).toFixed(2);if(Math.abs(Number(text.getAttribute('x'))-mid)>.05)text.setAttribute('x',String(mid))}}}
++for(const name of ['builderPlaceLabels149','builderBundleLabels163','builderBadges164']){const before=window[name];if(typeof before!=='function')continue;
++ window[name]=function(...args){const result=before.apply(this,args);try{fitLabels()}catch(e){}return result}}
++// The text's size follows the zoom (Build 141 sets it on each change of view), so a change that alters it fits again.
++let lastSize='';
++if(typeof applyBuilderViewport==='function'){const before=applyBuilderViewport;
++ applyBuilderViewport=function(...args){const result=before.apply(this,args),size=document.querySelector('#builderTree')?.style.getPropertyValue('--builder-label-size-v141')||'';
++  if(size!==lastSize){lastSize=size;try{fitLabels()}catch(e){}}return result}}
++
++// ---- 7. On a phone the connection handles under each card (Event data and the others) sit on the card's outgoing link,
++// where its route label goes, and the label was drawn under one. Labels and issue badges are kept clear of the list
++// Build 211 gives (containers' and type headers' controls, in canvas units, 2 px larger all round); on a phone the
++// handles that show join it.
++if(typeof window.builderLabelObstacles211==='function'){const before=window.builderLabelObstacles211;
++ window.builderLabelObstacles211=function(...args){const list=before.apply(this,args)||[];const w=world();
++  if(!w||typeof builderPhoneMedia158!=='object'||!builderPhoneMedia158.matches)return list;
++  const o=w.getBoundingClientRect(),z=state.builderViewport?.zoom||1;
++  for(const h of w.querySelectorAll('.builderConnectionHandles>button')){if(!h.checkVisibility({checkOpacity:true,checkVisibilityCSS:true}))continue;const r=h.getBoundingClientRect();if(!r.width)continue;
++   list.push({x:(r.left-o.left)/z-2,y:(r.top-o.top)/z-2,w:r.width/z+4,h:r.height/z+4})}
++  return list}}
++
++// ---- 9. A first visit opens where cards show their details. Build 231 folds Components when the topology would fit at
++// under 70%; the edit makes that 75%, the zoom from which cards show their details and links their labels (Build 163),
++// and calls this after its fit: if the fit is still under 75% (1280 px wide, say), the Inspector's own Hide control is
++// pressed too and the view is fitted again. Only on a first visit, and only when no panel state has been chosen, as before.
++let inspectorFolded=false;
++window.builderFirstFit232=function(){setTimeout(()=>{const v=state.builderViewport||{};if(document.body.dataset.view!=='builder'||!v.initialized||v.zoom>=.75)return;
++ if(typeof canvasPanelState!=='object'||!canvasPanelState.inspector)return;
++ const hide=document.getElementById('builderInspectorDrawerClose');if(hide?.checkVisibility())hide.click();else if(typeof toggleBuilderCanvasInspector==='function')toggleBuilderCanvasInspector();
++ inspectorFolded=true;requestAnimationFrame(()=>{try{fitBuilderView()}catch(e){}})},150)};
++// An Inspector folded this way opens again at the first selection (a card, a link or a badge, by pointer or key), as
++// that is where a person edits what they chose; its rail's own control is pressed. One that the person folds stays folded.
++const reopen=()=>{if(!inspectorFolded)return;const chosen=(state.builderSelected!==null&&state.builderSelected!==undefined)||!!state.builderSelectedEdge;if(!chosen)return;inspectorFolded=false;
++ if(typeof canvasPanelState!=='object'||canvasPanelState.inspector)return;
++ const rail=[...document.querySelectorAll('#topologyBuilder .dockRail197')].find(b=>b.checkVisibility()&&/Inspector/.test(b.getAttribute('aria-label')||b.title||b.textContent));
++ if(rail)rail.click();else if(typeof toggleBuilderCanvasInspector==='function')toggleBuilderCanvasInspector()};
++for(const type of ['click','keyup'])document.addEventListener(type,e=>{if(!inspectorFolded)return;if(e.target.closest?.('#topologyBuilder .dockRail197'))inspectorFolded=false;else if(e.target.closest?.('#topologyBuilder'))setTimeout(reopen,0)},true);
++
++window.builderSweep232={fitLabels};
++})();
++</script>

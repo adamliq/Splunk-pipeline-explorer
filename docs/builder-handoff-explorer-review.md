@@ -447,7 +447,7 @@ Each comparison takes Build 230 twice, to set aside whatever varies from run to 
 | The splits’ 40 checks, with the map’s tools taken out as Build 224’s handoff says | 40 of 40 | 40 of 40 |
 | Ingest Processor pipelines’ 31 checks | 31 of 31 | 31 of 31 |
 | The space tool | Meets every target | Meets every target; on a first visit the canvas gets 52% at 1280 px and 57% at 1440 px, for 37% and 43%, as Components starts folded there; the same at the other sizes |
-| The connector tool ¶ | 20 findings, all ‘badge over label’, in 7 of the 10 scenes | None: the Builder now opens at a larger zoom, where the badge clears the label. At the same zoom the two pages give the same result |
+| The connector tool ¶ | 20 findings, all ‘badge over label’, in 7 of the 10 scenes: none can be seen (corrected in Build 232, see ¶) | None |
 | The Builder’s redraws, 4 components: budget 40 ms § | 27 ms; 29 ms after a card moves | 26 ms; 28 ms after a card moves |
 | The Builder’s redraws, 5 components: budget 50 ms § | 36 ms; 40 ms after a card moves | 36 ms; 38 ms after a card moves |
 | The Builder’s redraws, 8 components: budget 80 ms § | 61 ms; 67 ms after a card moves | 63 ms; 63 ms after a card moves |
@@ -462,7 +462,7 @@ Each comparison takes Build 230 twice, to set aside whatever varies from run to 
 
 § `tools/builder-perf-check.js`, five runs on each page in turn after the timings: the medians of its redraw after a change, and after a card moves. Every median is within its budget on both pages.
 
-¶ `tools/builder-connector-check.js` adds a component from the Components panel. It now opens that panel when the Builder starts with it folded, as a person would with ＋ Add, and ran with that change on both pages. On Build 230 the change does nothing, as the panel starts open. Its findings on Build 230 are all one thing: an issue badge drawn over the File handoff label, between the Syslog Server and the Universal Forwarder, or over another label once a card is dragged. They aren’t on the new page only because its Builder opens at a larger zoom, as Components starts folded: 78% for 58%, where the first scene and the six drag scenes begin. Set to 58%, 65% and 70%, both pages draw the badge over the File handoff label; at 78%, neither does. So this build doesn’t move the badge; at a smaller zoom it still covers the label, as before. That’s left for a later build.
+¶ `tools/builder-connector-check.js` adds a component from the Components panel. It now opens that panel when the Builder starts with it folded, as a person would with ＋ Add, and ran with that change on both pages. On Build 230 the change does nothing, as the panel starts open. Its findings on Build 230 are all of one kind, a badge reported over a route label, and none can be seen. Under 75% zoom the Builder hides route labels and draws each issue badge on its link (Builds 163 and 164), but the tool measured the hidden label’s box. Build 230 opens at 58%, where every label is hidden; the new page opens at 78%, where labels show and no badge covers one. Corrected in Build 232, which makes the tool count a label the zoom hides as hidden. This note first said the badge still covered the File handoff label at 58% to 70%; at those zooms the label isn’t drawn.
 
 ### 4. Time
 
