@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fleet Tools</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.notes{min-width:0;overflow-wrap:anywhere}
+.panel p{margin:0 0 10px;color:var(--ink-2);font-size:13px}
+.panel a{color:inherit}
+.panel td:first-child{white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 233 TARGET · BUILD 232 + PROTOTYPE</span>
+ <h1>Fleet and Deployment Server tools</h1>
+ <p class="lede">Six tools over Operate › Multi-DS management, on one fleet inventory: the sample, or a real Deployment Server’s export read in the page. Their rules are Splunk’s own pages’, and what they take from Splunk was checked against a Splunk 10.6 Deployment Server and two agents.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>Build 232 against the prototype</h2>
+  <table>
+   <thead><tr><th>#</th><th>Tool</th><th>Build 232</th><th>With the prototype</th></tr></thead>
+   <tbody>
+    <tr><td>1</td><td>Import real deployment inventory</td><td>The sample only</td><td>A Deployment Server’s export, CSV or JSON, with serverclass.conf, read in the page; the overview and every tool follow it</td></tr>
+    <tr><td>2</td><td>Fleet cohort rollout simulator</td><td>Five fixed cards</td><td>Cohorts, windows, soak and gates, timed; a bad release stopped at the canary 83% of the time; cohort CSV and serverclass.conf steps</td></tr>
+    <tr><td>3</td><td>Deployment Server capacity model</td><td>None</td><td>Phone homes, retries, pushes and _dsphonehome records against Splunk’s sizing figures: 18.3 a second, 6.65 min for 620 agents</td></tr>
+    <tr><td>4</td><td>Configuration dependency graph</td><td>None</td><td>Each setting’s apps, classes and agents, and the value that wins: 145 agents keep primary_indexers</td></tr>
+    <tr><td>5</td><td>Upgrade compatibility planner</td><td>None</td><td>Paths from Splunk’s tables, forwarders against indexers, the 9.2 and 9.4.3 changes, an order</td></tr>
+    <tr><td>6</td><td>Release approval evidence workflow</td><td>An approval checkbox</td><td>Twelve checks from the other tools and the canary’s evidence; JSON and Markdown with a SHA-256</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>Where the design comes from</h2>
+  <dl>
+   <dt>Splunk’s figures, as Splunk gives them</dt><dd>Push times are the sizing page’s formulas; the model’s two assumptions (bundle size, longer phone homes) are named where they apply.</dd>
+   <dt>Checked against Splunk</dt><dd>The export’s columns, which app wins a setting, the cohort file, the 9.4.3 change and the phone-home records, on a Splunk 10.6 Deployment Server.</dd>
+   <dt>Nothing leaves the page</dt><dd>Exports and packages are read in the tab, and kept there until downloaded.</dd>
+  </dl>
+ </section>
+ <section class="panel rules">
+  <h2>Sources</h2>
+  <dl>
+   <dt>Splunk documentation</dt><dd><a href="https://help.splunk.com/en/splunk-enterprise/administer/admin-manual/10.4/configuration-file-reference/10.4.2-configuration-file-reference/deploymentclient.conf">deploymentclient.conf</a> · <a href="https://help.splunk.com/en/splunk-enterprise/administer/admin-manual/10.4/configuration-file-reference/10.4.2-configuration-file-reference/serverclass.conf">serverclass.conf</a> · <a href="https://help.splunk.com/splunk-enterprise/administer/update-your-deployment/10.2/manage-the-agent-management/estimate-agent-management-performance">Estimate agent management performance</a> · <a href="https://help.splunk.com/en/splunk-enterprise/administer/update-your-deployment/9.4/configure-the-deployment-system/implement-a-deployment-server-cluster">Deployment server cluster</a> · <a href="https://help.splunk.com/en/splunk-enterprise/release-notes-and-updates/compatibility-matrix/splunk-products-version-compatibility/compatibility-between-forwarders-and-splunk-enterprise-indexers">Forwarder and indexer compatibility</a> · <a href="https://help.splunk.com/en/splunk-enterprise/administer/admin-manual/10.2/administer-splunk-enterprise-with-configuration-files/configuration-file-precedence">Configuration file precedence</a>.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-fleet-ds-tools.md</code> · Prototype: a new script block, its styles and six in-place edits to Build 232, in <code>docs/mockups/fleet-ds-tools.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "tools", "img": "compare/fleet-ds-tools-tools.png", "group": "target", "tab": "The tools", "title": "Six tools over Multi-DS management", "w": 1160, "h": 488, "zoom": 1, "size": "1440 px window, Operate › Multi-DS management", "measure": {"buttons": ["Overview", "Inventory", "Rollout", "Server capacity", "Dependencies", "Upgrades", "Release approval"]}, "items": [{"n": 1, "head": "One row, seven views", "text": "The overview as before, then Inventory, Rollout, Server capacity, Dependencies, Upgrades and Release approval, all on the same fleet.", "x": 50, "y": 14.9, "box": [1.03, 2.4, 97.93, 9.22]}]}, {"id": "inventory", "img": "compare/fleet-ds-tools-inventory.png", "group": "target", "tab": "Inventory", "title": "A real Deployment Server’s export, read in the page", "w": 1156, "h": 482, "zoom": 1, "size": "1440 px window, Inventory, after the export and serverclass.conf of a Splunk 10.6 Deployment Server are chosen", "measure": {"preview": "2 agents, 4 server classes (4 from serverclass.conf), 5 apps, 1 Deployment Server."}, "items": [{"n": 1, "head": "The search", "text": "Run on each Deployment Server; its CSV or JSON export, or the REST response, reads as it is.", "x": 40.07, "y": 31.74, "box": [1.99, 20.02, 76.16, 8.4]}, {"n": 2, "head": "2 agents, 4 classes, 5 apps", "text": "What was read, which columns were used, and which server each agent reports to, before anything changes.", "x": 50, "y": 44.4, "box": [1.99, 36.72, 96.02, 4.36]}]}, {"id": "rollout", "img": "compare/fleet-ds-tools-rollout.png", "group": "target", "tab": "Rollout", "title": "Canary, waves, windows and gates, timed", "w": 1156, "h": 390, "zoom": 1, "size": "1440 px window, Rollout, the sample fleet", "measure": {"canary": 83, "exposed": 52, "hours": 6.1, "cohorts": [35, 85, 255, 510]}, "items": [{"n": 1, "head": "83% at the canary", "text": "A release that breaks 5% of agents is stopped at the canary’s gate 83% of the time.", "x": 72.56, "y": 88.77, "box": [70.94, 74.93, 3.23, 9.74]}, {"n": 2, "head": "Maintenance windows", "text": "Each push starts and ends inside its region’s window, after the gate before it.", "x": 60.27, "y": 65.7, "box": [24.6, 52.36, 71.33, 9.23]}, {"n": 3, "head": "52 agents", "text": "Expected to have a bad release before a gate stops it, of 885.", "x": 62.37, "y": 33.26, "box": [50.35, 2.47, 24.05, 26.69]}]}, {"id": "capacity", "img": "compare/fleet-ds-tools-capacity.png", "group": "target", "tab": "Server capacity", "title": "The fleet against Splunk’s own sizing figures", "w": 1156, "h": 474, "zoom": 1, "size": "1440 px window, Server capacity, the sample fleet", "measure": {"phs": 18.3, "push": 3.1, "splunk": 6.65, "perDay": 1584000}, "items": [{"n": 1, "head": "6.65 min for 50 MB", "text": "Splunk’s formula for 620 agents on a 12-core Linux host; 3.1 min for this 12 MB release.", "x": 18.69, "y": 82.93, "box": [15.92, 81.88, 0.87, 2.11]}, {"n": 2, "head": "18.3 a second", "text": "Phone homes from 1,100 agents every 60 s: each one also a record in _dsphonehome, about 330 bytes.", "x": 12.89, "y": 27.5, "box": [0.87, 2.16, 24.05, 21.96]}]}, {"id": "dependencies", "img": "compare/fleet-ds-tools-dependencies.png", "group": "target", "tab": "Dependencies", "title": "Where two apps set the same thing, which wins", "w": 1156, "h": 392, "zoom": 1, "size": "1440 px window, Dependencies, the sample’s apps", "measure": {"conflicts": [["outputs.conf [tcpout] defaultGroup", 145, "outputs_primary"], ["inputs.conf [WinEventLog://Security] renderXml", 18, "TA_windows_security"], ["inputs.conf [monitor:///var/log/audit/audit.log] index", 17, "TA_linux_auditd"]]}, "items": [{"n": 1, "head": "145 agents keep primary_indexers", "text": "regional_network’s defaultGroup loses: “outputs_primary” sorts first. btool on Splunk 10.6 shows the same.", "x": 50, "y": 61.95, "box": [0.87, 35.17, 98.27, 22.7]}]}, {"id": "upgrades", "img": "compare/fleet-ds-tools-upgrades.png", "group": "target", "tab": "Upgrades", "title": "What stands between today and Splunk 10.0", "w": 1156, "h": 590, "zoom": 1, "size": "1440 px window, Upgrades, target 10.0", "measure": {"critical": ["No supported path from 9.1.6", "TA_windows_security would reach no agents after the upgrade", "TA_api_collection isn’t declared for 10.0"]}, "items": [{"n": 1, "head": "The 9.4.3 change", "text": "A blacklist-only app stanza matches no agents from 9.4.3; on Splunk 10.6 the app left both test agents.", "x": 50, "y": 39.23, "box": [0.87, 18.13, 98.27, 18.39]}]}, {"id": "approval", "img": "compare/fleet-ds-tools-approval.png", "group": "target", "tab": "Release approval", "title": "One record, its checks drawn from the other tools", "w": 1156, "h": 841, "zoom": 1, "size": "1440 px window, Release approval", "measure": {"checks": 12, "blocked": 8}, "items": [{"n": 1, "head": "From Dependencies", "text": "release_candidate’s own settings lose on its canary: the canary can’t test them.", "x": 50, "y": 44.69, "box": [0.87, 33.26, 98.27, 9.53]}]}, {"id": "tools-today", "img": "compare/fleet-ds-tools-tools-today.png", "group": "today", "tab": "Today: Multi-DS", "title": "Build 232: the overview only", "w": 1160, "h": 429, "zoom": 1, "size": "1440 px window, Operate › Multi-DS management", "measure": {"buttons": []}, "items": [{"n": 1, "head": "No tools", "text": "One page of the sample’s figures; nothing reads a real fleet.", "x": 33.79, "y": 19.11, "box": [1.03, 8.67, 65.52, 6.71]}]}, {"id": "lifecycle-today", "img": "compare/fleet-ds-tools-lifecycle-today.png", "group": "today", "tab": "Today: rollout", "title": "Build 232: a rollout as five fixed cards", "w": 1160, "h": 133, "zoom": 1, "size": "1440 px window, Multi-DS management, the promotion lifecycle", "measure": {"cards": ["Stage", "Promote", "Canary", "Production", "Rollback"], "tools": 0}, "items": [{"n": 1, "head": "Fixed text", "text": "No times, windows, gates or cohorts.", "x": 50, "y": 98.8, "box": [40.48, 8.87, 19.03, 82.08]}]}, {"id": "changes-today", "img": "compare/fleet-ds-tools-changes-today.png", "group": "today", "tab": "Today: register", "title": "Build 232: the six were proposed", "w": 1364, "h": 251, "zoom": 1, "size": "1440 px window, Changes", "measure": {"six": ["High", "High", "Medium", "Medium", "Medium", "Medium"]}, "items": [{"n": 1, "head": "Proposed", "text": "With the other five, unticked.", "x": 25.37, "y": 33.36, "box": [0.73, 4.01, 49.27, 22.98]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 232 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
