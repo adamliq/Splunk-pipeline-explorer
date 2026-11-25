@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Explorer Review</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.notes{min-width:0;overflow-wrap:anywhere}
+.panel p{margin:0 0 10px;color:var(--ink-2);font-size:13px}
+.panel a{color:inherit}
+.panel td:first-child{white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 231 TARGET · BUILD 230 + PROTOTYPE</span>
+ <h1>Fixes and improvements from a review of every page</h1>
+ <p class="lede">Every page of the Explorer was swept at three widths, every control used once, and each page looked at by eye. Build 231 makes the 27 changes that came out of it: thirteen fixes, from a stage dialog that stopped opening after any OV page to text cut off on a phone, and fourteen improvements, from a shared section that folds away to SC4S settings in Generate.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>Build 230 against the prototype</h2>
+  <table>
+   <thead><tr><th>#</th><th>Where</th><th>Build 230</th><th>With the prototype</th></tr></thead>
+   <tbody>
+    <tr><td>1</td><td>AV-2’s search icon</td><td>As wide as the page</td><td>14 px</td></tr>
+    <tr><td>2</td><td>Authentication boundary cards</td><td>Labels run into values</td><td>Each label over its value</td></tr>
+    <tr><td>3</td><td>RASCI matrix header</td><td>Covers the first row</td><td>At the top of its box</td></tr>
+    <tr><td>4</td><td>SvcV-6’s flow table</td><td>124 px out of sight</td><td>Fits its column</td></tr>
+    <tr><td>5</td><td>Failure Lab handoff label</td><td>Over the next stage</td><td>Up the gap between stages</td></tr>
+    <tr><td>6</td><td>Matrix header</td><td>Scrolls away</td><td>Stays under the toolbar</td></tr>
+    <tr><td>7</td><td>TM-1’s date</td><td>4 Oct 2026, fixed</td><td>The pack’s date</td></tr>
+    <tr><td>8</td><td>Operate tables on a phone</td><td>Cut off</td><td>Scroll in their own box</td></tr>
+    <tr><td>9</td><td>Form fields</td><td>15 without a name, and Find</td><td>Named by their labels</td></tr>
+    <tr><td>10</td><td>Diagram buttons</td><td>No names on four pages</td><td>Named by their text or row</td></tr>
+    <tr><td>11</td><td>The stage dialog’s id</td><td>Shared with the OV pages: a stage opens nothing after any OV page</td><td>Its own: the stage’s detail opens</td></tr>
+    <tr><td>12</td><td>A page just opened</td><td>“Unsaved changes”</td><td>“Saved”</td></tr>
+    <tr><td>13</td><td>Two “Builder review fixes”</td><td>Same name</td><td>Named apart</td></tr>
+    <tr><td>14</td><td>The shared section</td><td>First on every view</td><td>Folds; a line says what’s selected</td></tr>
+    <tr><td>15</td><td>Path chips</td><td>7 of 12 out of sight</td><td>Wrap onto more rows</td></tr>
+    <tr><td>16</td><td>Matrix Y, Y*, N</td><td>Look alike</td><td>Tinted, with a key</td></tr>
+    <tr><td>17</td><td>Failure Lab scenarios</td><td>65, no way to find one</td><td>A count and a filter</td></tr>
+    <tr><td>18</td><td>Wide rows and diagrams</td><td>Cut off, no sign</td><td>A fade where there’s more</td></tr>
+    <tr><td>19</td><td>Builder first visit</td><td>58%; Got it above its help; “Builder ·”</td><td>78%; Got it at the foot; “Builder”</td></tr>
+    <tr><td>20</td><td>Config with no files</td><td>The whole stage table</td><td>Behind a button</td></tr>
+    <tr><td>21</td><td>Change register</td><td>One column, details under 10 px</td><td>Two columns, find, filter, order</td></tr>
+    <tr><td>22</td><td>Small text</td><td>4,684 under 11 px</td><td>25</td></tr>
+    <tr><td>23</td><td>Contrast</td><td>Three hard to read</td><td>Darker</td></tr>
+    <tr><td>24</td><td>Phone tap targets</td><td>Under 24 px</td><td>At least 24 px</td></tr>
+    <tr><td>25</td><td>Generate</td><td>No ports</td><td>SC4S settings and listeners</td></tr>
+    <tr><td>26</td><td>Compare with nothing saved</td><td>Six empty cards</td><td>What to do</td></tr>
+    <tr><td>27</td><td>Wording</td><td>modeled, Syslog server</td><td>modelled, Syslog Server</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>Where the design comes from</h2>
+  <dl>
+   <dt>Names</dt><dd>Every control has a name that assistive technology can read: WCAG’s Name, Role, Value. Labels are tied to their fields, and diagram buttons named by their own words.</dd>
+   <dt>Targets</dt><dd>On a phone, a target is at least 24 by 24 CSS pixels: WCAG’s Target Size (Minimum).</dd>
+   <dt>Text</dt><dd>Text is at least 11 px, and at a contrast of at least 4.5:1, WCAG’s minimum for normal text.</dd>
+   <dt>SC4S</dt><dd>A source’s own ports are one variable per source and protocol, its ports comma-separated with no spaces. An env_file takes a comment only on a line of its own.</dd>
+  </dl>
+ </section>
+ <section class="panel rules">
+  <h2>Sources</h2>
+  <dl>
+   <dt>WCAG 2.2</dt><dd><a href="https://www.w3.org/WAI/WCAG22/Understanding/name-role-value.html">Name, Role, Value</a>, <a href="https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html">Target Size (Minimum)</a> and <a href="https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html">Contrast (Minimum)</a>.</dd>
+   <dt>SC4S</dt><dd><a href="https://splunk.github.io/splunk-connect-for-syslog/main/sources/">Sources</a>, its unique listening ports; <a href="https://splunk.github.io/splunk-connect-for-syslog/main/configuration/">Configuration</a>, TLS; and its <a href="https://github.com/splunk/splunk-connect-for-syslog/blob/main/package/sbin/entrypoint.sh">entrypoint</a>, the default ports.</dd>
+   <dt>Docker</dt><dd><a href="https://docs.docker.com/reference/cli/docker/container/run/">docker container run</a>, on <code>--env-file</code>.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-explorer-review.md</code> · Prototype: a new script block, its styles and fourteen in-place edits to Build 230, in <code>docs/mockups/explorer-review.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "diagnose", "img": "compare/explorer-review-diagnose.png", "group": "target", "tab": "Diagnose", "title": "The shared section folds away", "w": 1388, "h": 909, "zoom": 1, "size": "1440 px window, Diagnose", "measure": {"top": 361}, "items": [{"n": 1, "head": "What’s selected, in a line", "text": "The component and the path the page is about, while the component strip, parallel panel, context and route diagram are folded.", "x": 9.64, "y": 29.72, "box": [0, 25.9, 19.28, 2.06]}, {"n": 2, "head": "Show components and model", "text": "Opens them again. Each view keeps its choice: Flow and Matrix open, Diagnose, Failure Lab, Changes and Operate folded until opened.", "x": 93.09, "y": 30.33, "box": [86.18, 25.3, 13.82, 3.27]}, {"n": 3, "head": "Diagnose starts here", "text": "Its symptoms start 361 px down the page; in Build 230 they started at 1,153 px, below a 1,000 px window.", "x": 23.2, "y": 64.84, "box": [0, 29.67, 21.61, 70.33]}]}, {"id": "builder", "img": "compare/explorer-review-builder.png", "group": "target", "tab": "Builder", "title": "A first visit: the canvas fits, and nothing is unsaved", "w": 1408, "h": 941, "zoom": 1, "size": "1440 px window, the Builder on a first visit", "measure": {"zoom": "78%", "save": "Saved"}, "items": [{"n": 1, "head": "Fits at 78%", "text": "On a first visit Components starts folded when the canvas would fit under 70%. Build 230 opened at 58%.", "x": 13.95, "y": 8.79, "box": [12.45, 5.87, 2.98, 1.22]}, {"n": 2, "head": "＋ Add", "text": "Opens Components again. A choice to keep it open is kept.", "x": 22.76, "y": 9.72, "box": [20.47, 4.94, 4.56, 3.08]}, {"n": 3, "head": "Saved", "text": "A page just opened has nothing to save. Build 230 said “Unsaved changes” before anything was done.", "x": 93.84, "y": 4.68, "box": [92.57, 1.7, 2.55, 1.28]}]}, {"id": "matrix", "img": "compare/explorer-review-matrix.png", "group": "target", "tab": "Matrix", "title": "Y stands out, with a key; the header stays in view", "w": 1404, "h": 908, "zoom": 1, "size": "1440 px window, the Matrix", "measure": {}, "items": [{"n": 1, "head": "The key", "text": "Y runs on that component, Y* when its setting or condition applies, N not used.", "x": 50, "y": 4.89, "box": [0.57, 0.84, 98.86, 2.28]}, {"n": 2, "head": "Y on a tint", "text": "Bold, on a green tint; Y* on amber.", "x": 70.07, "y": 12.74, "box": [66.17, 10.45, 2.32, 4.59]}, {"n": 3, "head": "N, quieter", "text": "Lighter and not bold, still readable.", "x": 49.08, "y": 12.74, "box": [40.46, 10.45, 7.05, 4.59]}, {"n": 4, "head": "The header stays", "text": "Under the toolbar while the table scrolls with the page; on narrower screens the table scrolls in its own box under its header.", "x": 5.48, "y": 12.21, "box": [0.64, 4.33, 9.68, 6.11]}]}, {"id": "failure", "img": "compare/explorer-review-failure.png", "group": "target", "tab": "Failure Lab", "title": "Find a scenario; each handoff labelled in its gap", "w": 1388, "h": 1309, "zoom": 1, "size": "1440 × 1400 px window, the Failure Lab filtered for “syslog”", "measure": {"count": "2 of 65 scenarios"}, "items": [{"n": 1, "head": "2 of 65 scenarios", "text": "How many of the 65 match; the selected scenario stays in the list.", "x": 23.2, "y": 21.28, "box": [0, 20.6, 21.61, 1.36]}, {"n": 2, "head": "Filter by name or stage", "text": "Typing narrows the list as you go.", "x": 10.81, "y": 25.93, "box": [0, 22.42, 21.61, 2.29]}, {"n": 3, "head": "Component handoff", "text": "Runs up the gap between two stages, above the arrow, instead of over the next stage.", "x": 81.05, "y": 45.52, "box": [78.67, 40.93, 0.79, 9.17]}]}, {"id": "changes", "img": "compare/explorer-review-changes.png", "group": "target", "tab": "Changes", "title": "The change register: find, filter and order; two columns", "w": 1388, "h": 909, "zoom": 1, "size": "1440 px window, Changes", "measure": {"count": "246 changes", "cols": 2}, "items": [{"n": 1, "head": "Find a change", "text": "By name or detail.", "x": 13.04, "y": 63, "box": [1.51, 57.72, 23.05, 3.52]}, {"n": 2, "head": "Status", "text": "All, done or proposed.", "x": 29.29, "y": 63, "box": [25.72, 57.72, 7.13, 3.52]}, {"n": 3, "head": "Newest first", "text": "Reverses each group.", "x": 37.36, "y": 63, "box": [34.01, 57.72, 6.71, 3.52]}, {"n": 4, "head": "246 changes", "text": "And “N of M changes” while filtered.", "x": 95.71, "y": 63, "box": [92.93, 59.18, 5.55, 2.06]}, {"n": 5, "head": "Two columns", "text": "Each group across the page, its items in two columns, details at 11 px or more.", "x": 98.6, "y": 84.83, "box": [1.59, 69.66, 96.83, 30.34]}]}, {"id": "generate", "img": "compare/explorer-review-generate.png", "group": "target", "tab": "Generate", "title": "Generate: a Syslog Server’s ports as SC4S settings", "w": 1148, "h": 452, "zoom": 1, "size": "1440 px window, Operate › Generate, with six ports on Syslog Server 1", "measure": {}, "items": [{"n": 1, "head": "SC4S’s env_file", "text": "One section per Syslog Server. No comment after a value, as an env_file takes none.", "x": 13.19, "y": 60.43, "box": [1.83, 58.88, 9.44, 3.1]}, {"n": 2, "head": "Several default ports", "text": "Comma-separated, no spaces.", "x": 27.03, "y": 76.88, "box": [1.83, 75.33, 23.29, 3.1]}, {"n": 3, "head": "A source’s own ports", "text": "One variable per source and protocol, as SC4S’s sources page shows; its note says to match the vendor and product. A load balancer’s listeners follow, when the topology has one.", "x": 34.58, "y": 93.34, "box": [1.83, 91.79, 30.84, 3.1]}]}, {"id": "phone", "img": "compare/explorer-review-phone.png", "group": "target", "tab": "Phone tables", "title": "On a phone, a wide table scrolls in its own box", "w": 342, "h": 538, "zoom": 1, "size": "390 px window, Operate › Multi-DS management", "measure": {"tableWidth": 940, "right": 974, "window": 390}, "items": [{"n": 1, "head": "Its own scroll box", "text": "The table is 940 px wide in a 390 px window. It scrolls sideways in its own box, and a fade at the right edge shows there’s more.", "x": 50, "y": 44.26, "box": [2.92, 1.86, 94.15, 39.42]}]}, {"id": "svcv6", "img": "compare/explorer-review-svcv6.png", "group": "target", "tab": "SvcV-6", "title": "SvcV-6: the flow table fits beside its panel", "w": 1258, "h": 303, "zoom": 1, "size": "1440 px window, OV › SvcV-6", "measure": {"over": 0}, "items": [{"n": 1, "head": "Fits its column", "text": "Its cells wrap, and nothing is left to scroll sideways. Below 1,180 px the side panel moves under it.", "x": 76.15, "y": 49.91, "box": [0.64, 2.6, 73.77, 94.62]}]}, {"id": "diagnose-today", "img": "compare/explorer-review-diagnose-today.png", "group": "today", "tab": "Today: Diagnose", "title": "Build 230: Diagnose under the shared section", "w": 1388, "h": 909, "zoom": 1, "size": "1440 px window, Diagnose", "measure": {"top": 1153}, "items": [{"n": 1, "head": "The shared section", "text": "The component strip, the parallel panel, the context and the route diagram come first on every view.", "x": 50, "y": 73.09, "box": [0, 15.5, 100, 55.82]}, {"n": 2, "head": "Diagnose is below", "text": "Diagnose’s own content starts 1,153 px down, below this 1,000 px window.", "x": 50, "y": 98.8, "box": [0, 90.75, 100, 9.25]}]}, {"id": "builder-today", "img": "compare/explorer-review-builder-today.png", "group": "today", "tab": "Today: Builder", "title": "Build 230: a first visit at 58%, “Unsaved changes”", "w": 1408, "h": 941, "zoom": 1, "size": "1440 px window, the Builder on a first visit", "measure": {"zoom": "58%", "save": "● Unsaved changes"}, "items": [{"n": 1, "head": "58%", "text": "Components and the inspector open beside a 754 px canvas.", "x": 13.95, "y": 8.79, "box": [12.45, 5.87, 2.98, 1.22]}, {"n": 2, "head": "Unsaved changes", "text": "Before anything was done.", "x": 90.94, "y": 4.68, "box": [86.76, 1.7, 8.36, 1.28]}]}, {"id": "svcv6-today", "img": "compare/explorer-review-svcv6-today.png", "group": "today", "tab": "Today: SvcV-6", "title": "Build 230: SvcV-6’s table clipped in a sideways scroll", "w": 1258, "h": 283, "zoom": 1, "size": "1440 px window, OV › SvcV-6", "measure": {"over": 124}, "items": [{"n": 1, "head": "124 px out of sight", "text": "Its last columns are out of sight until scrolled sideways.", "x": 76.15, "y": 50.06, "box": [0.64, 2.9, 73.77, 94.3]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 230 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>

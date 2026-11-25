@@ -1,0 +1,568 @@
+--- a/index.html
++++ b/index.html
+@@ -301 +301 @@
+-<dialog id="detail"><div class="detailTop"><button class="close" aria-label="Close detail">×</button><div class="eyebrow" id="dPipeline"></div><h2 id="dTitle"></h2><p id="dWhat"></p></div><div class="detailBody"><div class="detailGrid" id="dApplies"></div><div class="sectionLabel">Common configuration</div><div class="code" id="dConfig"></div><div id="dNoteWrap"><div class="sectionLabel">Operational note</div><div class="note" id="dNote"></div></div><div class="sources"><a href="https://help.splunk.com/en/splunk-enterprise/administer/distributed-deployment-manual/10.0/overview-of-splunk-enterprise-distributed-deployments/how-data-moves-through-splunk-deployments-the-data-pipeline" target="_blank" rel="noreferrer">Data pipeline overview ↗</a><a href="https://help.splunk.com/en/data-management/splunk-enterprise-admin-manual/10.2/configuration-file-reference/10.2.0-configuration-file-reference/props.conf" target="_blank" rel="noreferrer">props.conf reference ↗</a></div></div></dialog>
++<dialog id="stageDetail"><div class="detailTop"><button class="close" aria-label="Close detail">×</button><div class="eyebrow" id="dPipeline"></div><h2 id="dTitle"></h2><p id="dWhat"></p></div><div class="detailBody"><div class="detailGrid" id="dApplies"></div><div class="sectionLabel">Common configuration</div><div class="code" id="dConfig"></div><div id="dNoteWrap"><div class="sectionLabel">Operational note</div><div class="note" id="dNote"></div></div><div class="sources"><a href="https://help.splunk.com/en/splunk-enterprise/administer/distributed-deployment-manual/10.0/overview-of-splunk-enterprise-distributed-deployments/how-data-moves-through-splunk-deployments-the-data-pipeline" target="_blank" rel="noreferrer">Data pipeline overview ↗</a><a href="https://help.splunk.com/en/data-management/splunk-enterprise-admin-manual/10.2/configuration-file-reference/10.2.0-configuration-file-reference/props.conf" target="_blank" rel="noreferrer">props.conf reference ↗</a></div></div></dialog>
+@@ -419 +419 @@
+- ['Syslog file handoff','Syslog file write','Writes routed messages to the monitored filesystem path on the Syslog server.','File destination · permissions · SELinux context · filesystem','R','C','N','N','N','N','The file is the durable handoff between the Syslog daemon and the co-located Universal Forwarder.'],
++ ['Syslog file handoff','Syslog file write','Writes routed messages to the monitored filesystem path on the Syslog Server.','File destination · permissions · SELinux context · filesystem','R','C','N','N','N','N','The file is the durable handoff between the Syslog daemon and the co-located Universal Forwarder.'],
+@@ -741 +741 @@
+- {id:'syslog-unreachable',name:'Syslog server unreachable',scope:'Syslog transport',risk:'high',summary:'Syslog sources cannot connect to or deliver messages to the configured Syslog server listener.',loss:'High for UDP',detect:'Missing or delayed',recovery:'Restore and reconcile',affected:['Syslog listener reception'],effects:[
++ {id:'syslog-unreachable',name:'Syslog Server unreachable',scope:'Syslog transport',risk:'high',summary:'Syslog sources cannot connect to or deliver messages to the configured Syslog server listener.',loss:'High for UDP',detect:'Missing or delayed',recovery:'Restore and reconcile',affected:['Syslog listener reception'],effects:[
+@@ -746 +746 @@
+-  checks:['Test network reachability to the configured Syslog port and protocol.','Confirm the Syslog daemon is running, listening, and accepting messages.','Check firewall, DNS, TLS, disk, and service logs on the Syslog server.','Compare source send errors with destination-file and Splunk event freshness.'],actions:['Restore the listener, network path, certificate, or service dependency.','Confirm destination files resume advancing and the UF catches up.','Replay retained TCP/TLS data where supported and record unavoidable UDP gaps.']},
++  checks:['Test network reachability to the configured Syslog port and protocol.','Confirm the Syslog daemon is running, listening, and accepting messages.','Check firewall, DNS, TLS, disk, and service logs on the Syslog Server.','Compare source send errors with destination-file and Splunk event freshness.'],actions:['Restore the listener, network path, certificate, or service dependency.','Confirm destination files resume advancing and the UF catches up.','Replay retained TCP/TLS data where supported and record unavoidable UDP gaps.']},
+@@ -1014 +1014 @@
+- const m=dataQualityModel(),c=m.c,color=score=>score<60?'var(--red)':score<85?'var(--amber)':'var(--green)',rateColor=rate=>rate>=20?'var(--red)':rate>=5?'var(--amber)':'var(--green)';$('#operationsContent').innerHTML=`<div class="opsHero"><div><small>Data-quality degradation simulation</small><h2>When events arrive but intelligence degrades</h2><p>Models semantic defects that can pass through a healthy transport path and reduce search, correlation and detection value.</p></div><div class="opsControls"><button class="builderBtn" id="dqExportJson">Download JSON</button><button class="builderBtn primary" id="dqExportCsv">Download CSV</button></div></div><div class="dqPresets">${Object.entries(dataQualityPresets).map(([id,p])=>`<button class="dqPreset ${c.profile===id?'active':''}" data-dq-preset="${id}">${p.name}</button>`).join('')}</div><div class="dqInputs"><div class="dqField"><label>Events per second</label><input data-dq="eps" type="number" min="1" value="${c.eps}"></div><div class="dqField"><label>Window (minutes)</label><input data-dq="windowMin" type="number" min="1" value="${c.windowMin}"></div><div class="dqField"><label>Average event size (KB)</label><input data-dq="eventKb" type="number" min="0.01" step="0.1" value="${c.eventKb}"></div>${dataQualityIssues.map(([key,name])=>`<div class="dqField"><label>${name} (%)</label><input data-dq="${key}" type="number" min="0" max="100" step="0.1" value="${c[key]}"></div>`).join('')}</div><div class="dqScores"><div class="dqScore" style="--score:${color(m.qualityScore)}"><small>Overall quality</small><strong>${m.qualityScore.toFixed(1)} / 100</strong><span>Weighted semantic integrity</span></div><div class="dqScore" style="--score:${color(m.detectionReady)}"><small>Detection readiness</small><strong>${m.detectionReady.toFixed(1)} / 100</strong><span>Field and context usability</span></div><div class="dqScore" style="--score:${color(m.timeUsable)}"><small>Event-time usability</small><strong>${m.timeUsable.toFixed(1)} / 100</strong><span>Search-window reliability</span></div><div class="dqScore" style="--score:${m.affectedEvents/m.totalEvents>.2?'var(--red)':'var(--amber)'}"><small>Estimated affected</small><strong>${Math.round(m.affectedEvents).toLocaleString()}</strong><span>of ${Math.round(m.totalEvents).toLocaleString()} events</span></div></div><div class="sectionLabel">Quality propagation through the pipeline</div><div class="dqStageFlow">${m.stages.map(s=>`<article class="dqStage" style="--dq:${rateColor(s.rate)}"><small>${s.severity}</small><strong>${s.name}</strong><span>${s.detail}<br>${Math.min(100,s.rate).toFixed(1)}% modeled impact</span></article>`).join('')}</div><div class="sectionLabel">Defect volume</div><div class="dqIssueGrid">${dataQualityIssues.map(([key,name,stage])=>`<div class="dqIssue"><strong>${name}<small style="display:block;color:var(--muted);font-weight:400">${stage}</small></strong><div class="dqIssueTrack"><i style="--issue:${c[key]}%"></i></div><span>${c[key].toFixed(1)}% · ${Math.round(m.counts[key]).toLocaleString()}</span></div>`).join('')}</div><div class="sectionLabel">Downstream consequences</div><div class="dqFindings">${m.findings.map(f=>`<article class="dqFinding" style="--finding:${f.severity==='critical'?'var(--red)':f.severity==='warning'?'var(--amber)':'var(--green)'}"><strong>${f.title}</strong><p>${f.text}</p></article>`).join('')}</div><p class="dqMethod"><b>Method:</b> issue rates are treated as independent. The unique affected-event estimate accounts for probabilistic overlap; issue occurrence counts intentionally do not, so one event may contribute to several defect categories. Scores are comparative engineering indicators, not Splunk product guarantees.</p>`;
++ const m=dataQualityModel(),c=m.c,color=score=>score<60?'var(--red)':score<85?'var(--amber)':'var(--green)',rateColor=rate=>rate>=20?'var(--red)':rate>=5?'var(--amber)':'var(--green)';$('#operationsContent').innerHTML=`<div class="opsHero"><div><small>Data-quality degradation simulation</small><h2>When events arrive but intelligence degrades</h2><p>Models semantic defects that can pass through a healthy transport path and reduce search, correlation and detection value.</p></div><div class="opsControls"><button class="builderBtn" id="dqExportJson">Download JSON</button><button class="builderBtn primary" id="dqExportCsv">Download CSV</button></div></div><div class="dqPresets">${Object.entries(dataQualityPresets).map(([id,p])=>`<button class="dqPreset ${c.profile===id?'active':''}" data-dq-preset="${id}">${p.name}</button>`).join('')}</div><div class="dqInputs"><div class="dqField"><label>Events per second</label><input data-dq="eps" type="number" min="1" value="${c.eps}"></div><div class="dqField"><label>Window (minutes)</label><input data-dq="windowMin" type="number" min="1" value="${c.windowMin}"></div><div class="dqField"><label>Average event size (KB)</label><input data-dq="eventKb" type="number" min="0.01" step="0.1" value="${c.eventKb}"></div>${dataQualityIssues.map(([key,name])=>`<div class="dqField"><label>${name} (%)</label><input data-dq="${key}" type="number" min="0" max="100" step="0.1" value="${c[key]}"></div>`).join('')}</div><div class="dqScores"><div class="dqScore" style="--score:${color(m.qualityScore)}"><small>Overall quality</small><strong>${m.qualityScore.toFixed(1)} / 100</strong><span>Weighted semantic integrity</span></div><div class="dqScore" style="--score:${color(m.detectionReady)}"><small>Detection readiness</small><strong>${m.detectionReady.toFixed(1)} / 100</strong><span>Field and context usability</span></div><div class="dqScore" style="--score:${color(m.timeUsable)}"><small>Event-time usability</small><strong>${m.timeUsable.toFixed(1)} / 100</strong><span>Search-window reliability</span></div><div class="dqScore" style="--score:${m.affectedEvents/m.totalEvents>.2?'var(--red)':'var(--amber)'}"><small>Estimated affected</small><strong>${Math.round(m.affectedEvents).toLocaleString()}</strong><span>of ${Math.round(m.totalEvents).toLocaleString()} events</span></div></div><div class="sectionLabel">Quality propagation through the pipeline</div><div class="dqStageFlow">${m.stages.map(s=>`<article class="dqStage" style="--dq:${rateColor(s.rate)}"><small>${s.severity}</small><strong>${s.name}</strong><span>${s.detail}<br>${Math.min(100,s.rate).toFixed(1)}% modelled impact</span></article>`).join('')}</div><div class="sectionLabel">Defect volume</div><div class="dqIssueGrid">${dataQualityIssues.map(([key,name,stage])=>`<div class="dqIssue"><strong>${name}<small style="display:block;color:var(--muted);font-weight:400">${stage}</small></strong><div class="dqIssueTrack"><i style="--issue:${c[key]}%"></i></div><span>${c[key].toFixed(1)}% · ${Math.round(m.counts[key]).toLocaleString()}</span></div>`).join('')}</div><div class="sectionLabel">Downstream consequences</div><div class="dqFindings">${m.findings.map(f=>`<article class="dqFinding" style="--finding:${f.severity==='critical'?'var(--red)':f.severity==='warning'?'var(--amber)':'var(--green)'}"><strong>${f.title}</strong><p>${f.text}</p></article>`).join('')}</div><p class="dqMethod"><b>Method:</b> issue rates are treated as independent. The unique affected-event estimate accounts for probabilistic overlap; issue occurrence counts intentionally do not, so one event may contribute to several defect categories. Scores are comparative engineering indicators, not Splunk product guarantees.</p>`;
+@@ -1197 +1197 @@
+- const m=parsingLabModel(),c=m.c,statusColor=m.warningCount?'var(--amber)':'var(--green)',tags=(fields,empty)=>`<div class="parseFieldTags">${Object.entries(fields).map(([k,v])=>`<b>${evidenceXml(k)}=${evidenceXml(v)}</b>`).join('')||`<b>${empty}</b>`}</div>`;$('#operationsContent').innerHTML=`<div class="opsHero"><div><small>Effective parsing laboratory</small><h2>Separate index-time and search-time extraction</h2><p>Compare raw input with the modeled event boundaries, timestamp assignment, stored indexed fields, search-time fields, metadata and transform routing.</p></div><div class="opsControls"><button class="builderBtn" id="parseConfig">Download config</button><button class="builderBtn primary" id="parseExport">Download results</button></div></div><div class="parsePresetBar">${Object.entries(parsingLabPresets).map(([id,p])=>`<button class="parsePreset ${c.preset===id?'active':''}" data-parse-preset="${id}">${p.name}</button>`).join('')}</div><div class="parseWorkspace"><section class="parsePanel"><label>Representative raw input</label><textarea class="parseRaw" id="parseRaw">${evidenceXml(c.raw)}</textarea></section><section class="parsePanel"><small>Effective settings</small><div class="parseSettings"><div class="parseField"><label>Event boundary</label><select data-parse="boundary"><option value="newline" ${c.boundary==='newline'?'selected':''}>Every line</option><option value="timestamp" ${c.boundary==='timestamp'?'selected':''}>Timestamp prefix</option><option value="xml" ${c.boundary==='xml'?'selected':''}>XML Event element</option></select></div><div class="parseField"><label>Index-time extraction</label><select data-parse="indexExtraction"><option value="none" ${c.indexExtraction==='none'?'selected':''}>None</option><option value="json" ${c.indexExtraction==='json'?'selected':''}>INDEXED_EXTRACTIONS = JSON</option><option value="csv" ${c.indexExtraction==='csv'?'selected':''}>INDEXED_EXTRACTIONS = CSV</option></select></div><div class="parseField"><label>Search-time extraction</label><select data-parse="searchExtraction"><option value="none" ${c.searchExtraction==='none'?'selected':''}>KV_MODE = none</option><option value="kv" ${c.searchExtraction==='kv'?'selected':''}>KV_MODE = auto</option><option value="json" ${c.searchExtraction==='json'?'selected':''}>KV_MODE = json</option><option value="xml" ${c.searchExtraction==='xml'?'selected':''}>KV_MODE = xml</option></select></div><div class="parseField"><label>Timestamp mode</label><select data-parse="timestamp"><option value="iso" ${c.timestamp==='iso'?'selected':''}>ISO-8601</option><option value="epoch" ${c.timestamp==='epoch'?'selected':''}>Epoch</option><option value="none" ${c.timestamp==='none'?'selected':''}>No extraction</option></select></div><div class="parseField"><label>TRUNCATE characters</label><input data-parse-number="truncate" type="number" min="1" value="${c.truncate}"></div><div class="parseField"><label>Sourcetype</label><input data-parse="sourcetype" value="${evidenceXml(c.sourcetype)}"></div><div class="parseField"><label>Default index</label><input data-parse="index" value="${evidenceXml(c.index)}"></div><div class="parseField"><label>Route field</label><input data-parse="routeField" value="${evidenceXml(c.routeField)}"></div><div class="parseField"><label>Route value</label><input data-parse="routeValue" value="${evidenceXml(c.routeValue)}"></div><div class="parseField"><label>Route index</label><input data-parse="routeIndex" value="${evidenceXml(c.routeIndex)}"></div><div class="parseField"><label>Timezone</label><input data-parse="timezone" value="${evidenceXml(c.timezone)}"></div><div class="parseField" style="grid-column:1/-1"><label class="parseToggle"><input data-parse-check="merge" type="checkbox" ${c.merge?'checked':''}> Merge continuation lines until the next boundary</label></div></div></section></div><div class="parseSummary"><div class="parseMetric" style="--parse:var(--cyan)"><small>Events created</small><strong>${m.eventCount}</strong></div><div class="parseMetric" style="--parse:${statusColor}"><small>Warnings</small><strong>${m.warningCount}</strong></div><div class="parseMetric" style="--parse:var(--amber)"><small>Routed events</small><strong>${m.routed}</strong></div><div class="parseMetric" style="--parse:var(--green)"><small>Index-time fields</small><strong>${m.indexFieldNames.length}</strong></div><div class="parseMetric" style="--parse:var(--violet)"><small>Search-time fields</small><strong>${m.searchFieldNames.length}</strong></div><div class="parseMetric" style="--parse:${m.events.some(e=>e.truncated)?'var(--red)':'var(--green)'}"><small>Truncated</small><strong>${m.events.filter(e=>e.truncated).length}</strong></div></div><div class="sectionLabel">Effective configuration chain</div><div class="effectiveConfig">${m.effective.map(x=>`<article class="effectiveLayer" style="--layer:${x.color}"><small>Applied layer</small><strong>${x.name}</strong><span>${x.detail}</span></article>`).join('')}</div><div class="sectionLabel">Parsed event preview</div><div class="parseEventList">${m.events.length?m.events.map(e=>`<article class="parseEvent" style="--event:${e.warnings.length?'var(--amber)':'var(--green)'}"><div class="parseEventHead"><strong>Event ${e.number}</strong><span>${e.warnings.length?'Review':'Parsed'}</span></div><div class="parseEventBody"><div><pre class="parseEventRaw">${evidenceXml(e.raw)}</pre><div class="parsePhaseFields"><div class="parseFields ${Object.keys(e.indexFields).length?'':'empty'}"><small>Index time · stored</small>${tags(e.indexFields,'No indexed fields')}</div><div class="parseFields search ${Object.keys(e.searchFields).length?'':'empty'}"><small>Search time · calculated</small>${tags(e.searchFields,'No search-time fields')}</div></div>${e.warnings.length?`<div class="parseWarnings">${e.warnings.map(w=>`<span class="parseWarning">${evidenceXml(w)}</span>`).join('')}</div>`:''}</div><div class="parseFacts"><div class="parseFact"><small>_time · index time</small><strong>${e.time||'Not extracted'}</strong></div><div class="parseFact"><small>Sourcetype</small><strong>${e.metadata.sourcetype}</strong></div><div class="parseFact"><small>Target index</small><strong>${e.route}</strong></div><div class="parseFact"><small>Raw size</small><strong>${e.raw.length} / ${e.originalLength} characters</strong></div><button class="builderBtn" data-parse-walk="${e.number-1}">Open in walkthrough</button></div></div></article>`).join(''):'<div class="emptyState"><strong>No events produced</strong><span>Adjust the boundary mode or provide representative input.</span></div>'}</div><p class="parseDisclaimer"><b>Extraction boundary:</b> indexed fields are persisted with the event; search-time fields are calculated when searches run. Avoid configuring JSON extraction in both phases. <b>Representative laboratory:</b> validate generated settings on a non-production Splunk instance.</p>`;
++ const m=parsingLabModel(),c=m.c,statusColor=m.warningCount?'var(--amber)':'var(--green)',tags=(fields,empty)=>`<div class="parseFieldTags">${Object.entries(fields).map(([k,v])=>`<b>${evidenceXml(k)}=${evidenceXml(v)}</b>`).join('')||`<b>${empty}</b>`}</div>`;$('#operationsContent').innerHTML=`<div class="opsHero"><div><small>Effective parsing laboratory</small><h2>Separate index-time and search-time extraction</h2><p>Compare raw input with the modelled event boundaries, timestamp assignment, stored indexed fields, search-time fields, metadata and transform routing.</p></div><div class="opsControls"><button class="builderBtn" id="parseConfig">Download config</button><button class="builderBtn primary" id="parseExport">Download results</button></div></div><div class="parsePresetBar">${Object.entries(parsingLabPresets).map(([id,p])=>`<button class="parsePreset ${c.preset===id?'active':''}" data-parse-preset="${id}">${p.name}</button>`).join('')}</div><div class="parseWorkspace"><section class="parsePanel"><label>Representative raw input</label><textarea class="parseRaw" id="parseRaw">${evidenceXml(c.raw)}</textarea></section><section class="parsePanel"><small>Effective settings</small><div class="parseSettings"><div class="parseField"><label>Event boundary</label><select data-parse="boundary"><option value="newline" ${c.boundary==='newline'?'selected':''}>Every line</option><option value="timestamp" ${c.boundary==='timestamp'?'selected':''}>Timestamp prefix</option><option value="xml" ${c.boundary==='xml'?'selected':''}>XML Event element</option></select></div><div class="parseField"><label>Index-time extraction</label><select data-parse="indexExtraction"><option value="none" ${c.indexExtraction==='none'?'selected':''}>None</option><option value="json" ${c.indexExtraction==='json'?'selected':''}>INDEXED_EXTRACTIONS = JSON</option><option value="csv" ${c.indexExtraction==='csv'?'selected':''}>INDEXED_EXTRACTIONS = CSV</option></select></div><div class="parseField"><label>Search-time extraction</label><select data-parse="searchExtraction"><option value="none" ${c.searchExtraction==='none'?'selected':''}>KV_MODE = none</option><option value="kv" ${c.searchExtraction==='kv'?'selected':''}>KV_MODE = auto</option><option value="json" ${c.searchExtraction==='json'?'selected':''}>KV_MODE = json</option><option value="xml" ${c.searchExtraction==='xml'?'selected':''}>KV_MODE = xml</option></select></div><div class="parseField"><label>Timestamp mode</label><select data-parse="timestamp"><option value="iso" ${c.timestamp==='iso'?'selected':''}>ISO-8601</option><option value="epoch" ${c.timestamp==='epoch'?'selected':''}>Epoch</option><option value="none" ${c.timestamp==='none'?'selected':''}>No extraction</option></select></div><div class="parseField"><label>TRUNCATE characters</label><input data-parse-number="truncate" type="number" min="1" value="${c.truncate}"></div><div class="parseField"><label>Sourcetype</label><input data-parse="sourcetype" value="${evidenceXml(c.sourcetype)}"></div><div class="parseField"><label>Default index</label><input data-parse="index" value="${evidenceXml(c.index)}"></div><div class="parseField"><label>Route field</label><input data-parse="routeField" value="${evidenceXml(c.routeField)}"></div><div class="parseField"><label>Route value</label><input data-parse="routeValue" value="${evidenceXml(c.routeValue)}"></div><div class="parseField"><label>Route index</label><input data-parse="routeIndex" value="${evidenceXml(c.routeIndex)}"></div><div class="parseField"><label>Timezone</label><input data-parse="timezone" value="${evidenceXml(c.timezone)}"></div><div class="parseField" style="grid-column:1/-1"><label class="parseToggle"><input data-parse-check="merge" type="checkbox" ${c.merge?'checked':''}> Merge continuation lines until the next boundary</label></div></div></section></div><div class="parseSummary"><div class="parseMetric" style="--parse:var(--cyan)"><small>Events created</small><strong>${m.eventCount}</strong></div><div class="parseMetric" style="--parse:${statusColor}"><small>Warnings</small><strong>${m.warningCount}</strong></div><div class="parseMetric" style="--parse:var(--amber)"><small>Routed events</small><strong>${m.routed}</strong></div><div class="parseMetric" style="--parse:var(--green)"><small>Index-time fields</small><strong>${m.indexFieldNames.length}</strong></div><div class="parseMetric" style="--parse:var(--violet)"><small>Search-time fields</small><strong>${m.searchFieldNames.length}</strong></div><div class="parseMetric" style="--parse:${m.events.some(e=>e.truncated)?'var(--red)':'var(--green)'}"><small>Truncated</small><strong>${m.events.filter(e=>e.truncated).length}</strong></div></div><div class="sectionLabel">Effective configuration chain</div><div class="effectiveConfig">${m.effective.map(x=>`<article class="effectiveLayer" style="--layer:${x.color}"><small>Applied layer</small><strong>${x.name}</strong><span>${x.detail}</span></article>`).join('')}</div><div class="sectionLabel">Parsed event preview</div><div class="parseEventList">${m.events.length?m.events.map(e=>`<article class="parseEvent" style="--event:${e.warnings.length?'var(--amber)':'var(--green)'}"><div class="parseEventHead"><strong>Event ${e.number}</strong><span>${e.warnings.length?'Review':'Parsed'}</span></div><div class="parseEventBody"><div><pre class="parseEventRaw">${evidenceXml(e.raw)}</pre><div class="parsePhaseFields"><div class="parseFields ${Object.keys(e.indexFields).length?'':'empty'}"><small>Index time · stored</small>${tags(e.indexFields,'No indexed fields')}</div><div class="parseFields search ${Object.keys(e.searchFields).length?'':'empty'}"><small>Search time · calculated</small>${tags(e.searchFields,'No search-time fields')}</div></div>${e.warnings.length?`<div class="parseWarnings">${e.warnings.map(w=>`<span class="parseWarning">${evidenceXml(w)}</span>`).join('')}</div>`:''}</div><div class="parseFacts"><div class="parseFact"><small>_time · index time</small><strong>${e.time||'Not extracted'}</strong></div><div class="parseFact"><small>Sourcetype</small><strong>${e.metadata.sourcetype}</strong></div><div class="parseFact"><small>Target index</small><strong>${e.route}</strong></div><div class="parseFact"><small>Raw size</small><strong>${e.raw.length} / ${e.originalLength} characters</strong></div><button class="builderBtn" data-parse-walk="${e.number-1}">Open in walkthrough</button></div></div></article>`).join(''):'<div class="emptyState"><strong>No events produced</strong><span>Adjust the boundary mode or provide representative input.</span></div>'}</div><p class="parseDisclaimer"><b>Extraction boundary:</b> indexed fields are persisted with the event; search-time fields are calculated when searches run. Avoid configuring JSON extraction in both phases. <b>Representative laboratory:</b> validate generated settings on a non-production Splunk instance.</p>`;
+@@ -1202 +1202 @@
+- renderParsingLabWithoutTier();const m=parsingLabModel(),p=m.placement,color=p.severity==='invalid'?'var(--red)':p.severity==='advisory'?'var(--amber)':'var(--green)',hero=$('#operationsContent .opsHero');hero.querySelector('h2').textContent='Place parsing on the correct tier';hero.querySelector('p').textContent='Compare raw input with the modeled event boundaries, extraction phases and the component that first performs full parsing.';const first=$('#operationsContent .parseSettings .parseField');first.insertAdjacentHTML('afterend',`<div class="parseField"><label>Index-time processing tier</label><select id="parseTier"><option value="auto" ${m.c.processingTier==='auto'?'selected':''}>Automatic from topology</option><option value="uf" ${m.c.processingTier==='uf'?'selected':''}>Universal Forwarder</option><option value="hf" ${m.c.processingTier==='hf'?'selected':''}>Heavy Forwarder</option><option value="idx" ${m.c.processingTier==='idx'?'selected':''}>Indexer</option><option value="ip" ${m.c.processingTier==='ip'?'selected':''}>Ingest Processor</option></select></div>`);$('#parseTier').onchange=e=>{state.parsingLab.processingTier=e.target.value;state.parsingLab.preset='custom';renderParsingLab()};const diagram=`<section class="parsePlacement" style="--place:${color}"><div class="parsePlacementHead"><div><small>Topology-aware placement</small><strong>${p.names[p.resolved]||'No eligible parsing tier'}</strong></div><span>${p.severity}</span></div><div class="parsePlacementFlow">${p.nodes.map((n,i)=>`${i?'<div class="parseTierArrow">›</div>':''}<article class="parseTierNode" style="--tier:${n.color}"><small>${i===0?'Source':i===1?'First parsing tier':'Handoff'}</small><strong>${evidenceXml(n.label)}</strong><span>${evidenceXml(n.detail)}</span></article>`).join('')}</div><div class="parsePlacementNotes">${p.notes.map(n=>`<div class="parsePlacementNote ${n.severity}">${evidenceXml(n.text)}</div>`).join('')}</div></section>`;$('#operationsContent .parseWorkspace').insertAdjacentHTML('afterend',diagram);
++ renderParsingLabWithoutTier();const m=parsingLabModel(),p=m.placement,color=p.severity==='invalid'?'var(--red)':p.severity==='advisory'?'var(--amber)':'var(--green)',hero=$('#operationsContent .opsHero');hero.querySelector('h2').textContent='Place parsing on the correct tier';hero.querySelector('p').textContent='Compare raw input with the modelled event boundaries, extraction phases and the component that first performs full parsing.';const first=$('#operationsContent .parseSettings .parseField');first.insertAdjacentHTML('afterend',`<div class="parseField"><label>Index-time processing tier</label><select id="parseTier"><option value="auto" ${m.c.processingTier==='auto'?'selected':''}>Automatic from topology</option><option value="uf" ${m.c.processingTier==='uf'?'selected':''}>Universal Forwarder</option><option value="hf" ${m.c.processingTier==='hf'?'selected':''}>Heavy Forwarder</option><option value="idx" ${m.c.processingTier==='idx'?'selected':''}>Indexer</option><option value="ip" ${m.c.processingTier==='ip'?'selected':''}>Ingest Processor</option></select></div>`);$('#parseTier').onchange=e=>{state.parsingLab.processingTier=e.target.value;state.parsingLab.preset='custom';renderParsingLab()};const diagram=`<section class="parsePlacement" style="--place:${color}"><div class="parsePlacementHead"><div><small>Topology-aware placement</small><strong>${p.names[p.resolved]||'No eligible parsing tier'}</strong></div><span>${p.severity}</span></div><div class="parsePlacementFlow">${p.nodes.map((n,i)=>`${i?'<div class="parseTierArrow">›</div>':''}<article class="parseTierNode" style="--tier:${n.color}"><small>${i===0?'Source':i===1?'First parsing tier':'Handoff'}</small><strong>${evidenceXml(n.label)}</strong><span>${evidenceXml(n.detail)}</span></article>`).join('')}</div><div class="parsePlacementNotes">${p.notes.map(n=>`<div class="parsePlacementNote ${n.severity}">${evidenceXml(n.text)}</div>`).join('')}</div></section>`;$('#operationsContent .parseWorkspace').insertAdjacentHTML('afterend',diagram);
+@@ -1896 +1896 @@
+-function openDetail(id){const s=stages.find(x=>x.id===id),names=componentNames;$('#dPipeline').textContent=`Stage ${String(s.id).padStart(2,'0')} · ${s.pipeline}`;$('#dTitle').textContent=s.name;$('#dWhat').textContent=s.what;$('#dConfig').textContent=s.config;$('#dNote').textContent=s.note;$('#dNoteWrap').style.display=s.note?'block':'none';$('#dApplies').innerHTML=componentOrder.map(k=>`<div class="applies"><small>${names[k]}</small><strong style="color:${s[k]==='required'?'var(--green)':s[k]==='conditional'?'var(--amber)':'#718497'}">${statusLabel(s[k])}</strong></div>`).join('');$('#detail').showModal()}
++function openDetail(id){const s=stages.find(x=>x.id===id),names=componentNames;$('#dPipeline').textContent=`Stage ${String(s.id).padStart(2,'0')} · ${s.pipeline}`;$('#dTitle').textContent=s.name;$('#dWhat').textContent=s.what;$('#dConfig').textContent=s.config;$('#dNote').textContent=s.note;$('#dNoteWrap').style.display=s.note?'block':'none';$('#dApplies').innerHTML=componentOrder.map(k=>`<div class="applies"><small>${names[k]}</small><strong style="color:${s[k]==='required'?'var(--green)':s[k]==='conditional'?'var(--amber)':'#718497'}">${statusLabel(s[k])}</strong></div>`).join('');$('#stageDetail').showModal()}
+@@ -1920 +1920 @@
+-$('#detail .close').onclick=()=>$('#detail').close();$('#detail').onclick=e=>{if(e.target===$('#detail'))$('#detail').close()};
++$('#stageDetail .close').onclick=()=>$('#stageDetail').close();$('#stageDetail').onclick=e=>{if(e.target===$('#stageDetail'))$('#stageDetail').close()};
+@@ -7371 +7371 @@
+-  if(meta){const cell=document.createElement('div');cell.innerHTML='<small>Build · prepared</small><b>'+builderV125Text125($('#topologyBuilder').dataset.buildNumber)+' · 4 Oct 2026</b>';meta.append(cell)}
++  if(meta){const cell=document.createElement('div');cell.innerHTML='<small>Build · prepared</small><b>'+builderV125Text125($('#topologyBuilder').dataset.buildNumber)+' · '+builderOvShortDate136()+'</b>';meta.append(cell)}
+@@ -8048 +8048 @@
+-function builderPhoneChrome159(){if(builderPhoneMedia158.matches){builderPhoneMove159(builderMobileFind,builderMobileMoreBody);if(!builderFind159.isConnected)builderMobileMoreBody.appendChild(builderFind159);for(const selector of ['#builderSearchBar','#builderLargeNav'])builderPhoneMove159($(selector),builderFind159);builderPhoneMove159($('#builderGroupBy130')?.closest('.builderGroupingControl130'),builderMobileMoreBody);$('.builderBuildTitle h2').textContent='Builder ·';}else{for(const [node,marker] of builderPhoneMoves159)if(marker.isConnected)marker.replaceWith(node);builderPhoneMoves159.clear();builderFind159.remove();builderInfoText159.hidden=true;builderInfoText159.style.display='none';builderInfo159.setAttribute('aria-expanded','false');builderMap159.setAttribute('aria-pressed','false')}}
++function builderPhoneChrome159(){if(builderPhoneMedia158.matches){builderPhoneMove159(builderMobileFind,builderMobileMoreBody);if(!builderFind159.isConnected)builderMobileMoreBody.appendChild(builderFind159);for(const selector of ['#builderSearchBar','#builderLargeNav'])builderPhoneMove159($(selector),builderFind159);builderPhoneMove159($('#builderGroupBy130')?.closest('.builderGroupingControl130'),builderMobileMoreBody);$('.builderBuildTitle h2').textContent='Builder';}else{for(const [node,marker] of builderPhoneMoves159)if(marker.isConnected)marker.replaceWith(node);builderPhoneMoves159.clear();builderFind159.remove();builderInfoText159.hidden=true;builderInfoText159.style.display='none';builderInfo159.setAttribute('aria-expanded','false');builderMap159.setAttribute('aria-pressed','false')}}
+@@ -9734 +9734 @@
+-const walk=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while(n=walk.nextNode()){if(n.parentElement?.closest('input,textarea,script,style'))continue;n.textContent=n.textContent.replace(/\b(\d+) (systems|services|flows|providers|consumers|interfaces|attributes|needlines|mappings)\b/g,(_,v,noun)=>plural(v,noun.slice(0,-1)))}unfocus(root)}
++const walk=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while(n=walk.nextNode()){if(n.parentElement?.closest('input,textarea,script,style'))continue;n.textContent=n.textContent.replace(/(?<![\w-])(\d+) (systems|services|flows|providers|consumers|interfaces|attributes|needlines|mappings)\b/g,(_,v,noun)=>plural(v,noun.slice(0,-1)))}unfocus(root)}
+@@ -9904 +9904 @@
+-const ruleDefs=[['AR-009',"Load-balanced syslog keeps the sender's address",'Critical'],['AR-010','HEC acknowledgement through a load balancer is sticky','High'],['AR-011','Deployment Servers behind one address form a cluster','High'],['AR-012',"Deployment server cluster stays within Splunk's limits",'Medium'],['AR-013',"A load balancer isn't a single point of failure",'High'],['AR-014','Load balancers check member health','Medium'],['AR-015','TLS that ends on a load balancer is re-encrypted','Medium']];
++const ruleDefs=[['AR-009',"Load-balanced syslog keeps the sender's address",'Critical'],['AR-010','HEC acknowledgement through a load balancer is sticky','High'],['AR-011','Deployment Servers behind one address form a cluster','High'],['AR-012',"Deployment Server cluster stays within Splunk's limits",'Medium'],['AR-013',"A load balancer isn't a single point of failure",'High'],['AR-014','Load balancers check member health','Medium'],['AR-015','TLS that ends on a load balancer is re-encrypted','Medium']];
+@@ -9926 +9926 @@
+- const guidance={syslog:"SC4S guidance: load balancers aren't a best practice for syslog, except for senders on the untrusted internet. TCP connections tend to stay on one member, and the load balancer becomes a new single point of failure. For high availability, SC4S recommends MetalLB in BGP mode.",hec:'With HEC acknowledgement, use sticky sessions with the longest cookie timeout the load balancer allows. Duplicates are still possible when a client moves to another member under load.',deployment:"Two or more Deployment Servers behind one address are a deployment server cluster (Splunk Enterprise 9.2 or later): up to 3 servers, about 25,000 clients each, sharing deployment_apps and client_events on a shared drive. Clients can run older versions. If server classes match clients by IP address, keep the client's address or match by host name."};html+='<p class="lbGuidance186">'+esc(guidance[n.lbServes])+'</p>';if(n.lbServes==='deployment'){const ans=[['notRecorded','Not recorded'],['yes','Yes'],['no','No']];html+='<section><h4>Deployment server cluster</h4>'+select('lbDsVersion','All members run Splunk Enterprise 9.2 or later',ans,n)+select('lbDsSharedDrive','deployment_apps and client_events are on a shared drive',ans,n)+'<p>'+clientCount(n)+(clientCount(n)===1?' client phones':' clients phone')+' home here, within '+(builderLbMembers(n).length*25000).toLocaleString('en-US')+' ('+builderLbMembers(n).length+' × 25,000). A cluster has at most 3 servers.</p></section>'}html+='<section><h4>Links</h4><ul>'+builderTraceEdges('all').filter(e=>e.from===n.id||e.to===n.id).map(e=>'<li>'+esc(name(e.edge.source)+' → '+name(e.edge.target)+' · '+(e.plane==='data'?'Event data':'Fleet management')+' · '+e.edge.label)+'</li>').join('')+'</ul>';const memberIds=builderLbMembers(n).map(m=>m.id),direct=state.builderRelations.filter(r=>memberIds.includes(r.from)&&r.type==='deployment_client');if(n.lbServes==='deployment'&&direct.length)html+='<button type="button" data-lb-move>Move '+direct.length+(direct.length===1?' client':' clients')+' to '+esc(name(n))+'</button>';html+='</section>';box.innerHTML=html;panel.append(box);
++ const guidance={syslog:"SC4S guidance: load balancers aren't a best practice for syslog, except for senders on the untrusted internet. TCP connections tend to stay on one member, and the load balancer becomes a new single point of failure. For high availability, SC4S recommends MetalLB in BGP mode.",hec:'With HEC acknowledgement, use sticky sessions with the longest cookie timeout the load balancer allows. Duplicates are still possible when a client moves to another member under load.',deployment:"Two or more Deployment Servers behind one address are a deployment server cluster (Splunk Enterprise 9.2 or later): up to 3 servers, about 25,000 clients each, sharing deployment_apps and client_events on a shared drive. Clients can run older versions. If server classes match clients by IP address, keep the client's address or match by host name."};html+='<p class="lbGuidance186">'+esc(guidance[n.lbServes])+'</p>';if(n.lbServes==='deployment'){const ans=[['notRecorded','Not recorded'],['yes','Yes'],['no','No']];html+='<section><h4>Deployment Server cluster</h4>'+select('lbDsVersion','All members run Splunk Enterprise 9.2 or later',ans,n)+select('lbDsSharedDrive','deployment_apps and client_events are on a shared drive',ans,n)+'<p>'+clientCount(n)+(clientCount(n)===1?' client phones':' clients phone')+' home here, within '+(builderLbMembers(n).length*25000).toLocaleString('en-US')+' ('+builderLbMembers(n).length+' × 25,000). A cluster has at most 3 servers.</p></section>'}html+='<section><h4>Links</h4><ul>'+builderTraceEdges('all').filter(e=>e.from===n.id||e.to===n.id).map(e=>'<li>'+esc(name(e.edge.source)+' → '+name(e.edge.target)+' · '+(e.plane==='data'?'Event data':'Fleet management')+' · '+e.edge.label)+'</li>').join('')+'</ul>';const memberIds=builderLbMembers(n).map(m=>m.id),direct=state.builderRelations.filter(r=>memberIds.includes(r.from)&&r.type==='deployment_client');if(n.lbServes==='deployment'&&direct.length)html+='<button type="button" data-lb-move>Move '+direct.length+(direct.length===1?' client':' clients')+' to '+esc(name(n))+'</button>';html+='</section>';box.innerHTML=html;panel.append(box);
+@@ -16402,0 +16403,363 @@
++<style id="explorer-review-v231-styles">
++/* Build 231: the fixes and improvements from the review of every page. Each rule group names its item. */
++:root{--stick231:83px}
++/* 1. AV-2's search icon keeps its own size: the OV pages size every svg to their width. */
++.ov1Page132 .search svg{width:14px;height:14px;display:inline-block;flex:none}
++/* 2. Authentication cards: each label on its own line, over its value. */
++.authCardHead>div>small{display:block;margin-bottom:3px;color:var(--muted);font-size:.69rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
++.authFacts>span{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:.74rem;line-height:1.35}
++.authFacts>span>small{color:var(--muted);font-size:.69rem;letter-spacing:.05em;text-transform:uppercase}
++/* 3. The RASCI matrix's header sits at the top of its own scroll box. */
++.rasciWrap th{top:0}
++/* 4. SvcV-6: the flow table fits its column; its cells wrap. */
++.svcv6Page172 .model{grid-template-columns:minmax(0,1fr) 300px}
++.svcv6Page172 .tablewrap table{width:100%;table-layout:auto}
++.svcv6Page172 .tablewrap .mx6{min-width:0}
++.svcv6Page172 .tablewrap :is(td,th){white-space:normal;overflow-wrap:anywhere}
++@media(max-width:1180px){.svcv6Page172 .model{grid-template-columns:1fr}}
++/* 5. The Failure Lab's boundary label runs down the gap between two stages, above the arrow. */
++.flowBeam .boundaryLabel{writing-mode:vertical-rl;transform:translateX(-50%) rotate(180deg);top:auto;bottom:9px;left:50%;line-height:1;letter-spacing:.04em}
++/* 6. The Matrix scrolls in a box of its own, one window high under the toolbar, with its header row held at the box's
++   top. The same box scrolls sideways, as the table is wider than the page below about 1,400 px. */
++#matrix.matrixWrap{max-height:calc(100vh - var(--stick231) - 20px);overflow:auto}
++#matrix th{top:0}
++/* 14. The shared section folds away; a line says what's selected. */
++.ctx231{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin:-4px 0 10px}
++.ctx231[hidden]{display:none}
++.ctx231Now{margin:0 auto 0 0;color:#aab9c8;font-size:.78rem}
++.ctx231Toggle{border:1px solid #2b4355;border-radius:999px;background:#0e1c28;color:#cfe0ef;padding:5px 12px;font-size:.74rem;cursor:pointer}
++.ctx231Toggle:hover{border-color:#4f7b94}
++.ctx231Toggle:focus-visible,.scen231 input:focus-visible,.chg231 :is(input,select):focus-visible{outline:2px solid #57c7e8;outline-offset:2px}
++body[data-ctx231="folded"] main.shell>:is(section.componentStrip,section.parallelPanel,div.context,section#routeDiagram){display:none}
++/* 15. The path chips wrap to more rows instead of running off the right edge. */
++@media(min-width:760px){nav.topologyBar{flex-wrap:wrap;overflow-x:visible;row-gap:8px}}
++/* 16. The Matrix's cells: Y and Y* stand out on a tint, N is quieter and still readable; the key above the table. */
++#matrix td.yn.none{color:#8a9db0;font-weight:500}
++#matrix td.yn.yes{background:color-mix(in srgb,var(--green) 13%,transparent)}
++#matrix td.yn.maybe{background:color-mix(in srgb,#f3bd61 13%,transparent)}
++.matrixKey231{display:none;flex-wrap:wrap;gap:6px 18px;margin:0 0 10px;color:#aab9c8;font-size:.78rem}
++body:is([data-view="matrix"],[data-view="config"]) .matrixKey231{display:flex}
++.k231{display:inline-block;min-width:26px;margin-right:6px;padding:1px 6px;border-radius:6px;text-align:center;font-weight:800}
++.k231.yes{color:var(--green);background:color-mix(in srgb,var(--green) 13%,transparent)}
++.k231.maybe{color:#f3bd61;background:color-mix(in srgb,#f3bd61 13%,transparent)}
++.k231.none{color:#8a9db0;font-weight:500}
++/* 20. Config with no files read: the stage table waits behind a button. */
++.configTable231{display:none;align-items:center;justify-content:space-between;gap:14px;margin:0 0 12px;padding:12px 14px;border:1px dashed #2b4355;border-radius:10px;color:#aab9c8;font-size:.8rem}
++.configTable231 p{margin:0}
++body[data-view="config"] #configView205.propsEmpty205~.configTable231{display:flex}
++body[data-view="config"]:not([data-config-table231="open"]) #configView205.propsEmpty205~:is(.matrixKey231,#matrix){display:none}
++/* 17. The Failure Lab's scenario count and filter, in one column with the list. */
++.scenCol231{display:grid;gap:8px;align-content:start;min-width:0}
++.scen231{display:grid;gap:6px}
++.scen231Count{color:#aab9c8;font-size:.74rem}
++.scen231 input{width:100%;box-sizing:border-box;height:30px;padding:4px 9px;border:1px solid #294052;border-radius:8px;background:#08131d;color:#edf5fb;font-size:.78rem}
++#scenarioList [data-failure][hidden]{display:none}
++/* 18 (and 15 on phones). A fade marks the edge where a row or diagram has more to scroll to. */
++.cueRight231{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 48px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 48px),transparent)}
++.cueLeft231{-webkit-mask-image:linear-gradient(to left,#000 calc(100% - 48px),transparent);mask-image:linear-gradient(to left,#000 calc(100% - 48px),transparent)}
++.cueLeft231.cueRight231{-webkit-mask-image:linear-gradient(to right,transparent,#000 48px,#000 calc(100% - 48px),transparent);mask-image:linear-gradient(to right,transparent,#000 48px,#000 calc(100% - 48px),transparent)}
++/* 8. Operate tables that are wider than the page scroll in their own box, with their header at the box's top: the page's
++   own th{position:sticky;top:75px} would push it 75 px down inside the box, over the rows. */
++.ops231Scroll{max-width:100%;overflow-x:auto}
++.ops231Scroll th{top:0}
++/* 19. The Builder's help card: its words, then Got it at its foot (its own rules show and hide it). */
++.builderSpaceHelpPopover140{padding-bottom:54px!important}
++.builderSpaceHelpPopover140 .builderHelpGotIt163{position:absolute;left:12px;bottom:10px;margin:0}
++/* 21. Changes: a group across the page, its items in columns, readable text, and the search, filter and order. */
++.changesGroups{grid-template-columns:minmax(0,1fr)}
++@media(min-width:980px){.changesList{grid-template-columns:repeat(2,minmax(0,1fr))}}
++.changeItem p{font-size:.74rem;line-height:1.45}
++.changeItem em{font-size:.69rem}
++.changeItem[hidden],.changesGroups [hidden]{display:none}
++.chg231{display:flex;flex-wrap:wrap;align-items:end;gap:10px 16px;margin:12px 0}
++.chg231 label{display:grid;gap:4px;color:#aab9c8;font-size:.74rem}
++.chg231 :is(input[type=search],select){height:32px;box-sizing:border-box;padding:4px 9px;border:1px solid #294052;border-radius:8px;background:#08131d;color:#edf5fb;font-size:.8rem}
++.chg231Find input{width:min(320px,70vw)}
++.chg231 .chg231Order{display:flex;align-items:center;gap:6px;height:32px}
++.chg231Count{margin:0 0 0 auto;color:#aab9c8;font-size:.78rem}
++/* 23. Contrast: OV-6c's notes, DIV-1's dimmed concepts and CV-6's "Not covered". */
++.tracePage195 .seq .note text{fill:#5b4a24}
++.divPage169 svg.focused .concept:not(.on),.divPage169 svg.focused .rel:not(.on){opacity:.62}
++.activityPage191 .stc.not{color:#a8261c}
++/* 26. Compare, with nothing saved: the empty cards give way to what to do. */
++.compareEmpty231{margin:14px 0;padding:14px 16px;border:1px dashed #2b4355;border-radius:10px;color:#cfe0ef}
++.compareEmpty231 p{margin:6px 0 0;color:#aab9c8;font-size:.8rem;line-height:1.5}
++#operationsContent:has(.compareEmpty231) .diffCard{display:none}
++/* 24. Tap targets on phones: at least 24 px. */
++@media(max-width:760px){
++ .vcs .vc,.rowh button{min-height:24px}
++ .tmNotes150>summary{min-height:24px;display:flex;align-items:center}
++ :is(.custodyCheck,.multiDsCheck,label)>input[type=checkbox]{width:18px;height:18px}
++ :is(.custodyCheck,.multiDsCheck){min-height:24px;align-items:center}
++}
++/* 22. No text under 11 px on screen in the app's own panels. Generated by
++   docs/mockups/explorer-review-text-floor.js: each selector was checked on every page to match only text at or under
++   11 px, outside SVGs and the Builder's canvas, so the floor only raises text. Important, because the page's own rules
++   for the same text are often more specific; screens only, so print keeps its own sizes. */
++@media screen{
++ .a0 span.k{font-size:11px!important}
++ .accountabilityBanner :is(label,small,span){font-size:11px!important}
++ .ahead :is(small,span.aid){font-size:11px!important}
++ .al :is(span.chip,th){font-size:11px!important}
++ .allocation h3{font-size:11px!important}
++ .authCard p{font-size:11px!important}
++ .authCardHead span.authState{font-size:11px!important}
++ .authControl :is(small,strong){font-size:11px!important}
++ .authDetailHead span.authState{font-size:11px!important}
++ .authFlowNode :is(small,span){font-size:11px!important}
++ .authMetric small{font-size:11px!important}
++ .authTabs button{font-size:11px!important}
++ .authWarning :is(span,strong){font-size:11px!important}
++ .boundaryControl :is(small,span){font-size:11px!important}
++ .boundaryGateTitle :is(b,small){font-size:11px!important}
++ .builderCanvasPanelHeader :is(button,button.builderNavBtn){font-size:11px!important}
++ .c span.flowcell{font-size:11px!important}
++ .capacityBar :is(b,span){font-size:11px!important}
++ .capacityField label{font-size:11px!important}
++ .capacityMetric :is(small,span){font-size:11px!important}
++ .capacityScenarioHead span{font-size:11px!important}
++ .capacitySensitivity th{font-size:11px!important}
++ .card199 :is(dd,dt,h4,label.check199,label.field199,p.note199){font-size:11px!important}
++ .catalogue175 :is(span.chip,th){font-size:11px!important}
++ .causeActions :is(button,button.primaryAction){font-size:11px!important}
++ .causeFact small{font-size:11px!important}
++ .causeTop span.confidenceLabel{font-size:11px!important}
++ .cfFileHead205 b{font-size:11px!important}
++ .cfFiles205 :is(b,span.cfWins205){font-size:11px!important}
++ .cfPartsScroll228 :is(button.cfStageLink228,small,th){font-size:11px!important}
++ .cfPartsTotal228 :is(small,th){font-size:11px!important}
++ .cfTier221 small{font-size:11px!important}
++ .changeItem :is(span.changeTick,strong){font-size:11px!important}
++ .changesGroupHead span{font-size:11px!important}
++ .changesMetric small{font-size:11px!important}
++ .chips span.chip{font-size:11px!important}
++ .colh :is(span.cid,span.nm){font-size:11px!important}
++ .cols :is(th.rowh,th.st){font-size:11px!important}
++ .compareColumn label{font-size:11px!important}
++ .componentFlowBand small{font-size:11px!important}
++ .conditions h3{font-size:11px!important}
++ .correlationStages span.correlationStage{font-size:11px!important}
++ .crossingEndpoint :is(small,span){font-size:11px!important}
++ .custodyCheck :is(small,strong){font-size:11px!important}
++ .custodyField label{font-size:11px!important}
++ .custodyFinding :is(p,strong){font-size:11px!important}
++ .custodyNode div.custodyOwner{font-size:11px!important}
++ .custodyNodeBody :is(b,span){font-size:11px!important}
++ .custodyNodeHead small{font-size:11px!important}
++ .custodyRow :is(small,span,span.custodyIndex,span.custodyStatus,strong){font-size:11px!important}
++ .custodySeal :is(small,strong){font-size:11px!important}
++ .custodyStat small{font-size:11px!important}
++ .cv2Screen171 h3{font-size:11px!important}
++ .cv2Screen171 .detail h3{font-size:11px!important}
++ .cv2Screen171 .tablewrap small{font-size:11px!important}
++ .cvList170 h3{font-size:11px!important}
++ .cvScreen170 h3{font-size:11px!important}
++ .cvTableWrap170 :is(small,span.chip,th){font-size:11px!important}
++ .detail :is(small,span.chip,span.cmp,span.dom){font-size:11px!important}
++ .diagnosticHero div.eyebrow{font-size:11px!important}
++ .diagnosticSummary small{font-size:11px!important}
++ .diagramKey span{font-size:11px!important}
++ .divPage169 h3{font-size:11px!important}
++ .divPage169 .detail h3{font-size:11px!important}
++ .dqField label{font-size:11px!important}
++ .dqFinding p{font-size:11px!important}
++ .dqIssue :is(small,span,strong){font-size:11px!important}
++ .dqMethod b{font-size:11px!important}
++ .dqPresets button.dqPreset{font-size:11px!important}
++ .dqScore :is(small,span){font-size:11px!important}
++ .dqStage :is(small,span){font-size:11px!important}
++ .drDependency span{font-size:11px!important}
++ .drField label{font-size:11px!important}
++ .drFinding p{font-size:11px!important}
++ .drNode :is(small,span){font-size:11px!important}
++ .drPhase :is(small,span){font-size:11px!important}
++ .drPresets button.drPreset{font-size:11px!important}
++ .drScore :is(small,span){font-size:11px!important}
++ .effect small{font-size:11px!important}
++ .effectiveLayer :is(small,span,strong){font-size:11px!important}
++ .evidenceFile :is(div.evidenceFileIcon,small,span,strong){font-size:11px!important}
++ .evidenceNote p{font-size:11px!important}
++ .evidenceStat small{font-size:11px!important}
++ .fact span.k{font-size:11px!important}
++ .failureMode :is(button,button.active){font-size:11px!important}
++ .fam th{font-size:11px!important}
++ .filters span.lbl{font-size:11px!important}
++ .findings span.chip{font-size:11px!important}
++ .findings199 :is(button.btn199,span){font-size:11px!important}
++ .flowBeam span.boundaryLabel{font-size:11px!important}
++ .fns span.idc{font-size:11px!important}
++ .generatorTabs :is(button,button.active){font-size:11px!important}
++ .guardrailBudget :is(small,span,strong){font-size:11px!important}
++ .guardrailDisclaimer b{font-size:11px!important}
++ .guardrailField label{font-size:11px!important}
++ .guardrailFinding :is(b,p){font-size:11px!important}
++ .guardrailFindingHead span{font-size:11px!important}
++ .guardrailMetric :is(small,span){font-size:11px!important}
++ .guardrailPresets button.guardrailPreset{font-size:11px!important}
++ .healthMetric small{font-size:11px!important}
++ .ihead199 span.eyebrow199{font-size:11px!important}
++ .impactStat small{font-size:11px!important}
++ .issue :is(span.k,span.sev){font-size:11px!important}
++ .itopo199 p.note199{font-size:11px!important}
++ .l1 small{font-size:11px!important}
++ .l2 :is(small,span.id){font-size:11px!important}
++ .legend :is(span.chip,span.idc){font-size:11px!important}
++ .lineageCheck :is(span,strong){font-size:11px!important}
++ .lineageDetection :is(span,strong){font-size:11px!important}
++ .lineageField :is(small,span,strong){font-size:11px!important}
++ .lineageMetric small{font-size:11px!important}
++ .lineageNote b{font-size:11px!important}
++ .lineagePanel small{font-size:11px!important}
++ .lineageStatus :is(b,p,small){font-size:11px!important}
++ .lineageTier :is(small,span){font-size:11px!important}
++ .lineageTierList b{font-size:11px!important}
++ .lm th{font-size:11px!important}
++ .m3 :is(th.corner,th.loc){font-size:11px!important}
++ .mapCaption :is(span,strong){font-size:11px!important}
++ .mapLegend :is(button.motionToggle,span){font-size:11px!important}
++ .matrixWrap th{font-size:11px!important}
++ .multiDsCheck span{font-size:11px!important}
++ .multiDsConnector small{font-size:11px!important}
++ .multiDsDataPlane span{font-size:11px!important}
++ .multiDsEvidence :is(span,strong){font-size:11px!important}
++ .multiDsField label{font-size:11px!important}
++ .multiDsFinding :is(span,strong){font-size:11px!important}
++ .multiDsGraph :is(small,span,strong){font-size:11px!important}
++ .multiDsInventoryCard :is(small,span){font-size:11px!important}
++ .multiDsMetric small{font-size:11px!important}
++ .multiDsNode :is(small,span){font-size:11px!important}
++ .multiDsRisk :is(span,strong){font-size:11px!important}
++ .multiDsTable th{font-size:11px!important}
++ .multiDsWave :is(small,span,strong){font-size:11px!important}
++ .mx :is(span.chip,span.stc,th.grp2,th.state){font-size:11px!important}
++ .mx button > span{font-size:11px!important}
++ .mx td > small{font-size:11px!important}
++ .mx6 :is(small.origin,span.chip,th,th.sticky){font-size:11px!important}
++ .na :is(span.sev,span.stc){font-size:11px!important}
++ .nd button > span{font-size:11px!important}
++ .nodeTop :is(span.nodeNo,span.nodeState){font-size:11px!important}
++ .num175 small.origin{font-size:11px!important}
++ .on :is(small,span.chip){font-size:11px!important}
++ .operationsContent :is(div.overlayLayerNote,div.walkDisclaimer,p.dqMethod,p.guardrailDisclaimer,p.lineageNote,p.parseDisclaimer,p.parsePresetNote201){font-size:11px!important}
++ .opsCard :is(p,small){font-size:11px!important}
++ .opsHero small{font-size:11px!important}
++ .ov3Filters134 :is(label.ov3Find139,strong){font-size:11px!important}
++ .ov3Grid134 :is(td,th){font-size:11px!important}
++ .ov3GridArea139 h3{font-size:11px!important}
++ .ov3Matrix134 :is(span.ov3NodeId139,th){font-size:11px!important}
++ .ov3Screen139 h3{font-size:11px!important}
++ .ovBelow137 h3{font-size:11px!important}
++ .overlayBadges span.overlayBadge{font-size:11px!important}
++ .overlayBoundaryGate :is(small,strong){font-size:11px!important}
++ .overlayControls button.overlayToggle{font-size:11px!important}
++ .overlayIssue :is(b,span){font-size:11px!important}
++ .overlayLegend span{font-size:11px!important}
++ .overlayNode div.overlayOwnerBand{font-size:11px!important}
++ .overlayNodeBody small{font-size:11px!important}
++ .overlayStat small{font-size:11px!important}
++ .overlayZoneBand span{font-size:11px!important}
++ .ovMission137 small{font-size:11px!important}
++ .ovTitle137 small{font-size:11px!important}
++ .ownerGroupHead :is(b,small){font-size:11px!important}
++ .ownerGroupNode :is(span,strong){font-size:11px!important}
++ .panel :is(dt,span.chip,span.idc,span.ov,span.stc){font-size:11px!important}
++ .parallelConfig :is(small,span){font-size:11px!important}
++ .parallelToggle span{font-size:11px!important}
++ .parseDisclaimer b{font-size:11px!important}
++ .parseEventBody pre.parseEventRaw{font-size:11px!important}
++ .parseEventHead span{font-size:11px!important}
++ .parseFact :is(small,strong){font-size:11px!important}
++ .parseField :is(label,label.parseToggle){font-size:11px!important}
++ .parseFields small{font-size:11px!important}
++ .parseFieldTags b{font-size:11px!important}
++ .parseMetric small{font-size:11px!important}
++ .parsePanel :is(label,small,textarea.parseRaw){font-size:11px!important}
++ .parsePlacementHead :is(small,span){font-size:11px!important}
++ .parsePlacementNotes div.parsePlacementNote{font-size:11px!important}
++ .parsePresetGroup201 :is(button.parsePreset,span.parsePresetLabel201){font-size:11px!important}
++ .parsePresetNote201 b{font-size:11px!important}
++ .parseTierNode :is(small,span,strong){font-size:11px!important}
++ .part span.pid{font-size:11px!important}
++ .pathContext small{font-size:11px!important}
++ .phaseCard :is(small,span){font-size:11px!important}
++ .policyFinding :is(b,span){font-size:11px!important}
++ .propsRowLine205 i.propsFile205{font-size:11px!important}
++ .propsStage205 b{font-size:11px!important}
++ .propsTabs205 :is(i.propsFile205,small){font-size:11px!important}
++ .propsTiers205 :is(i.maybe,i.none,i.yes){font-size:11px!important}
++ .propsTitle205 small{font-size:11px!important}
++ .purpose span.tb-k{font-size:11px!important}
++ .queueLabel :is(em,span){font-size:11px!important}
++ .rankBadge small{font-size:11px!important}
++ .rasciLegend :is(b,span){font-size:11px!important}
++ .rasciTable :is(span.rasciRole,th){font-size:11px!important}
++ .recoveryField label{font-size:11px!important}
++ .recoveryFinding :is(p,strong){font-size:11px!important}
++ .recoveryTier small{font-size:11px!important}
++ .recoveryTierHead :is(span,strong){font-size:11px!important}
++ .reg :is(span.chip,span.cmp,span.life,span.state,th,th.n){font-size:11px!important}
++ .register175 :is(span.chip,th){font-size:11px!important}
++ .responseStep :is(small,strong){font-size:11px!important}
++ .responsibilityEndpoint :is(small,span){font-size:11px!important}
++ .responsibilityGate strong{font-size:11px!important}
++ .responsibilityGateHead :is(b,small){font-size:11px!important}
++ .responsibilityStat small{font-size:11px!important}
++ .responsibilityTerm :is(small,span){font-size:11px!important}
++ .rh :is(button,i){font-size:11px!important}
++ .rmx :is(th,th.corner){font-size:11px!important}
++ .routeBox small{font-size:11px!important}
++ .row span.k{font-size:11px!important}
++ .row199 button.btn199{font-size:11px!important}
++ .rowh :is(b,span.cid){font-size:11px!important}
++ .rtab :is(span.sev,span.stc,th){font-size:11px!important}
++ .rule :is(button,small){font-size:11px!important}
++ .screen175 > h3{font-size:11px!important}
++ .si span{font-size:11px!important}
++ .sis button.si{font-size:11px!important}
++ .st span.chip{font-size:11px!important}
++ .stage span.pipeTag{font-size:11px!important}
++ .stageHead span.status{font-size:11px!important}
++ .stageName small{font-size:11px!important}
++ .state :is(small,span.stc){font-size:11px!important}
++ .steps :is(span.chip,th){font-size:11px!important}
++ .support span.k{font-size:11px!important}
++ .svc3Screen174 .detail dt{font-size:11px!important}
++ .svc3Screen174 .mx small{font-size:11px!important}
++ .svc3Screen174 .rowh small{font-size:11px!important}
++ .svc4Screen173 .detail dt{font-size:11px!important}
++ .svcScreen172 .findings h3{font-size:11px!important}
++ .svcScreen172 > h3{font-size:11px!important}
++ .symptomBtn span{font-size:11px!important}
++ .symptomPanelHead small{font-size:11px!important}
++ .sys small{font-size:11px!important}
++ .tableScroll th{font-size:11px!important}
++ .tablewrap :is(small.derived,span.chip,th){font-size:11px!important}
++ .term span.cat{font-size:11px!important}
++ .titleblock span.tb-k{font-size:11px!important}
++ .tl :is(span.stc,th){font-size:11px!important}
++ .tmClass150 span{font-size:11px!important}
++ .tmFilters150 span.tmCount152{font-size:11px!important}
++ .tmMeta150 small{font-size:11px!important}
++ .tmScroll150 th{font-size:11px!important}
++ .tmTitle217 small{font-size:11px!important}
++ .tracePage195 .grp th{font-size:11px!important}
++ .trustComponent :is(span,strong){font-size:11px!important}
++ .trustDiagramContext span{font-size:11px!important}
++ .trustDiagramHead small{font-size:11px!important}
++ .trustZoneHead :is(small,span.trustZoneCount,span.trustZoneOwner){font-size:11px!important}
++ .unifiedPlaneCheck span{font-size:11px!important}
++ .vcs button.vc{font-size:11px!important}
++ .vid button.vc{font-size:11px!important}
++ .walkControls :is(button,button.primary,span){font-size:11px!important}
++ .walkDelta :is(li,small){font-size:11px!important}
++ .walkDisclaimer strong{font-size:11px!important}
++ .walkFact :is(small,strong){font-size:11px!important}
++ .walkInput :is(label,textarea){font-size:11px!important}
++ .walkPresetPanel span{font-size:11px!important}
++ .walkPresets button.walkPreset{font-size:11px!important}
++ .walkProgress button.walkDot{font-size:11px!important}
++ .walkStageInfo :is(p,small){font-size:11px!important}
++ .walkStates pre.walkCode{font-size:11px!important}
++ .walkStateTabs span{font-size:11px!important}
++}
++</style>
+@@ -17706,0 +18070,159 @@
++<script id="explorer-review-v231">
++(function(){
++'use strict';
++// Build 231: the fixes and improvements from the review of every page. Each part names its item in the review list.
++const KEY='splunkPipelineExplorer.review231.';
++const store={get(k,d){try{const v=localStorage.getItem(KEY+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(KEY+k,JSON.stringify(v))}catch(e){}}};
++const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
++const shell=document.querySelector('main.shell');
++const viewOf=()=>document.body.dataset.view||'flow';
++// One pass after the page changes: the parts below that follow re-renders hook in here.
++const after=[];let queued=false;
++const run=()=>{queued=false;for(const f of after){try{f()}catch(e){console.warn('Build 231',e)}}};
++const soon=()=>{if(!queued){queued=true;requestAnimationFrame(run)}};
++new MutationObserver(soon).observe(document.body,{childList:true,subtree:true});
++addEventListener('resize',soon);
++
++// ---- 14. The shared section (component cards, capacity, processing diagram) folds away on the views where it is context.
++const CTX_VIEWS=['flow','matrix','operations','diagnostic','failure','changes'],CTX_OPEN={flow:true,matrix:true};
++const ctxBar=document.createElement('div');ctxBar.className='ctx231';ctxBar.innerHTML='<p class="ctx231Now" aria-live="polite"></p><button type="button" class="ctx231Toggle" aria-controls="routeDiagram" aria-expanded="true"></button>';
++document.querySelector('nav.topologyBar')?.after(ctxBar);
++const ctxOpen=v=>store.get('ctx.'+v,!!CTX_OPEN[v]);
++function ctxApply(){const v=viewOf(),on=CTX_VIEWS.includes(v),open=on?ctxOpen(v):true;document.body.dataset.ctx231=open?'open':'folded';ctxBar.hidden=!on;
++ const btn=ctxBar.querySelector('button');btn.setAttribute('aria-expanded',String(open));btn.textContent=open?'Hide components and model':'Show components and model';
++ const comp=document.querySelector('section.componentStrip .component.active strong')?.textContent.trim()||'All components',path=document.querySelector('nav.topologyBar .chip.active')?.textContent.replace(/\s+/g,' ').trim()||'Complete model';
++ ctxBar.querySelector('.ctx231Now').textContent=open?'':`Showing ${comp} on ${path}.`}
++ctxBar.querySelector('button').addEventListener('click',()=>{const v=viewOf();store.set('ctx.'+v,!ctxOpen(v));ctxApply()});
++window.explorerContext231={open:v=>ctxOpen(v),set:(v,open)=>{store.set('ctx.'+v,!!open);ctxApply()}};
++
++// ---- 6 and 16. The Matrix: a box one window high under the toolbar (--stick231, kept to the toolbar's height), with its
++// header row at the box's top, and a key that says what Y, Y* and N mean. 20: in the Config view with no files read,
++// the table waits behind a button.
++const matrix=document.getElementById('matrix');
++const key=document.createElement('p');key.className='matrixKey231';key.id='matrixKey231';
++key.innerHTML='<span><b class="k231 yes">Y</b> runs on that component</span><span><b class="k231 maybe">Y*</b> runs when its setting or condition applies</span><span><b class="k231 none">N</b> not used</span>';
++const cfgTable=document.createElement('div');cfgTable.className='configTable231';cfgTable.innerHTML='<p>The stage table shows where each of the <span data-stage-count231></span> stages runs. It waits until you read files, or you can open it now.</p><button type="button" class="builderBtn" aria-expanded="false" aria-controls="matrix">Show the stage table</button>';
++if(matrix){matrix.before(cfgTable);matrix.before(key)}
++cfgTable.querySelector('button').addEventListener('click',e=>{const open=document.body.dataset.configTable231!=='open';document.body.dataset.configTable231=open?'open':'';e.currentTarget.setAttribute('aria-expanded',String(open));e.currentTarget.textContent=open?'Hide the stage table':'Show the stage table'});
++cfgTable.querySelector('[data-stage-count231]').textContent=String(typeof stages!=='undefined'&&stages.length?stages.length:125);
++const toolbar=document.querySelector('section.toolbar');
++const stick=()=>{if(!toolbar)return;const s=getComputedStyle(toolbar),r=toolbar.getBoundingClientRect();const v=s.position==='sticky'||s.position==='fixed'?Math.ceil((parseFloat(s.top)||0)+r.height):0;document.documentElement.style.setProperty('--stick231',v+'px')};
++if(toolbar&&window.ResizeObserver)new ResizeObserver(stick).observe(toolbar);stick();addEventListener('resize',stick);
++
++// ---- 15 and 18. Rows and diagrams that scroll sideways show a fade where more is hidden.
++const CUE='nav.topologyBar,.ovTabs135,.combinedOverlayCanvas,.custodyMap,.failureMap,.matrixWrap,.tablewrap,.rasciWrap,.ops231Scroll';
++function cue(el){const more=el.scrollWidth-el.clientWidth>2;el.classList.toggle('cueRight231',more&&el.scrollLeft+el.clientWidth<el.scrollWidth-2);el.classList.toggle('cueLeft231',more&&el.scrollLeft>2)}
++document.addEventListener('scroll',e=>{if(e.target instanceof Element&&e.target.matches(CUE))cue(e.target)},true);
++// The Failure Lab's stage flow scrolls in the parent of its track.
++after.push(()=>{if(viewOf()==='builder')return;if(viewOf()==='failure'){const t=document.querySelector('#failureLab .mapTrack');const box=t&&[t.parentElement,t.parentElement?.parentElement].find(a=>a&&/auto|scroll/.test(getComputedStyle(a).overflowX));box?.classList.add('failureMap')}
++ for(const el of document.querySelectorAll(CUE))if(el.checkVisibility())cue(el)});
++
++// ---- 17. The Failure Lab's scenarios: a count and a filter above the list. The two share the lab's first grid cell, in a
++// column of their own, so the lab keeps its two cells: the list and the scenario's detail.
++const scen=document.getElementById('scenarioList');
++if(scen){const col=document.createElement('div');col.className='scenCol231';scen.before(col);
++ const head=document.createElement('div');head.className='scen231';head.innerHTML='<label for="scenFilter231" class="scen231Count"></label><input id="scenFilter231" type="search" placeholder="Filter by name or stage" autocomplete="off">';col.append(head,scen);
++ const input=head.querySelector('input'),count=head.querySelector('label');
++ const filter=()=>{const q=input.value.trim().toLowerCase(),items=[...scen.querySelectorAll('[data-failure]')];let shown=0;
++  for(const b of items){const hit=!q||b.textContent.toLowerCase().includes(q)||b.classList.contains('active');b.hidden=!hit;if(hit)shown++}
++  count.textContent=q?`${shown} of ${items.length} scenarios`:`${items.length} scenarios`};
++ input.addEventListener('input',filter);new MutationObserver(filter).observe(scen,{childList:true});filter()}
++
++// ---- 8. An Operate table wider than its space scrolls in a box of its own instead of being cut off. Only such a table
++// is boxed: a box makes the page's sticky headers stick inside it, so its header is held at its top (styles).
++// ---- 9. Each Operate form field gets the label beside it as its name.
++let fieldIds=0;
++after.push(()=>{if(viewOf()!=='operations')return;const c=document.getElementById('operationsContent');if(!c)return;
++ for(const t of c.querySelectorAll('table')){if(t.parentElement.classList.contains('ops231Scroll')||!t.checkVisibility())continue;let a=t.parentElement,boxed=false;for(;a&&a!==c;a=a.parentElement)if(/auto|scroll/.test(getComputedStyle(a).overflowX)){boxed=true;break}
++  if(boxed||t.getBoundingClientRect().width<=t.parentElement.clientWidth+1)continue;const w=document.createElement('div');w.className='ops231Scroll';t.before(w);w.append(t)}
++ for(const l of c.querySelectorAll('label:not([for])')){if(l.querySelector('input,select,textarea'))continue;const f=l.nextElementSibling;if(!f||!f.matches('input:not([type=hidden]),select,textarea'))continue;if(!f.id)f.id='opsField231-'+(++fieldIds);l.htmlFor=f.id}});
++after.push(()=>{const finder=document.getElementById('builderSearchInput');if(finder&&!finder.getAttribute('aria-label'))finder.setAttribute('aria-label','Find components on the canvas')});
++
++// ---- 10. Clickable parts of the OV diagrams are named by their own text.
++after.push(()=>{if(viewOf()!=='ov')return;const ws=document.getElementById('ovWorkspace135');if(!ws)return;
++ for(const g of ws.querySelectorAll('g[role=button]:not([aria-label]),g[tabindex]:not([aria-label])')){if(g.querySelector('title'))continue;let t=[...g.querySelectorAll('text')].map(x=>x.textContent.trim()).filter(Boolean).join(' ');
++  // A link drawn without words takes its name from its row in the page, which carries the same id.
++  if(!t&&g.dataset.k){const row=g.closest('[data-ov-panel]')?.querySelector(`tr[data-k="${CSS.escape(g.dataset.k)}"]`);t=row?[...row.cells].slice(0,3).map(c=>c.textContent.trim()).filter(Boolean).join(', '):g.dataset.k}
++  t=t.replace(/\s+/g,' ').slice(0,140);if(t)g.setAttribute('aria-label',t)}});
++
++// Showing an OV page only changes which page is hidden, which the observer above doesn't see: the after-draw parts run
++// then too, for the page's fades and names.
++if(typeof builderOvShow135==='function'){const showBefore231=builderOvShow135;builderOvShow135=function(...a){const r=showBefore231.apply(this,a);soon();return r}}
++
++// ---- 11. The stage dialog is #stageDetail (edits 1, 8 and 9), so the main page's one lookup of an id that the OV pages
++// also use is gone. The OV pages keep their own repeated ids (detail, legend, findings and others): their code reads
++// them within its own page. Taking the hidden pages out of the document instead broke the print handlers and AV-2's
++// links, which reach into every page.
++
++// ---- 12. A fresh page isn't "unsaved": until the person first acts, the Builder takes what it loaded as saved. Later
++// blocks add default details to links after the first fingerprint was taken.
++let untouched=true;const touched=()=>{untouched=false};
++if(document.readyState==='complete')setTimeout(touched,1500);else addEventListener('load',()=>setTimeout(touched,1500),{once:true});
++addEventListener('pointerdown',touched,true);addEventListener('keydown',touched,true);
++if(typeof loadTopologyDocument==='function'){const loadBefore231=loadTopologyDocument;loadTopologyDocument=function(...a){untouched=false;return loadBefore231.apply(this,a)}}
++function settle(){if(!untouched)return;try{if(builderHistory?.past?.length||builderHistory?.future?.length){untouched=false;return}if(recoveryPending)return;
++ if(savedFingerprint!==currentBuilderFingerprint()){savedFingerprint=currentBuilderFingerprint();recoveryMessage='';clearTimeout(draftTimer);updateBuilderSaveState()}}catch(e){}}
++if(typeof renderBuilder==='function'){const renderBefore231=renderBuilder;renderBuilder=function(...a){const r=renderBefore231.apply(this,a);settle();return r}}
++
++// ---- 19. The Builder on a first visit: when the topology would fit at under 70%, the Components panel starts folded so
++// the canvas is wide enough to read; + Add opens it. A panel state the person has chosen is kept as before.
++let firstBuilder=true;
++function firstVisit(){if(!firstBuilder||viewOf()!=='builder')return;firstBuilder=false;let chosen=false;try{chosen=localStorage.getItem('splunkPipelineExplorer.dockedPanels.v1')!==null}catch(e){chosen=true}
++ if(chosen||typeof canvasPanelState!=='object'||typeof toggleBuilderCanvasPalette!=='function')return;
++ let tries=0;const check=()=>{if(viewOf()!=='builder')return;const v=state.builderViewport||{};if(!canvasPanelState.palette){if(++tries<8)setTimeout(check,200);return}
++  // Docked (wide screens), the panels keep their own state, which only their Hide control changes: it is pressed.
++  if(v.initialized&&v.zoom<.7){const hide=document.getElementById('builderPaletteDrawerClose');if(hide?.checkVisibility())hide.click();else toggleBuilderCanvasPalette();requestAnimationFrame(()=>{try{fitBuilderView()}catch(e){}});return}
++  if(++tries<8)setTimeout(check,200)};setTimeout(check,120)}
++
++// ---- 21. Changes: one group across the page, its items in columns; a search, a status filter and the newest first.
++const reg={q:'',status:'all',newest:false};
++function changesTools(){const m=document.getElementById('changesMode');if(!m||m.querySelector('.chg231'))return;const sum=m.querySelector('.changesSummary');if(!sum)return;
++ const bar=document.createElement('div');bar.className='chg231';
++ bar.innerHTML='<label class="chg231Find"><span>Find a change</span><input type="search" autocomplete="off" placeholder="Name or detail"></label><label><span>Status</span><select><option value="all">All</option><option value="done">Done</option><option value="proposed">Proposed</option></select></label><label class="chg231Order"><input type="checkbox"> Newest first</label><p class="chg231Count" aria-live="polite"></p>';
++ sum.after(bar);const [find,status,order]=[bar.querySelector('input[type=search]'),bar.querySelector('select'),bar.querySelector('input[type=checkbox]')];
++ find.value=reg.q;status.value=reg.status;order.checked=reg.newest;
++ const apply=()=>{reg.q=find.value.trim().toLowerCase();reg.status=status.value;reg.newest=order.checked;let shown=0,all=0;
++  for(const list of m.querySelectorAll('.changesList')){const want=reg.newest?'1':'';if((list.dataset.rev231||'')!==want){list.append(...[...list.children].reverse());list.dataset.rev231=want}let n=0;for(const it of list.querySelectorAll('.changeItem')){all++;const done=it.classList.contains('done'),hit=(!reg.q||it.textContent.toLowerCase().includes(reg.q))&&(reg.status==='all'||(reg.status==='done')===done);it.hidden=!hit;if(hit){n++;shown++}}
++   const group=list.closest('section,article,div.changeGroup')||list.parentElement;group.hidden=!n}
++  bar.querySelector('.chg231Count').textContent=reg.q||reg.status!=='all'?`${shown} of ${all} changes`:`${all} changes`};
++ find.addEventListener('input',apply);status.addEventListener('change',apply);order.addEventListener('change',apply);apply()}
++if(typeof renderChanges==='function'){const changesBefore231=renderChanges;renderChanges=function(...a){const r=changesBefore231.apply(this,a);changesTools();return r}}
++
++// ---- 25. Generate: a Syslog Server's listening ports as SC4S settings, and a load balancer's listeners. An env_file
++// takes no comment after a value, so each note has its own line; one variable per source and protocol, its ports
++// comma-separated with no spaces, as SC4S's sources page shows (SC4S_LISTEN_CISCO_ASA_UDP_PORT=5005,6005).
++if(typeof generatedConfiguration==='function'){const genBefore231=generatedConfiguration;generatedConfiguration=function(...a){let text=genBefore231.apply(this,a);const P=window.builderPorts230;if(!P)return text;const lines=[];
++ const name=n=>typeof componentInstanceLabel==='function'?componentInstanceLabel(n):n.type;
++ for(const n of state.builderNodes.filter(n=>n.type==='syslog')){const ports=P.ports(n),shared=ports.filter(p=>!p.senders),own=ports.filter(p=>p.senders);
++  lines.push(`\n# SC4S env_file (/opt/sc4s/env_file) — ${name(n)}: its listening ports`);
++  if(ports.some(p=>p.protocol==='tls'))lines.push('# TLS: turned on here; the server key and certificate go in /opt/sc4s/tls/server.key and server.pem','SC4S_SOURCE_TLS_ENABLE=yes');
++  for(const pr of ['udp','tcp','tls']){const list=[...new Set(shared.filter(p=>p.protocol===pr).map(p=>p.port))];if(!list.length)continue;
++   if(list.length>1)lines.push(`# ${list.length} ${pr.toUpperCase()} ports for every sender, in the comma-separated form SC4S documents for a source's ports`);
++   lines.push(`SC4S_LISTEN_DEFAULT_${pr.toUpperCase()}_PORT=${list.join(',')}`)}
++  const bySource=new Map();for(const p of own){const key=p.senders.toUpperCase().replace(/[^A-Z0-9]+/g,'_').replace(/^_|_$/g,'')||'SOURCE',k=key+' '+p.protocol;
++   const g=bySource.get(k)||bySource.set(k,{key,protocol:p.protocol,senders:p.senders,ports:[]}).get(k);if(!g.ports.includes(p.port))g.ports.push(p.port)}
++  for(const g of bySource.values()){lines.push(`# ${String(g.senders).replace(/\s+/g,' ')}: match ${g.key} to the vendor and product in SC4S's sources list`);
++   if(g.protocol==='tls')lines.push("# SC4S's sources page shows this form with UDP and TCP; check that your version takes TLS in it");
++   lines.push(`SC4S_LISTEN_${g.key}_${g.protocol.toUpperCase()}_PORT=${g.ports.join(',')}`)}}
++ for(const n of state.builderNodes.filter(n=>n.type==='loadBalancer')){const ls=P.lbPorts(n);if(!ls.length)continue;lines.push(`\n# Load balancer listeners — ${name(n)} (each forwards to the same port on its members)`);for(const p of ls)lines.push(`listener ${p.protocol.toUpperCase()} ${p.port}`)}
++ return lines.length?text+'\n'+lines.join('\n'):text}}
++
++// ---- 26. Compare: with nothing saved, say how to get something to compare.
++if(typeof renderCompareOperations==='function'){const compareBefore231=renderCompareOperations;renderCompareOperations=function(...a){const r=compareBefore231.apply(this,a);
++ try{if(topologyChoiceDocuments().length<2){const c=document.getElementById('operationsContent');const box=document.createElement('div');box.className='compareEmpty231';box.setAttribute('role','note');
++  box.innerHTML='<strong>Nothing saved to compare with yet</strong><p>Save the topology in the Builder, change it, then come back: Compare shows the components and relationships added, removed or changed since the save.</p>';
++  c.querySelector('.compareSelectors')?.after(box)}}catch(e){}return r}}
++
++// ---- 13 and 27. The change register: the two "Builder review fixes" named apart, and wording as the rest of the page.
++if(typeof changeRegister!=='undefined'){const all=changeRegister.flatMap(g=>g.items);
++ const fix=(name,start,to)=>{const it=all.find(i=>i[0]===name&&i[1].startsWith(start));if(it)it[0]=to};
++ fix('Builder review fixes','Restore the desktop toolbar','Builder review fixes: toolbar and header');
++ fix('Builder review fixes','Keep relationship labels visible','Builder review fixes: labels, collapsed hosts and Splunk Cloud');
++ for(const it of all){if(it[0]==='Syslog server and UF file handoff')it[0]='Syslog Server and UF file handoff';it[1]=it[1].replace(/\bserialization\b/g,'serialisation')}}
++
++// ---- After every view switch: the shared section, the Builder's first visit, and the pages' own parts.
++if(typeof switchView==='function'){const switchBefore231=switchView;switchView=function(...a){const r=switchBefore231.apply(this,a);ctxApply();firstVisit();soon();return r}}
++ctxApply();settle();soon();
++window.explorerReview231={ctxApply,settle,cue};
++})();
++</script>

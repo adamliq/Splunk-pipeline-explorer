@@ -57,7 +57,7 @@ const summarise=r=>r.map(e=>{const bad=[];if(!e.arrowIntoNode)bad.push(`arrow ${
 // 1) default horizontal
 let p=await go();results['1 default (auto/horizontal)']=summarise(await p.evaluate(MEASURE));await p.close();
 // 2) screenshot scenario: add HEC client via palette with UF selected (auto layout). From 1280px the palette is docked open and "+ Add" is hidden.
-p=await go();if(await p.locator('#builderAddToggle').isVisible())await p.click('#builderAddToggle');await p.waitForTimeout(250);await p.fill('#builderPaletteQuery','hec');await p.keyboard.press('Enter');await p.waitForTimeout(600);await p.click('#builderInspectorDrawerClose').catch(()=>{});await p.waitForTimeout(300);
+p=await go();if(!(await p.locator('#builderPaletteQuery').isVisible())){const add=p.locator('#builderAddToggle:visible, .tbAdd198:visible').first();if(await add.count())await add.click()}await p.waitForTimeout(250);await p.fill('#builderPaletteQuery','hec');await p.keyboard.press('Enter');await p.waitForTimeout(600);await p.click('#builderInspectorDrawerClose').catch(()=>{});await p.waitForTimeout(300);
 results['2 after +Add HEC client (auto)']=summarise(await p.evaluate(MEASURE));await shot(p,'edge-2.png');await p.close();
 // 3..n) free layout moves via real mouse drags
 const scenarios=[['3 Syslog Server dragged down-right (diagonal)',1,[140,260]],['4 Syslog Server dragged directly below Syslog Source',1,[-270,230]],['5 Syslog Server dragged left of Syslog Source (reversed)',1,[-560,40]],['6 Syslog Server dragged up-right',1,[120,-60]],['7 Universal Forwarder overlapping Syslog Server column',2,[-200,210]],['8 Indexer dragged below-left of UF',3,[-300,240]]];
