@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scenario Library</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.notes{min-width:0;overflow-wrap:anywhere}
+.panel p{margin:0 0 10px;color:var(--ink-2);font-size:13px}
+.panel a{color:inherit}
+.panel td:first-child{white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 235 TARGET · BUILD 234 + PROTOTYPE</span>
+ <h1>Scenario library packs</h1>
+ <p class="lede">Failure, recovery and data-quality scenarios kept in packs: run together on the topology of the moment, opened in their simulator, saved from it, and carried as a file. Each scenario is worked out by its own simulator’s model; the library adds none.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>Build 234 against the prototype</h2>
+  <table>
+   <thead><tr><th>#</th><th>Feature</th><th>Build 234</th><th>With the prototype</th></tr></thead>
+   <tbody>
+    <tr><td>1</td><td>Built-in packs</td><td>None: each simulator holds one set of settings</td><td>5 packs, 28 scenarios: failures, correlated failures, injected faults, recovery and data quality, from the simulators’ own failures and presets</td></tr>
+    <tr><td>2</td><td>Run a pack</td><td>One case at a time, in its simulator</td><td>Every scenario through its own simulator’s model, on the topology of the moment: serious, with a cost, fine, or can’t run here; results as CSV. On the default topology the 27 that run show the same figures in their simulators (104 figures compared)</td></tr>
+    <tr><td>3</td><td>Open a scenario</td><td>None</td><td>Into its simulator, in place of its settings, with a banner that says where they came from and puts back what they replaced</td></tr>
+    <tr><td>4</td><td>Save to library</td><td>Export of the result only</td><td>In the Failure Lab’s Single, Correlate and Inject modes and the Recovery and Data-quality simulations; named from its settings, into the pack you choose</td></tr>
+    <tr><td>5</td><td>Your packs</td><td>None</td><td>New, copied from a built-in, renamed, with notes; scenarios removed; a pack deleted after a confirm; kept in this browser</td></tr>
+    <tr><td>6</td><td>Pack files</td><td>None</td><td>Download and load; each scenario checked, what this build can’t read named with the reason, values set within the simulator’s limits</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>Where the design comes from</h2>
+  <dl>
+   <dt>The simulators’ own models</dt><dd>A pack holds inputs only. Running it, each scenario goes through the Failure Lab’s, the Recovery simulation’s or the Data-quality simulation’s model, on a copy of that simulator’s settings, against the topology of the moment.</dd>
+   <dt>The same figures in both places</dt><dd>Every built-in scenario that runs on the default topology was opened from the library and its simulator read: 27 of 27 show the library’s figures.</dd>
+   <dt>Nothing leaves the page</dt><dd>Your packs stay in this browser until downloaded; pack files are read in the tab.</dd>
+  </dl>
+ </section>
+ <section class="panel rules">
+  <h2>Sources</h2>
+  <dl>
+   <dt>What the built-in packs exercise, in Splunk’s documentation</dt><dd><a href="https://help.splunk.com/en/splunk-enterprise/administer/admin-manual/10.6/configuration-file-reference/10.6.0-configuration-file-reference/outputs.conf">outputs.conf</a> · <a href="https://help.splunk.com/en/splunk-enterprise/administer/admin-manual/10.6/configuration-file-reference/10.6.0-configuration-file-reference/inputs.conf">inputs.conf</a> · <a href="https://help.splunk.com/en/splunk-enterprise/administer/admin-manual/10.6/configuration-file-reference/10.6.0-configuration-file-reference/props.conf">props.conf</a> · <a href="https://help.splunk.com/en/splunk-enterprise/get-started/get-data-in/9.3/get-data-with-http-event-collector/set-up-and-use-http-event-collector-with-configuration-files">HTTP Event Collector with configuration files</a> · <a href="https://help.splunk.com/en/splunk-enterprise/administer/update-your-deployment/9.4/configure-the-deployment-system/implement-a-deployment-server-cluster">Deployment server cluster</a> · <a href="https://help.splunk.com/en/splunk-enterprise/administer/manage-users-and-security/10.4/use-saml-as-an-authentication-scheme-for-single-sign-on/configure-single-sign-on-with-saml">Single sign-on with SAML</a>.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-scenario-library.md</code> · Prototype: a new script block, its styles and one in-place edit to Build 234, in <code>docs/mockups/scenario-library.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "library", "img": "compare/scenario-library-library.png", "group": "target", "tab": "The library", "title": "Five packs built in, each run on the topology of the moment", "w": 1160, "h": 990, "zoom": 1, "size": "1440 px window, Operate › Scenario library, Indexer outage drill, after Run the pack", "measure": {"packs": ["Indexer outage drill", "Parsing and event quality", "HEC ingestion", "Deployment Server incidents", "Identity and credentials"], "scenarios": 28, "topology": 4, "counts": {"bad": 4, "warn": 1, "ok": 1, "need": 0}, "rows": [{"name": "Receiver unreachable", "sev": "bad", "label": "High risk", "head": "Loss: Conditional", "detail": "Detection: Delayed. Recovery: Automatic when buffered. 8 stages."}, {"name": "Indexer down for an hour", "sev": "bad", "label": "Data lost", "head": "29.44 GB past the buffer", "detail": "At Indexer 1, tcpin_queue. Buffer full in 24.3 min; recovery 48.5 min."}, {"name": "One-hour outage, acknowledgement in doubt", "sev": "warn", "label": "Held, at a cost", "head": "The buffers hold 49.44 GB", "detail": "49.44 GB arrives during the outage; recovery 4.2 hr; duplicates at risk 2.47 GB."}, {"name": "One-hour outage, acknowledgement confirmed", "sev": "ok", "label": "Held", "head": "The buffers hold 49.44 GB", "detail": "49.44 GB arrives during the outage; recovery 4.2 hr; duplicates at risk 0 MB."}, {"name": "Four-hour outage", "sev": "bad", "label": "Data lost", "head": "117.75 GB past the buffers", "detail": "197.75 GB arrives during the outage; recovery 7.3 hr; duplicates at risk 9.89 GB."}, {"name": "Receiver down, then indexQueue stalls", "sev": "bad", "label": "High risk", "head": "Primary: Receiver unreachable", "detail": "16 stages touched, 0 shared; fullest queue 98%; highest risk high."}]}, "items": [{"n": 1, "head": "5 packs, 28 scenarios", "text": "Indexer outage, parsing, HEC, Deployment Server and identity: failures, injected faults, recovery and data quality.", "x": 24.48, "y": 36.9, "box": [1.03, 14.08, 21.55, 45.63]}, {"n": 2, "head": "4 serious, 1 with a cost, 1 fine", "text": "Each scenario goes through its own simulator’s model, on a copy of its settings: the simulators’ own aren’t touched.", "x": 61.47, "y": 33.68, "box": [25.26, 29.79, 72.41, 2.27]}, {"n": 3, "head": "29.44 GB past the buffer", "text": "An hour of 12,000 EPS of 1.2 KB is 49.44 GB; the Indexer’s 20 GB buffer holds 20 of it.", "x": 86.65, "y": 50.33, "box": [71.57, 49.88, 18.17, 1.82]}, {"n": 4, "head": "Open", "text": "Puts the scenario into its simulator, here Failure Lab · Inject, in place of its settings.", "x": 94.05, "y": 51.75, "box": [91.12, 47.1, 5.86, 3.03]}]}, {"id": "opened", "img": "compare/scenario-library-opened.png", "group": "target", "tab": "Opened", "title": "A scenario opened: the simulator shows the library’s figures", "w": 1053, "h": 525, "zoom": 1, "size": "1440 px window, Failure Lab, after Open on Indexer down for an hour", "measure": {"banner": "From the scenario library: Indexer down for an hour (Indexer outage drill).", "mode": "inject", "target": "Indexer", "metrics": ["BACKLOG CREATED 49.44 GB", "BEYOND DURABILITY 29.44 GB", "BUFFER EXHAUSTION 24.3 min", "RETURN TO NORMAL 48.5 min", "DETECTION IMPACT Destination interruption"]}, "items": [{"n": 1, "head": "Where the settings came from", "text": "Put back the previous settings restores what the scenario replaced; Back to the library returns to the pack.", "x": 22.19, "y": 11.75, "box": [2.28, 5.28, 39.83, 3.43]}, {"n": 2, "head": "49.44 GB backlog, 29.44 GB past the buffer", "text": "The same figures as the library’s row: one model gives both.", "x": 50, "y": 98.8, "box": [1.14, 86.35, 97.72, 11.4]}]}, {"id": "save", "img": "compare/scenario-library-save.png", "group": "target", "tab": "Save to library", "title": "Save to library, in each simulator", "w": 1160, "h": 155, "zoom": 1, "size": "1440 px window, Operate › Recovery simulation, outage set to 120 minutes, after Save to library", "measure": {"msg": "Saved “120-minute outage at 12,000 EPS, acknowledgement ambiguous” to My scenarios. Open the library", "first": "sl235SaveBox", "packs": ["My scenarios: 120-minute outage at 12,000 EPS, acknowledgement ambiguous"]}, "items": [{"n": 1, "head": "Save to library", "text": "Also in the Failure Lab (Single, Correlate and Inject) and the Data-quality simulation.", "x": 55.61, "y": 18.52, "box": [44.8, 7.55, 8.91, 21.94]}, {"n": 2, "head": "Named from its settings", "text": "Saved to My scenarios, started on the first save; Open the library goes to it.", "x": 71.09, "y": 59.16, "box": [44.8, 33.36, 52.58, 15.48]}]}, {"id": "yours", "img": "compare/scenario-library-yours.png", "group": "target", "tab": "Your packs", "title": "Your own pack: rename, add notes, run, download", "w": 1160, "h": 703, "zoom": 1, "size": "1440 px window, Operate › Scenario library, My scenarios, after saving four scenarios, renaming one and adding a note", "measure": {"pack": "My scenarios", "names": ["Truncation cut-off drill", "Receiver unreachable + indexQueue or disk I/O stall", "120-minute outage at 12,000 EPS, acknowledgement ambiguous", "Duplicate storm"], "notes": ["Run before changing TRUNCATE on the indexers.", "", "", ""], "target": "My scenarios", "counts": {"bad": 3, "warn": 1, "ok": 0, "need": 0}, "rows": [{"name": "Truncation cut-off drill", "sev": "bad", "label": "High risk", "head": "Loss: Yes — event tail", "detail": "Detection: Incomplete. Recovery: Source replay. 8 stages."}, {"name": "Receiver unreachable + indexQueue or disk I/O stall", "sev": "bad", "label": "High risk", "head": "Primary: Receiver unreachable", "detail": "16 stages touched, 0 shared; fullest queue 98%; highest risk high."}, {"name": "120-minute outage at 12,000 EPS, acknowledgement ambiguous", "sev": "bad", "label": "Data lost", "head": "18.88 GB past the buffers", "detail": "98.88 GB arrives during the outage; recovery 6.9 hr; duplicates at risk 4.94 GB."}, {"name": "Duplicate storm", "sev": "warn", "label": "Degraded", "head": "Quality 83.8 / 100", "detail": "Detection readiness 86.3; event-time usability 97.2; 16,629,718 of 43,200,000 events affected."}]}, "items": [{"n": 1, "head": "Names and notes", "text": "Saved scenarios are named from their settings; rename them and say what each tests.", "x": 42.64, "y": 34.77, "box": [25.26, 34.77, 17.38, 14.28]}, {"n": 2, "head": "Save new scenarios to", "text": "Choose which of your packs the simulators’ Save to library fills.", "x": 11.81, "y": 77.36, "box": [1.03, 70.39, 21.55, 4.69]}, {"n": 3, "head": "A file to share", "text": "Download pack writes each scenario’s kind, name, note and settings; Load a pack… reads them back, checked.", "x": 43.64, "y": 19.76, "box": [34.17, 19.76, 9.47, 4.84]}]}, {"id": "files", "img": "compare/scenario-library-files.png", "group": "target", "tab": "Loading a file", "title": "A pack file from elsewhere: what can’t be read is named, with the reason", "w": 1160, "h": 506, "zoom": 1, "size": "1440 px window, Operate › Scenario library, after Load a pack… with a file of four scenarios", "measure": {"msg": "Loaded “Team drills” (2 scenarios) from team-drills.json. Left out: “Queue stall from a later build” in Team drills: “index-queue-v2” isn’t a failure in this build; “Lonely correlation” in Team drills: a correlation takes 2 to 4 failures, not 1.", "kind": "warn", "pack": "Team drills", "names": ["Receiver unreachable", "Outage typed by hand 1/100"]}, "items": [{"n": 1, "head": "Left out: 2 of 4", "text": "A failure this build doesn’t have, and a correlation of one failure.", "x": 50, "y": 16.45, "box": [1.03, 2.46, 97.93, 10.83]}, {"n": 2, "head": "Set within the limits", "text": "An outage of −5 minutes and a replay of 900% become 1 minute and 100%, as the simulator itself would read them.", "x": 72.77, "y": 84.32, "box": [52.77, 74.56, 18.1, 19.5]}]}, {"id": "hec", "img": "compare/scenario-library-hec.png", "group": "target", "tab": "Needs a component", "title": "A scenario that needs a component the topology lacks says so", "w": 1160, "h": 706, "zoom": 1, "size": "1440 px window, Operate › Scenario library, HEC ingestion, after Run the pack and Open on Tokens rejected for 30 minutes", "measure": {"msg": "“Tokens rejected for 30 minutes” needs a HEC Endpoint in the topology: add one in the Builder, then open it again.", "kind": "warn", "counts": {"bad": 3, "warn": 1, "ok": 0, "need": 1}, "rows": [{"name": "HEC request rejected", "sev": "bad", "label": "High risk", "head": "Loss: Client dependent", "detail": "Detection: Missing. Recovery: Correct and replay. 9 stages."}, {"name": "HEC endpoint unavailable", "sev": "bad", "label": "Critical risk", "head": "Loss: Low while durably buffered", "detail": "Detection: Missing or delayed. Recovery: Restore and drain. 7 stages."}, {"name": "HEC acknowledgement not confirmed", "sev": "bad", "label": "High risk", "head": "Loss: Low; duplicate risk", "detail": "Detection: Delayed or duplicated. Recovery: Reconcile then retry. 12 stages."}, {"name": "Tokens rejected for 30 minutes", "sev": "need", "label": "Can’t run here", "head": "Needs a HEC Endpoint", "detail": "The topology has no HEC Endpoint to inject into: add one in the Builder."}, {"name": "Clients resend a fifth of an hour’s events", "sev": "warn", "label": "Held, at a cost", "head": "The buffers hold 49.44 GB", "detail": "49.44 GB arrives during the outage; recovery 4.8 hr; duplicates at risk 3.46 GB."}]}, "items": [{"n": 1, "head": "What to add", "text": "Opening it changes nothing: add a HEC endpoint in the Builder, then open it again.", "x": 50, "y": 9.32, "box": [1.03, 1.76, 97.93, 5.3]}, {"n": 2, "head": "Can’t run here", "text": "Not counted as fine or failing: the pack’s summary keeps it apart.", "x": 82.42, "y": 85.22, "box": [71.57, 83.62, 8.95, 3.19]}]}, {"id": "ops-today", "img": "compare/scenario-library-ops-today.png", "group": "today", "tab": "Today: Operate", "title": "Build 234: each simulator holds one set of settings", "w": 230, "h": 968, "zoom": 1, "size": "1440 px window, Operate › Data-quality simulation", "measure": {"nav": ["Health overlay", "Multi-DS management", "Capacity model", "Recovery simulation", "Data-quality simulation", "Parsing laboratory", "Performance guardrails", "Detection lineage", "Multi-region & DR", "Security boundaries", "Authentication boundaries", "Responsibility boundaries", "Combined boundary overlay", "Telemetry chain-of-custody", "Event walkthrough", "Login walkthrough", "Runbook", "Generate", "Compare", "Evidence pack", "Architecture report"], "save": false}, "items": [{"n": 1, "head": "No library", "text": "Recovery and Data quality keep only their current settings: trying another case loses the last.", "x": 98.6, "y": 22.79, "box": [9.57, 20.74, 80.43, 4.11]}]}, {"id": "lab-today", "img": "compare/scenario-library-lab-today.png", "group": "today", "tab": "Today: Failure Lab", "title": "Build 234: an injected fault can be exported, not kept", "w": 1379, "h": 463, "zoom": 1, "size": "1440 px window, Failure Lab · Inject, the Indexer for 60 minutes", "measure": {"save": false, "mode": "inject", "metrics": ["BACKLOG CREATED 49.44 GB", "BEYOND DURABILITY 29.44 GB", "BUFFER EXHAUSTION 24.3 min", "RETURN TO NORMAL 48.5 min", "DETECTION IMPACT Destination interruption"]}, "items": [{"n": 1, "head": "Single, Correlate, Inject", "text": "Each mode keeps one case; nothing groups cases to run again or hand on.", "x": 21.17, "y": 13.06, "box": [0.87, 13.06, 20.3, 8.75]}]}, {"id": "changes-today", "img": "compare/scenario-library-changes-today.png", "group": "today", "tab": "Today: register", "title": "Build 234: scenario library packs were proposed", "w": 692, "h": 78, "zoom": 1, "size": "1440 px window, Changes", "measure": {"item": ["Scenario library packs", "Later", "○ Scenario library packs Portable reusable failure, recovery and data-quality scenario bundles. LATER"]}, "items": [{"n": 1, "head": "Proposed, Later", "text": "Portable, reusable failure, recovery and data-quality scenario bundles.", "x": 77.19, "y": 49.25, "box": [1.45, 12.28, 97.11, 73.94]}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 234 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>

@@ -1,0 +1,438 @@
+diff --git a/index.html b/index.html
+--- a/index.html
++++ b/index.html
+@@ -1810 +1810 @@ const changeRegister=[
+-  ['Scenario library packs','Portable reusable failure, recovery and data-quality scenario bundles.',false,'Later']
++  ['Scenario library packs','Portable reusable failure, recovery and data-quality scenario bundles.',true,'Later']
+@@ -17106,0 +17107,77 @@ p.fleet233Warn{font-size:13px;margin:6px 0}
++<style id="scenario-library-v235-styles">
++/* Build 235: the scenario library (Operate) and its Save to library and banner in the simulators. Text 11 px or more. */
++.sl235Layout{display:grid;grid-template-columns:minmax(200px,250px) minmax(0,1fr);gap:16px;margin-top:15px;align-items:start}
++.sl235Packs{display:grid;gap:6px;min-width:0}
++.sl235Packs h4{margin:8px 0 2px;color:#8fa3b3;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
++.sl235PackBtn{display:grid;gap:3px;text-align:left;border:1px solid #263c4e;border-radius:9px;background:#08131d;color:#d6e7ef;padding:9px 11px;cursor:pointer;font-size:12px}
++.sl235PackBtn small{color:#9db7c5;font-size:11px;line-height:1.35}
++.sl235PackBtn:hover,.sl235PackBtn:focus-visible{border-color:#48657b;outline:none}
++.sl235PackBtn.on{border-color:#57c7e8;background:#0d2130}
++.sl235Empty{margin:4px 0;color:#9db7c5;font-size:12px;line-height:1.45}
++.sl235Target{display:grid;gap:5px;margin-top:10px;color:#9db7c5;font-size:11px}
++.sl235Target select{font-size:12px;padding:7px 8px}
++.sl235Pack{min-width:0;border:1px solid #213547;border-radius:11px;background:#0a1621;padding:14px}
++.sl235Pack h3{margin:0 0 4px;font-size:16px;color:#e4eef4}
++.sl235Desc{margin:0 0 6px;color:#b9cad7;font-size:12px;line-height:1.5;max-width:75ch}
++.sl235Meta{margin:0 0 10px;color:#8fa3b3;font-size:11px}
++.sl235Edit{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 10px;align-items:center;margin-bottom:8px;font-size:12px;color:#9db7c5}
++.sl235Edit input,.sl235Name textarea,.sl235Target select{width:100%;min-width:0;box-sizing:border-box;border:1px solid #294052;background:#08131d;color:#e4eef4;border-radius:7px;font-family:inherit}
++.sl235Edit input{font-size:13px;padding:7px 9px}
++.sl235Edit input:focus,.sl235Name textarea:focus,.sl235Target select:focus{border-color:#57c7e8;outline:none}
++.sl235Edit input::placeholder,.sl235Name textarea::placeholder{color:#7f97a8}
++.sl235Tools{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 10px}
++.sl235Tools .builderBtn{font-size:12px}
++.sl235Tools .builderBtn:disabled{cursor:default;color:#9db7c5}
++.sl235Confirm{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 10px;padding:9px 11px;border:1px solid rgba(255,107,107,.45);border-radius:9px;background:rgba(255,107,107,.08);color:#f3d0d0;font-size:12px}
++.sl235Confirm button,.sl235Msg button,.sl235Banner button,.sl235Acts button{font-size:12px;border:1px solid #2f5268;border-radius:6px;background:#0d2130;color:#d6e7ef;padding:5px 9px;cursor:pointer;min-height:28px}
++.sl235Confirm button:focus-visible,.sl235Msg button:focus-visible,.sl235Banner button:focus-visible,.sl235Acts button:focus-visible,.sl235Link:focus-visible{outline:2px solid #57c7e8;outline-offset:1px}
++.sl235Msg{margin:12px 0 0;padding:9px 11px;border-radius:9px;border:1px solid #294153;background:#0b1a25;color:#cfe0ea;font-size:12px;line-height:1.45}
++.sl235Msg[data-kind="warn"]{border-color:rgba(243,189,97,.5)}
++.sl235Msg[data-kind="error"]{border-color:rgba(255,107,107,.55);color:#f3d0d0}
++.sl235Summary{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin:0 0 10px;color:#b9cad7;font-size:12px}
++.sl235Sev{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:99px;padding:2px 8px;border:1px solid}
++.sl235Sev i{font-style:normal}
++.sl235Sev[data-sev="bad"]{color:#ff9f9f;border-color:rgba(255,107,107,.5)}
++.sl235Sev[data-sev="warn"]{color:#f3bd61;border-color:rgba(243,189,97,.5)}
++.sl235Sev[data-sev="ok"]{color:#66e0a3;border-color:rgba(102,224,163,.5)}
++.sl235Sev[data-sev="need"]{color:#b4c6d2;border-color:#3b5568;border-style:dashed}
++.sl235TableWrap{overflow-x:auto}
++.sl235Table{width:100%;min-width:0;border-collapse:collapse;font-size:12px;color:#cfe0ea;table-layout:fixed}
++.sl235Table col.cName{width:24%}.sl235Table col.cKind{width:14%}.sl235Table col.cSettings{width:25%}.sl235Table col.cOut{width:27%}.sl235Table col.cActs{width:10%}
++.sl235Table th{position:static;text-align:left;font-size:11px;color:#8fa3b3;font-weight:600;padding:6px 8px;border-bottom:1px solid #213547;background:none}
++.sl235Table td{vertical-align:top;padding:9px 8px;border-bottom:1px solid #17293a;overflow-wrap:anywhere}
++.sl235Table td p{margin:4px 0 0;color:#9db7c5;font-size:11px;line-height:1.45}
++.sl235Name textarea{display:block;font-size:12px;line-height:1.4;padding:5px 7px;resize:vertical}
++.sl235Name textarea[data-sl235-rename]{font-weight:600}
++.sl235Name textarea[data-sl235-note]{margin-top:5px;font-size:11px;color:#b9cad7}
++.sl235Settings{color:#b4c6d2;font-size:11px;line-height:1.45}
++.sl235Out strong{display:block;margin-top:5px;color:#e4eef4;font-size:12px}
++.sl235Pending{color:#9db7c5;font-size:11px}
++.sl235Kind{display:inline-block;font-size:11px;border-radius:6px;padding:2px 7px;border:1px solid #2f5268;color:#b9d6e4}
++.sl235Kind[data-family="recovery"]{border-color:rgba(111,168,255,.5);color:#b6cdf7}
++.sl235Kind[data-family="data-quality"]{border-color:rgba(169,150,255,.55);color:#d2c8ff}
++.sl235Acts button{display:block;width:100%;margin-bottom:5px;text-align:left}
++.sl235Remove{color:#f3d0d0!important}
++.sl235Note{margin:12px 0 0;color:#9db7c5;font-size:11px;line-height:1.5}
++.sl235Msg:focus-visible,.sl235Banner:focus-visible{outline:2px solid #57c7e8;outline-offset:1px}
++.sl235Pack,.sl235Banner{scroll-margin-top:96px}
++.sl235SaveBox{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
++.sl235SaveBox.inLab{margin:0 0 8px;padding:0 2px}
++.sl235SaveBox .builderBtn{font-size:12px}
++.sl235SaveMsg{color:#b9cad7;font-size:12px;line-height:1.4}
++.sl235SaveMsg:empty{display:none}
++.sl235SaveMsg[data-kind="error"]{color:#f3d0d0}
++.sl235Link{display:inline-flex;align-items:center;min-height:24px;vertical-align:middle;border:0;background:none;color:#7fd6f0;text-decoration:underline;cursor:pointer;font-size:12px;padding:0 2px}
++.sl235Banner{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0 0 12px;padding:9px 11px;border:1px solid rgba(87,199,232,.45);border-radius:9px;background:#0b1d29;color:#cfe0ea;font-size:12px}
++@media (max-width:760px){
++ .sl235Layout{grid-template-columns:minmax(0,1fr)}
++ .sl235Table thead{display:none}
++ .sl235Table,.sl235Table tbody,.sl235Table tr,.sl235Table td{display:block;width:100%}
++ .sl235Table tr{border-bottom:1px solid #213547;padding:6px 0}
++ .sl235Table td{border:0;padding:5px 2px;min-width:0}
++ .sl235Acts button{display:inline-block;width:auto;margin:0 6px 6px 0;min-height:32px}
++ .sl235Edit{grid-template-columns:minmax(0,1fr)}
++ .sl235PackBtn{min-height:44px}
++ .sl235Pack,.sl235Banner{scroll-margin-top:12px}
++}
++</style>
+@@ -19986,0 +20064,353 @@ if(state.view==='builder')later(refreshAfterBuilder);
++<script id="scenario-library-v235">
++// Build 235: scenario library packs. Failure, recovery and data-quality scenarios saved from the Failure Lab and the two
++// Operate simulators, grouped in packs, run together against the current topology, opened in their simulator, and
++// downloaded or loaded as a portable file. The simulators' own models do every calculation: a pack only holds inputs.
++(function(){
++if(window.scenarios235)return;
++const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
++const num=v=>Number(v).toLocaleString();
++const plural=(n,one,many=one+'s')=>`${num(n)} ${n===1?one:many}`;
++const clone=v=>JSON.parse(JSON.stringify(v));
++const uid=p=>p+'-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
++const cap=s=>String(s).charAt(0).toUpperCase()+String(s).slice(1);
++const gb=v=>formatCapacityData(v),dur=v=>formatCapacityDuration(v);
++const csvCell=v=>{const s=String(v??'');return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s};
++const failureOf=id=>failures.find(f=>f.id===id);
++const typeName=t=>builderComponents[t]?.name||t;
++
++// ---- The five kinds of scenario, and the simulator each opens in.
++const KINDS={
++ failure:{label:'Failure',family:'failure',page:'failure',where:'Failure Lab · Single'},
++ correlation:{label:'Correlated failures',family:'failure',page:'failure',where:'Failure Lab · Correlate'},
++ injection:{label:'Injected fault',family:'failure',page:'failure',where:'Failure Lab · Inject'},
++ recovery:{label:'Recovery',family:'recovery',page:'recovery',where:'Operate › Recovery simulation'},
++ 'data-quality':{label:'Data quality',family:'data-quality',page:'data-quality',where:'Operate › Data-quality simulation'}};
++const FAMILIES={failure:'Failure Lab',recovery:'Recovery','data-quality':'Data quality'};
++const RECOVERY_KEYS=['arrivalEps','eventKb','outageMin','sourceGb','ufGb','hfGb','indexerGb','perSetEps','sharedEps','pipelineSets','imbalancePct','replayPct','ackMode'];
++const DQ_KEYS=['profile','eps','windowMin','eventKb',...dataQualityIssues.map(([k])=>k)];
++const FAULT_KEYS=['durationMin','arrivalEps','eventKb','bufferGb','recoveryEps'];
++
++// The simulators read the page's state. A scenario runs on a copy of the parts it sets; the page's own are put back.
++function withState(patch,fn){
++ const keys=Object.keys(patch),saved=keys.map(k=>[k,state[k]]);
++ try{for(const k of keys)state[k]=clone(patch[k]);return fn()}
++ finally{for(const [k,v] of saved)state[k]=v}}
++
++// A scenario's settings, checked and set within the simulators' own limits: {ok, scenario} or {ok:false, why}.
++const finite=(v,min,max=Infinity)=>Number.isFinite(Number(v))?Math.min(max,Math.max(min,Number(v))):null;
++function normalize(raw){
++ const kind=raw?.kind,s=raw?.settings||{},name=String(raw?.name||'').trim().slice(0,120),note=String(raw?.note||'').trim().slice(0,400);
++ if(!KINDS[kind])return {ok:false,why:`“${String(kind)}” isn’t a kind of scenario this build knows`};
++ let settings;
++ if(kind==='failure'){
++  const f=failureOf(s.failure);if(!f)return {ok:false,why:`“${String(s.failure)}” isn’t a failure in this build`};
++  settings={failure:f.id,scope:s.scope==='p1'&&laneLocalFailures.has(f.id)?'p1':'component'}}
++ else if(kind==='correlation'){
++  const ids=[...new Set((Array.isArray(s.failures)?s.failures:[]).map(String))],unknown=ids.filter(id=>!failureOf(id));
++  if(unknown.length)return {ok:false,why:`${unknown.map(x=>`“${x}”`).join(', ')} ${unknown.length===1?'isn’t a failure':'aren’t failures'} in this build`};
++  if(ids.length<2||ids.length>4)return {ok:false,why:`a correlation takes 2 to 4 failures, not ${ids.length}`};
++  settings={failures:ids,timing:Object.fromEntries(ids.map(id=>{const t=s.timing?.[id]||{};return [id,{start:finite(t.start,0,10080)??0,duration:finite(t.duration,1,10080)??30}]}))}}
++ else if(kind==='injection'){
++  const t=s.target||{};if(!builderComponents[t.type])return {ok:false,why:`“${String(t.type)}” isn’t a Builder component in this build`};
++  if(!injectionFaults[s.fault])return {ok:false,why:`“${String(s.fault)}” isn’t a fault this build injects`};
++  settings={target:{type:t.type,name:String(t.name||'').slice(0,120)},stage:String(s.stage||''),fault:s.fault,
++   durationMin:finite(s.durationMin,1,10080)??30,arrivalEps:finite(s.arrivalEps,0)??0,eventKb:finite(s.eventKb,.01)??1.2,bufferGb:finite(s.bufferGb,0)??0,recoveryEps:finite(s.recoveryEps,0)??0}}
++ else if(kind==='recovery'){
++  // recoveryModel() sets its own limits: its inputs, as it reads them, are the settings.
++  const base=clone(state.recovery);for(const k of RECOVERY_KEYS)if(s[k]!==undefined)base[k]=s[k];
++  const c=withState({recovery:base},()=>recoveryModel().c);settings=Object.fromEntries(RECOVERY_KEYS.map(k=>[k,c[k]]))}
++ else{
++  const base=clone(state.dataQuality);for(const k of DQ_KEYS)if(s[k]!==undefined)base[k]=s[k];
++  const c=withState({dataQuality:base},()=>dataQualityModel().c);settings=Object.fromEntries(DQ_KEYS.map(k=>[k,c[k]]));
++  if(!dataQualityPresets[settings.profile])settings.profile='custom';
++  else if(dataQualityIssues.some(([k])=>Number(dataQualityPresets[settings.profile][k])!==settings[k]))settings.profile='custom'}
++ const sc={id:typeof raw.id==='string'&&raw.id?raw.id.slice(0,60):uid('sc'),kind,name:name||autoName({kind,settings}),note,settings};
++ return {ok:true,scenario:sc}}
++
++// ---- Names and one-line settings, as a person reads them.
++function injectionTarget(s){return s.target?(s.target.name||typeName(s.target.type)):'a component'}
++function autoName({kind,settings:s}){
++ if(kind==='failure')return failureOf(s.failure).name+(s.scope==='p1'?' (pipeline set 1)':'');
++ if(kind==='correlation')return s.failures.map(id=>failureOf(id).name).join(' + ');
++ if(kind==='injection')return `${injectionFaults[s.fault].name} at ${injectionTarget(s)}, ${num(s.durationMin)} min`;
++ if(kind==='recovery')return `${num(s.outageMin)}-minute outage at ${num(s.arrivalEps)} EPS, acknowledgement ${s.ackMode}`;
++ return s.profile==='custom'?'Custom data quality':dataQualityPresets[s.profile].name}
++function settingsText({kind,settings:s}){
++ if(kind==='failure'){const f=failureOf(s.failure);return `${f.name} · ${f.scope}${s.scope==='p1'?' · pipeline set 1 only':''}`}
++ if(kind==='correlation')return s.failures.map(id=>`${failureOf(id).name} from ${num(s.timing[id].start)} min for ${num(s.timing[id].duration)}`).join('; ');
++ if(kind==='injection')return `${injectionFaults[s.fault].name} at ${injectionTarget(s)}${s.stage?` (${s.stage})`:''} for ${num(s.durationMin)} min; ${num(s.arrivalEps)} EPS of ${s.eventKb} KB; ${num(s.bufferGb)} GB buffer; ${num(s.recoveryEps)} EPS to recover`;
++ if(kind==='recovery')return `${num(s.outageMin)} min at ${num(s.arrivalEps)} EPS of ${s.eventKb} KB; buffers: source ${num(s.sourceGb)}, UF ${num(s.ufGb)}, HF ${num(s.hfGb)}, Indexer ${num(s.indexerGb)} GB; ${s.pipelineSets} pipeline set${s.pipelineSets===2?'s':''} of ${num(s.perSetEps)} EPS, shared ${num(s.sharedEps)}; replay ${s.replayPct}%; acknowledgement ${s.ackMode}`;
++ const rates=dataQualityIssues.filter(([k])=>s[k]>0).map(([k,label])=>`${label.toLowerCase()} ${s[k]}%`);
++ return `${s.profile==='custom'?'Custom':dataQualityPresets[s.profile].name}: ${num(s.eps)} EPS for ${num(s.windowMin)} min; ${rates.join(', ')||'no defects'}`}
++// ---- Built-in packs. Every scenario is the simulators' own: a failure from the Failure Lab's list, a fault it injects,
++// or inputs to the Recovery and Data-quality simulations. Notes say what each one exercises.
++const RECOVERY_DEFAULT={arrivalEps:12000,eventKb:1.2,outageMin:60,sourceGb:30,ufGb:20,hfGb:10,indexerGb:20,perSetEps:9000,sharedEps:15000,pipelineSets:2,imbalancePct:15,replayPct:5,ackMode:'ambiguous'};
++const DQ_BASE={eps:12000,windowMin:60,eventKb:1.2};
++const dqPreset=id=>({profile:id,...DQ_BASE,...Object.fromEntries(dataQualityIssues.map(([k])=>[k,dataQualityPresets[id][k]]))});
++const F=(failure,name,note,scope='component')=>({kind:'failure',name,note,settings:{failure,scope}});
++const BUILTIN_SOURCE=[
++ {id:'outage-drill',name:'Indexer outage drill',description:'An indexer stops taking data for an hour, then comes back: what the queues and buffers hold, what’s resent, and how long the backlog takes to drain.',scenarios:[
++  F('receiver-down','Receiver unreachable','The forwarder can’t reach its indexer: tcpout_queue fills and backpressure reaches collection.'),
++  {kind:'injection',name:'Indexer down for an hour',note:'The Indexer’s own 20 GB buffer against an hour of 12,000 EPS.',settings:{target:{type:'idx',name:''},stage:'',fault:'unavailable',durationMin:60,arrivalEps:12000,eventKb:1.2,bufferGb:20,recoveryEps:18000}},
++  {kind:'recovery',name:'One-hour outage, acknowledgement in doubt',note:'Events in flight when the link failed are resent, so some may be indexed twice.',settings:{...RECOVERY_DEFAULT}},
++  {kind:'recovery',name:'One-hour outage, acknowledgement confirmed',note:'The same outage with every block confirmed: the replay brings no duplicates.',settings:{...RECOVERY_DEFAULT,ackMode:'confirmed'}},
++  {kind:'recovery',name:'Four-hour outage',note:'The same buffers against four hours: what they can’t hold has to be replayed from the source.',settings:{...RECOVERY_DEFAULT,outageMin:240}},
++  {kind:'correlation',name:'Receiver down, then indexQueue stalls',note:'Two failures eight minutes apart: which one is the cause, and which follows from it.',settings:{failures:['receiver-down','index-stall'],timing:{'receiver-down':{start:0,duration:30},'index-stall':{start:8,duration:45}}}}]},
++ {id:'parsing-quality',name:'Parsing and event quality',description:'Defects that arrive intact but search badly: line breaking, truncation, timestamps and schema drift.',scenarios:[
++  F('line-breaker','Incorrect LINE_BREAKER','Events split or merged in the wrong places, before any other parsing.'),
++  F('truncate','TRUNCATE too low','Long events cut at the limit, losing the fields at their end.'),
++  F('timestamp','Timestamp extraction failure','Events indexed at the wrong time, so searches over a time range miss them.'),
++  {kind:'data-quality',name:'Truncation and boundaries',note:'The simulation’s truncation preset, at 12,000 EPS for an hour.',settings:dqPreset('truncation')},
++  {kind:'data-quality',name:'Timestamp corruption',note:'The simulation’s timestamp preset: parse failures and events out of their time window.',settings:dqPreset('timestamp')},
++  {kind:'data-quality',name:'Schema drift',note:'The simulation’s schema-drift preset: required fields missing as the source changes.',settings:dqPreset('schema')}]},
++ {id:'hec-ingestion',name:'HEC ingestion',description:'The HTTP Event Collector refusing requests, unavailable, or unable to confirm what it took.',scenarios:[
++  F('hec-reject','HEC request rejected','Requests refused at admission: the client must hold and resend them.'),
++  F('hec-unavailable','HEC endpoint unavailable','The endpoint is down: what the clients don’t buffer is lost.'),
++  F('hec-ack-timeout','HEC acknowledgement not confirmed','Events taken but not confirmed: clients that resend can duplicate them.'),
++  {kind:'injection',name:'Tokens rejected for 30 minutes',note:'Needs a HEC endpoint in the topology. Its clients buffer 5 GB.',settings:{target:{type:'hecEndpoint',name:''},stage:'',fault:'authentication',durationMin:30,arrivalEps:12000,eventKb:1.2,bufferGb:5,recoveryEps:18000}},
++  {kind:'recovery',name:'Clients resend a fifth of an hour’s events',note:'Acknowledgement off: the model counts about a third of the replay as duplicates.',settings:{...RECOVERY_DEFAULT,replayPct:20,ackMode:'disabled'}}]},
++ {id:'ds-incidents',name:'Deployment Server incidents',description:'Fleet management failing while events may still flow: an unreachable server, a phone-home storm, a change that reaches too many agents.',scenarios:[
++  F('deployment-server-unreachable','Deployment Server unreachable','Agents keep their last configuration; nothing new reaches them.'),
++  F('deployment-phonehome-storm','Phone-home storm after an outage','Every agent phones home at once when the server comes back.'),
++  F('deployment-blast-radius','Server-class change reaches too many agents','A class change matches far more of the fleet than meant.'),
++  F('management-healthy-event-broken','Management healthy, events broken','The agent phones home, but its events don’t arrive: the two planes fail apart.'),
++  {kind:'correlation',name:'Server back after an hour, then the storm',note:'The outage, then the agents that all phone home when it ends.',settings:{failures:['deployment-server-unreachable','deployment-phonehome-storm'],timing:{'deployment-server-unreachable':{start:0,duration:60},'deployment-phonehome-storm':{start:60,duration:20}}}}]},
++ {id:'identity',name:'Identity and credentials',description:'Sign-in and machine trust failing: the identity provider, MFA, certificates, tokens, and a rotation done halfway.',scenarios:[
++  F('auth-idp-unavailable','SAML identity provider unavailable','Nobody signs in through the provider; only local or break-glass accounts work.'),
++  F('auth-mfa-rejection','MFA or conditional-access rejection','The second factor or a policy refuses the sign-in.'),
++  F('auth-certificate','Certificate expired, untrusted or wrong name','Machine connections fail their TLS check.'),
++  F('auth-hec-token','HEC token disabled, expired or wrong index','HEC refuses the client’s events.'),
++  F('auth-partial-rotation','Rotation done on one tier only','A credential changed on one side of a connection but not the other.'),
++  {kind:'correlation',name:'Clock skew, then assertions refused',note:'A clock drifts, and five minutes later the provider’s assertions fall outside their window.',settings:{failures:['auth-clock-skew','auth-saml-assertion'],timing:{'auth-clock-skew':{start:0,duration:120},'auth-saml-assertion':{start:5,duration:60}}}}]}];
++// The built-in packs go through the same checks as a loaded file.
++const BUILTIN=BUILTIN_SOURCE.map(p=>({id:p.id,name:p.name,description:p.description,builtIn:true,scenarios:p.scenarios.map((sc,i)=>{const r=normalize({...sc,id:`${p.id}-${i+1}`});if(!r.ok)throw new Error(`${p.name}: ${r.why}`);return r.scenario})}));
++
++// ---- Your packs, kept in this browser.
++const STORE='splunkPipelineExplorer.scenarioPacks235',PACK_SCHEMA='splunk-pipeline-explorer/scenario-pack';
++function readStore(){try{const v=JSON.parse(localStorage.getItem(STORE)||'null');if(v&&Array.isArray(v.packs))return v}catch(e){}return {packs:[],target:null}}
++function writeStore(v){try{localStorage.setItem(STORE,JSON.stringify(v));return true}catch(e){return false}}
++let store=readStore();
++// Packs from storage are checked as a loaded file is. A scenario this build can't read (one a later build saved, say) is
++// kept as it was, so saving here doesn't lose it, and it goes into the pack's file.
++function loadPack(p){
++ const rs=[...(Array.isArray(p.scenarios)?p.scenarios:[]),...(Array.isArray(p.kept)?p.kept:[])].map(raw=>[raw,normalize(raw)]);
++ return {id:String(p.id||uid('pack')),name:p.name.slice(0,120),description:String(p.description||'').slice(0,400),builtIn:false,
++  scenarios:rs.filter(([,r])=>r.ok).map(([,r])=>r.scenario),kept:rs.filter(([raw,r])=>!r.ok&&raw&&typeof raw==='object'&&!Array.isArray(raw)).map(([raw])=>raw)}}
++store.packs=store.packs.filter(p=>p&&typeof p.name==='string').map(loadPack);
++const userPacks=()=>store.packs;
++const allPacks=()=>[...BUILTIN,...store.packs];
++const packOf=id=>allPacks().find(p=>p.id===id);
++const save=()=>writeStore(store);
++function uniqueName(name){const names=new Set(allPacks().map(p=>p.name));if(!names.has(name))return name;let i=2;while(names.has(`${name} (${i})`))i++;return `${name} (${i})`}
++function newPack(name,description=''){const p={id:uid('pack'),name:uniqueName(String(name||'').trim()||'My scenarios'),description,builtIn:false,scenarios:[],kept:[]};store.packs.push(p);if(!store.target)store.target=p.id;save();return p}
++function targetPack(){return store.packs.find(p=>p.id===store.target)||store.packs[0]||newPack('My scenarios')}
++// ---- Running a scenario: its simulator's model, on a copy of the state, against the current topology.
++// sev: bad (serious: data lost, a critical or high-risk failure, poor quality), warn (with a cost), ok (fine), need
++// (can't run on this topology). label: what the outcome is, in the scenario's own terms.
++const RISK_SEV={critical:'bad',high:'bad',medium:'warn',low:'ok'},RISK_LABEL={critical:'Critical risk',high:'High risk',medium:'Medium risk',low:'Low risk'};
++function resolveTarget(t){
++ if(!t)return null;const nodes=(state.builderNodes||[]).filter(n=>n.type===t.type);
++ return nodes.find(n=>t.name&&componentInstanceLabel(n)===t.name)||nodes[0]||null}
++function outcome(sc){
++ const s=sc.settings;
++ if(sc.kind==='failure'){const f=failureOf(s.failure),stagesHit=(failureFlowSteps[f.id]||f.affected).length;
++  return {sev:RISK_SEV[f.risk]||'warn',label:RISK_LABEL[f.risk]||cap(f.risk),headline:`Loss: ${f.loss}`,detail:`Detection: ${f.detect}. Recovery: ${f.recovery}. ${plural(stagesHit,'stage')}.`,
++   figures:{risk:f.risk,loss:f.loss,detection:f.detect,recovery:f.recovery,stages:stagesHit}}}
++ if(sc.kind==='correlation'){
++  const m=withState({correlatedFailures:s.failures,failureTiming:{...state.failureTiming,...s.timing},failureCorrelation:true,failureInjectionMode:false},()=>correlationModel());
++  const top=m.queues.reduce((a,q)=>Math.max(a,q.level),0);
++  return {sev:RISK_SEV[m.highest.risk]||'warn',label:RISK_LABEL[m.highest.risk]||cap(m.highest.risk),headline:`Primary: ${m.primary.f.name}`,detail:`${plural(m.stages.length,'stage')} touched, ${num(m.shared.length)} shared; ${m.queues.length?`fullest queue ${top}%`:'no queue grows'}; highest risk ${m.highest.risk}.`,
++   figures:{primary:m.primary.f.name,stages:m.stages.length,shared:m.shared.length,fullestQueuePct:top,highestRisk:m.highest.risk}}}
++ if(sc.kind==='injection'){
++  const t=resolveTarget(s.target);
++  if(!t)return {sev:'need',label:'Can’t run here',headline:`Needs a ${typeName(s.target.type)}`,detail:`The topology has no ${typeName(s.target.type)} to inject into: add one in the Builder.`,figures:{}};
++  const m=withState({failureInjection:{...s,target:t.id}},()=>failureInjectionModel());
++  const sev=m.fault.kind==='semantic'?'warn':m.overflowGb>0?'bad':m.backlogGb>0?'warn':'ok';
++  const headline=m.fault.kind==='semantic'?`${gb(m.unreliableGb)} unreliable`:m.overflowGb>0?`${gb(m.overflowGb)} past the buffer`:m.backlogGb>0?`The buffer holds ${gb(m.backlogGb)}`:'No backlog';
++  return {sev,label:m.fault.kind==='semantic'?'Data unreliable':sev==='bad'?'Data lost':sev==='warn'?'Held, at a cost':'Held',headline,detail:`At ${componentInstanceLabel(t)}, ${m.stage}. Buffer full in ${Number.isFinite(m.fillMin)?dur(m.fillMin):'never'}; recovery ${m.retainedGb?dur(m.recoveryMin):'immediate'}.`,
++   figures:{component:componentInstanceLabel(t),stage:m.stage,backlogGb:+m.backlogGb.toFixed(3),overflowGb:+m.overflowGb.toFixed(3),unreliableGb:+m.unreliableGb.toFixed(3),fillMin:Number.isFinite(m.fillMin)?+m.fillMin.toFixed(1):null,recoveryMin:Number.isFinite(m.recoveryMin)?+m.recoveryMin.toFixed(1):null}}}
++ if(sc.kind==='recovery'){
++  const m=withState({recovery:s},()=>recoveryModel());
++  const sev=m.overflowGb>0?'bad':(m.duplicateRiskGb>0||!Number.isFinite(m.recoveryMin))?'warn':'ok';
++  return {sev,label:sev==='bad'?'Data lost':sev==='warn'?'Held, at a cost':'Held',headline:m.overflowGb>0?`${gb(m.overflowGb)} past the buffers`:`The buffers hold ${gb(m.retainedGb)}`,
++   detail:`${gb(m.outageGb)} arrives during the outage; recovery ${dur(m.recoveryMin)}; duplicates at risk ${gb(m.duplicateRiskGb)}.`,
++   figures:{outageGb:+m.outageGb.toFixed(3),retainedGb:+m.retainedGb.toFixed(3),overflowGb:+m.overflowGb.toFixed(3),duplicateRiskGb:+m.duplicateRiskGb.toFixed(3),recoveryMin:Number.isFinite(m.recoveryMin)?+m.recoveryMin.toFixed(1):null}}}
++ const m=withState({dataQuality:s},()=>dataQualityModel());
++ const sev=m.qualityScore<60?'bad':m.qualityScore<85?'warn':'ok';
++ return {sev,label:sev==='bad'?'Poor quality':sev==='warn'?'Degraded':'Good quality',headline:`Quality ${m.qualityScore.toFixed(1)} / 100`,
++  detail:`Detection readiness ${m.detectionReady.toFixed(1)}; event-time usability ${m.timeUsable.toFixed(1)}; ${num(Math.round(m.affectedEvents))} of ${num(Math.round(m.totalEvents))} events affected.`,
++  figures:{qualityScore:+m.qualityScore.toFixed(1),detectionReady:+m.detectionReady.toFixed(1),timeUsable:+m.timeUsable.toFixed(1),affectedEvents:Math.round(m.affectedEvents),totalEvents:Math.round(m.totalEvents)}}}
++const SEV_TEXT={bad:'serious',warn:'with a cost',ok:'fine',need:'can’t run here'};
++function runPack(p){const rows=p.scenarios.map(sc=>({id:sc.id,...outcome(sc)}));const counts={bad:0,warn:0,ok:0,need:0};rows.forEach(r=>counts[r.sev]++);return {at:new Date().toISOString(),rows,counts,topology:state.builderNodes.length}}
++function resultsCsv(p,run){
++ const rows=[['pack','scenario','kind','settings','severity','outcome','headline','detail']];
++ p.scenarios.forEach((sc,i)=>{const r=run.rows[i];rows.push([p.name,sc.name,KINDS[sc.kind].label,settingsText(sc),SEV_TEXT[r.sev],r.label,r.headline,r.detail])});
++ return rows.map(r=>r.map(csvCell).join(',')).join('\n')+'\n'}
++
++// ---- Pack files: one or more packs, each with its scenarios' kinds, names, notes and settings.
++function packFileText(packs){return JSON.stringify({schema:PACK_SCHEMA,version:1,exportedAt:new Date().toISOString(),
++ packs:packs.map(p=>({name:p.name,description:p.description||'',scenarios:[...p.scenarios,...(p.kept||[])].map(({kind,name,note,settings})=>({kind,name,note,settings}))}))},null,2)}
++function readPackFile(text){
++ let doc;try{doc=JSON.parse(text)}catch(e){throw new Error('The file isn’t JSON.')}
++ if(doc?.schema!==PACK_SCHEMA)throw new Error('It isn’t a scenario pack: its schema isn’t splunk-pipeline-explorer/scenario-pack.');
++ if(!(Number(doc.version)>=1))throw new Error('Its version is missing.');
++ const packs=[],left=[];
++ for(const p of Array.isArray(doc.packs)?doc.packs:[]){
++  const name=String(p?.name||'').trim().slice(0,120);if(!name){left.push('a pack with no name');continue}
++  const scenarios=[];for(const raw of Array.isArray(p.scenarios)?p.scenarios:[]){const r=normalize({...raw,id:undefined});if(r.ok)scenarios.push(r.scenario);else left.push(`“${String(raw?.name||raw?.kind||'a scenario')}” in ${name}: ${r.why}`)}
++  packs.push({name,description:String(p.description||'').slice(0,400),scenarios})}
++ if(!packs.length)throw new Error('It holds no pack.');
++ return {packs,left}}
++// ---- Operate › Scenario library.
++const LIB={pack:BUILTIN[0].id,runs:{},msg:null,confirm:null,opened:null};
++const SEV_ICON={bad:'✕',warn:'◐',ok:'✓',need:'–'};
++function familyCounts(p){const c={failure:0,recovery:0,'data-quality':0};p.scenarios.forEach(sc=>c[KINDS[sc.kind].family]++);return Object.entries(c).filter(([,n])=>n).map(([f,n])=>`${FAMILIES[f]} ${n}`).join(' · ')}
++function say(text,kind='ok'){LIB.msg={text,kind}}
++// Re-draws the page and puts the keyboard focus back on what the action leaves in front of the person.
++function rerender(sel){renderScenarioLibrary();if(!sel)return;const root=$('#operationsContent');const el=typeof sel==='function'?sel(root):root?.querySelector(sel);el?.focus({preventScroll:true})}
++const rowsFor=(text,per,min,max)=>Math.max(min,Math.min(max,Math.ceil(String(text||'').length/per)||min));
++function renderScenarioLibrary(){
++ const root=$('#operationsContent');if(!root)return;
++ const p=packOf(LIB.pack)||BUILTIN[0];LIB.pack=p.id;const run=LIB.runs[p.id],mine=userPacks();
++ const packButton=q=>`<button type="button" class="sl235PackBtn${q.id===p.id?' on':''}" data-sl235-pack="${esc(q.id)}" aria-pressed="${q.id===p.id}"><strong>${esc(q.name)}</strong><small>${plural(q.scenarios.length,'scenario')}${q.scenarios.length?` · ${esc(familyCounts(q))}`:''}</small></button>`;
++ const counts=run?`<p class="sl235Summary" role="status">On this topology (${plural(run.topology,'component')}): ${['bad','warn','ok','need'].filter(k=>run.counts[k]).map(k=>`<span class="sl235Sev" data-sev="${k}"><i aria-hidden="true">${SEV_ICON[k]}</i>${num(run.counts[k])} ${SEV_TEXT[k]}</span>`).join(' ')}</p>`:'';
++ const rows=p.scenarios.map((sc,i)=>{const r=run?.rows[i];
++  const name=p.builtIn?`<strong>${esc(sc.name)}</strong>${sc.note?`<p>${esc(sc.note)}</p>`:''}`
++   :`<textarea id="sl235Name-${esc(sc.id)}" data-sl235-rename="${esc(sc.id)}" aria-label="Scenario name" rows="${rowsFor(sc.name,26,1,4)}" maxlength="120">${esc(sc.name)}</textarea>`+
++    `<textarea id="sl235Note-${esc(sc.id)}" data-sl235-note="${esc(sc.id)}" aria-label="Note on ${esc(sc.name)}" rows="${rowsFor(sc.note,30,2,6)}" maxlength="400" placeholder="Note: what it tests">${esc(sc.note||'')}</textarea>`;
++  return `<tr data-sl235-row="${esc(sc.id)}"><td class="sl235Name">${name}</td>`+
++   `<td><span class="sl235Kind" data-family="${KINDS[sc.kind].family}">${KINDS[sc.kind].label}</span><p>Opens in ${esc(KINDS[sc.kind].where)}</p></td><td class="sl235Settings">${esc(settingsText(sc))}</td>`+
++   `<td class="sl235Out">${r?`<span class="sl235Sev" data-sev="${r.sev}"><i aria-hidden="true">${SEV_ICON[r.sev]}</i>${esc(r.label)}</span><strong>${esc(r.headline)}</strong><p>${esc(r.detail)}</p>`:'<span class="sl235Pending">Not run yet</span>'}</td>`+
++   `<td class="sl235Acts"><button type="button" data-sl235-open="${esc(sc.id)}" aria-label="Open ${esc(sc.name)} in ${esc(KINDS[sc.kind].where)}" title="Open in ${esc(KINDS[sc.kind].where)}">Open</button>${p.builtIn?'':`<button type="button" class="sl235Remove" data-sl235-remove="${esc(sc.id)}" aria-label="Remove ${esc(sc.name)} from ${esc(p.name)}">Remove</button>`}</td></tr>`}).join('');
++ const head=p.builtIn?`<h3>${esc(p.name)}</h3><p class="sl235Desc">${esc(p.description)}</p><p class="sl235Meta">Built in · ${plural(p.scenarios.length,'scenario')} · ${esc(familyCounts(p))}</p>`
++  :`<div class="sl235Edit"><label for="sl235PackName">Pack name</label><input id="sl235PackName" data-sl235-packname value="${esc(p.name)}" maxlength="120"><label for="sl235PackDesc">Description</label><input id="sl235PackDesc" data-sl235-packdesc value="${esc(p.description||'')}" maxlength="400" placeholder="What the pack is for"></div><p class="sl235Meta">Yours · ${plural(p.scenarios.length,'scenario')}${p.scenarios.length?` · ${esc(familyCounts(p))}`:''}${p.kept?.length?` · ${plural(p.kept.length,'scenario')} this build can’t read, kept as saved and in the pack’s file`:''}</p>`;
++ const confirm=LIB.confirm===p.id?`<div class="sl235Confirm" role="alert"><span>Delete “${esc(p.name)}” and its ${plural(p.scenarios.length,'scenario')} from this browser?</span><button type="button" data-sl235-delete-yes>Delete</button><button type="button" data-sl235-delete-no>Keep it</button></div>`:'';
++ const acts=`<div class="sl235Tools"><button type="button" class="builderBtn primary" data-sl235-run ${p.scenarios.length?'':'disabled'}>Run the pack</button><button type="button" class="builderBtn" data-sl235-download ${p.scenarios.length?'':'disabled'}>Download pack</button><button type="button" class="builderBtn" data-sl235-csv ${run?'':'disabled'}>Download results (CSV)</button>${p.builtIn?'<button type="button" class="builderBtn" data-sl235-copy>Copy to your packs</button>':'<button type="button" class="builderBtn" data-sl235-delete>Delete pack</button>'}</div>`;
++ const target=mine.length?`<label class="sl235Target">Save new scenarios to<select id="sl235Target">${mine.map(q=>`<option value="${esc(q.id)}" ${q.id===targetPack().id?'selected':''}>${esc(q.name)}</option>`).join('')}</select></label>`:'';
++ root.innerHTML=`<div class="opsHero"><div><small>Scenario library</small><h2>Failure, recovery and data-quality scenarios, in packs</h2><p>Run a pack to see how each scenario ends on this topology, or open one in its simulator. Save the scenario you’re looking at from the Failure Lab, the Recovery simulation or the Data-quality simulation, and download a pack to use it elsewhere.</p></div>`+
++  `<div class="opsControls"><button type="button" class="builderBtn" data-sl235-new>New pack</button><button type="button" class="builderBtn" data-sl235-load>Load a pack…</button><input id="sl235File" type="file" accept=".json,application/json" aria-label="Scenario pack file to load" hidden></div></div>`+
++  (LIB.msg?`<p class="sl235Msg" data-kind="${LIB.msg.kind}" role="status" tabindex="-1">${esc(LIB.msg.text)}${LIB.msg.putBack?' <button type="button" data-sl235-putback>Put back the previous settings</button>':''}</p>`:'')+
++  `<div class="sl235Layout"><nav class="sl235Packs" aria-label="Packs"><h4>Built in</h4>${BUILTIN.map(packButton).join('')}<h4>Yours</h4>${mine.length?mine.map(packButton).join(''):'<p class="sl235Empty">None yet. Save a scenario from the Failure Lab, the Recovery simulation or the Data-quality simulation, start a new pack, or load a pack file.</p>'}${target}</nav>`+
++  `<section class="sl235Pack" aria-label="${esc(p.name)}">${head}${acts}${confirm}${counts}`+
++  (p.scenarios.length?`<div class="sl235TableWrap"><table class="sl235Table"><colgroup><col class="cName"><col class="cKind"><col class="cSettings"><col class="cOut"><col class="cActs"></colgroup><thead><tr><th>Scenario</th><th>Kind</th><th>Settings</th><th>Outcome</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div>`
++   :'<p class="sl235Empty">This pack has no scenarios yet. Use Save to library in the Failure Lab, the Recovery simulation or the Data-quality simulation; new scenarios go to the pack chosen under Save new scenarios to.</p>')+
++  `<p class="sl235Note">Opening a scenario replaces that simulator’s settings: save them first to keep them. A pack holds inputs only; each run works out the outcomes again on the topology of the moment.</p></section></div>`;
++ wireLibrary(root,p)}
++function wireLibrary(root,p){
++ const q=s=>root.querySelector(s),packBtn=id=>r=>r.querySelector(`[data-sl235-pack="${CSS.escape(id)}"]`);
++ root.querySelectorAll('[data-sl235-pack]').forEach(b=>b.onclick=()=>{LIB.pack=b.dataset.sl235Pack;LIB.confirm=null;LIB.msg=null;rerender(packBtn(LIB.pack));
++  // On a phone the packs come first: take the person to the one they chose.
++  if(matchMedia('(max-width:760px)').matches)$('#operationsContent .sl235Pack')?.scrollIntoView({block:'start'})});
++ q('[data-sl235-new]').onclick=()=>{const np=newPack('New pack');LIB.pack=np.id;say(`Started “${np.name}”. Name it here; new scenarios go to the pack chosen under Save new scenarios to.`);rerender('#sl235PackName')};
++ q('[data-sl235-load]').onclick=()=>q('#sl235File').click();
++ q('#sl235File').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;let focus='[data-sl235-load]';
++  try{if(f.size>5*1024*1024)throw new Error('The file is over 5 MB.');const {packs,left}=readPackFile(await f.text());const added=packs.map(x=>{const np=newPack(x.name,x.description);np.scenarios=x.scenarios;return np});save();LIB.pack=added[0].id;focus=packBtn(LIB.pack);
++   say(`Loaded ${added.map(x=>`“${x.name}” (${plural(x.scenarios.length,'scenario')})`).join(', ')} from ${f.name}.${left.length?` Left out: ${left.join('; ')}.`:''}`,left.length?'warn':'ok')}
++  catch(err){say(`${f.name}: ${err.message}`,'error')}
++  rerender(focus)};
++ const run=q('[data-sl235-run]');if(run)run.onclick=()=>{LIB.runs[p.id]=runPack(p);LIB.msg=null;rerender('[data-sl235-run]')};
++ const dl=q('[data-sl235-download]');if(dl)dl.onclick=()=>downloadText(`scenario-pack-${p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'pack'}.json`,packFileText([p]),'application/json');
++ const csv=q('[data-sl235-csv]');if(csv)csv.onclick=()=>{const r=LIB.runs[p.id];if(r)downloadText('scenario-pack-results.csv',resultsCsv(p,r),'text/csv')};
++ const copy=q('[data-sl235-copy]');if(copy)copy.onclick=()=>{const np=newPack(p.name,p.description);np.scenarios=p.scenarios.map(sc=>({...clone(sc),id:uid('sc')}));save();LIB.pack=np.id;say(`Copied “${p.name}” to your packs as “${np.name}”: rename it, remove scenarios, or add your own.`);rerender('#sl235PackName')};
++ const del=q('[data-sl235-delete]');if(del)del.onclick=()=>{LIB.confirm=p.id;rerender('[data-sl235-delete-no]')};
++ const yes=q('[data-sl235-delete-yes]');if(yes)yes.onclick=()=>{store.packs=store.packs.filter(x=>x.id!==p.id);if(store.target===p.id)store.target=store.packs[0]?.id||null;save();delete LIB.runs[p.id];LIB.confirm=null;LIB.pack=store.packs[0]?.id||BUILTIN[0].id;say(`Deleted “${p.name}”.`);rerender(packBtn(LIB.pack))};
++ const no=q('[data-sl235-delete-no]');if(no)no.onclick=()=>{LIB.confirm=null;rerender('[data-sl235-delete]')};
++ // Renaming a pack changes its button and the section's name in place, so the focus stays where the person moves it.
++ const pn=q('[data-sl235-packname]');if(pn)pn.onchange=()=>{const v=pn.value.trim();if(!v){pn.value=p.name;return}p.name=v.slice(0,120);save();
++  const b=q(`[data-sl235-pack="${CSS.escape(p.id)}"] strong`);if(b)b.textContent=p.name;q('.sl235Pack')?.setAttribute('aria-label',p.name);
++  const o=q(`#sl235Target option[value="${CSS.escape(p.id)}"]`);if(o)o.textContent=p.name};
++ const pd=q('[data-sl235-packdesc]');if(pd)pd.onchange=()=>{p.description=pd.value.trim().slice(0,400);save()};
++ const tg=q('#sl235Target');if(tg)tg.onchange=()=>{store.target=tg.value;save()};
++ root.querySelectorAll('[data-sl235-rename]').forEach(i=>{
++  i.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();i.dispatchEvent(new Event('change'))}};
++  i.onchange=()=>{const sc=p.scenarios.find(x=>x.id===i.dataset.sl235Rename);const v=i.value.replace(/\s+/g,' ').trim();if(!sc)return;if(!v){i.value=sc.name;return}sc.name=v.slice(0,120);i.value=sc.name;save();
++   const btn=q(`[data-sl235-open="${CSS.escape(sc.id)}"]`);if(btn)btn.setAttribute('aria-label',`Open ${sc.name} in ${KINDS[sc.kind].where}`);
++   q(`[data-sl235-note="${CSS.escape(sc.id)}"]`)?.setAttribute('aria-label',`Note on ${sc.name}`);q(`[data-sl235-remove="${CSS.escape(sc.id)}"]`)?.setAttribute('aria-label',`Remove ${sc.name} from ${p.name}`)}});
++ root.querySelectorAll('[data-sl235-note]').forEach(i=>i.onchange=()=>{const sc=p.scenarios.find(x=>x.id===i.dataset.sl235Note);if(sc){sc.note=i.value.trim().slice(0,400);save()}});
++ root.querySelectorAll('[data-sl235-remove]').forEach(b=>b.onclick=()=>{const i=p.scenarios.findIndex(x=>x.id===b.dataset.sl235Remove),sc=p.scenarios[i];p.scenarios.splice(i,1);save();delete LIB.runs[p.id];say(`Removed “${sc.name}” from “${p.name}”.`);
++  const next=p.scenarios[i]||p.scenarios[i-1];rerender(next?`[data-sl235-open="${CSS.escape(next.id)}"]`:'#sl235PackName')});
++ root.querySelectorAll('[data-sl235-open]').forEach(b=>b.onclick=()=>openScenario(p.scenarios.find(x=>x.id===b.dataset.sl235Open),p));
++ const pb=q('[data-sl235-putback]');if(pb)pb.onclick=()=>putBack()}
++// ---- Opening a scenario in its simulator, and putting back what it replaced.
++const FAILURE_KEYS=['failure','failureScope','failureCorrelation','failureInjectionMode','correlatedFailures','failureTiming','failureInjection','highlightFailure'];
++const PAGE_KEYS={failure:FAILURE_KEYS,recovery:['recovery'],'data-quality':['dataQuality']};
++function showPage(page){
++ if(page==='failure'){renderFailures();render();switchView('failure')}else{state.operationsView=page;switchView('operations')}
++ decorate();window.scrollTo?.(0,0);
++ // The banner says where the settings came from; the keyboard focus goes to it, and on a small screen the page scrolls to it.
++ const b=document.querySelector(page==='failure'?'#failureDetail .sl235Banner':'#operationsContent .sl235Banner');
++ if(b){b.focus({preventScroll:true});if(b.getBoundingClientRect().bottom>innerHeight)b.scrollIntoView({block:'start'})}}
++function openScenario(sc,p){
++ if(!sc)return;const page=KINDS[sc.kind].page,s=clone(sc.settings);
++ if(sc.kind==='injection'&&!resolveTarget(s.target)){say(`“${sc.name}” needs a ${typeName(s.target.type)} in the topology: add one in the Builder, then open it again.`,'warn');rerender('.sl235Msg');return}
++ const before=Object.fromEntries(PAGE_KEYS[page].map(k=>[k,clone(state[k])]));
++ if(sc.kind==='failure')Object.assign(state,{failureCorrelation:false,failureInjectionMode:false,failure:s.failure,failureScope:s.scope,highlightFailure:false});
++ else if(sc.kind==='correlation')Object.assign(state,{failureCorrelation:true,failureInjectionMode:false,correlatedFailures:s.failures,failureTiming:{...state.failureTiming,...s.timing},highlightFailure:false});
++ else if(sc.kind==='injection')Object.assign(state,{failureCorrelation:false,failureInjectionMode:true,failureInjection:{...s,target:resolveTarget(s.target).id},highlightFailure:false});
++ else if(sc.kind==='recovery')state.recovery={...s};
++ else state.dataQuality={...s};
++ LIB.opened={page,name:sc.name,pack:p.name,before};
++ say(`Opened “${sc.name}” in ${KINDS[sc.kind].where}, in place of its settings.`);LIB.msg.putBack=true;
++ showPage(page)}
++function putBack(){
++ const o=LIB.opened;if(!o)return;for(const [k,v] of Object.entries(o.before))state[k]=clone(v);LIB.opened=null;
++ if(LIB.msg)LIB.msg.putBack=false;
++ if(state.view==='operations'&&state.operationsView==='scenario-library'){say(`Put back the settings “${o.name}” had replaced.`);rerender('.sl235Msg');return}
++ showPage(o.page)}
++// A note at the top of the page a scenario was opened in.
++function bannerFor(page){
++ const o=LIB.opened;if(!o||o.page!==page)return null;const b=document.createElement('div');b.className='sl235Banner';b.setAttribute('role','status');b.tabIndex=-1;
++ b.innerHTML=`<span>From the scenario library: <strong>${esc(o.name)}</strong> (${esc(o.pack)}).</span><button type="button" data-sl235-banner-back>Put back the previous settings</button><button type="button" data-sl235-banner-lib>Back to the library</button>`;
++ b.querySelector('[data-sl235-banner-back]').onclick=()=>putBack();
++ b.querySelector('[data-sl235-banner-lib]').onclick=()=>{state.operationsView='scenario-library';switchView('operations')};
++ return b}
++
++// ---- Save to library: the Failure Lab (each of its modes), the Recovery and the Data-quality simulations.
++function capture(from){
++ if(from==='recovery')return {kind:'recovery',settings:recoveryModel().c};
++ if(from==='data-quality')return {kind:'data-quality',settings:dataQualityModel().c};
++ if(state.failureInjectionMode){const m=failureInjectionModel(),t=m.target;
++  return {kind:'injection',settings:{target:t?{type:t.type,name:componentInstanceLabel(t)}:null,stage:m.stage,fault:m.c.fault,durationMin:m.duration,arrivalEps:m.arrival,eventKb:m.eventKb,bufferGb:m.buffer,recoveryEps:m.normalCapacity}}}
++ if(state.failureCorrelation)return {kind:'correlation',settings:{failures:state.correlatedFailures,timing:state.failureTiming}};
++ return {kind:'failure',settings:{failure:state.failure,scope:state.failureScope}}}
++function saveCurrent(from){
++ const r=normalize({...clone(capture(from)),id:undefined});if(!r.ok)return {ok:false,why:r.why};
++ const p=targetPack();p.scenarios.push(r.scenario);const stored=save();return {ok:true,scenario:r.scenario,pack:p,stored}}
++function saveBox(from){
++ const box=document.createElement('div');box.className='sl235SaveBox';
++ box.innerHTML=`<button type="button" class="builderBtn" data-sl235-save="${from}">Save to library</button><span class="sl235SaveMsg" role="status"></span>`;
++ box.querySelector('button').onclick=()=>{const r=saveCurrent(from),msg=box.querySelector('.sl235SaveMsg');
++  if(!r.ok){msg.textContent=`Not saved: ${r.why}.`;msg.dataset.kind='error';return}
++  msg.dataset.kind='ok';msg.textContent='';msg.append(`Saved “${r.scenario.name}” to ${r.pack.name}${r.stored?'':' for this visit (the browser keeps nothing)'}. `);
++  const go=document.createElement('button');go.type='button';go.className='sl235Link';go.textContent='Open the library';go.onclick=()=>{LIB.pack=r.pack.id;state.operationsView='scenario-library';switchView('operations')};msg.append(go)};
++ return box}
++// The Failure Lab draws its list and detail from a function for each mode, and its fields redraw them; Operate redraws its
++// content for each page. Whenever any of them is drawn again, the save box and the banner go back in.
++function placeBanner(root,page){
++ const o=LIB.opened,key=o&&o.page===page?`${o.pack} › ${o.name}`:'',has=root.querySelector(':scope > .sl235Banner');
++ if(has&&has.dataset.sl235For===key)return;has?.remove();if(key){const b=bannerFor(page);b.dataset.sl235For=key;root.prepend(b)}}
++function decorateLab(){
++ const list=$('#scenarioList'),mode=list?.querySelector('.failureMode');
++ if(mode&&!list.querySelector('.sl235SaveBox')){const box=saveBox('failure');box.classList.add('inLab');(list.querySelector('.correlationHint')||mode).after(box)}
++ const detail=$('#failureDetail');if(detail)placeBanner(detail,'failure')}
++function decorateOps(){
++ const page=state.operationsView,root=$('#operationsContent');if(!root||(page!=='recovery'&&page!=='data-quality'))return;
++ const ctl=root.querySelector('.opsHero .opsControls');if(ctl&&!ctl.querySelector('[data-sl235-save]'))ctl.prepend(saveBox(page));
++ placeBanner(root,page)}
++const decorate=()=>{try{decorateLab();decorateOps()}catch(e){console.error(e)}};
++for(const id of ['scenarioList','failureDetail','operationsContent']){const el=document.getElementById(id);if(el)new MutationObserver(decorate).observe(el,{childList:true})}
++decorate();
++
++// ---- Operate's menu: Scenario library after Data-quality simulation.
++const opsDq=document.querySelector('.operationsNav [data-operations-view="data-quality"]');
++if(opsDq){const b=document.createElement('button');b.type='button';b.dataset.operationsView='scenario-library';b.textContent='Scenario library';b.className=opsDq.className.replace(/\bactive\b/,'').trim();
++ b.onclick=()=>{state.operationsView='scenario-library';renderOperations()};opsDq.after(b)}
++const renderOperationsBefore235=renderOperations;
++renderOperations=function(...args){
++ if(state.operationsView!=='scenario-library')return renderOperationsBefore235.apply(this,args);
++ $$('.operationsNav button').forEach(b=>b.classList.toggle('active',b.dataset.operationsView===state.operationsView));renderScenarioLibrary()};
++// For the checks: the models and the library's own state.
++window.scenarios235={KINDS,BUILTIN,LIB,normalize,autoName,settingsText,outcome,runPack,resultsCsv,packFileText,readPackFile,openScenario,putBack,saveCurrent,capture,
++ userPacks,allPacks,newPack,targetPack,withState,resolveTarget,renderScenarioLibrary,STORE,PACK_SCHEMA,store:()=>store};
++})();
++</script>
