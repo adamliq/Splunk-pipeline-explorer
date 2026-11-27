@@ -1,0 +1,92 @@
+/* Build 238: colour and clarity. Each part names its item. */
+
+/* 8. Tokens for the colours Build 238 uses. --stage238 is the stage cards' tier (item 6), set by the block after each render. */
+:root{--tier-collect:#338ced;--tier-process:#e76624;--tier-store:#00a888;--tier-none:#90a2b5;
+ --status-good:#66e0a3;--status-warning:#f3bd61;--status-serious:#f49b66;--status-critical:#ff6b6b;--status-neutral:#90a2b5;--stage238:var(--tier-none)}
+
+/* 1. OV's dark theme, finished where it never reached: the stop red (the views read --ovStop, which was never set), the
+   activity-page views' "not" states, OV-1's thread numbers, and OV-6c's and SV-10c's notes. Build 231 darkened the notes'
+   text for the light theme (#5b4a24) in both themes; in the dark theme they take the sheet's own ink again. */
+#ovWorkspace135{--ovStop:#c84b4b}
+#ovWorkspace135.theme-dark{--ovStop:#ff8a80}
+#ovWorkspace135.theme-dark .activityPage191 .stc.not{color:var(--ovStop)}
+#ovWorkspace135.theme-dark .ov1Page132 .ov1Thread132 b{color:#0c1e2b}
+#ovWorkspace135.theme-dark .tracePage195 .seq .note text{fill:var(--ink-2)}
+
+/* 3. Detection lineage: each field's word with its sign. */
+.lineageField[data-state238="available"] span::before{content:"✓ " / ""}
+.lineageField[data-state238="degraded"] span::before{content:"! " / ""}
+.lineageField:is([data-state238="missing"],[data-state238="blind"]) span::before{content:"✕ " / ""}
+
+/* 6. Flow's stage cards: the top line and number in the tier of the component chosen above (neutral with All components);
+   the pipeline tag in neutral words, in sentence case. */
+.pipeline .stage,.pipelineLane .stage{--accent:var(--stage238)!important}
+.stage .pipeTag{color:var(--muted)!important;text-transform:none;letter-spacing:normal}
+
+/* 7. One status scale. The Failure Lab's severities, with a sign for each (the edits set their colours). */
+.risk.low::before{content:"– " / ""}
+.risk.medium::before{content:"! " / ""}
+.risk.high::before{content:"▲ " / ""}
+.risk.critical::before{content:"✕ " / ""}
+/* OV's status words, marked by the block: good, warning, neutral and critical, for each theme, with their signs. */
+#ovWorkspace135{--st238-good:#2e7d32;--st238-warn:#805100;--st238-none:#526d7e;--st238-crit:#b3261e}
+#ovWorkspace135.theme-dark{--st238-good:#8ae2ac;--st238-warn:#efc87d;--st238-none:#a9c0ce;--st238-crit:#ff9b90}
+#ovWorkspace135 [data-st238="good"]{color:var(--st238-good)!important;border-color:currentColor!important}
+#ovWorkspace135 [data-st238="warn"]{color:var(--st238-warn)!important;border-color:currentColor!important}
+#ovWorkspace135 [data-st238="none"]{color:var(--st238-none)!important;border-color:currentColor!important;background:none!important}
+#ovWorkspace135 [data-st238="crit"]{color:var(--st238-crit)!important;border-color:currentColor!important}
+#ovWorkspace135 [data-st238="good"]::before{content:"✓ " / ""}
+#ovWorkspace135 [data-st238="warn"]::before{content:"! " / ""}
+#ovWorkspace135 [data-st238="none"]::before{content:"– " / ""}
+#ovWorkspace135 [data-st238="crit"]::before{content:"✕ " / ""}
+
+/* 9 and 13. Operate's headings: the subject under the menu entry's name, and a page's second sentence under the heading
+   block's line. Diagnose's caution about rankings, a note under the symptom's summary. */
+.opsHero .opsSubject238{margin:4px 0 0;font-size:15px;font-weight:600;line-height:1.35;color:#c9d8e3}
+.opsAside238{margin:12px 0 14px;max-width:80ch;color:var(--muted);font-size:13px;line-height:1.5}
+.diagnosticHero p.note238{margin-top:6px;font-size:12px;color:var(--muted)}
+
+/* 11. The views' own headings, there for screen readers and hidden from sight, as the open tab shows the view's name. */
+.vh238{position:absolute!important;width:1px!important;height:1px!important;margin:-1px!important;padding:0!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
+
+/* 12. Capitals for one level of section label only: tags and value labels in sentence case. */
+.component small,.rankBadge small,.confidenceLabel,.causeFact small,.diagnosticSummary small,
+.multiDsMetric small,.multiDsNode small,.multiDsTable th,.multiDsInventoryCard small,.multiDsGraph small,.multiDsWave small,
+.authMetric small,.authFlowNode small,.authState,.authControl small,.authCardHead>div>small,.authFacts>span>small{text-transform:none!important;letter-spacing:normal!important}
+/* 12. Sizes between steps move to the nearest whole step. The Builder's canvas, which zooms, keeps its sizes. */
+.component small,.parallelConfig code,.causeTitle p,.causeCheck,.causeCheck b,
+.multiDsActionRow .builderBtn,.opsControls .builderBtn,.authFlowNode strong{font-size:12px!important}
+.component em,.stage>p,.multiDsTable td,.multiDsMetric strong,.diagnosticSummary strong,
+.tbLead198 .tbBtn198,.builderCanvasPanelHeader strong,.ihead199 .meta199{font-size:13px!important}
+.causeTitle h3,.symptomPanelHead strong{font-size:15px!important}
+
+/* 10. The glossary: the header's button, the marks, and the dialog. */
+.shell>header>.glossBtn238{flex:none;align-self:center;padding:7px 11px;border:1px solid var(--line);border-radius:9px;background:rgba(12,23,34,.7);color:var(--text);font-family:inherit;font-size:.78rem;font-weight:600;line-height:1.2;cursor:pointer}
+.shell>header>.glossBtn238:hover{border-color:var(--cyan)}
+.shell>header>.glossBtn238:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+@media(max-width:820px){.shell>header>.glossBtn238{margin-left:auto;padding:6px 10px;min-height:32px}}
+/* In the Builder and OV from 761 px the header is one 48 px row, with the view tabs laid over it from 276 px: the button takes
+   the row's right end, and the tabs stop short of it. On a phone OV hides the header, and the button is in its Actions menu. */
+@media(min-width:761px){
+ body:is([data-view="builder"],[data-view="ov"]) .shell>header>.glossBtn238{position:absolute;top:9px;right:16px;z-index:17;padding:6px 10px}
+ body:is([data-view="builder"],[data-view="ov"]) .shell>.toolbar{right:112px!important}}
+abbr.gl238{text-decoration:underline dotted 1px;text-underline-offset:2px;text-decoration-color:color-mix(in srgb,currentColor 55%,transparent);cursor:help}
+dialog.gloss238{width:min(720px,calc(100vw - 32px));max-height:min(80vh,760px);padding:0;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--text);box-shadow:var(--shadow);overflow:hidden}
+dialog.gloss238[open]{display:flex;flex-direction:column}
+dialog.gloss238::backdrop{background:rgba(3,8,13,.66)}
+.gloss238Head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--line)}
+.gloss238Head h2{margin:0 auto 0 0;font-size:16px}
+.gloss238Find{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.gloss238Find input{width:min(220px,46vw);min-height:32px;padding:5px 9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:inherit;font-size:13px}
+.gloss238Close{min-height:32px;padding:5px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--text);font-family:inherit;font-size:12px;font-weight:600;line-height:1.2;cursor:pointer}
+.gloss238Find input:focus-visible,.gloss238Close:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.gloss238Body{overflow:auto;padding:6px 16px 16px}
+.gloss238Body h3{margin:14px 0 6px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.gloss238Body dl{margin:0}
+.gloss238Row{display:grid;grid-template-columns:84px 1fr;gap:10px;padding:7px 8px;border-radius:8px}
+.gloss238Row dt{font-weight:700;font-size:13px;color:var(--text)}
+.gloss238Row dd{margin:0;font-size:13px;line-height:1.45;color:#c9d8e3}
+.gloss238Row dd small{display:block;color:var(--muted);font-size:12px}
+.gloss238Row.on238{background:rgba(87,199,232,.12);box-shadow:inset 3px 0 0 var(--cyan)}
+.gloss238None{color:var(--muted);font-size:13px}
+@media print{.shell>header>.glossBtn238{display:none}abbr.gl238{text-decoration:none}}

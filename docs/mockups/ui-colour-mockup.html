@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Colour and Clarity Changes</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.notes{min-width:0;overflow-wrap:anywhere}
+.panel p{margin:0 0 10px;color:var(--ink-2);font-size:13px}
+.panel a{color:inherit}
+.panel td:first-child{white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 238 TARGET · BUILD 237 + PROTOTYPE</span>
+ <h1>Colour and clarity</h1>
+ <p class="lede">Every page of Build 237 was swept for its colours and its clarity: 86 page states at two widths, each status word’s colour, the headings, first paragraphs, abbreviations, sizes and capitals, and the component colours measured pair by pair. Build 238 makes the 13 changes that came out of it: eight on colour, from OV’s unfinished dark theme to one colour per tier and one status scale, and five on clarity, from Operate’s headings to a glossary of 96 abbreviations.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>Build 237 against the prototype</h2>
+  <table>
+   <thead><tr><th>#</th><th>Where</th><th>Build 237</th><th>With the prototype</th></tr></thead>
+   <tbody>
+    <tr><td>1</td><td>OV’s dark theme</td><td>A light strip under light text (1.34:1), a pale frame; the stop red 3.69:1, CV-6’s “not” 2.06:1, OV-1’s thread numbers 1.56:1</td><td>Dark, as written; each 4.5:1 or more</td></tr>
+    <tr><td>2</td><td>OV’s theme as it opens</td><td>The computer’s light or dark setting</td><td>Dark, unless the reader chose; printed light</td></tr>
+    <tr><td>3</td><td>A missing lineage field</td><td>Green, the colour of available</td><td>Red with ✕; ! degraded, ✓ available</td></tr>
+    <tr><td>4</td><td>The Indexer and Amazon S3</td><td>Swapped between the cards and the Failure Lab and route boxes</td><td>One colour each, everywhere</td></tr>
+    <tr><td>5</td><td>Component colours</td><td>12 colours, two exact pairs; 28 of 66 pairs under the floors</td><td>Three tiers that pass every pair; All components neutral</td></tr>
+    <tr><td>6</td><td>Stage cards</td><td>Pipelines in the components’ colours, in capitals</td><td>Neutral words in sentence case; the chosen component’s tier</td></tr>
+    <tr><td>7</td><td>Status words</td><td>High and critical one red, low green; Not deployed red, brown or plain; Not set brown or plain</td><td>One colour and one sign each</td></tr>
+    <tr><td>8</td><td>Colour tokens</td><td>None for tiers or statuses</td><td>Nine on :root, OV’s per theme</td></tr>
+    <tr><td>9</td><td>Operate’s headings</td><td>The subject modelled: 17 of 23 shared no word with the menu</td><td>The menu’s name, its group above, the subject under it</td></tr>
+    <tr><td>10</td><td>Abbreviations</td><td>151 in use, no glossary</td><td>A glossary of 96; first uses marked, a button on every view</td></tr>
+    <tr><td>11</td><td>View headings</td><td>The selection stood for the view; Config had none</td><td>An h2 for each view; the selection at level 3</td></tr>
+    <tr><td>12</td><td>Capitals and sizes</td><td>Tags and value labels in capitals; sizes at 11.5–14.5 px</td><td>Sentence case; sizes on the scale</td></tr>
+    <tr><td>13</td><td>First paragraphs</td><td>55 and 43 words; Diagnose’s caution in its summary; Changes in two sentences</td><td>One sentence each; the rest under the line or a note</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>Where the design comes from</h2>
+  <dl>
+   <dt>Colour</dt><dd>Colour is never the only way something is shown: WCAG’s Use of Color. Each status word has a sign, and each component is named wherever it is coloured.</dd>
+   <dt>Contrast</dt><dd>Text at least 4.5:1 against its background (Contrast, Minimum); a component’s colour at least 3:1 against the ground (Non-text Contrast).</dd>
+   <dt>Distance</dt><dd>Any two component colours at least 15 apart for normal vision and 8 with red–green colour blindness simulated, in OKLab ΔE ×100.</dd>
+   <dt>Headings</dt><dd>A heading names what follows it (Headings and Labels), and the headings show the page’s structure (Info and Relationships).</dd>
+   <dt>Abbreviations</dt><dd>A way to find what an abbreviation stands for: WCAG’s Abbreviations, with the abbr element’s title.</dd>
+  </dl>
+ </section>
+ <section class="panel rules">
+  <h2>Sources</h2>
+  <dl>
+   <dt>WCAG 2.2</dt><dd><a href="https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html">Use of Color</a>, <a href="https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html">Contrast (Minimum)</a>, <a href="https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html">Non-text Contrast</a>, <a href="https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships.html">Info and Relationships</a>, <a href="https://www.w3.org/WAI/WCAG22/Understanding/headings-and-labels.html">Headings and Labels</a> and <a href="https://www.w3.org/WAI/WCAG22/Understanding/abbreviations.html">Abbreviations</a>.</dd>
+   <dt>MDN</dt><dd><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/abbr">The abbr element</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog">the dialog element</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeprint_event">the beforeprint event</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/content#alternative_text_string_counter">the content property’s alternative text</a>.</dd>
+   <dt>OKLab</dt><dd>Björn Ottosson, <a href="https://bottosson.github.io/posts/oklab/">A perceptual color space for image processing</a>.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-ui-colour.md</code> · Prototype: a new script block, its styles and in-place edits to Build 237, in <code>docs/mockups/ui-colour.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "ov-dark", "img": "compare/ui-colour-ov-dark.png", "group": "target", "tab": "OV dark", "title": "OV’s dark theme, finished", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, OV-1 in OV’s dark theme", "measure": {}, "items": [{"n": 1, "head": "A dark strip", "text": "The summary strip is dark under its light text, as the theme always said: the rule named a class the workspace doesn’t have.", "x": 3.26, "y": 20.0, "box": [1.18, 17.94, 97.64, 4.11]}, {"n": 1, "head": "No pale frame", "text": "The sheet sits on the dark ground, #081721.", "x": 3.26, "y": 34.22, "box": [1.18, 32.0, 97.64, 68.0]}, {"n": 1, "head": "Thread numbers", "text": "Dark on the light blue, where they were white (1.56:1)."}, {"n": 7, "head": "Not set", "text": "Neutral, with –."}, {"n": 10, "head": "S2S, TLS and TCP", "text": "In OV-1’s threads, marked with what they stand for."}]}, {"id": "ov-status", "img": "compare/ui-colour-ov-status.png", "group": "target", "tab": "OV status", "title": "One colour and a sign for each status", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, CV-7 in OV’s light theme", "measure": {}, "items": [{"n": 7, "head": "Not deployed: a warning", "text": "Amber with !, here and on SvcV-1, SvcV-3b and SvcV-5.", "x": 83.93, "y": 49.97, "box": [81.85, 48.92, 7.81, 2.11]}, {"n": 7, "head": "Deployed: good", "text": "Green with ✓.", "x": 83.93, "y": 46.19, "box": [81.85, 45.14, 5.82, 2.11]}, {"n": 7, "head": "Not set", "text": "Neutral with – on every view that shows it, but where SvcV-2 flags it as a stop."}]}, {"id": "components", "img": "compare/ui-colour-components.png", "group": "target", "tab": "Components", "title": "A component’s colour shows its tier", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Flow’s component cards", "measure": {}, "items": [{"n": 5, "head": "Collection and management: blue", "text": "HEC Delivery, SQL Database, the Deployment Server, the Universal Forwarder.", "x": 3.89, "y": 13.86, "box": [1.81, 11.63, 31.67, 10.56]}, {"n": 5, "head": "Processing: orange", "text": "Splunk DB Connect, the Heavy Forwarder and the Ingest Processor.", "x": 36.25, "y": 37.19, "box": [34.17, 34.97, 31.67, 10.56]}, {"n": 4, "head": "Indexing, storage and search: aqua", "text": "The Indexer and Amazon S3, with the Search Head, SQS and the S3 Data Catalog; the same in the Builder, the Failure Lab and the route boxes below.", "x": 68.61, "y": 25.52, "box": [66.53, 23.3, 31.67, 10.56]}, {"n": 5, "head": "All components", "text": "Neutral."}, {"n": 12, "head": "Tier labels", "text": "In sentence case."}]}, {"id": "stages", "img": "compare/ui-colour-stages.png", "group": "target", "tab": "Stage cards", "title": "Stage cards: neutral pipelines, the chosen component’s tier", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Flow with the Indexer chosen", "measure": {}, "items": [{"n": 6, "head": "The pipeline in words", "text": "Input pipeline, Parsing handoff: neutral, in sentence case.", "x": 4.93, "y": 17.14, "box": [2.85, 16.22, 4.87, 1.83]}, {"n": 6, "head": "The chosen component’s tier", "text": "The line and number in the Indexer’s aqua; neutral with All components.", "x": 3.32, "y": 23.86, "box": [2.85, 22.61, 0.94, 2.5]}]}, {"id": "failure", "img": "compare/ui-colour-failure.png", "group": "target", "tab": "Failure Lab", "title": "Severities with signs; bands by tier", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, the Failure Lab", "measure": {}, "items": [{"n": 5, "head": "The band by tier", "text": "The Universal Forwarder’s band is collection blue, as its card.", "x": 28.33, "y": 60.43, "box": [26.25, 58.77, 73.75, 3.33]}, {"n": 7, "head": "High and critical apart", "text": "▲ high in orange, ✕ critical in red, ! medium in amber, – low neutral.", "x": 19.71, "y": 26.84, "box": [18.38, 25.9, 2.67, 1.87]}]}, {"id": "lineage", "img": "compare/ui-colour-lineage.png", "group": "target", "tab": "Lineage", "title": "A missing field is red", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Operate › Detection lineage", "measure": {}, "items": [{"n": 3, "head": "Missing", "text": "Source geography: red, with ✕. Degraded fields carry !, available ones ✓.", "x": 93.24, "y": 49.98, "box": [91.2, 49.06, 4.08, 1.83]}]}, {"id": "operate", "img": "compare/ui-colour-operate.png", "group": "target", "tab": "Operate", "title": "Operate’s pages headed with their menu names", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Operate › Capacity model", "measure": {}, "items": [{"n": 9, "head": "The entry’s name", "text": "Capacity model, as the menu says, under its group, Fleet.", "x": 19.93, "y": 46.84, "box": [17.85, 45.24, 52.78, 3.2]}, {"n": 9, "head": "What it models", "text": "Indexer durability boundary, the heading before, is the line under it.", "x": 19.93, "y": 50.12, "box": [17.85, 49.0, 52.78, 2.25]}, {"n": 10, "head": "Glossary", "text": "In the header, on every view, phones included."}]}, {"id": "pack", "img": "compare/ui-colour-pack.png", "group": "target", "tab": "Pack", "title": "One sentence first", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Operate › Alert and dashboard pack", "measure": {}, "items": [{"n": 13, "head": "One sentence", "text": "25 words, where there were 55.", "x": 19.93, "y": 53.33, "box": [17.85, 51.25, 52.78, 4.16]}, {"n": 13, "head": "The rest, under the line", "text": "Where the searches read from, as a paragraph of its own.", "x": 19.93, "y": 60.69, "box": [17.85, 58.52, 45.56, 4.33]}]}, {"id": "diagnose", "img": "compare/ui-colour-diagnose.png", "group": "target", "tab": "Diagnose", "title": "Diagnose: sentence case, a note, and a heading for the view", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Diagnose", "measure": {}, "items": [{"n": 12, "head": "Labels in sentence case", "text": "Likely component, First affected stage, Strong match: sentence case, where they were capitals.", "x": 28.82, "y": 83.31, "box": [26.74, 82.39, 18.33, 1.83]}, {"n": 13, "head": "The caution, as a note", "text": "Under the summary, in place of its last sentence.", "x": 27.08, "y": 55.11, "box": [25.0, 54.11, 52.78, 2.0]}, {"n": 11, "head": "Level 3", "text": "The symptom’s heading is announced at level 3, under a level-2 heading naming the view, which is hidden from sight as the open tab shows it.", "x": 27.08, "y": 46.34, "box": [25.0, 44.69, 52.78, 3.31]}]}, {"id": "glossary", "img": "compare/ui-colour-glossary.png", "group": "target", "tab": "Glossary", "title": "A glossary of 96 abbreviations", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, the header’s Glossary button pressed", "measure": {}, "items": [{"n": 10, "head": "Five groups", "text": "Splunk; security and identity; operations; data and protocols; architecture views. Each term with what it stands for and a line on what it is.", "x": 28.26, "y": 13.44, "box": [26.18, 12.11, 4.84, 2.67]}, {"n": 10, "head": "Find", "text": "Narrows the list by abbreviation or word. Escape or Close closes it."}]}, {"id": "abbr", "img": "compare/ui-colour-abbr.png", "group": "target", "tab": "Marks", "title": "First uses marked", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Flow", "measure": {}, "items": [{"n": 10, "head": "S2S", "text": "Its first use on the view is marked with what it stands for, Splunk-to-Splunk; a click opens the glossary at it.", "x": 84.61, "y": 49.95, "box": [83.75, 49.07, 1.71, 1.78]}]}, {"id": "ov-dark-today", "img": "compare/ui-colour-ov-dark-today.png", "group": "today", "tab": "OV dark today", "title": "Build 237: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, OV-1 in OV’s dark theme", "measure": {}, "items": [{"n": 1, "head": "A light strip", "text": "Light text on a light ground: 1.34:1, its numbers 1.03:1. A pale frame round the sheet."}, {"n": 1, "head": "Thread numbers", "text": "White on light blue, 1.56:1."}, {"n": 7, "head": "Not set", "text": "A brown chip."}]}, {"id": "ov-status-today", "img": "compare/ui-colour-ov-status-today.png", "group": "today", "tab": "OV status today", "title": "Build 237: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, CV-7 in OV’s light theme", "measure": {}, "items": [{"n": 7, "head": "Not deployed", "text": "Red here and on SvcV-5, brown on SvcV-1, plain on SvcV-3b."}]}, {"id": "components-today", "img": "compare/ui-colour-components-today.png", "group": "today", "tab": "Components today", "title": "Build 237: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Flow’s component cards", "measure": {}, "items": [{"n": 5, "head": "Two pairs alike", "text": "All components and HEC Delivery one green; Splunk DB Connect and the Ingest Processor one purple."}, {"n": 4, "head": "The Indexer and Amazon S3", "text": "Amber and orange here; the Failure Lab and the route boxes drew them the other way round."}]}, {"id": "stages-today", "img": "compare/ui-colour-stages-today.png", "group": "today", "tab": "Stage cards today", "title": "Build 237: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Flow with the Indexer chosen", "measure": {}, "items": [{"n": 6, "head": "Pipelines in colour", "text": "Each pipeline tag in capitals and a colour of its own, from the components’ set."}]}, {"id": "failure-today", "img": "compare/ui-colour-failure-today.png", "group": "today", "tab": "Failure Lab today", "title": "Build 237: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, the Failure Lab", "measure": {}, "items": [{"n": 7, "head": "One red", "text": "High and critical in one red, words alone."}]}, {"id": "lineage-today", "img": "compare/ui-colour-lineage-today.png", "group": "today", "tab": "Lineage today", "title": "Build 237: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Operate › Detection lineage", "measure": {}, "items": [{"n": 3, "head": "Missing, green", "text": "In green, the colour of available."}]}, {"id": "operate-today", "img": "compare/ui-colour-operate-today.png", "group": "today", "tab": "Operate today", "title": "Build 237: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Operate › Capacity model", "measure": {}, "items": [{"n": 9, "head": "The subject as heading", "text": "Indexer durability boundary, under Capacity and exhaustion model; the menu says Capacity model."}]}, {"id": "pack-today", "img": "compare/ui-colour-pack-today.png", "group": "today", "tab": "Pack today", "title": "Build 237: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Operate › Alert and dashboard pack", "measure": {}, "items": [{"n": 13, "head": "55 words", "text": "Two sentences before the page’s content."}]}, {"id": "diagnose-today", "img": "compare/ui-colour-diagnose-today.png", "group": "today", "tab": "Diagnose today", "title": "Build 237: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Diagnose", "measure": {}, "items": [{"n": 12, "head": "Capitals", "text": "Likely causes ranked, Likely component, Strong match, in capitals."}, {"n": 13, "head": "Three sentences", "text": "The caution ran on in the first paragraph."}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 237 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.filter(it=>it.x!=null).forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
