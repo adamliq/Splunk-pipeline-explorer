@@ -1,0 +1,148 @@
+/* Build 237: the fixes and improvements from the review of every UI element. Each part names its item. */
+.vh237{position:absolute!important;width:1px!important;height:1px!important;margin:-1px!important;padding:0!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
+
+/* 3 and 16. OV: the views grouped by viewpoint above the tabs; the two stay together at the top while a view scrolls. */
+.ovNav237{position:sticky;top:0;z-index:9;background:#e1ebf0;border-bottom:1px solid #c1d1dc}
+.theme-dark .ovNav237{background:#102637;border-color:#37566b}
+.ovNav237 .ovTabs135{position:static;border-bottom:0;background:transparent;padding-top:6px}
+.ovGroups237{display:flex;flex-wrap:wrap;gap:6px;padding:9px 10px 0}
+.ovGroups237 button{display:inline-flex;align-items:center;gap:6px;min-height:28px;border:1px solid #a9c1cd;border-radius:999px;padding:4px 11px;background:transparent;color:#244b61;font:600 12px/1.2 inherit;font-family:inherit;cursor:pointer}
+.ovGroups237 button small{min-width:18px;border-radius:9px;padding:0 5px;background:#cfdde5;color:#244b61;font-size:11px;text-align:center}
+.ovGroups237 button[aria-pressed="true"]{background:#244b61;border-color:#244b61;color:#fff}
+.ovGroups237 button[aria-pressed="true"] small{background:#fff;color:#244b61}
+.ovGroups237 button:focus-visible{outline:2px solid #176d86;outline-offset:2px}
+.theme-dark .ovGroups237 button{border-color:#5b8196;color:#e7f5f7}
+.theme-dark .ovGroups237 button small{background:#24495e;color:#e7f5f7}
+.theme-dark .ovGroups237 button[aria-pressed="true"]{background:#e7f5f7;border-color:#e7f5f7;color:#102637}
+.theme-dark .ovGroups237 button[aria-pressed="true"] small{background:#102637;color:#e7f5f7}
+.theme-dark .ovGroups237 button:focus-visible{outline-color:#8bd9e8}
+.ovTabs135 [data-ov-tab].ovOther237{display:none}
+.ovPick237{display:none}
+.ovHead135 p.ovHeadView237{font-weight:600}
+@media(max-width:760px){
+ .ovGroups237,.ovNav237 .ovTabs135{display:none}
+ .ovPick237{display:flex;align-items:center;gap:8px;padding:8px 10px}
+ .ovPick237 span{color:#244b61;font-size:12px;font-weight:700}
+ .theme-dark .ovPick237 span{color:#e7f5f7}
+ .ovPick237 select{flex:1;min-width:0;min-height:40px;border:1px solid #a9c1cd;border-radius:8px;padding:6px 8px;background:#f4f8fa;color:#143d55;font:600 14px/1.2 inherit;font-family:inherit}
+ .theme-dark .ovPick237 select{border-color:#5b8196;background:#183a4d;color:#e7f5f7}
+}
+@media print{.ovGroups237,.ovPick237{display:none!important}.ovNav237{position:static;border:0;background:none}}
+
+/* 19. The extra title bar 16 views opened with: the view's title block already names it. Print keeps it. */
+@media screen{#ovWorkspace135 .ovSectionTitle135{display:none}}
+
+/* 4 and 17. Operate: headed groups; on a desktop the list stays in view and scrolls on its own; on a phone, one list. */
+.opsGroup237{display:flex;flex-direction:column;gap:5px}
+.opsGroup237+.opsGroup237{margin-top:9px}
+.opsGroup237>p{margin:2px 11px;color:#93a6b6;font-size:11px;font-weight:700;letter-spacing:.08em;line-height:1.5;text-transform:uppercase}
+.opsPick237{display:none}
+@media(min-width:821px){
+ .operationsMode.active{overflow:clip}
+ .operationsMode.active>.operationsNav{position:sticky;top:var(--opsTop237,96px);align-self:start;max-height:calc(100vh - var(--opsTop237,96px) - 12px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+}
+@media(max-width:820px){
+ .operationsMode.active>.operationsNav{display:none}
+ .opsPick237{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid var(--line);background:#0b1620}
+ .opsPick237 span{color:var(--muted);font-size:12px;font-weight:700}
+ .opsPick237 select{flex:1;min-width:0;min-height:42px;border:1px solid #315368;border-radius:8px;padding:6px 10px;background:#132635;color:var(--text);font:600 15px/1.2 inherit;font-family:inherit}
+}
+
+/* 18. The header on a phone: no tagline; a search button beside the views, which sit in one row. */
+.searchToggle237{display:none}
+@media(max-width:820px){
+ body:not(.builderView) .headcopy p{display:none}
+ body:not(.builderView) .shell>header{margin-bottom:10px}
+ body:not(.builderView) .toolbar{display:grid!important;grid-template-columns:44px minmax(0,1fr);gap:8px;padding:8px}
+ body:not(.builderView) .searchToggle237{position:relative;display:inline-flex;align-items:center;justify-content:center;grid-column:1;grid-row:1;width:44px;height:44px;border:1px solid var(--line);border-radius:10px;background:#0f1d29;color:var(--text);cursor:pointer}
+ body:not(.builderView) .searchToggle237 svg{width:19px;height:19px}
+ body:not(.builderView) .searchToggle237[aria-expanded="true"]{border-color:#57c7e8;background:#132635}
+ body:not(.builderView) .searchToggle237:focus-visible{outline:2px solid #57c7e8;outline-offset:2px}
+ .searchToggle237 .searchOn237{position:absolute;top:-6px;right:-7px;border-radius:9px;padding:0 5px;background:#57c7e8;color:#04121a;font-size:11px;line-height:17px}
+ body:not(.builderView) .toolbar>.seg{grid-column:2;grid-row:1;display:flex;flex-wrap:nowrap;align-items:center;overflow-x:auto;min-width:0;scrollbar-width:none}
+ body:not(.builderView) .toolbar>.seg::-webkit-scrollbar{display:none}
+ body:not(.builderView) .toolbar>.seg button{flex:0 0 auto;min-height:36px;white-space:nowrap}
+ body:not(.builderView) .toolbar>.search,body:not(.builderView) .toolbar>#pipelineFilter{grid-column:1/-1}
+ body:not(.builderView) .toolbar:not(.open237)>.search,body:not(.builderView) .toolbar:not(.open237)>#pipelineFilter{display:none}
+}
+
+/* 7. Config's tier marks: a sign in each, and a key above the settings; their column is wider for the signs. */
+@media(min-width:781px){.propsLine205{grid-template-columns:34px minmax(0,1fr) minmax(0,auto) 152px}}
+.propsTiers205 i b{margin-right:2px;font-weight:800}
+.propsTierKey237{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px 14px;margin:0;padding:8px 16px 4px;color:#9db7c5;font-size:11px;line-height:1.5}
+.propsTierKey237>b{color:#c5d6e0;font-weight:700}
+.propsTierKey237 span b{margin-right:3px;font-weight:800}
+.propsTierKey237 span:nth-of-type(1) b{color:var(--green)}
+.propsTierKey237 span:nth-of-type(2) b{color:var(--amber)}
+.propsTierKey237 span:nth-of-type(3) b{color:#8a9bab}
+
+/* 10. OV diagrams on screen: no print cap on their height; the widths and label sizes the fit sets. */
+@media screen{
+ #ovWorkspace135 .ov1Page132 svg{max-height:none}
+ #ovWorkspace135 svg[style*="--w237"]{width:var(--w237)!important;min-width:var(--w237)!important;max-width:none!important;height:auto!important;max-height:none!important}
+ #ovWorkspace135 svg :is(text,tspan)[style*="--fs237"]{font-size:var(--fs237)!important}
+}
+
+/* 13. Phone tap targets: at least 24 px. */
+@media(max-width:820px){
+ .builderSheetHandle{position:relative;width:64px!important;height:24px!important;margin:0 auto 2px!important;background:transparent!important}
+ .builderSheetHandle::before{content:"";position:absolute;left:6px;right:6px;top:9px;height:5px;border-radius:99px;background:#7399aa}
+ .cfStageLink228,.propsLink205{display:inline-flex;align-items:center;min-height:24px}
+ .propsRowLine205{min-height:24px}
+ .ihead199 .route199 button{min-height:24px}
+ #ovWorkspace135 :is(.vid>button.vc,.sis>button.si,.m3 th>button,.cvIncrementEditor170>summary){min-height:24px}
+}
+/* 13. The hit circles of OV-1's thread markers and the Builder's link review markers carry their own paint, and the Builder's its
+   radius, in their style attribute (edits thread-hit and edge-marker-hit): earlier rules paint every circle in a marker, the
+   Builder's with an id and !important, and set a review-only marker's circles to r 11. */
+
+/* 14. The Failure Lab's handoff label: 4.0:1 before. */
+.flowBeam .boundaryLabel{color:#a3b3c1}
+/* 8, 9 and 11. No text under 11 px on screen in the app's own panels, in the states the review opened as well: the
+   Failure Lab's Correlate and Inject, the Flow view with pipeline sets, the OV pages' tables and Multi-region & DR, at
+   1440 and 390 px. Generated by docs/mockups/ui-review-text-floor.js as Build 231's floor is, each selector checked on
+   every page and state to match only text at or under 11 px outside SVGs and the Builder's canvas; then narrower
+   selectors for the 26 pieces whose plain selector also matches larger text. Screens only, so print keeps its sizes. */
+@media screen{
+ .accuracyCardHead span{font-size:11px!important}
+ .accuracyHead small{font-size:11px!important}
+ .accuracyNote strong{font-size:11px!important}
+ .causalEvent :is(small,span.causalClass){font-size:11px!important}
+ .correlationQueueHead :is(em,span){font-size:11px!important}
+ .injectionAssessment p{font-size:11px!important}
+ .injectionField label{font-size:11px!important}
+ .injectionMetric small{font-size:11px!important}
+ .injectionNode :is(small,span){font-size:11px!important}
+ .injectionTankHead :is(em,span){font-size:11px!important}
+ .laneMetricHead :is(b,span){font-size:11px!important}
+ .loadModes button.loadMode{font-size:11px!important}
+ .multiComponentHead span{font-size:11px!important}
+ .parallelAccuracy div.accuracyNote{font-size:11px!important}
+ .parallelRouteKey :is(b,span){font-size:11px!important}
+ .queueMini :is(b,span){font-size:11px!important}
+ .routeBox b.pipelineSetNo{font-size:11px!important}
+ .scenarioBtn i.selectMark{font-size:11px!important}
+ .scenarioList div.correlationHint{font-size:11px!important}
+ .selectedFailureChips span.selectedFailureChip{font-size:11px!important}
+ .sharedConstraintBand :is(b,span){font-size:11px!important}
+ .stage span.laneMarker{font-size:11px!important}
+ .timelineRow label{font-size:11px!important}
+ .workBand :is(small,span){font-size:11px!important}
+ .builderValidation small{font-size:11px!important}
+ .ovHead135 small{font-size:11px!important}
+ /* Narrower, by hand: CV-6, CV-7, SV-5b and SvcV-5's matrices; SvcV-3a and 3b; SV-3; SV-10a; SvcV-6; DR's link label. */
+ .activityPage191 .mx thead th,.matrixPage192 .mx thead th{font-size:11px!important}
+ .activityPage191 .mx tbody th.rowh,.matrixPage192 .mx tbody th.rowh{font-size:11px!important}
+ .activityPage191 .mx tfoot th,.matrixPage192 .mx tfoot th{font-size:11px!important}
+ .svcv3Page174 .mx thead th.colh,.svcv3Page174 .mx tfoot th.rowh{font-size:11px!important}
+ .m3 tr.nums th,.m3 tbody th.rh,.m3 tfoot :is(th,td){font-size:11px!important}
+ .rmx tfoot td{font-size:11px!important}
+ .svcScreen172 td.sticky small{font-size:11px!important}
+ .drMap .drConnector.replication{font-size:11px!important}
+}
+/* The Builder's phone controls, which sit inside its canvas on wider screens. */
+@media screen and (max-width:820px){
+ .builderMobileGestureHint b{font-size:11px!important}
+ .builderMobileZoomControls span.builderMobileZoomPercent{font-size:11px!important}
+ .builderPhoneFooter158 div.builderMobileGestureHint{font-size:11px!important}
+}

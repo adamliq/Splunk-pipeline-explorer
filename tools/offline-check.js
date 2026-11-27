@@ -41,7 +41,8 @@ const ok = (name, good, seen) => { good ? pass++ : fail++; console.log(`${good ?
   await page.evaluate(() => switchView('ov'));
   await page.waitForTimeout(1200);
   const tabs = await page.evaluate(() => [...document.querySelectorAll('.ovTabs135 [data-ov-tab]')].map(t => t.dataset.ovTab));
-  for (const t of tabs) { await page.click(`.ovTabs135 [data-ov-tab="${t}"]`); await page.waitForTimeout(250); }
+  // Each tab clicked in the page: since Build 237 a view of another viewpoint is not shown until its viewpoint is chosen.
+  for (const t of tabs) { await page.evaluate(t => document.querySelector(`.ovTabs135 [data-ov-tab="${t}"]`).click(), t); await page.waitForTimeout(250); }
   ok(`OV: all ${tabs.length} tabs drawn`, tabs.length > 0, tabs.length);
 
   // Operations: the evidence pack.

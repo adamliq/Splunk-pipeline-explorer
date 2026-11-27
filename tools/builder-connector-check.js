@@ -45,7 +45,8 @@ const MEASURE=()=>{
   const hit=(a,b)=>a.x<b.x+b.w&&b.x<a.x+a.w&&a.y<b.y+b.h&&b.y<a.y+a.h;
   const labelOverNode=LR?state.builderNodes.some(n=>{const R=node(n.id);return R&&hit(LR,R)}):false;
   // any badge (edge or node) overlapping this label's own rect
-  const badgeOverLabel=LR?[...document.querySelectorAll('.builderEdgeIssueMarker circle,.builderNodeIssueMarker')].some(m=>hit(scr(m.getBoundingClientRect()),LR)):false;
+  // a badge is its drawn circle: Build 237's transparent hit circle under it (circle.hit237) is a larger tap target, not a badge
+  const badgeOverLabel=LR?[...document.querySelectorAll('.builderEdgeIssueMarker circle:not(.hit237),.builderNodeIssueMarker')].some(m=>hit(scr(m.getBoundingClientRect()),LR)):false;
   const ownBadge=g?.querySelector('.builderEdgeIssueMarker');
   // a label deliberately hidden for lack of room (data-label-hidden, v156) keeps only its badge on the line
   const labelHidden=g?.dataset.labelHidden==='true'||zoomHidden;let badgeDist=null;if(labelHidden&&ownBadge){const B=scr(ownBadge.getBoundingClientRect()),c={x:B.x+B.w/2,y:B.y+B.h/2};badgeDist=1e9;for(let t=0;t<=L;t+=3){const q=at(t);badgeDist=Math.min(badgeDist,Math.hypot(q.x-c.x,q.y-c.y))}badgeDist=Math.round(badgeDist)}
