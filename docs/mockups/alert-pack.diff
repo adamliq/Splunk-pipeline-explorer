@@ -1,0 +1,420 @@
+diff --git a/index.html b/index.html
+--- a/index.html
++++ b/index.html
+@@ -1807 +1807 @@ const changeRegister=[
+-  ['Alert and dashboard pack generation','Generate operational searches for stale clients, drift, failed activation and queue pressure.',false,'Medium'],
++  ['Alert and dashboard pack generation','Generate operational searches for stale clients, drift, failed activation and queue pressure.',true,'Medium'],
+@@ -17183,0 +17184,67 @@ p.fleet233Warn{font-size:13px;margin:6px 0}
++<style id="alert-pack-v236-styles">
++/* Build 236: Operate › Alert and dashboard pack. Text 11 px or more. */
++.ap236Msg{margin:12px 0 0;padding:9px 11px;border-radius:9px;border:1px solid #294153;background:#0b1a25;color:#cfe0ea;font-size:12px;line-height:1.45}
++.ap236Msg:empty{display:none}
++.ap236Msg[data-kind="warn"]{border-color:rgba(243,189,97,.5)}
++.ap236Msg[data-kind="error"]{border-color:rgba(255,107,107,.55);color:#f3d0d0}
++.ap236Msg:focus-visible{outline:2px solid #57c7e8;outline-offset:1px}
++.ap236Body{display:grid;gap:14px;margin-top:15px;min-width:0}
++.ap236Topo,.ap236Settings,.ap236Concern,.ap236Dash,.ap236Files{min-width:0;border:1px solid #213547;border-radius:11px;background:#0a1621;padding:14px}
++.ap236Topo h3,.ap236Settings h3,.ap236Concern h3,.ap236Dash h3,.ap236Files h3{margin:0 0 8px;font-size:16px;color:#e4eef4}
++.ap236Topo ul{margin:0;padding-left:18px;color:#cfe0ea;font-size:12px;line-height:1.55}
++.ap236Topo li+li{margin-top:5px}
++.ap236Topo b,.ap236Derived b,.ap236Summary b{color:#e4eef4}
++.ap236Form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 14px}
++.ap236Field{display:grid;gap:4px;min-width:0;color:#9db7c5;font-size:11px}
++.ap236Field span{color:#b9cad7;font-size:12px}
++.ap236Field small{color:#8fa3b3;font-size:11px}
++.ap236Field input,.ap236Field select{width:100%;min-width:0;box-sizing:border-box;border:1px solid #294052;background:#08131d;color:#e4eef4;border-radius:7px;font-family:inherit;font-size:13px;padding:7px 9px;min-height:32px}
++.ap236Field input:focus,.ap236Field select:focus{border-color:#57c7e8;outline:none}
++.ap236Derived{margin:10px 0 0;color:#b9cad7;font-size:12px}
++.ap236Summary{padding:10px 12px;border:1px solid rgba(87,199,232,.4);border-radius:9px;background:#0b1d29;color:#cfe0ea;font-size:12px}
++.ap236Summary code,.ap236Files code{font-size:12px;color:#d6e7ef}
++.ap236Count{margin-left:6px;font-size:11px;font-weight:600;color:#9db7c5;border:1px solid #2f5268;border-radius:99px;padding:1px 8px;vertical-align:middle}
++.ap236Lead{margin:0 0 10px;color:#b9cad7;font-size:12px;line-height:1.5;max-width:90ch}
++.ap236Search{border-top:1px solid #17293a;padding:12px 0 2px}
++.ap236Search h4{margin:0 0 4px;font-size:14px;color:#e4eef4}
++.ap236Search.off h4{color:#b4c6d2}
++.ap236What{margin:0 0 8px;color:#cfe0ea;font-size:12px;line-height:1.5;max-width:95ch}
++.ap236Off{margin:0;color:#9db7c5;font-size:12px}
++.ap236Meta{display:flex;flex-wrap:wrap;gap:4px 18px;margin:0 0 8px;font-size:12px}
++.ap236Meta div{display:flex;gap:6px}
++.ap236Meta dt{color:#8fa3b3}
++.ap236Meta dd{margin:0;color:#d6e7ef}
++.ap236Catches h5{margin:0 0 4px;font-size:11px;color:#8fa3b3;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
++.ap236Catches ul{margin:0 0 8px;padding-left:18px;color:#b9cad7;font-size:12px;line-height:1.5}
++.ap236Link{display:inline-flex;align-items:center;min-height:24px;vertical-align:baseline;border:0;background:none;color:#7fd6f0;text-decoration:underline;cursor:pointer;font-size:12px;padding:0 2px;font-family:inherit}
++.ap236Link:focus-visible,.ap236Spl summary:focus-visible,.ap236FileList summary:focus-visible,.ap236Sources summary:focus-visible{outline:2px solid #57c7e8;outline-offset:1px}
++.ap236Spl{margin:0 0 8px}
++.ap236Spl summary,.ap236FileList summary,.ap236Sources summary{cursor:pointer;color:#b9d6e4;font-size:12px;min-height:24px;display:list-item}
++.ap236Spl pre,.ap236FileList pre{margin:6px 0 8px;padding:10px 12px;max-height:360px;overflow:auto;border:1px solid #213547;border-radius:8px;background:#060f17;color:#d6e7ef;font-size:12px;line-height:1.5;white-space:pre}
++.ap236Spl .builderBtn{font-size:12px}
++.ap236Notes{margin:0 0 8px;padding-left:18px;color:#9db7c5;font-size:11px;line-height:1.5}
++.ap236DashMap{display:grid;gap:5px;width:100%;max-width:900px;box-sizing:border-box;padding:5px;border:1px solid #213547;border-radius:8px;background:#060f17}
++.ap236Row{display:flex;flex-wrap:wrap;gap:5px;min-width:0}
++.ap236Panel{display:flex;min-width:0;box-sizing:border-box}
++.ap236Panel[data-kind="count"]{min-width:104px}
++.ap236Panel span{display:block;width:100%;box-sizing:border-box;padding:5px 7px;border-radius:5px;background:#10263a;border:1px solid #2a4a62;color:#cfe0ea;font-size:11px;line-height:1.3;overflow-wrap:break-word;min-height:64px}
++.ap236Panel[data-kind="count"] span{min-height:46px}
++.ap236Panel[data-kind="line"] span{min-height:84px}
++.ap236Panel[data-kind="count"] span{background:#0f2d3c;border-color:#2f6a85}
++.ap236Panel[data-kind="line"] span{background:#14253f;border-color:#3d5f9a}
++.ap236FileList{list-style:none;margin:0;padding:0;display:grid;gap:6px}
++.ap236FileList li,.ap236FileList details,.ap236Spl{min-width:0}
++.ap236FileList summary,.ap236FileList summary code{overflow-wrap:anywhere;word-break:break-word}
++.ap236Spl pre,.ap236FileList pre{max-width:100%;box-sizing:border-box}
++.ap236FileList summary span{color:#8fa3b3;font-size:11px;margin-left:4px}
++.ap236Sources{color:#9db7c5;font-size:12px}
++.ap236Sources ul{margin:6px 0 0;padding-left:18px;line-height:1.6}
++.ap236Sources a{color:#7fd6f0;display:inline-flex;align-items:center;min-height:24px}
++@media (max-width:900px){.ap236Form{grid-template-columns:repeat(2,minmax(0,1fr))}}
++@media (max-width:760px){
++ .ap236Form{grid-template-columns:minmax(0,1fr)}
++ .ap236Topo,.ap236Settings,.ap236Concern,.ap236Dash,.ap236Files{padding:12px}
++ .ap236Meta{flex-direction:column}
++ .ap236Link{min-height:24px}
++}
++</style>
+@@ -20416,0 +20484,345 @@ window.scenarios235={KINDS,BUILTIN,LIB,normalize,autoName,settingsText,outcome,r
++<script id="alert-pack-v236">
++// Build 236: the alert and dashboard pack. Operate › Alert and dashboard pack writes, for the topology of the moment, a
++// Splunk app of scheduled alerts and a Dashboard Studio dashboard that watch four things: deployment clients that stop
++// phoning home (stale clients), app downloads and installs that fail (failed activation), clients and Deployment
++// Servers whose app versions differ (drift), and queues that stay full (queue pressure). The searches read what Splunk
++// itself records: the Deployment Server's _dsphonehome, _dsclient and _dsappevent indexes (Splunk 9.2 and later), and
++// metrics.log and splunkd.log in _internal. Each was run on a Splunk 10.6.1.1 Deployment Server and two clients with the
++// condition it looks for made real.
++(function(){
++'use strict';
++if(window.alertPack236)return;
++const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
++const num=v=>Number(v).toLocaleString('en-US');
++const plural=(n,one,many=one+'s')=>`${num(n)} ${n===1?one:many}`;
++const typeName=t=>builderComponents[t]?.name||t;
++const failureOf=id=>failures.find(f=>f.id===id);
++const nodeName=n=>componentInstanceLabel(n);
++const listText=a=>a.length<3?a.join(' and '):a.slice(0,-1).join(', ')+' and '+a[a.length-1];
++// Splunk's pages for what the pack writes and reads.
++const SRC={
++ agent:['agent_management.conf, 10.6','https://help.splunk.com/en/splunk-enterprise/administer/admin-manual/10.6/configuration-file-reference/10.6.0-configuration-file-reference/agent_management.conf'],
++ pre92:['Upgrade pre-9.2 deployment servers','https://help.splunk.com/en/splunk-enterprise/administer/update-your-deployment/10.2/configure-the-agent-management-system/upgrade-pre-9.2-deployment-servers'],
++ retention:['Change the index retention period','https://help.splunk.com/en/splunk-enterprise/administer/update-your-deployment/10.2/troubleshooting/troubleshoot-performance-issues/change-the-index-retention-period'],
++ client:['deploymentclient.conf, 10.6','https://help.splunk.com/en/splunk-enterprise/administer/admin-manual/10.6/configuration-file-reference/10.6.0-configuration-file-reference/deploymentclient.conf'],
++ metrics:['About metrics.log','https://help.splunk.com/en/splunk-enterprise/administer/troubleshoot/10.6/splunk-enterprise-log-files/about-metrics.log'],
++ saved:['savedsearches.conf, 10.6','https://help.splunk.com/en/splunk-enterprise/administer/admin-manual/10.6/configuration-file-reference/10.6.0-configuration-file-reference/savedsearches.conf'],
++ macros:['macros.conf, 10.6','https://help.splunk.com/en/splunk-enterprise/administer/admin-manual/10.6/configuration-file-reference/10.6.0-configuration-file-reference/macros.conf'],
++ app:['app.conf, 10.6','https://help.splunk.com/en/splunk-enterprise/administer/admin-manual/10.6/configuration-file-reference/10.6.0-configuration-file-reference/app.conf'],
++ dashdef:['What is a dashboard definition?','https://help.splunk.com/en/splunk-enterprise/create-dashboards-and-reports/dashboard-studio/10.6/source-code-editor/what-is-a-dashboard-definition'],
++ dashfile:['Create a dashboard using REST API endpoints','https://help.splunk.com/en/splunk-enterprise/create-dashboards-and-reports/dashboard-studio/10.6/manage-dashboards']};
++const link=(key,text)=>`<a href="${SRC[key][1]}" target="_blank" rel="noopener">${esc(text||SRC[key][0])}</a>`;
++
++// ---- Settings: what the person chooses. The topology gives the rest.
++const DEFAULTS={appName:'pipeline_ops_pack',label:'Pipeline operations',every:15,missed:3,fill:80,blocked:50};
++const EVERY=[5,10,15,30,60];
++const LIMITS={missed:[1,20],fill:[50,100],blocked:[1,100]};
++const AP=state.alertPack236={settings:{...DEFAULTS},msg:null};
++// A Splunk app's folder: letters, digits, "_" and "-", starting with a letter.
++const APP_RE=/^[A-Za-z][A-Za-z0-9_-]{0,63}$/;
++function clampInt(v,[lo,hi],dflt){const n=Math.round(Number(v));return Number.isFinite(n)?Math.min(hi,Math.max(lo,n)):dflt}
++// Each setting checked as it is set; a value that can't be used says why and keeps the last good one.
++function setSetting(key,value){
++ const s=AP.settings;
++ if(key==='appName'){const v=String(value).trim();if(!APP_RE.test(v))return 'An app folder name starts with a letter and has only letters, digits, “_” and “-”, at most 64.';s.appName=v;return null}
++ if(key==='label'){const v=String(value).replace(/\s+/g,' ').trim();if(v.length<5||v.length>80)return 'The app’s label is 5 to 80 characters, as app.conf recommends.';if(/^splunk for\b/i.test(v))return 'app.conf says a label must not start “Splunk For”.';s.label=v;return null}
++ if(key==='every'){const v=Number(value);if(!EVERY.includes(v))return 'Choose one of the schedules listed.';s.every=v;return null}
++ if(key in LIMITS){const [lo,hi]=LIMITS[key],n=Number(value);if(!Number.isFinite(n)||Math.round(n)!==n||n<lo||n>hi)return `A whole number from ${lo} to ${hi}.`;s[key]=n;return null}
++ return 'Unknown setting.'}
++
++// ---- What the topology says: its Deployment Servers and their clients, its forwarders and indexers.
++// Splunk components whose queues metrics.log reports, by what they do on the event path.
++const FORWARDER_TYPES=new Set(['uf','hf','dbConnect','apiCollector']);
++const INDEXING_TYPES=new Set(['hf','dbConnect','apiCollector','idx','hecEndpoint']);
++const SEARCH_TYPES=['monitoringConsole','search','shcMember','shcCluster'];
++// The output group the Generate page writes into outputs.conf: a forwarder's output queue is tcpout_<group>.
++const OUTPUT_GROUP='primary_receivers';
++function topology(){
++ const nodes=state.builderNodes||[],rels=state.builderRelations||[];
++ const ds=nodes.filter(n=>n.type==='ds');
++ const clientRels=rels.filter(r=>r.type==='deployment_client');
++ const clientIds=[...new Set(clientRels.map(r=>r.to))];
++ const clients=clientIds.map(id=>nodes.find(n=>n.id===id)).filter(Boolean);
++ const intervals=clientRels.map(r=>Number(r.phoneHome)).filter(v=>Number.isFinite(v)&&v>0);
++ const children=id=>nodes.filter(n=>n.parent===id);
++ const forwarders=nodes.filter(n=>FORWARDER_TYPES.has(n.type)&&children(n.id).length>0);
++ const indexing=nodes.filter(n=>INDEXING_TYPES.has(n.type));
++ const searchTier=SEARCH_TYPES.map(t=>nodes.find(n=>n.type===t)).find(Boolean)||null;
++ // A Deployment Server sends its _ds indexes on if the topology gives it an event path to an indexer.
++ const reachesIndexer=n=>{const seen=new Set(),walk=id=>children(id).some(c=>{if(seen.has(c.id))return false;seen.add(c.id);return c.type==='idx'||walk(c.id)});return walk(n.id)};
++ return {nodes,ds,clients,clientRels,interval:intervals.length?Math.max(...intervals):60,intervalFromTopology:intervals.length>0,intervals:[...new Set(intervals)].sort((a,b)=>a-b),
++  forwarders,indexing,searchTier,dsForwarding:ds.filter(reachesIndexer)}}
++// A client counts as stale after this many seconds without a phone home: the missed phone homes at the topology's
++// longest interval, plus Splunk's own 20 seconds of slack (agent_management.conf's offline search adds 20 s too).
++const staleSeconds=(t,s=AP.settings)=>s.missed*t.interval+20;
++const duration=sec=>sec<120?`${num(sec)} s`:sec<7200?`${num(Math.round(sec/6)/10)} min`:`${num(Math.round(sec/360)/10)} h`;
++
++// ---- The searches. Each is what a scheduled alert runs, and the dashboard's panel runs the same SPL.
++// The thresholds are macros, so they can be changed in Splunk without editing a search.
++const MACRO={stale:'pipeline_ops_stale_seconds',fill:'pipeline_ops_queue_fill_pct',blocked:'pipeline_ops_blocked_share_pct'};
++const m=k=>'`'+MACRO[k]+'`';
++// Client names: _dsclient keeps each client's name, host and address (60 days by default).
++const NAMES='[search index=_dsclient earliest=-60d | stats latest(data.name) AS client latest(data.hostname) AS hostname latest(data.ip) AS ip latest(data.splunkVersion) AS version BY data.clientId]';
++const SEVERITY={3:'warning',4:'error',5:'severe'};
++const CONCERNS=[
++ {id:'stale',label:'Stale clients',what:'Deployment clients that stop phoning home.'},
++ {id:'failed',label:'Failed activation',what:'App downloads and installs that fail on a client.'},
++ {id:'drift',label:'Drift',what:'Clients behind the app versions their Deployment Server serves, and Deployment Servers that serve one app at different versions.'},
++ {id:'queue',label:'Queue pressure',what:'Queues that stay full, and forwarding that stops.'}];
++function searches(t=topology(),s=AP.settings){
++ const noDs='There’s no Deployment Server in this topology. Add one in the Builder: the pattern Regional Deployment Server tier adds three.';
++ const win=`-${s.every}m`;
++ const list=[
++ {id:'stale',concern:'stale',name:'Stale deployment clients',
++  what:`Clients whose last phone home is more than ${duration(staleSeconds(t,s))} ago: ${s.missed} missed phone ${s.missed===1?'home':'homes'} at ${duration(t.interval)}${t.intervalFromTopology?(t.intervals.length>1?', the longest interval in this topology,':', this topology’s interval,'):', Splunk’s default interval,'} plus 20 s. Each client is named from _dsclient.`,
++  applies:t.ds.length>0,why:noDs,earliest:'-7d',suppress:['data.clientId','24h'],severity:3,
++  spl:['| tstats max(data.lastPhoneHomeTime) AS last_phonehome values(host) AS deployment_server WHERE index=_dsphonehome earliest=-7d BY data.clientId',
++   '| eval silent_seconds=now()-last_phonehome',`| where silent_seconds > ${m('stale')}`,`| join type=left data.clientId ${NAMES}`,'| sort 0 - silent_seconds',
++   '| eval last_phonehome=strftime(last_phonehome, "%F %T %z"), silent=tostring(silent_seconds, "duration")',
++   '| table client hostname ip deployment_server last_phonehome silent version data.clientId'],
++  notes:['_dsphonehome keeps phone homes 7 days by default: a client silent for longer drops out of this search, as it drops out of Agent Management.',
++   'Agent Management’s count of offline agents (query_agents_offline, agent_management.conf) counts an agent offline once its silence passes 1.05 times its average interval plus 20 s, the average taken over the whole window: a client that was off for a while has a long average, and is counted late. This search uses the interval the topology sets instead.'],
++  catches:[['deployment-server-unreachable','Its clients can’t reach it, so their phone homes stop.'],['deployment-tls-expiry','Clients can’t complete TLS with it, so their phone homes stop.']]},
++ {id:'failed',concern:'failed',name:'Failed app downloads and installs',
++  what:'Apps whose latest download or install on a client didn’t end Ok, on clients that phoned home in the last 24 hours, as Agent Management’s list of agents with errors has it. The reason is the one the client reported.',
++  applies:t.ds.length>0,why:noDs,earliest:'-7d',suppress:['data.clientId,app','24h'],severity:4,
++  spl:['index=_dsappevent earliest=-7d (data.action=Download OR data.action=Install)',
++   '| eval download_result=if(\'data.action\'=="Download", \'data.result\', null()), install_result=if(\'data.action\'=="Install", \'data.result\', null()), failed_reason=if(\'data.result\'!="Ok", replace(\'data.failedReason\', "^\'(.*)\'$", "\\1"), null())',
++   '| stats latest(download_result) AS download_result latest(install_result) AS install_result latest(failed_reason) AS failed_reason latest(data.serverClassName) AS server_class count(eval(\'data.result\'!="Ok")) AS failed_attempts max(_time) AS last_attempt BY host data.clientId data.appName',
++   '| where download_result!="Ok" OR install_result!="Ok"',
++   '| join type=inner data.clientId [| tstats max(data.lastPhoneHomeTime) AS last_phonehome WHERE index=_dsphonehome earliest=-24h BY data.clientId]',
++   `| join type=left data.clientId ${NAMES}`,
++   '| eval failed_at=if(download_result!="Ok", "download", "install"), last_attempt=strftime(last_attempt, "%F %T %z")',
++   '| rename host AS deployment_server, data.appName AS app',
++   '| table client hostname deployment_server server_class app failed_at failed_reason failed_attempts last_attempt data.clientId'],
++  notes:['A client that keeps failing records a failed install at each attempt: the alert names it once a day, with the count.'],
++  catches:[['deployment-activation-failure','The download ends Ok and the install doesn’t.'],['deployment-app-download-fails','The download doesn’t end Ok.'],['deployment-app-validation-fails','The install doesn’t complete.']]},
++ {id:'drift-clients',concern:'drift',name:'Clients behind their Deployment Server',
++  what:'Clients whose installed copy of an app has a different checksum from the one their Deployment Server serves now: the checksum of the app’s latest download from that server. An app taken off a client is left out.',
++  applies:t.ds.length>0,why:noDs,earliest:'-60d',suppress:['data.clientId,app','24h'],severity:3,
++  spl:['index=_dsappevent earliest=-60d data.result=Ok (data.action=Download OR data.action=Install OR data.action=Uninstall)',
++   '| eval served=if(\'data.action\'=="Download", \'data.checksum\', null()), installed=if(\'data.action\'=="Install", \'data.checksum\', null())',
++   '| eventstats latest(served) AS served_checksum BY host data.appName',
++   '| stats latest(data.action) AS last_action latest(installed) AS installed_checksum values(served_checksum) AS served_checksum max(_time) AS last_change BY host data.clientId data.appName',
++   '| where last_action!="Uninstall" AND isnotnull(installed_checksum) AND installed_checksum!=served_checksum',
++   `| join type=left data.clientId ${NAMES}`,
++   '| eval last_change=strftime(last_change, "%F %T %z")',
++   '| rename host AS deployment_server, data.appName AS app',
++   '| table client hostname deployment_server app installed_checksum served_checksum last_change data.clientId'],
++  notes:['A stale client is behind as soon as its Deployment Server serves a new version: it shows here and in Stale deployment clients.','_dsappevent keeps 60 days by default: an app installed earlier than that has no install to compare.'],
++  catches:[['event-healthy-config-stale','A client that forwards events but runs an older app than its server serves.'],['deployment-activation-failure','After a failed install the client keeps the version it had.']]},
++ {id:'drift-servers',concern:'drift',name:'Deployment Servers out of step',
++  what:'Apps that different Deployment Servers serve at different checksums: each server’s latest download of the app, compared across servers.',
++  applies:t.ds.length>1,why:t.ds.length?'This topology has one Deployment Server: there’s no other to compare it with.':noDs,earliest:'-60d',suppress:['app','24h'],severity:4,
++  spl:['index=_dsappevent earliest=-60d data.action=Download data.result=Ok',
++   '| stats latest(data.checksum) AS served_checksum max(_time) AS last_download BY host data.appName',
++   '| stats dc(served_checksum) AS versions values(host) AS deployment_servers values(served_checksum) AS checksums max(last_download) AS last_download BY data.appName',
++   '| where versions > 1',
++   '| eval last_download=strftime(last_download, "%F %T %z")',
++   '| rename data.appName AS app',
++   '| table app versions deployment_servers checksums last_download'],
++  notes:['It compares the servers that serve one app: in a Deployment Server cluster or a regional tier, the servers that should agree.'],
++  catches:[['deployment-content-drift','Each server’s latest download of the app gives a different checksum.']]},
++ {id:'queue',concern:'queue',name:'Queue pressure',
++  what:`Queues whose average fill over the last ${s.every} minutes is ${s.fill}% or more, or that reported blocked=true in ${s.blocked}% of their reports or more. A pipeline queue’s fill is current_size_kb of max_size_kb; an output queue (tcpout_<group>) reports bytes, current_size of max_size.`,
++  applies:t.forwarders.length+t.indexing.length>0,why:'There’s no forwarder or indexer in this topology.',earliest:win,suppress:['host,queue','1h'],severity:4,
++  spl:['index=_internal source=*metrics.log* sourcetype=splunkd group=queue',
++   '| eval fill_pct=round(100*coalesce(current_size_kb/max_size_kb, current_size/max_size), 1), blocked_report=if(blocked=="true", 1, 0)',
++   '| stats count AS reports avg(fill_pct) AS avg_fill_pct max(fill_pct) AS max_fill_pct sum(blocked_report) AS blocked_reports max(blocked_count) AS max_blocked_count BY host name',
++   '| eval avg_fill_pct=round(avg_fill_pct, 1), blocked_share_pct=round(100*blocked_reports/reports, 0)',
++   `| where avg_fill_pct >= ${m('fill')} OR blocked_share_pct >= ${m('blocked')}`,
++   '| sort 0 - avg_fill_pct','| rename name AS queue',
++   '| table host queue avg_fill_pct max_fill_pct blocked_reports reports blocked_share_pct max_blocked_count'],
++  notes:['metrics.log reports each queue about every 30 seconds. Splunk’s page About metrics.log calls a few scattered blocked reports flow control, normal on a busy indexer, and many in a row data that isn’t flowing: hence a share of the reports, not one.'],
++  catches:[['parsing-blocked','parsingqueue reports blocked=true.'],['typing-regex','typingqueue fills behind an expensive regex.'],['index-stall','indexqueue reports blocked=true.'],['receiver-down','The output queue fills to its limit.'],['ack','With useACK the output queue holds each block until the receiver acknowledges it.']]},
++ {id:'forwarding',concern:'queue',name:'Forwarding blocked',
++  what:'Forwarders whose splunkd says it paused the data flow to an output group, with how long the longest pause had lasted.',
++  applies:t.forwarders.length>0,why:'There’s no forwarder that sends on in this topology.',earliest:win,suppress:['host,output_group','1h'],severity:4,
++  spl:['index=_internal sourcetype=splunkd component=TcpOutputProc log_level=WARN "paused the data flow"',
++   '| rex "inside output group (?<output_group>\\S+) from host_src=(?<host_src>\\S+) has been blocked for blocked_seconds=(?<blocked_for>\\d+)"',
++   '| fillnull value="(not named)" output_group',
++   '| stats max(blocked_for) AS longest_blocked_seconds count AS warnings max(_time) AS last_warning BY host output_group',
++   '| eval longest_blocked=tostring(longest_blocked_seconds, "duration"), last_warning=strftime(last_warning, "%F %T %z")',
++   '| table host output_group longest_blocked warnings last_warning'],
++  notes:[`splunkd repeats the warning every 10 seconds while the flow stays paused. ${t.forwarders.length?`In this topology the forwarders send to the group the Generate page writes, ${OUTPUT_GROUP}: their output queue is tcpout_${OUTPUT_GROUP}.`:''}`],
++  catches:[['receiver-down','splunkd pauses the flow when no receiver takes the data.'],['management-healthy-event-broken','Phone homes go on while forwarding is paused.']]}];
++ return list.map(x=>({...x,schedule:s.every===60?'0 * * * *':`*/${s.every} * * * *`,every:s.every,title:`${s.label} - ${x.name}`}))}
++const scheduleText=s=>s.every===60?'every hour':`every ${s.every} minutes`;
++const throttleText=x=>`once ${x.suppress[1]==='24h'?'a day':'an hour'} for each ${x.suppress[0].split(',').map(f=>({'data.clientId':'client',app:'app',host:'host',queue:'queue',output_group:'output group'}[f]||f)).join(' and ')}`;
++const windowText=x=>({'-7d':'the last 7 days','-60d':'the last 60 days'}[x.earliest]||`the last ${x.every} minutes`);
++
++// ---- The app: its files, as Splunk reads them, and a .tar.gz of them to install.
++const VIEW='pipeline_operations';
++const escXml=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
++const oneLine=v=>String(v).replace(/\s+/g,' ').trim();
++// A setting's value over several lines: each line but the last ends in a backslash, as .conf files continue a value.
++// Splunk keeps the newline and drops the backslash (checked on 10.6.1.1), so nothing comes before the backslash.
++const confLines=lines=>lines.join('\\\n');
++function summaryText(t){const parts=[plural(t.nodes.length,'component')];if(t.ds.length)parts.push(`${plural(t.ds.length,'Deployment Server')} with ${plural(t.clients.length,'deployment client')}`);
++ if(t.forwarders.length)parts.push(plural(t.forwarders.length,'forwarder'));const idx=t.nodes.filter(n=>n.type==='idx').length;if(idx)parts.push(plural(idx,'indexer'));return parts.join(', ')}
++const QUEUE_TREND=['index=_internal source=*metrics.log* sourcetype=splunkd group=queue',
++ '| eval fill_pct=round(100*coalesce(current_size_kb/max_size_kb, current_size/max_size), 1), series=host.": ".name',
++ '| timechart span=5m limit=10 useother=false avg(fill_pct) BY series'];
++const key=x=>x.id.replace(/-/g,'_');
++// The dashboard, as Dashboard Studio's definition: a count of each alert's results across the top, then each alert's
++// results in a table (the alert's own search), then the queues' fill over the last four hours.
++function dashboard(t=topology(),s=AP.settings,list=searches(t,s)){
++ const on=list.filter(x=>x.applies),W=1440,dataSources={},visualizations={},structure=[];let y=0;
++ if(!on.length)return null;
++ const n=on.length,w=Math.floor(W/n);
++ on.forEach((x,i)=>{const k=key(x);
++  dataSources[`ds_${k}`]={type:'ds.search',name:x.name,options:{query:x.spl.join('\n'),queryParameters:{earliest:x.earliest,latest:'now'}}};
++  dataSources[`ds_${k}_count`]={type:'ds.chain',name:`${x.name}, counted`,options:{extend:`ds_${k}`,query:'| stats count'}};
++  visualizations[`viz_${k}_count`]={type:'splunk.singlevalue',title:x.name,dataSources:{primary:`ds_${k}_count`}};
++  structure.push({item:`viz_${k}_count`,type:'block',position:{x:i*w,y,w:i===n-1?W-i*w:w,h:130}})});
++ y+=130;
++ on.forEach(x=>{const k=key(x);visualizations[`viz_${k}`]={type:'splunk.table',title:x.name,description:x.what,dataSources:{primary:`ds_${k}`}};
++  structure.push({item:`viz_${k}`,type:'block',position:{x:0,y,w:W,h:260}});y+=260});
++ if(on.some(x=>x.id==='queue')){dataSources.ds_queue_fill={type:'ds.search',name:'Queue fill over time',options:{query:QUEUE_TREND.join('\n'),queryParameters:{earliest:'-4h',latest:'now'}}};
++  visualizations.viz_queue_fill={type:'splunk.line',title:'Queue fill over the last 4 hours, percent (the 10 fullest queues)',dataSources:{primary:'ds_queue_fill'}};
++  structure.push({item:'viz_queue_fill',type:'block',position:{x:0,y,w:W,h:320}});y+=320}
++ return {title:s.label,description:`Generated by the Splunk Pipeline Explorer for ${summaryText(t)}. Each table runs its alert’s search.`,
++  inputs:{},defaults:{},visualizations,dataSources,layout:{type:'grid',options:{width:W},structure,globalInputs:[]}}}
++function files(t=topology(),s=AP.settings,list=searches(t,s),when=new Date()){
++ const on=list.filter(x=>x.applies),app=s.appName,day=when.toISOString().slice(0,10);
++ if(!on.length)return [];
++ const stamp=`# Generated by the Splunk Pipeline Explorer, Build 236, on ${day}, for a topology of ${summaryText(t)}.`;
++ const usesMacro=k=>on.some(x=>x.spl.join('\n').includes('`'+MACRO[k]+'`'));
++ const macros=[stamp,'# The alerts’ thresholds: change a definition here, and every search that uses it follows.'];
++ if(usesMacro('stale'))macros.push('',`[${MACRO.stale}]`,`definition = ${staleSeconds(t,s)}`,`description = Seconds without a phone home before a deployment client counts as stale: ${s.missed} missed phone ${s.missed===1?'home':'homes'} at ${t.interval} s, plus 20 s.`);
++ if(usesMacro('fill'))macros.push('',`[${MACRO.fill}]`,`definition = ${s.fill}`,'description = A queue’s average fill, in percent, over the alert’s window, at which Queue pressure alerts.');
++ if(usesMacro('blocked'))macros.push('',`[${MACRO.blocked}]`,`definition = ${s.blocked}`,'description = The share of a queue’s metrics.log reports, in percent, that say blocked=true, at which Queue pressure alerts.');
++ const saved=[stamp,`# ${plural(on.length,'alert')}, each run ${scheduleText(s)}. Each alerts for every result, once per throttle period, and is kept on the Triggered Alerts page.`];
++ for(const x of on)saved.push('',`[${x.title}]`,`description = ${oneLine(x.what)}`,`search = ${confLines(x.spl)}`,`dispatch.earliest_time = ${x.earliest}`,'dispatch.latest_time = now',
++  'enableSched = 1',`cron_schedule = ${x.schedule}`,'schedule_window = auto','counttype = number of events','relation = greater than','quantity = 0',
++  'alert.track = 1',`alert.severity = ${x.severity}`,'alert.digest_mode = 0','alert.suppress = 1',`alert.suppress.fields = ${x.suppress[0]}`,`alert.suppress.period = ${x.suppress[1]}`);
++ const dash=dashboard(t,s,list),json=JSON.stringify(dash,null,4);
++ if(json.includes(']]>'))throw Error('The dashboard’s definition can’t hold “]]>”');
++ const view=[`<dashboard version="2" theme="dark">`,`    <label>${escXml(s.label)}</label>`,`    <description>${escXml(dash.description)}</description>`,
++  '    <definition><![CDATA[',json,'    ]]></definition>','    <meta type="hiddenElements"><![CDATA[','{','    "hideEdit": false,','    "hideOpenInSearch": false,','    "hideExport": false','}','    ]]></meta>','</dashboard>'];
++ const appConf=[stamp,'[install]','is_configured = false','','[ui]','is_visible = true',`label = ${s.label}`,'','[launcher]','author = Splunk Pipeline Explorer',
++  'description = Alerts and a dashboard for stale deployment clients, failed app installs, drift and queue pressure, written for one topology.','version = 1.0.0','','[package]','check_for_updates = false'];
++ const nav=['<nav search_view="search">',`    <view name="${VIEW}" default="true" />`,'    <view name="search" />','    <view name="alerts" />','</nav>'];
++ const meta=['# Everyone can read the app’s alerts, macros and dashboard; admins change them.','[]','access = read : [ * ], write : [ admin ]','export = none'];
++ const readme=[`${s.label} (${app})`,'',`Generated by the Splunk Pipeline Explorer, Build 236, on ${day}, for a topology of ${summaryText(t)}.`,'',
++  'What it holds:',...on.map(x=>`- ${x.title}: ${oneLine(x.what)} Runs ${scheduleText(s)}; severity ${SEVERITY[x.severity]}.`),
++  `- The dashboard ${s.label} (${VIEW}): a count of each alert's results, each alert's results in a table, and the queues' fill over 4 hours.`,'',
++  installText(t,false),'',
++  'The thresholds are macros in default/macros.conf. Change them in Settings > Advanced search > Search macros, or in a local/macros.conf.'];
++ const out=[[`${app}/default/app.conf`,appConf],[`${app}/default/macros.conf`,macros],[`${app}/default/savedsearches.conf`,saved],[`${app}/default/data/ui/views/${VIEW}.xml`,view],
++  [`${app}/default/data/ui/nav/default.xml`,nav],[`${app}/metadata/default.meta`,meta],[`${app}/README.txt`,readme]];
++ return out.map(([path,lines])=>({path,text:lines.join('\n')+'\n'}))}
++// Where the pack goes: a search head that searches the indexers. The deployment alerts need the _ds indexes there.
++function installText(t,html=true){const b=v=>html?`<b>${esc(v)}</b>`:v;
++ const where=t.searchTier?`on ${b(nodeName(t.searchTier))}, which searches the indexers`:'on a search head that searches your indexers, or on the Monitoring Console';
++ if(!t.ds.length)return `Install it ${where}.`;
++ const fwd=t.dsForwarding.length?` In this topology ${listText(t.dsForwarding.map(n=>b(nodeName(n))))} ${t.dsForwarding.length===1?'sends':'send'} events to an indexer.`:'';
++ return `Install it ${where}. The deployment alerts read _dsphonehome, _dsclient and _dsappevent: a Deployment Server on Splunk 9.2 or later forwards them with its other internal logs when it forwards to the indexers, and indexers need them defined if they are older than 9.2. A Deployment Server that keeps them can run the pack itself.${fwd}`}
++// A .tar.gz of the files, as a Splunk app package: ustar headers, each file in 512-byte blocks, two empty blocks at the end.
++function tarBytes(list,mtime=Math.floor(Date.now()/1000)){
++ const enc=new TextEncoder(),parts=[],dirs=new Set();
++ for(const f of list){const segs=f.path.split('/');for(let i=1;i<segs.length;i++)dirs.add(segs.slice(0,i).join('/')+'/')}
++ const header=(name,size,type)=>{const h=new Uint8Array(512),put=(s,at,len)=>{const b=enc.encode(s);if(b.length>len)throw Error(`A name too long for a tar header: ${name}`);h.set(b,at)};
++  put(name,0,100);put(type==='5'?'0000755\0':'0000644\0',100,8);put('0000000\0',108,8);put('0000000\0',116,8);
++  put(size.toString(8).padStart(11,'0')+'\0',124,12);put(mtime.toString(8).padStart(11,'0')+'\0',136,12);h.fill(32,148,156);put(type,156,1);
++  put('ustar\0',257,6);put('00',263,2);let sum=0;for(const v of h)sum+=v;put(sum.toString(8).padStart(6,'0')+'\0 ',148,8);return h};
++ for(const d of [...dirs].sort())parts.push(header(d,0,'5'));
++ for(const f of list){const body=enc.encode(f.text);parts.push(header(f.path,body.length,'0'),body);const pad=(512-body.length%512)%512;if(pad)parts.push(new Uint8Array(pad))}
++ parts.push(new Uint8Array(1024));
++ const out=new Uint8Array(parts.reduce((n,p)=>n+p.length,0));let at=0;for(const p of parts){out.set(p,at);at+=p.length}return out}
++async function tarGz(list){if(typeof CompressionStream!=='function')throw Error('This browser can’t compress files: copy each file from the list below instead.');
++ return new Response(new Blob([tarBytes(list)]).stream().pipeThrough(new CompressionStream('gzip'))).blob()}
++function saveBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),0)}
++const size=n=>n<1024?`${n} bytes`:`${(n/1024).toFixed(1)} KB`;
++
++// ---- Operate › Alert and dashboard pack.
++const $c=()=>document.getElementById('operationsContent');
++function say(text,kind='ok'){AP.msg={text,kind}}
++function topoHtml(t){
++ const rows=[];
++ if(t.ds.length)rows.push(`<li><b>Deployment Servers:</b> ${esc(listText(t.ds.map(nodeName)))}. ${t.clients.length?`${plural(t.clients.length,'client')} (${esc(listText(t.clients.map(nodeName)))}), phoning home every ${t.intervals.length?esc(listText(t.intervals.map(v=>`${v} s`))):'60 s'}.`:'No client is connected to one yet: the stale-client threshold uses Splunk’s default interval, 60 s.'}</li>`);
++ else rows.push('<li><b>Deployment Servers:</b> none, so the pack has no deployment alerts. Add one in the Builder: the pattern Regional Deployment Server tier adds three.</li>');
++ const fwd=t.forwarders,ix=t.nodes.filter(n=>n.type==='idx');
++ rows.push(`<li><b>Queues:</b> ${fwd.length||ix.length?`${fwd.length?`${esc(listText(fwd.map(nodeName)))} ${fwd.length===1?'forwards':'forward'} on`:''}${fwd.length&&ix.length?'; ':''}${ix.length?`${esc(listText(ix.map(nodeName)))} ${ix.length===1?'indexes':'index'}`:''}. Queue pressure reads every queue they report in metrics.log.`:'no forwarder or indexer, so the pack has no queue alerts.'}</li>`);
++ rows.push(`<li><b>Where it goes:</b> ${installText(t)}</li>`);
++ return `<section class="ap236Topo" aria-labelledby="ap236-topo"><h3 id="ap236-topo">On this topology</h3><ul>${rows.join('')}</ul></section>`}
++function settingsHtml(t,s){
++ const num=(k,label,unit)=>`<label class="ap236Field"><span>${label}</span><input type="number" inputmode="numeric" data-ap236-set="${k}" value="${s[k]}" min="${LIMITS[k][0]}" max="${LIMITS[k][1]}" step="1"${unit?` aria-describedby="ap236-u-${k}"`:''}>${unit?`<small id="ap236-u-${k}">${unit}</small>`:''}</label>`;
++ return `<section class="ap236Settings" aria-labelledby="ap236-set"><h3 id="ap236-set">Settings</h3><div class="ap236Form">
++  <label class="ap236Field"><span>App folder</span><input type="text" data-ap236-set="appName" value="${esc(s.appName)}" maxlength="64" spellcheck="false" autocomplete="off"></label>
++  <label class="ap236Field"><span>App label</span><input type="text" data-ap236-set="label" value="${esc(s.label)}" maxlength="80" autocomplete="off"></label>
++  <label class="ap236Field"><span>Run the alerts</span><select data-ap236-set="every">${EVERY.map(v=>`<option value="${v}"${v===s.every?' selected':''}>${v===60?'every hour':`every ${v} minutes`}</option>`).join('')}</select></label>
++  ${num('missed','Missed phone homes before a client is stale','phone homes')}${num('fill','Average queue fill that alerts','percent')}${num('blocked','Blocked reports that alert','percent of a queue’s reports')}</div>
++  <p class="ap236Derived">${t.ds.length?`A client is stale after <b>${duration(staleSeconds(t,s))}</b> without a phone home: ${s.missed} × ${t.interval} s + 20 s.`:'With no Deployment Server, only the queue settings are used.'}</p></section>`}
++// An alert that isn't in the pack says why; alerts of one concern left out for one reason say it once, after the last.
++const lcFirst=s=>s.charAt(0).toLowerCase()+s.slice(1);
++function searchHtml(x,t,next){
++ const id=`ap236-h-${x.id}`;
++ if(!x.applies)return `<article class="ap236Search off" data-ap236-search="${x.id}" aria-labelledby="${id}"><h4 id="${id}">${esc(x.name)}</h4>${next&&!next.applies&&next.why===x.why?'':`<p class="ap236Off">Not in this pack: ${esc(lcFirst(x.why))}</p>`}</article>`;
++ const catches=x.catches.filter(([f])=>failureOf(f)).map(([f,why])=>`<li><button type="button" class="ap236Link" data-ap236-failure="${f}">${esc(failureOf(f).name)}</button> ${esc(why)}</li>`).join('');
++ return `<article class="ap236Search" data-ap236-search="${x.id}" aria-labelledby="${id}"><h4 id="${id}">${esc(x.name)}</h4><p class="ap236What">${esc(x.what)}</p>
++  <dl class="ap236Meta"><div><dt>Runs</dt><dd>${esc(scheduleText(AP.settings))}, over ${esc(windowText(x))}</dd></div><div><dt>Alerts</dt><dd>for each result, ${esc(throttleText(x))}</dd></div><div><dt>Severity</dt><dd>${SEVERITY[x.severity]}</dd></div></dl>
++  ${catches?`<div class="ap236Catches"><h5>Catches, in the Failure Lab</h5><ul>${catches}</ul></div>`:''}
++  <details class="ap236Spl"><summary>The search, ${x.spl.length} lines</summary><pre><code>${esc(x.spl.join('\n'))}</code></pre><button type="button" class="builderBtn" data-ap236-copy="${x.id}">Copy the search</button></details>
++  ${x.notes?.length?`<ul class="ap236Notes">${x.notes.filter(Boolean).map(v=>`<li>${esc(v)}</li>`).join('')}</ul>`:''}</article>`}
++function concernHtml(c,list,t){const own=list.filter(x=>x.concern===c.id),n=own.filter(x=>x.applies).length;
++ return `<section class="ap236Concern" data-ap236-concern="${c.id}" aria-labelledby="ap236-c-${c.id}"><h3 id="ap236-c-${c.id}">${esc(c.label)} <span class="ap236Count">${n?plural(n,'alert'):'none in this pack'}</span></h3><p class="ap236Lead">${esc(c.what)}</p>${own.map((x,i)=>searchHtml(x,t,own[i+1])).join('')}</section>`}
++function dashHtml(t,s,list){const d=dashboard(t,s,list);if(!d)return '';
++ // The layout's rows, each panel as wide as its share of the row: the titles wrap rather than get cut off, and on a
++ // narrow screen the counts wrap onto more rows.
++ const items=d.layout.structure,rows=[];for(const i of items){let r=rows.find(r=>r.y===i.position.y);if(!r)rows.push(r={y:i.position.y,items:[]});r.items.push(i)}
++ const boxes=rows.map(r=>`<div class="ap236Row">${r.items.map(i=>{const v=d.visualizations[i.item],kind={'splunk.singlevalue':'count','splunk.table':'table','splunk.line':'line'}[v.type];
++  return `<div class="ap236Panel" data-kind="${kind}" style="flex:${i.position.w} 1 0"><span>${esc(v.title)}</span></div>`}).join('')}</div>`).join('');
++ const counts=items.filter(i=>d.visualizations[i.item].type==='splunk.singlevalue').length,tables=items.filter(i=>d.visualizations[i.item].type==='splunk.table').length,line=items.some(i=>d.visualizations[i.item].type==='splunk.line');
++ return `<section class="ap236Dash" aria-labelledby="ap236-dash"><h3 id="ap236-dash">The dashboard</h3><p class="ap236Lead">${esc(s.label)}, a Dashboard Studio dashboard and the app’s home page: ${plural(counts,'count')} across the top, ${plural(tables,'table')}, one for each alert and running its search${line?', and the queues’ fill over the last 4 hours':''}.</p>
++  <div class="ap236DashMap" aria-hidden="true">${boxes}</div></section>`}
++function filesHtml(list){if(!list.length)return '';
++ return `<section class="ap236Files" aria-labelledby="ap236-files"><h3 id="ap236-files">The app’s files</h3><p class="ap236Lead">${plural(list.length,'file')}, ${esc(size(list.reduce((n,f)=>n+new TextEncoder().encode(f.text).length,0)))} in all. The download is these files as a .tar.gz, the form Splunk installs an app from.</p><ul class="ap236FileList">${list.map((f,i)=>`<li><details data-ap236-file="${i}"><summary><code>${esc(f.path)}</code> <span>${esc(size(new TextEncoder().encode(f.text).length))}</span></summary><pre><code>${esc(f.text)}</code></pre></details></li>`).join('')}</ul></section>`}
++function renderAlertPack(){
++ const root=$c();if(!root)return;
++ const t=topology(),s=AP.settings,list=searches(t,s),fl=files(t,s,list),on=list.filter(x=>x.applies).length,msg=AP.msg;
++ root.innerHTML=`<div class="opsHero"><div><small>Alert and dashboard pack</small><h2>Alerts and a dashboard that watch this topology</h2><p>A Splunk app of scheduled searches for stale deployment clients, failed app downloads and installs, drift and queue pressure, written for the topology in the Builder, with a dashboard that shows what each alert finds. The searches read what Splunk records: the Deployment Server’s _dsphonehome, _dsclient and _dsappevent indexes, and metrics.log and splunkd.log in _internal.</p></div>
++  <div class="opsControls"><button type="button" class="builderBtn" data-ap236-download${on?'':' disabled'}>Download the app (.tar.gz)</button></div></div>
++  <p class="ap236Msg" role="status" tabindex="-1"${msg?` data-kind="${msg.kind}"`:''}>${msg?esc(msg.text):''}</p>
++  <div class="ap236Body">${topoHtml(t)}${settingsHtml(t,s)}
++  <div class="ap236Summary">${on?`<b>${plural(on,'alert')}</b> for this topology, ${esc(scheduleText(s))}, in the app <code>${esc(s.appName)}</code>.`:'<b>Nothing to watch yet:</b> add a Deployment Server, a forwarder or an indexer in the Builder.'}</div>
++  ${CONCERNS.map(c=>concernHtml(c,list,t)).join('')}${dashHtml(t,s,list)}${filesHtml(fl)}
++  <details class="ap236Sources"><summary>Splunk’s pages for these searches and files</summary><ul>${Object.keys(SRC).map(k=>`<li>${link(k)}</li>`).join('')}</ul></details></div>`;
++ wire(root)}
++// Draw again with the keyboard focus where it was.
++function rerender(sel){const a=document.activeElement,k=a?.dataset?.ap236Set;renderAlertPack();const root=$c();if(!root)return;
++ const el=sel?root.querySelector(sel):k?root.querySelector(`[data-ap236-set="${k}"]`):null;el?.focus({preventScroll:true})}
++function openFailure(id){if(!failureOf(id))return;
++ Object.assign(state,{failureCorrelation:false,failureInjectionMode:false,failure:id,highlightFailure:false});renderFailures();render();switchView('failure');window.scrollTo?.(0,0);
++ const b=document.querySelector(`#scenarioList .scenarioBtn[data-failure="${CSS.escape(id)}"]`);b?.focus({preventScroll:true});b?.scrollIntoView?.({block:'nearest'})}
++// The message line changes in place, so the focus and any selection stay where they are; role=status reads it out.
++function showMsg(){const p=$c()?.querySelector('.ap236Msg');if(!p)return;const m=AP.msg;p.textContent=m?m.text:'';if(m)p.dataset.kind=m.kind;else delete p.dataset.kind}
++async function copySearch(x,btn){const text=x.spl.join('\n');
++ try{if(!navigator.clipboard?.writeText)throw Error('no clipboard');await navigator.clipboard.writeText(text);say(`Copied the search “${x.name}”.`)}
++ catch{const code=btn.closest('details')?.querySelector('code');if(code){const r=document.createRange();r.selectNodeContents(code);const sel=getSelection();sel.removeAllRanges();sel.addRange(r)}say(`This browser didn’t allow copying: the search “${x.name}” is selected, to copy with the keyboard.`,'warn')}
++ showMsg()}
++async function download(){const t=topology(),s=AP.settings,fl=files(t,s);if(!fl.length)return;
++ try{const blob=await tarGz(fl);saveBlob(blob,`${s.appName}.tar.gz`);say(`Downloaded ${s.appName}.tar.gz: ${plural(fl.length,'file')}, ${size(blob.size)}. Install it from Apps › Manage Apps › Install app from file, or unpack it into $SPLUNK_HOME/etc/apps and restart.`)}
++ catch(e){say(e.message,'error')}
++ showMsg()}
++function wire(root){
++ root.querySelectorAll('[data-ap236-set]').forEach(el=>el.addEventListener('change',()=>{const k=el.dataset.ap236Set,err=setSetting(k,el.value);
++  if(err){say(err,'error');el.value=AP.settings[k];rerender();return}AP.msg=null;rerender()}));
++ root.querySelectorAll('[data-ap236-set]').forEach(el=>{if(el.type==='text')el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();el.dispatchEvent(new Event('change'))}})});
++ root.querySelectorAll('[data-ap236-failure]').forEach(b=>b.onclick=()=>openFailure(b.dataset.ap236Failure));
++ root.querySelectorAll('[data-ap236-copy]').forEach(b=>b.onclick=()=>{const x=searches().find(v=>v.id===b.dataset.ap236Copy);if(x)copySearch(x,b)});
++ root.querySelector('[data-ap236-download]')?.addEventListener('click',download)}
++
++// ---- Operate's menu: Alert and dashboard pack after Generate, which writes the topology's configuration.
++const opsGen=document.querySelector('.operationsNav [data-operations-view="generate"]');
++if(opsGen){const b=document.createElement('button');b.type='button';b.dataset.operationsView='alert-pack';b.textContent='Alert and dashboard pack';b.className=opsGen.className.replace(/\bactive\b/,'').trim();
++ b.onclick=()=>{state.operationsView='alert-pack';AP.msg=null;renderOperations()};opsGen.after(b)}
++const renderOperationsBefore236=renderOperations;
++renderOperations=function(...args){
++ if(state.operationsView!=='alert-pack')return renderOperationsBefore236.apply(this,args);
++ $$('.operationsNav button').forEach(b=>b.classList.toggle('active',b.dataset.operationsView===state.operationsView));renderAlertPack()};
++// For the checks: the model, the searches and the files, as the page writes them.
++window.alertPack236={DEFAULTS,EVERY,LIMITS,MACRO,CONCERNS,SRC,VIEW,OUTPUT_GROUP,settings:()=>AP.settings,setSetting,topology,staleSeconds,searches,dashboard,files,tarBytes,tarGz,
++ render:renderAlertPack,openFailure};
++})();
++</script>
