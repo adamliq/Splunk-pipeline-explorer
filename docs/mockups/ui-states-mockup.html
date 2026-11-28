@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>States and Focus Changes</title>
+<style>
+/* Builder look: dark, the canvas palette. */
+:root{--page:#070f17;--panel:#0c1823;--panel-2:#102131;--ink:#e4eef4;--ink-2:#b4c6d2;--muted:#8aa0b0;--rule:#24465a;--accent:#57c7e8;--accent-ink:#04121a;--today:#ff8d8d;--target:#8fe0b8;
+ --font:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--font)}
+.wrap{max-width:1500px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;font:600 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--accent)}
+h1{margin:10px 0 6px;font:700 24px/1.2 var(--font);text-wrap:balance}
+.lede{margin:0;max-width:92ch;color:var(--ink-2)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px;align-items:center}
+.tabs .sep{width:1px;align-self:stretch;background:var(--rule);margin:0 6px}
+.tabs button{font:600 12.5px/1 var(--font);padding:9px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}
+.tabs button[data-group="today"]{border-style:dashed}
+.tabs button[aria-selected="true"]{border-color:var(--accent);color:var(--ink);background:var(--panel-2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button[data-group="today"][aria-selected="true"]{border-color:var(--today);box-shadow:inset 0 -3px 0 var(--today)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+figure{margin:0;min-width:0}
+.shot{position:relative;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#04090e}
+.shot img{display:block;width:100%;height:auto}
+.marker{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-ink);background:var(--accent);color:var(--accent-ink);font:800 13px/24px var(--font);text-align:center;box-shadow:0 0 0 3px rgba(87,199,232,.35),0 2px 8px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.today .marker{background:var(--today);box-shadow:0 0 0 3px rgba(255,141,141,.35),0 2px 8px rgba(0,0,0,.6)}
+.marker:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hl{position:absolute;border:2px dashed var(--accent);border-radius:8px;background:rgba(87,199,232,.08);pointer-events:none;display:none}
+.today .hl{border-color:var(--today);background:rgba(255,141,141,.08)}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:8px;color:var(--muted);font-size:12.5px}
+figcaption b{color:var(--ink)}
+.notes{border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px}
+.notes h2{margin:0 0 4px;font:700 15px/1.3 var(--font)}
+.notes .kind{font:600 11px var(--mono);letter-spacing:.06em;color:var(--target)}
+.today .notes .kind{color:var(--today)}
+.notes ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px;border-radius:8px;border:1px solid transparent;cursor:default}
+.notes li.on{border-color:var(--rule);background:var(--panel-2)}
+.notes li .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 12px/24px var(--font);text-align:center}
+.today .notes li .n{background:var(--today)}
+.notes li b{display:block;font-weight:650;margin-bottom:2px}
+.notes li span{color:var(--ink-2);font-size:13px}
+.panel{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);padding:14px 16px}
+.panel h2{margin:0 0 8px;font:700 15px/1.3 var(--font)}
+.rules dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0}
+.rules dt{color:var(--accent);font:600 12.5px/1.5 var(--mono)}
+.rules dd{margin:0;color:var(--ink-2)}
+.map{overflow-x:auto}
+.map table{border-collapse:collapse;width:100%;min-width:620px;font-size:13px}
+.map th,.map td{text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--rule)}
+.map th{color:var(--muted);font:600 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-top:0}
+.map td:first-child{color:var(--ink);white-space:nowrap}
+.map td{color:var(--ink-2)}
+.map b{color:var(--ink);font-weight:600}
+.foot{margin-top:14px;color:var(--muted);font-size:12px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){h1{font-size:20px}.marker{width:22px;height:22px;font:800 11px/18px var(--font)}.rules dl{grid-template-columns:minmax(0,1fr)}.rules dt{margin-top:6px}}
+.map td code,.rules dd code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.notes{min-width:0;overflow-wrap:anywhere}
+.panel p{margin:0 0 10px;color:var(--ink-2);font-size:13px}
+.panel a{color:inherit}
+.panel td:first-child{white-space:nowrap}
+.marker{width:auto;min-width:22px;padding:0 5px;border-radius:11px}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <span class="pill">MOCKUP · BUILD 239 TARGET · BUILD 238 + PROTOTYPE</span>
+ <h1>States and focus</h1>
+ <p class="lede">A visual audit of Build 238 asked whether people can tell what is clickable, what is selected, what belongs together and what needs attention; a review of every UI element asked what each one does with a mouse, a keyboard and a screen reader. Build 239 makes the 13 findings (F1 to F13) and the 11 items (U1 to U11) that came out of them, 22 changes where two overlap, and fixes a bug found on the way: a click in ten OV views showed OV-1. The pictures are 1440 px windows, Build 238 and the prototype; the markers name the finding or item.</p>
+ <div class="tabs" role="tablist" aria-label="Scenes" id="tabs"></div>
+ <div class="stage" id="stage">
+  <figure>
+   <div class="shot" id="shot"><img id="img" alt=""><div class="hl" id="hl"></div></div>
+   <figcaption><span id="cap"></span><span id="size"></span></figcaption>
+  </figure>
+  <aside class="notes" aria-live="polite"><span class="kind" id="kind"></span><h2 id="title"></h2><ol id="list"></ol></aside>
+ </div>
+ <section class="panel map">
+  <h2>Build 238 against the prototype</h2>
+  <table>
+   <thead><tr><th>#</th><th>Where</th><th>Build 238</th><th>With the prototype</th></tr></thead>
+   <tbody>
+    <tr><td>OV</td><td>Clicks in ten OV views</td><td>A click anywhere in OV-5a, OV-6c, CV-6, CV-7, SvcV-5, SV-3, SV-5b, SV-10a, SV-10c or StdV-1 showed OV-1: their handlers found the page’s own data-view</td><td>Each view acts only on its own links</td></tr>
+    <tr><td>F1</td><td>OV’s view tabs, keyboard focus</td><td>The outline in the header’s own colour (1:1)</td><td>A 2 px ring, 9.74:1; 4.86:1 on the light tab bar</td></tr>
+    <tr><td>F2</td><td>A refused number</td><td>A red border only; the old value in force without a word</td><td>The rule under the field, with a sign, read with it</td></tr>
+    <tr><td>F3</td><td>Operate’s list, symptoms, scenarios</td><td>Chosen and hover told apart by fills 1.07:1 apart</td><td>Chosen: cyan border and bar, aria-current or aria-pressed; hover: a border</td></tr>
+    <tr><td>F4</td><td>The view switcher</td><td>The open view a fill 1.38:1 from the rest; no hover</td><td>A cyan underline and aria-current; a hover fill</td></tr>
+    <tr><td>F5</td><td>Header figures and Glossary</td><td>Drawn alike</td><td>Figures plain; the button with a 3.92:1 border and a sign</td></tr>
+    <tr><td>F6</td><td>Authentication cards</td><td>A click changed nothing visible</td><td>Cyan all round, a fill, aria-pressed</td></tr>
+    <tr><td>F7</td><td>Text fields and lists</td><td>Borders 1.4 to 1.72:1</td><td>#5b7489, 3.71 to 3.92:1; cyan with focus</td></tr>
+    <tr><td>F8</td><td>The pointer</td><td>On 212 things that do nothing</td><td>Only on what acts</td></tr>
+    <tr><td>F9</td><td>Native control parts</td><td>Drawn for a light page</td><td>color-scheme: dark; OV’s light theme light</td></tr>
+    <tr><td>F10</td><td>Focus styles</td><td>The browser’s ring on most; hover’s border in OV’s header</td><td>One 2 px ring, 2 px out, cyan; OV in its theme’s colour</td></tr>
+    <tr><td>F11</td><td>Colour meanings</td><td>Selection green; a secondary action and a likely cause red</td><td>Selection cyan; secondary neutral; the likeliest cause in the accent</td></tr>
+    <tr><td>F12</td><td>Builder canvas cards</td><td>Edges 2.72 to 2.87:1</td><td>3:1 or more</td></tr>
+    <tr><td>F13</td><td>Operate’s field boxes</td><td>Three levels of the same outline</td><td>Fields without boxes; sections outlined</td></tr>
+    <tr><td>U1</td><td>Rows that act</td><td>The Matrix’s 125 rows and DIV-1’s 10 out of keyboard reach</td><td>Each takes focus; Enter and Space act</td></tr>
+    <tr><td>U3</td><td>Controls with no focus look</td><td>36: SvcV-3a and 3b column heads, CV-2’s selected entry, OV-3’s count</td><td>A ring on each</td></tr>
+    <tr><td>U4</td><td>The Builder’s modal dialogs</td><td>Tab left the Insert dialog and the presentation</td><td>The page behind inert while open; Escape closes the Insert dialog</td></tr>
+    <tr><td>U5</td><td>Focus on close</td><td>Lost after the review popup and the Insert dialog</td><td>Back on the marker, the Insert button, or the menu</td></tr>
+    <tr><td>U6</td><td>Builder link names</td><td>“data relationship 2”; markers alike for every link</td><td>Named by their ends; markers by their link</td></tr>
+    <tr><td>U7</td><td>AV-1’s sheet</td><td>Named by an id no element had</td><td>Named by its own title</td></tr>
+    <tr><td>U8</td><td>SV-1 and SV-2 targets on a phone</td><td>11 to 19 px, no room around them</td><td>Tags 24 px or more; links 24 px thick, each with its tag</td></tr>
+    <tr><td>U9</td><td>“Show affected stages”</td><td>A fixed 340 px, above the stages</td><td>The first highlighted stage, below the toolbar</td></tr>
+    <tr><td>U10</td><td>Rank badges</td><td>The match line flush left</td><td>Centred, padded</td></tr>
+    <tr><td>U11</td><td>The alert pack’s files</td><td>Stamped Build 236</td><td>The page’s own build</td></tr>
+   </tbody>
+  </table>
+ </section>
+ <section class="panel rules">
+  <h2>Where the design comes from</h2>
+  <dl>
+   <dt>Focus</dt><dd>Keyboard focus is visible (Focus Visible), with a ring 3:1 or more against what is around it (Non-text Contrast), one style everywhere.</dd>
+   <dt>States</dt><dd>A chosen entry, card or view is shown by more than a fill: a 3:1 border or bar, and a state a screen reader reads (aria-current, aria-pressed).</dd>
+   <dt>Boundaries</dt><dd>A field’s edge, a card’s edge and a button’s edge are 3:1 or more against the ground (Non-text Contrast).</dd>
+   <dt>Errors</dt><dd>A refused value is described in words, under the field and tied to it (Error Identification), with a sign as well as a colour (Use of Color).</dd>
+   <dt>Pointer and keyboard</dt><dd>What acts on a click acts from the keyboard (Keyboard), and the pointer is kept for what acts. A modal dialog keeps focus and gives it back. Targets are 24 px or more, or have an equivalent that is (Target Size, Minimum).</dd>
+  </dl>
+ </section>
+ <section class="panel rules">
+  <h2>Sources</h2>
+  <dl>
+   <dt>WCAG 2.2</dt><dd><a href="https://www.w3.org/WAI/WCAG22/Understanding/focus-visible.html">Focus Visible</a>, <a href="https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html">Non-text Contrast</a>, <a href="https://www.w3.org/WAI/WCAG22/Understanding/error-identification.html">Error Identification</a>, <a href="https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html">Use of Color</a>, <a href="https://www.w3.org/WAI/WCAG22/Understanding/keyboard.html">Keyboard</a>, <a href="https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html">Target Size (Minimum)</a>.</dd>
+   <dt>ARIA</dt><dd><a href="https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/">The modal dialog pattern</a>; <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-current">aria-current</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-pressed">aria-pressed</a>.</dd>
+   <dt>MDN</dt><dd><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inert">The inert attribute</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme">color-scheme</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible">:focus-visible</a>.</dd>
+  </dl>
+ </section>
+ <p class="foot">Handoff: <code>docs/builder-handoff-ui-states.md</code> · Prototype: a new script block, its styles and in-place edits to Build 238, in <code>docs/mockups/ui-states.diff</code>.</p>
+</div>
+<script>
+const SCENES=[{"id": "toolbar", "img": "compare/ui-states-toolbar.png", "group": "target", "tab": "Toolbar", "title": "What is open, what is chosen, what has focus", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Flow; keyboard focus on a path chip, the pointer on Matrix", "measure": {}, "items": [{"n": "F4", "head": "The open view", "text": "Underlined in cyan, 9:1 on the bar, and marked aria-current.", "x": 51.98, "y": 14.13, "box": [49.98, 12.1, 3.99, 4.06]}, {"n": "F4", "head": "Hover", "text": "Matrix, under the pointer, lifts to #10202d with white text.", "x": 56.06, "y": 14.13, "box": [53.98, 12.1, 4.76, 4.06]}, {"n": "F5", "head": "Figures", "text": "125 stages, 13 components, 65 failures: plain text, no longer drawn like a button.", "x": 70.25, "y": 5.16, "box": [68.17, 3.23, 22.0, 3.86]}, {"n": "F5", "head": "Glossary", "text": "The header’s one button: a 3.92:1 border and a ? sign.", "x": 93.5, "y": 5.16, "box": [91.42, 3.44, 6.77, 3.44]}, {"n": "F7", "head": "Fields", "text": "Search and the pipeline list: #5b7489 borders, 3.74:1.", "x": 4.86, "y": 13.88, "box": [2.78, 11.66, 28.73, 4.94]}, {"n": "F11", "head": "The chosen path", "text": "Complete model in the selection’s cyan; green stays for “runs”.", "x": 7.32, "y": 22.19, "box": [5.24, 20.05, 9.87, 4.28]}, {"n": "F10", "head": "Keyboard focus", "text": "A 2 px cyan ring, 2 px out: the same ring on every control.", "x": 38.69, "y": 22.19, "box": [36.61, 20.05, 19.35, 4.28]}]}, {"id": "diagnose", "img": "compare/ui-states-diagnose.png", "group": "target", "tab": "Diagnose", "title": "Chosen, hovered and ranked", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Diagnose; the pointer on the third symptom", "measure": {}, "items": [{"n": "F3", "head": "Chosen", "text": "A cyan border and bar (9.34:1) and aria-pressed.", "x": 4.58, "y": 50.97, "box": [2.5, 48.74, 19.44, 6.47]}, {"n": "F3", "head": "Hover", "text": "A #5b7489 border only, not a fill like the chosen one’s.", "x": 4.58, "y": 63.91, "box": [2.5, 61.69, 19.44, 8.12]}, {"n": "F11", "head": "Strong match", "text": "In the accent, cyan; red stays for failures. A possible match is neutral, a secondary check muted.", "x": 27.99, "y": 74.06, "box": [27.39, 72.73, 1.2, 2.67]}, {"n": "U10", "head": "Rank badge", "text": "“97% match” centred, with room around it.", "x": 27.99, "y": 76.92, "box": [26.6, 75.39, 2.78, 3.06]}]}, {"id": "affected", "img": "compare/ui-states-affected.png", "group": "target", "tab": "Affected", "title": "“Show affected stages” lands on them", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Flow, after the Failure Lab’s “Show affected stages”", "measure": {}, "items": [{"n": "U9", "head": "The first highlighted stage", "text": "Just below the sticky toolbar, at 1440 and 390 px.", "x": 84.79, "y": 13.25, "box": [82.71, 11.02, 15.49, 19.81]}]}, {"id": "failure", "img": "compare/ui-states-failure.png", "group": "target", "tab": "Failure Lab", "title": "A chosen scenario; a secondary button", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, the Failure Lab", "measure": {}, "items": [{"n": "F3", "head": "Chosen scenario", "text": "A cyan border and bar, and aria-pressed.", "x": 4.58, "y": 60.22, "box": [2.5, 58.0, 19.44, 7.11]}, {"n": "F11", "head": "Show affected stages", "text": "A secondary button, neutral: the failure red is for failures.", "x": 86.21, "y": 44.86, "box": [84.12, 42.63, 12.47, 4.72]}]}, {"id": "auth", "img": "compare/ui-states-auth.png", "group": "target", "tab": "Auth cards", "title": "The chosen card shows", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Operate › Authentication boundaries, the second card clicked", "measure": {}, "items": [{"n": "F6", "head": "The chosen card", "text": "Cyan all round (9.5:1), its kind’s colour kept on the left, a lifted fill, aria-pressed.", "x": 39.81, "y": 44.11, "box": [37.73, 41.89, 19.25, 16.26]}, {"n": "F3", "head": "The open page", "text": "In Operate’s list: a cyan border and bar, and aria-current.", "x": 4.79, "y": 46.54, "box": [2.71, 44.33, 12.85, 4.42]}]}, {"id": "fleet", "img": "compare/ui-states-fleet.png", "group": "target", "tab": "Fields", "title": "A refused number says why", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Operate › Multi-DS management › Server capacity, −5 typed in CPU cores", "measure": {}, "items": [{"n": "F2", "head": "Why", "text": "“Enter 1 to 256. Until then, 12 stays in use.”, with a sign, under the field and read with it; the red border stays.", "x": 35.89, "y": 43.22, "box": [33.81, 41.24, 15.19, 3.94]}, {"n": "F13", "head": "No boxes", "text": "Label and field group each field; the section keeps its outline.", "x": 51.71, "y": 40.0, "box": [49.62, 37.78, 15.33, 12.92]}, {"n": "F7", "head": "Borders", "text": "#5b7489, 3:1 or more; the field with focus turns cyan.", "x": 67.67, "y": 43.22, "box": [65.58, 41.24, 15.19, 3.94]}, {"n": "F9", "head": "Arrows", "text": "The number fields’ arrows are drawn for a dark page.", "x": 83.55, "y": 43.22, "box": [81.47, 41.24, 15.2, 3.94]}]}, {"id": "capacity", "img": "compare/ui-states-capacity.png", "group": "target", "tab": "Capacity", "title": "Fields without boxes", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Operate › Capacity model", "measure": {}, "items": [{"n": "F13", "head": "Seven fields", "text": "Without boxes, aligned with the section.", "x": 19.93, "y": 61.08, "box": [17.85, 58.85, 25.88, 8.53]}, {"n": "F7", "head": "Borders", "text": "3.81:1 on the panel.", "x": 46.5, "y": 64.31, "box": [44.42, 62.47, 25.74, 3.7]}, {"n": "F8", "head": "Rows", "text": "The table’s rows no longer take a pointer: a click on them does nothing."}]}, {"id": "matrix", "img": "compare/ui-states-matrix.png", "group": "target", "tab": "Matrix", "title": "A row with keyboard focus", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, the Matrix; Tab to the fourth row", "measure": {}, "items": [{"n": "U1", "head": "Rows take focus", "text": "Tab reaches each of the 125 rows; Enter opens the stage, Escape brings focus back. DIV-1’s ten relationship rows too.", "x": 3.96, "y": 52.82, "box": [1.87, 50.6, 97.0, 6.5]}]}, {"id": "ov-tabs", "img": "compare/ui-states-ov-tabs.png", "group": "target", "tab": "OV tabs", "title": "OV’s open view with keyboard focus", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, OV-1 in OV’s dark theme", "measure": {}, "items": [{"n": "F1", "head": "A ring", "text": "#8bd9e8, 9.74:1 on the header; #176d86 on the light theme’s tab bar. The header’s buttons take it too, distinct from their hover.", "x": 4.51, "y": 29.06, "box": [2.43, 27.33, 7.69, 3.44]}]}, {"id": "svcv3", "img": "compare/ui-states-svcv3.png", "group": "target", "tab": "SvcV-3a", "title": "Column heads show focus", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, OV › SvcV-3a", "measure": {}, "items": [{"n": "U3", "head": "S3 Syslog", "text": "A ring inside the cell; and on SvcV-3b, CV-2’s selected entry and OV-3’s count.", "x": 25.81, "y": 91.12, "box": [24.07, 89.24, 3.5, 3.75]}]}, {"id": "insert", "img": "compare/ui-states-insert.png", "group": "target", "tab": "Insert dialog", "title": "Focus stays in the dialog", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, the Builder’s Insert dialog, three Tabs after Cancel", "measure": {}, "items": [{"n": "U4", "head": "Back in the dialog", "text": "The page behind is inert while it is open; Escape closes it; focus goes back to Insert. The presentation does the same.", "x": 23.61, "y": 37.39, "box": [21.53, 35.17, 56.94, 29.66]}]}, {"id": "builder", "img": "compare/ui-states-builder.png", "group": "target", "tab": "Builder", "title": "Canvas cards with a 3:1 edge", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, the Builder", "measure": {}, "items": [{"n": "F12", "head": "Card edges", "text": "Each card’s border mixes more of its tier: 3:1 or more against the canvas.", "x": 9.21, "y": 41.49, "box": [7.13, 39.27, 10.29, 19.41]}, {"n": "U6", "head": "Names", "text": "A link is “data relationship from Syslog Source 1 to Syslog Server 1”; a marker names its link."}]}, {"id": "toolbar-today", "img": "compare/ui-states-toolbar-today.png", "group": "today", "tab": "Toolbar today", "title": "Build 238: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Flow; keyboard focus on a path chip, the pointer on Matrix", "measure": {}, "items": [{"n": "F4", "head": "The open view", "text": "A fill 1.38:1 from the others; no hover style."}, {"n": "F5", "head": "Figures and button alike", "text": "One fill, one 1.48:1 border, one radius."}, {"n": "F7", "head": "Fields", "text": "Borders 1.7:1."}, {"n": "F11", "head": "The chosen path", "text": "Green, the colour of “runs”."}, {"n": "F10", "head": "Focus", "text": "The browser’s own ring."}]}, {"id": "diagnose-today", "img": "compare/ui-states-diagnose-today.png", "group": "today", "tab": "Diagnose today", "title": "Build 238: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Diagnose; the pointer on the third symptom", "measure": {}, "items": [{"n": "F3", "head": "Chosen and hovered alike", "text": "Fills 1.18:1 and 1.1:1 on the ground, 1.07:1 apart."}, {"n": "F11", "head": "Strong match", "text": "In the failure red."}, {"n": "U10", "head": "Rank badge", "text": "The match line flush left, wrapping."}]}, {"id": "affected-today", "img": "compare/ui-states-affected-today.png", "group": "today", "tab": "Affected today", "title": "Build 238: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Flow, after “Show affected stages”", "measure": {}, "items": [{"n": "U9", "head": "Above the stages", "text": "A fixed 340 px: the highlighted stages begin below the screen."}]}, {"id": "failure-today", "img": "compare/ui-states-failure-today.png", "group": "today", "tab": "Failure Lab today", "title": "Build 238: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, the Failure Lab", "measure": {}, "items": [{"n": "F11", "head": "Show affected stages", "text": "In the failure red."}]}, {"id": "auth-today", "img": "compare/ui-states-auth-today.png", "group": "today", "tab": "Auth cards today", "title": "Build 238: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Operate › Authentication boundaries, the second card clicked", "measure": {}, "items": [{"n": "F6", "head": "Nothing shows", "text": "The clicked card looks like the others."}]}, {"id": "fleet-today", "img": "compare/ui-states-fleet-today.png", "group": "today", "tab": "Fields today", "title": "Build 238: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Operate › Multi-DS management › Server capacity, −5 typed", "measure": {}, "items": [{"n": "F2", "head": "A red border", "text": "No words: 12 stays in use without a sign of it."}, {"n": "F13", "head": "Boxes", "text": "A box round each field, inside the section’s."}, {"n": "F9", "head": "White arrows", "text": "The number fields’ arrows drawn for a light page."}]}, {"id": "capacity-today", "img": "compare/ui-states-capacity-today.png", "group": "today", "tab": "Capacity today", "title": "Build 238: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, Operate › Capacity model", "measure": {}, "items": [{"n": "F13", "head": "Boxes", "text": "Seven field boxes; the rows below take a pointer and do nothing."}]}, {"id": "matrix-today", "img": "compare/ui-states-matrix-today.png", "group": "today", "tab": "Matrix today", "title": "Build 238: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, the Matrix; Tab to the fourth row", "measure": {}, "items": [{"n": "U1", "head": "Tab skips the rows", "text": "They open on a click only."}]}, {"id": "ov-tabs-today", "img": "compare/ui-states-ov-tabs-today.png", "group": "today", "tab": "OV tabs today", "title": "Build 238: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, OV-1 in OV’s dark theme", "measure": {}, "items": [{"n": "F1", "head": "No ring", "text": "The outline is the header’s own colour, #102637."}]}, {"id": "svcv3-today", "img": "compare/ui-states-svcv3-today.png", "group": "today", "tab": "SvcV-3a today", "title": "Build 238: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, OV › SvcV-3a", "measure": {}, "items": [{"n": "U3", "head": "No change", "text": "Focus on S3 Syslog changes nothing."}]}, {"id": "insert-today", "img": "compare/ui-states-insert-today.png", "group": "today", "tab": "Insert today", "title": "Build 238: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, the Builder’s Insert dialog, three Tabs after Cancel", "measure": {}, "items": [{"n": "U4", "head": "Focus behind", "text": "On the Glossary button, behind the overlay."}]}, {"id": "builder-today", "img": "compare/ui-states-builder-today.png", "group": "today", "tab": "Builder today", "title": "Build 238: the same", "w": 1440, "h": 900, "zoom": 1, "size": "1440 px window, the Builder", "measure": {}, "items": [{"n": "F12", "head": "Card edges", "text": "2.72 to 2.87:1 against the canvas."}]}];
+const tabs=document.getElementById('tabs'),stage=document.getElementById('stage'),shot=document.getElementById('shot'),img=document.getElementById('img'),hl=document.getElementById('hl'),list=document.getElementById('list');
+let current=null;
+SCENES.forEach((s,i)=>{if(i&&s.group!==SCENES[i-1].group){const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');tabs.append(sep)}const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.id='tab-'+s.id;b.dataset.id=s.id;b.dataset.group=s.group;b.textContent=s.tab;b.onclick=()=>show(s.id);b.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const all=[...tabs.querySelectorAll('button')],n=all[(all.indexOf(b)+(e.key==='ArrowRight'?1:all.length-1))%all.length];n.focus();show(n.dataset.id)};tabs.append(b)});
+function mark(n,on){const s=current;if(!s)return;const it=s.items.find(x=>x.n===n);list.querySelectorAll('li').forEach(li=>li.classList.toggle('on',on&&Number(li.dataset.n)===n));if(on&&it){hl.style.display='block';hl.style.left=it.box[0]+'%';hl.style.top=it.box[1]+'%';hl.style.width=it.box[2]+'%';hl.style.height=it.box[3]+'%'}else hl.style.display='none'}
+function show(id){const s=SCENES.find(x=>x.id===id)||SCENES[0];current=s;
+ tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===s.id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ stage.classList.toggle('today',s.group==='today');stage.setAttribute('role','tabpanel');stage.setAttribute('aria-labelledby','tab-'+s.id);
+ img.src=s.img;shot.style.maxWidth=s.w*s.zoom+'px';img.alt=s.title;document.getElementById('cap').innerHTML='<b>'+s.title+'</b>';document.getElementById('size').textContent=s.size;
+ document.getElementById('kind').textContent=s.group==='today'?'BUILD 238 TODAY':'TARGET';document.getElementById('title').textContent=s.title;
+ shot.querySelectorAll('.marker').forEach(m=>m.remove());hl.style.display='none';
+ s.items.filter(it=>it.x!=null).forEach(it=>{const m=document.createElement('button');m.type='button';m.className='marker';m.textContent=it.n;m.style.left=it.x+'%';m.style.top=it.y+'%';m.setAttribute('aria-label',it.n+'. '+it.head);m.onmouseenter=m.onfocus=()=>mark(it.n,true);m.onmouseleave=m.onblur=()=>mark(it.n,false);shot.append(m)});
+ list.innerHTML=s.items.map(it=>'<li data-n="'+it.n+'" tabindex="0"><span class="n">'+it.n+'</span><span><b>'+it.head+'</b><span>'+it.text+'</span></span></li>').join('');
+ list.querySelectorAll('li').forEach(li=>{const n=Number(li.dataset.n);li.onmouseenter=li.onfocus=()=>mark(n,true);li.onmouseleave=li.onblur=()=>mark(n,false)});
+ try{history.replaceState(null,'','#'+s.id)}catch(e){}}
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>
